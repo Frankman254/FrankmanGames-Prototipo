@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-64: Bloqueo — Rework de los pisos a mano de la cripta (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-64/BLOQUEO.md`.
+
+**Qué se hizo:**
+- **Diagnóstico:** se intentó rediseñar los 5 pisos manuales de `data/dungeons/cripta-tulivieja.json` añadiendo columnas, nichos y formas irregulares.
+- **Bloqueo identificado:** cualquier cambio en la geometría rompe las pruebas de antorchas (`j16_torches`, `tor01_regression`, `tor01_audit`) porque el generador automático de antorchas en `src/world/dungeon.ts` coloca antorchas en las nuevas paredes internas con normales que apuntan a roca.
+- **Causa raíz:** los pisos manuales están estrechamente acoplados con el generador de antorchas. No hay forma de declarar antorchas manuales en el JSON.
+- **Solución requerida:** coordinación con OMP o modificación autorizada del generador de antorchas.
+
+**Validación:** Sin código modificado. Suite intacta (3283/3284, 1 fallo pre-existente de OMP).
+
+**Evidencia:** `work/junie-jl-64/BLOQUEO.md`.
+
 ## 2026-11-21 — JL-63: Auditoría nombre contra modelo (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-63/NOMBRE_MODELO.md`.

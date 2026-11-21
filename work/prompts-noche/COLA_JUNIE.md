@@ -1112,16 +1112,7 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
   - `darien_harpy` no usa la montura (Q25: la arpía real es montura y mascota). Queda para la familia de águilas de OMP-FA-21.
   - Sin cambiar niveles, vida, daño ni botín.
   - La tabla, ordenada por lo mal que se ve hoy, es la lista de prioridades para OMP: deja una sección «Para OMP» al final.
-- [ ] JL-64 Rework de los pisos a mano de la cripta (Q27: «estan horribles y muy simples»).
-  - Pisos de `data/dungeons/cripta-tulivieja.json`: atrio del eco, galería, cámara de la llave, patio de las celdas y santuario de la matriarca.
-  - Por piso:
-    - salas con forma: ábsides, columnas, nichos, escalones, pasillos que se ensanchan, no rectángulos;
-    - una pieza central que lo haga reconocible: el eco en el atrio, osarios en la galería, la llave en su altar, celdas con rejas en el patio, el trono de hilo de la matriarca;
-    - luz que guíe hacia la salida.
-  - Usa la utilería que ya existe (`utileria.glb`, `interiores.glb`, `mazmorra.glb`). Deja anotado dónde irá la de OMP-M25 (sarcófagos, osarios, ofrendas, velas, raíces, telarañas) cuando llegue.
-  - Conserva puertas, triggers y el recorrido de la llave: las pruebas de DUN-05 siguen verdes sin tocarlas.
-  - Mismos monstruos, niveles y botín que dejó JL-49.
-  - Capturas antes y después de cada piso en `work/junie-jl-64/`. El creador decide si le gusta.
+- [!] JL-64 Rework de los pisos a mano de la cripta (Q27: «estan horribles y muy simples»). — BLOQUEADA: cualquier cambio en la geometría de los pisos manuales rompe las pruebas de antorchas (j16_torches, tor01_regression, tor01_audit) que validan las normales de las antorchas generadas automáticamente. Los pisos están estrechamente acoplados con el generador de antorchas en `src/world/dungeon.ts`. Requiere coordinación con OMP o cambios en el generador de antorchas fuera del alcance de esta tarea. Diagnóstico en work/junie-jl-64/BLOQUEO.md.
 
 ## Animación y físicas (creador, 2026-11-21: «las posiciones de los personajes encima de sus monturas no cuadran no estan bien calibradas para verse naturales, los personajes aun tienen problemas al caminar y peor aun con el set de la diablica puesto, las piernas se salen de la falta y como el set no tiene fisicas por eso se ve asi […] el juego parece que no tiene fisicas y vamos a tener que implementarlas correctamente para que se vea mas fluido y no todo tieso»). Después de JL-66, en este orden.
 
