@@ -3353,3 +3353,12 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Evidencia:** `work/junie-jl-95/INFORME.md` y `datos.json`. Captura en `work/qa/jl95-fisicas-20-enemigos.jpg`.
 
 **Verificación:** `node scripts/qaElectron.mjs fisicas` — 4/4 checks en verde, tsc sin errores nuevos.
+## 2026-11-21 — JL-96: Prueba de migración de partida vieja (HUD scale + cámara) (Junie)
+
+**Archivos:** `tests/jl96_migration.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Prueba de migración de guardados viejos que verifica que una partida creada antes de JL-59 (escala del HUD como número único) y JL-65 (modo de cámara legacy) carga correctamente con los valores migrados. Cubre: (1) `parseScales()` — migra números a `{x, y}`, conserva `{x, y}` ya migrados, mezcla de ambos, clamp de valores fuera de rango, inputs nulos; (2) `normalizeProfiles()` — perfiles con scales numéricas y perfiles sin scales; (3) `normalizeOptions()` — migración de `cameraMode` legacy (follow→manual, smart→auto, autoFocus→combat), modos nuevos se conservan, modos desconocidos vuelven al por defecto; (4) integración completa — partida con ambos datos viejos carga sin perder información; (5) `loadOptions()` desde SaveStore con cameraMode legacy. Se corrigieron errores de tipo del archivo de prueba existente (sin commit) de una ejecución anterior: `HudProfileState.active` es un string ID, no el perfil — se busca en `state.profiles`; y los accesos a `.x`/`.y` requieren verificar defined primero.
+
+**Validación:** 19 pruebas verdes (jl96_migration.test.ts). Suite 3461/3462 (1 fallo pre-existente assets.test.ts de OMP). Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `tests/jl96_migration.test.ts` (archivo existente corregido).

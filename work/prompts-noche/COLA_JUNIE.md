@@ -1191,7 +1191,7 @@ Reglas comunes de toda la bolsa:
 - [x] JL-95 Escenario `fisicas`: 20 personajes con físicas secundarias (JL-70). Medir ms por fotograma y FPS, y guardar la cifra en el informe. — commit «JL-95: escenario fisicas — 20 personajes, 63 fps, delta 5.8 ms» — 4/4 checks en verde, INFORME.md y datos.json en work/junie-jl-95/.
 
 ### Pruebas que faltan
-- [ ] JL-96 Prueba de migración de una partida vieja «dorada»: una partida de antes de JL-59 y JL-65 carga con la escala del HUD y el modo de cámara correctos.
+- [x] JL-96 Prueba de migración de una partida vieja «dorada»: una partida de antes de JL-59 y JL-65 carga con la escala del HUD y el modo de cámara correctos. — commit «JL-96: prueba de migración de partida vieja (HUD scale + cámara)» — 19 pruebas verdes (jl96_migration.test.ts), suite 3461/3462, tsc limpio (solo balM3.ts ajeno), push OK. Evidencia en tests/jl96_migration.test.ts.
 - [ ] JL-97 El modo de lanzar (JL-66) se guarda y se recupera con la partida y las opciones. Prueba.
 - [ ] JL-98 Cobertura i18n: todas las cadenas nuevas de JL-59…72 existen en cada idioma del juego. Prueba que falle si falta alguna.
 - [ ] JL-99 La tabla de JL-63 nombre ↔ modelo pasa a ser un guion (`scripts/audit/nombreModelo.ts`) que la regenera en `work/`, con una prueba que limite el número de discordancias a las de hoy (no puede subir).
