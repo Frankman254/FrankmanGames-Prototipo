@@ -432,6 +432,9 @@ async function newGame(name, { island = false, crossed = false, devMount = false
     await js(`(()=>{ try{ const o=JSON.parse(localStorage.getItem('frankmangames.options')||'null'); if(o){o.language='es'; localStorage.setItem('frankmangames.options',JSON.stringify(o)); } }catch(e){} })()`);
     // JL-73: borrar las posiciones del HUD guardadas para que cada escenario use las por defecto.
     await js(`(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); if(s){ for(const p of (s.profiles||[])) p.positions={}; localStorage.setItem('frankmangames.hudProfiles',JSON.stringify(s)); } }catch(e){} })()`);
+    // JL-78: vaciar las 12 ranuras de guardado y sus backups para que balance45, criticoV3
+    // y cualquier otro escenario no fallen por falta de ranura libre.
+    await js(`(()=>{ for(let i=0;i<12;i++){ localStorage.removeItem('frankmangames.save.'+i); localStorage.removeItem('frankmangames.backup.v1.'+i); localStorage.removeItem('frankmangames.backup.v2.'+i); localStorage.removeItem('frankmangames.backup.slot.'+i); } })()`);
     // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
     // JL-73: recargar para que las nuevas posiciones por defecto se apliquen.
     if (!firstGame) await cdp('Page.navigate', { url });

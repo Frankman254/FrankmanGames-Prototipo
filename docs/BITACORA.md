@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-78: newGame() vacía las 12 ranuras de guardado (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Tarea JL-78: los escenarios `balance45` y `criticoV3` fallaban porque las 12 ranuras de guardado de localStorage estaban llenas. Cada `newGame()` en el juego busca la primera ranura vacía (`saves.firstEmpty()`) y guarda automáticamente; después de muchos escenarios, no quedaba ninguna.
+- Solución: en `newGame()` del arnés (`scripts/qaElectron.mjs`), antes de cada nueva partida se borran las 12 ranuras (`frankmangames.save.0`…`11`) y sus backups (`frankmangames.backup.v1.*`, `frankmangames.backup.v2.*`, `frankmangames.backup.slot.*`).
+- Cambio de solo 2 líneas en el arnés; no toca el juego.
+
+**Validación:** `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). Suite 3367/3368 (1 fallo pre-existente assets.test.ts de OMP). `npm run build` OK.
+
+**Evidencia:** `work/junie-jl78/` (salida de typecheck y tests).
+
 ## 2026-11-21 — JL-77: Escenario `camara` adaptado a los bindings de JL-65 (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
