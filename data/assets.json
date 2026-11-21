@@ -1571,6 +1571,52 @@
           }
         ]
       }
+    },
+    "neque": {
+      "kind": "gltf",
+      "file": "assets/models/neque.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.2,
+      "height": 0.36,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "tapir": {
+      "kind": "gltf",
+      "file": "assets/models/tapir.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.8,
+      "height": 1.09,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
     }
   },
   "assets": {
@@ -3307,9 +3353,7 @@
       }
     },
     "enemy.darien_neque": {
-      "template": "bestia",
-      "model": "wolf",
-      "scale": 1.2,
+      "template": "neque",
       "palettes": {
         "default": {
           "skin": [
@@ -3476,9 +3520,7 @@
       }
     },
     "enemy.darien_tapir": {
-      "template": "bestia",
-      "model": "wolf",
-      "scale": 1.2,
+      "template": "tapir",
       "palettes": {
         "default": {
           "skin": [

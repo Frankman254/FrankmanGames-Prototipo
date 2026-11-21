@@ -3240,3 +3240,11 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** `npx tsc --noEmit` sin errores nuevos. `npx vitest run`: 3283/3284 pasadas (1 fallo pre-existente en assets.test.ts, de OMP). Electron no disponible para capturas.
 
 **Evidencia:** `work/junie-jl62/EVIDENCIA.md`.
+
+## 2026-11-21 — JL-87: Ñeque y tapir de FA-06 integrados (Junie)
+
+**Archivos:** `data/assets.json`, `tests/jl87_nequeTapir.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 2 plantillas GLB registradas en `data/assets.json` (`neque`, `tapir`) con clips medidos desde los GLB. `enemy.darien_neque` y `enemy.darien_tapir` cambiados de `wolf` (bestia) a sus propios templates. Ambos usan clips estándar (Reposo/Caminar/Atacar/Golpeado/Morir) con evento hit en t=0.5. Alturas: neque 0.36 m (agutí/roedor), tapir 1.09 m (mamífero forestal).
+
+**Verificación:** 17 pruebas verdes (jl87_nequeTapir.test.ts), tsc limpio (solo balM3.ts ajeno), suite 3408/3409 (1 fallo pre-existente assets.test.ts de OMP). Capturas de Electron omitidas: sin escenario dedicado para Darién Profundo.
