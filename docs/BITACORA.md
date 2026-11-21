@@ -1,3 +1,18 @@
+## 2026-11-21 — OMP-FA-04: saíno y jabalí de Cerro Punta
+
+**Archivos:** `assets/models/pecari.glb`, `assets/models/jabali.glb`, `arte/blender/fauna_cerropunta.blend`, `scripts/blender/{fauna_cerropunta,validar_fauna_cerropunta,revisar_fauna_cerropunta}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Dos especies nuevas con esqueleto propio `FG_Pecari`/`FG_Jabali` (mismos nombres de hueso entre sí: una sola función de clips, amplitudes ×0,85 en el jabalí por peso).
+- **Saíno** (`cerropunta_peccary`): suido esbelto gris con collar claro en el cuello, línea de costado, hocico discoidal con ollares, colmillo corto asomando y crin de púas. 0,82 m de largo, 0,67 m de alto, 672 tri.
+- **Jabalí** (`cerropunta_boar`, élite): macizo, lamparona de cerdanas en la cruz, mamelón de costado, cabeza enorme con papada, colmillos de hoz hacia arriba + superior bajando, orejas tiesas, cola en cepillo. 1,02 m de largo, 0,89 m de alto, 704 tri.
+- Cinco clips sin salto (Reposo, Caminar, Atacar = embestida agachada, Golpeado, Morir); materiales teñibles skin/cloth/trim/hair/gear para las paletas existentes de `data/` (no se toca `data/`: integra Junie JL-45).
+- Referencias anotadas en el generador y en PROCEDENCIA (no había lámina REF-01 para esta familia): fichas de campo del pecari listado y del jabalí europeo, clean-room.
+
+**Validación:** `validar_fauna_cerropunta.py` en verde (rig, clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango); láminas de 5 vistas + 5 pasos de andar revisadas y aceptadas en el estilo de la casa.
+
+**Evidencia:** `work/omp-fa-04/revision_{pecari,jabali}.png` y las 20 vistas sueltas.
+
 ## 2026-11-20 — OMP-FA-03: variantes de cripta por tramo (rata, guardián, bruto)
 
 **Archivos:** `assets/models/cripta_{rata,guardian,bruto}_{cueva,huaca}.glb`, `arte/blender/cripta_variantes.blend`, `scripts/blender/{cripta_variantes,validar_criptas_variantes,revisar_criptas_variantes}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
