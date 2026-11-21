@@ -1479,6 +1479,98 @@
           }
         ]
       }
+    },
+    "aguila_negra": {
+      "kind": "gltf",
+      "file": "assets/models/aguila_negra.glb",
+      "yawDeg": 90,
+      "runSpeed": 4,
+      "height": 0.40,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "aguila_ornada": {
+      "kind": "gltf",
+      "file": "assets/models/aguila_ornada.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.5,
+      "height": 0.98,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "aguila_crestada": {
+      "kind": "gltf",
+      "file": "assets/models/aguila_crestada.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.5,
+      "height": 0.99,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "aguila_arpia": {
+      "kind": "gltf",
+      "file": "assets/models/aguila_arpia.glb",
+      "yawDeg": 90,
+      "runSpeed": 3,
+      "height": 3.20,
+      "clips": {
+        "idle": "idle_ground",
+        "walk": "walk",
+        "run": "run",
+        "hit": "fly_idle",
+        "death": "land",
+        "attack": "fly_forward"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
     }
   },
   "assets": {
@@ -3351,9 +3443,8 @@
       }
     },
     "enemy.darien_harpy": {
-      "template": "bestia",
-      "model": "wolf",
-      "scale": 1.5,
+      "template": "aguila_arpia",
+      "scale": 1,
       "palettes": {
         "default": {
           "skin": [

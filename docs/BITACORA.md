@@ -1,3 +1,11 @@
+## 2026-11-21 — JL-86: Águilas de FA-21 integradas (Junie)
+
+**Archivos:** `data/assets.json`, `tests/jl86_aguilas.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 4 plantillas GLB de águila registradas en `data/assets.json` (`aguila_negra`, `aguila_ornada`, `aguila_crestada`, `aguila_arpia`) con clips medidos desde los GLB. `enemy.darien_harpy` cambiado de `wolf` (bestia) a `aguila_arpia` (GLB propio). Las 3 primeras usan clips estándar (Reposo/Caminar/Atacar/Golpeado/Morir); `aguila_arpia` usa clips de vuelo (idle_ground/walk/run/fly_forward/land).
+
+**Verificación:** 24 pruebas verdes (jl86_aguilas.test.ts), tsc limpio (solo balM3.ts ajeno), suite 3391/3392 (1 fallo pre-existente assets.test.ts de OMP). Electron `iguanera` 7/7 sin errores. Captura de `darien_harpy` no factible: el enemigo solo aparece en Darién Profundo, fuera del mundo base.
+
 ## 2026-11-21 — JL-85: Diagnóstico `crestalba` — BLOQUEADA sin display (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl85/DIAGNOSTICO.md`.
