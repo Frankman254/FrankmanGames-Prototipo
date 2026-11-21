@@ -1119,5 +1119,42 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
 Todo es visual, en `src/render/`. No cambies la velocidad de movimiento, las colisiones de juego ni nada de `src/sim/`.
 
 - [x] JL-67 Motor de físicas secundarias (huesos con muelle). — 7ba2cee — 25 pruebas verdes (jl67_secondaryPhysics.test.ts), suite 3308/3309 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, push OK. Lógica pura sin Babylon: SecondaryChain (Verlet + muelle + ángulo máximo + colisión cápsulas), SecondaryPhysics (paso fijo 60 Hz, freeze/thaw), bodyInertiaLean (pitch/roll por aceleración y giro), pointToCapsuleDistance. Integración en GltfCharacter pendiente de huesos `fis_` de OMP (OMP-POL-13). Evidencia en work/junie-jl67/.
-- [x] JL-68 Jinetes bien sentados en cada montura. — commit «JL-68: seatDrop por montura — jinetes calibrados» — 12 pruebas verdes (jl68_riderSeat.test.ts), suite 3320/3321 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, build OK, push OK. seatDrop en MountLook, parser en content.ts, arenaView.ts usa look.seatDrop ?? RIDE_SEAT_DROP. Datos: mula 0.35, tapir 0.35, caballo 0.38, arpía 0.25, diostedé 0.28, crestalba 0.28, falcopama 0.28 (y 7 variantes). Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl68/.
+- [x] JL-68 Jinetes bien sentados en cada montura. — 5020624 — 12 pruebas verdes (jl68_riderSeat.test.ts), suite 3320/3321 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, build OK, push OK. seatDrop en MountLook, parser en content.ts, arenaView.ts usa look.seatDrop ?? RIDE_SEAT_DROP. Datos: mula 0.35, tapir 0.35, caballo 0.38, arpía 0.25, diostedé 0.28, crestalba 0.28, falcopama 0.28 (y 7 variantes). Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl68/.
 
+
+## Tanda del 2026-11-21, noche (coordinador; el creador: «junie no tiene tareas»). En este orden.
+
+Revisión de JL-58…68 por el coordinador: suite 3320/3321 (el único rojo es `assets.test.ts`, por los GLB de ranas que OMP aún no ha registrado), tsc limpio salvo `balM3.ts` ajeno y `tests/jl53_chatGrip.test.ts`. Tres huecos:
+- `src/render/characters/secondaryPhysics.ts` (JL-67) no lo importa nadie: en el juego no se mueve nada todavía.
+- JL-65 no vuelve transparentes los obstáculos en el modo Manual: si una casa tapa al personaje, no se le ve.
+- No hay capturas en Electron de JL-59, 60, 61, 65, 67 ni 68, aunque JL-58 sí usó el arnés. Una tarea visual no está hecha sin verla en el juego.
+
+- [ ] JL-69 Capturas en Electron que faltan. Averigua por qué en JL-65 «Electron no estaba disponible» (JL-58 lo usó con `node scripts/qaElectron.mjs`) y arréglalo si es del arnés. Luego, en `work/junie-jl-69/`:
+  - JL-59: la barra fusionada por defecto, y estirada solo en X y solo en Y;
+  - JL-60: el HUD por defecto a 1366×768, 1920×1080, 2000×1191, 2560×1080, 3440×1440 y 5120×1440;
+  - JL-61: caimán, garza, saíno, jabalí y las variantes de cripta en su sitio;
+  - JL-65: cada modo de cámara junto a una casa de Villa Raspadura;
+  - JL-68: el héroe y la heroína en cada montura, de lado y de frente.
+  - Lo que se vea mal en las capturas va a `work/junie-jl-69/FALLOS.md` y se arregla en esta misma tarea si es de JL-59…68.
+  - De paso, arregla el error de tipos de `tests/jl53_chatGrip.test.ts:52` (string | undefined) sin relajar la prueba.
+- [ ] JL-70 Conectar las físicas de JL-67 al juego.
+  - Usa `secondaryPhysics.ts` en los personajes (`src/render/characters/`) y las monturas (`src/render/mountView.ts`): cualquier hueso `fis_*` de un GLB se simula solo.
+  - La inercia del cuerpo (inclinarse al arrancar, frenar y girar) y la mezcla de `idle`, `walk` y `run` según la velocidad real tienen que verse en el juego, no solo en la prueba.
+  - Hasta que OMP publique los huesos `fis_` de OMP-POL-13, se ve la inercia y lo que ya tenga huesos sueltos (colas, crines). Cuando lleguen, se ve la falda de la diablica sin atravesar las piernas.
+  - Mide `node scripts/qaElectron.mjs rendimiento` antes y después: ≤ 0,5 ms por fotograma con 20 personajes y sin perder más de un 5 % de FPS.
+  - Vídeo o capturas en `work/junie-jl-70/` andando, frenando y girando, a pie y montado.
+- [ ] JL-71 Cámara Manual: el obstáculo se transparenta (lo que faltó de JL-65).
+  - Cuando una caja, casa, roca o árbol queda entre la cámara y el personaje, en Manual y Semiautomático ese obstáculo baja su opacidad (o se dibuja la silueta del personaje encima) y vuelve a la normal al dejar de tapar, con transición suave.
+  - Solo los obstáculos que tapan, no todos los cercanos. Sin crear materiales nuevos cada fotograma.
+  - Prueba de lógica pura para elegir qué cajas tapan el rayo. Captura antes y después junto a una casa.
+- [ ] JL-64b Desbloqueo de JL-64, autorizado por el coordinador (opciones B y C de `work/junie-jl-64/BLOQUEO.md`).
+  - Las pruebas de antorchas tienen razón: una antorcha que mira a roca está mal puesta. No las toques.
+  - Cambia el generador de antorchas de los pisos a mano (`generateHandFloor` en `src/world/dungeon.ts`), solo lo necesario:
+    - solo pone antorchas en caras de muro cuya normal apunta a una baldosa caminable; si no, salta esa cara;
+    - un piso a mano puede declarar sus antorchas en el JSON (`torches: [{x, y, dir}]`) y entonces el generador no pone las suyas.
+  - Luego haz JL-64 tal como está escrita, con `j16_torches`, `tor01_regression` y `tor01_audit` en verde.
+- [ ] JL-72 Integrar lo nuevo de OMP, con el procedimiento de JL-61:
+  - FA-05 (`08d954b`): `baru_jaguar` y `baru_elder`;
+  - FA-07 (ranas de Coclá) cuando llegue a `master`: `bocas_frog` pasa a `rana_venenosa.glb`.
+  - Las ranas nuevas (`cocle_frog_poison`, `cocle_frog_redeye`, `cocle_toad` y la jefa `cocle_goldenfrog`) necesitan nivel, vida, daño, zona y botín, y eso son cifras de contenido: escribe la propuesta en `work/junie-jl-72/PROPUESTA_RANAS.md` y no la metas en `data/` hasta que el creador diga.
+  - Corrige en `work/junie-jl-63/NOMBRE_MODELO.md`: el ñeque es un roedor (agutí), no un espíritu.

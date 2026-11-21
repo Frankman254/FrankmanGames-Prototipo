@@ -1,3 +1,12 @@
+## 2026-11-21 — Revisión de JL-58…68 y tanda JL-69…72 (Coord)
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- Revisión: suite 3320/3321, con un único rojo pasajero (`assets.test.ts`, GLB de ranas de OMP sin registrar). JL-64 quedó bloqueada por las pruebas de antorchas.
+- Huecos encontrados: `secondaryPhysics.ts` sin usar, sin transparencia de obstáculos en la cámara Manual y sin capturas en Electron.
+- Tanda JL-69…72 y JL-64b. El coordinador autoriza tocar solo el generador de antorchas de los pisos a mano; las pruebas de antorchas no se tocan.
+
 ## 2026-11-21 — JL-68: Jinetes bien sentados — seatDrop por montura (Junie)
 
 **Archivos:** `src/rpg/contracts.ts`, `src/rpg/content.ts`, `src/render/arenaView.ts`, `data/rpg/items.json`, `tests/jl68_riderSeat.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
