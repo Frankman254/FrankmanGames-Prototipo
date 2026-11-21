@@ -31,6 +31,11 @@ import {
     type BoneFit,
     type HeldSlot,
 } from './heldGear';
+import {
+    SecondaryPhysics,
+    DEFAULT_CHAIN_CONFIG,
+    type Vec3,
+} from './secondaryPhysics';
 
 /** Tabla de ajuste de las piezas a medida (EQ-10), por GLB (nombre sin `.glb`) y hueso. */
 const FIT = ajusteEquipo as unknown as Readonly<Record<string, Readonly<Record<string, BoneFit>>>>;
@@ -94,6 +99,12 @@ export class GltfCharacter implements CharacterModel {
     private readonly sceneRef: Scene;
     private readonly tints: Array<{ mat: Tintable; base: Color3 }> = [];
     private shade = 1;
+    /** Físicas secundarias: huesos `fis_*` con muelle y amortiguación. */
+    private secondaryPhys: SecondaryPhysics | null = null;
+    /** Huesos `fis_*` por grupo de cadena (nombre → TransformNode). */
+    private secondaryBones: Array<Array<{ node: TransformNode; restPos: Vec3 }>> = [];
+    /** Inercia pendiente para aplicar en el observer. */
+    private inertiaVec: Vec3 = { x: 0, y: 0, z: 0 };
 
     constructor(
         scene: Scene,
@@ -152,6 +163,8 @@ export class GltfCharacter implements CharacterModel {
                     }
                     m.dispose(false, false);
                 }
+                // Físicas secundarias: buscar huesos `fis_*` y construir cadenas.
+                this.buildSecondaryPhysics();
                 this.applyPalette();
                 void this.holdGear(scene, name);
                 for (const [state, clip] of Object.entries(entry.clips)) {
@@ -546,24 +559,131 @@ export class GltfCharacter implements CharacterModel {
         if (pose === this.pose) return;
         this.pose = pose;
         if (pose && !this.poseObserver)
-            this.poseObserver = this.sceneRef.onAfterAnimationsObservable.add(() => this.applyPose());
+            this.poseObserver = this.sceneRef.onAfterAnimationsObservable.add(() => this.applyPoseAndSecondary());
     }
 
-    private applyPose(): void {
-        if (!this.pose) return;
-        for (const [joint, angle, spread] of RIDE_POSE) {
-            const n = this.joints.get(joint) as TransformNode | undefined;
-            if (!n?.rotationQuaternion) continue;
-            let base = this.rest.get(joint);
-            if (!base) this.rest.set(joint, (base = n.rotationQuaternion.clone()));
-            const rad = Math.PI / 180;
-            n.rotationQuaternion.copyFrom(base.multiply(Quaternion.RotationYawPitchRoll(0, angle * rad, spread * rad)));
+    private applyPoseAndSecondary(): void {
+        if (this.pose) {
+            for (const [joint, angle, spread] of RIDE_POSE) {
+                const n = this.joints.get(joint) as TransformNode | undefined;
+                if (!n?.rotationQuaternion) continue;
+                let base = this.rest.get(joint);
+                if (!base) this.rest.set(joint, (base = n.rotationQuaternion.clone()));
+                const rad = Math.PI / 180;
+                n.rotationQuaternion.copyFrom(base.multiply(Quaternion.RotationYawPitchRoll(0, angle * rad, spread * rad)));
+            }
         }
+        // Aplicar físicas secundarias después de las animaciones y la pose.
+        this.applySecondaryPhysics();
+    }
+
+    /**
+     * Construye las cadenas de físicas secundarias a partir de los huesos `fis_*`.
+     * Se llama una vez, después de cargar el GLB.
+     */
+    private buildSecondaryPhysics(): void {
+        // Buscar huesos `fis_*` y agruparlos por cadena.
+        // Cada cadena empieza con un hueso raíz (no `fis_`) y sigue con hijos `fis_`.
+        // Por simplicidad, agrupamos todos los `fis_*` en una sola cadena por ahora.
+        const fisBones: Array<{ node: TransformNode; restPos: Vec3 }> = [];
+        const rootInv = this.gltfRoot instanceof TransformNode
+            ? this.gltfRoot.computeWorldMatrix(true).clone().invert()
+            : null;
+        if (!rootInv) return;
+
+        for (const [name, node] of this.joints) {
+            if (!name.startsWith('fis_')) continue;
+            const tn = node as TransformNode | undefined;
+            if (!tn) continue;
+            // Posición de reposo en espacio del gltfRoot.
+            const worldPos = tn.getAbsolutePosition();
+            const localPos = Vector3.TransformCoordinates(worldPos, rootInv);
+            fisBones.push({ node: tn, restPos: { x: localPos.x, y: localPos.y, z: localPos.z } });
+        }
+
+        if (fisBones.length === 0) return;
+
+        this.secondaryPhys = new SecondaryPhysics();
+        this.secondaryPhys.buildChains(
+            fisBones.map((b) => [{ restPos: b.restPos }]),
+            DEFAULT_CHAIN_CONFIG,
+            [],
+        );
+        this.secondaryBones = fisBones.map((b) => [b]);
+        // Registrar el observer para aplicar las físicas después de las animaciones.
+        if (!this.poseObserver) {
+            this.poseObserver = this.sceneRef.onAfterAnimationsObservable.add(() => this.applyPoseAndSecondary());
+        }
+    }
+
+    /** Aplica las posiciones calculadas por las físicas secundarias a los huesos. */
+    private applySecondaryPhysics(): void {
+        if (!this.secondaryPhys || this.secondaryBones.length === 0) return;
+        const positions = this.secondaryPhys.update(0, this.inertiaVec);
+        const rootInv = this.gltfRoot instanceof TransformNode
+            ? this.gltfRoot.computeWorldMatrix(true).clone().invert()
+            : null;
+        if (!rootInv) return;
+
+        for (let i = 0; i < positions.length; i++) {
+            const chain = positions[i];
+            if (!chain || chain.length === 0) continue;
+            const boneGroup = this.secondaryBones[i];
+            if (!boneGroup || boneGroup.length === 0) continue;
+            const bone = boneGroup[0];
+            if (!bone) continue;
+            const pos = chain[0];
+            if (!pos) continue;
+            // Convertir de espacio local a world.
+            const worldPos = Vector3.TransformCoordinates(new Vector3(pos.x, pos.y, pos.z), rootInv);
+            // Desplazamiento relativo a la posición de reposo.
+            const restWorld = Vector3.TransformCoordinates(new Vector3(bone.restPos.x, bone.restPos.y, bone.restPos.z), rootInv);
+            const dx = worldPos.x - restWorld.x;
+            const dy = worldPos.y - restWorld.y;
+            const dz = worldPos.z - restWorld.z;
+            const parent = bone.node.parent as TransformNode | null;
+            if (parent) {
+                const parentInv = parent.computeWorldMatrix(true).clone().invert();
+                const currentWorld = bone.node.getAbsolutePosition();
+                const currentLocal = Vector3.TransformCoordinates(currentWorld, parentInv);
+                bone.node.position.set(
+                    currentLocal.x + dx,
+                    currentLocal.y + dy,
+                    currentLocal.z + dz,
+                );
+            }
+        }
+    }
+
+    /**
+     * Inercia del cuerpo para las físicas secundarias.
+     * `accel` = aceleración lineal (m/s²), `yawRate` = velocidad de giro (rad/s).
+     */
+    setInertia(accel: number, yawRate: number, dt: number): void {
+        if (!this.secondaryPhys) return;
+        // La inercia lineal se aplica en el eje X (hacia delante del personaje).
+        // La gravedad ya está en el motor; aquí solo pasamos la aceleración del personaje.
+        this.inertiaVec = { x: accel * 0.5, y: 0, z: yawRate * 0.3 };
+        this.secondaryPhys.update(dt, this.inertiaVec);
+    }
+
+    /** Congela las físicas secundarias (lejos de la cámara). */
+    freezeSecondary(): void {
+        this.secondaryPhys?.freeze();
+    }
+
+    /** Descongela las físicas secundarias (cerca de la cámara). */
+    thawSecondary(): void {
+        this.secondaryPhys?.thaw();
     }
 
     dispose(): void {
         this.disposed = true;
+        this.secondaryPhys?.dispose();
+        this.secondaryPhys = null;
+        this.secondaryBones = [];
         if (this.poseObserver) this.sceneRef.onAfterAnimationsObservable.remove(this.poseObserver);
+        this.poseObserver = null;
         for (const g of this.groups.values()) g.stop();
         // Las copias de equipo.glb comparten material y textura con el archivo cargado (y con los
         // demás personajes): se quitan antes, sin sus materiales, para que el siguiente modelo

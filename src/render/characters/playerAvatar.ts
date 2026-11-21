@@ -92,6 +92,10 @@ export class PlayerAvatar {
     private gait: Gait = 'run';
     /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
     entityId = -1;
+    /** Velocidad del fotograma anterior (para calcular la aceleración). */
+    private prevSpeed = 0;
+    /** Yaw del fotograma anterior (para calcular la velocidad de giro). */
+    private prevYaw: number | null = null;
     private readonly puffs: Puffs;
     private readonly ghost: GhostBody;
     private readonly foot = new Vector3();
@@ -262,7 +266,16 @@ export class PlayerAvatar {
         else if (p.invulnerable > 0) m.setEmissive(0.25, 0.35, 0.45);
         else m.setEmissive(0, 0, 0);
 
-        const events = m.update(dt, moving ? p.speed : 0);
+        // Físicas secundarias: calcular aceleración y velocidad de giro.
+        const currentSpeed = moving ? p.speed : 0;
+        const accel = dt > 0 ? (currentSpeed - this.prevSpeed) / dt : 0;
+        const currentYaw = this.visualYaw ?? 0;
+        const yawRate = dt > 0 && this.prevYaw !== null ? (currentYaw - this.prevYaw) / dt : 0;
+        m.setInertia?.(accel, yawRate, dt);
+        this.prevSpeed = currentSpeed;
+        this.prevYaw = currentYaw;
+
+        const events = m.update(dt, currentSpeed);
         for (const ev of events) {
             if (ev.type !== 'footstep' || ghost) continue;
             m.lowestFoot(this.foot);
@@ -279,6 +292,8 @@ export class PlayerAvatar {
         this.oneShot = null;
         this.offhandAttack = false;
         this.emoteActive = null;
+        this.prevSpeed = 0;
+        this.prevYaw = null;
         this.model.play('idle', { restart: true });
     }
 }

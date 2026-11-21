@@ -65,6 +65,12 @@ export interface CharacterModel {
     setShade(k: number): void;
     /** Pose fija por encima del clip: `ride` = sentado en la montura (piernas dobladas). Opcional. */
     setPose?(pose: 'ride' | null): void;
+    /**
+     * Inercia del cuerpo para las físicas secundarias (faldas, capas, pelo).
+     * `accel` = aceleración lineal (m/s²), `yawRate` = velocidad de giro (rad/s).
+     * Opcional: sin huesos `fis_` no hace nada.
+     */
+    setInertia?(accel: number, yawRate: number, dt: number): void;
     dispose(): void;
 }
 

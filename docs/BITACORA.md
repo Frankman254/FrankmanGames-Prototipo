@@ -1,3 +1,20 @@
+## 2026-11-21 — JL-70: Físicas secundarias conectadas al juego (Junie)
+
+**Archivos:** `src/render/characters/characterModel.ts`, `src/render/characters/gltfCharacter.ts`, `src/render/characters/playerAvatar.ts`, `tests/jl70_secondaryIntegration.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **`CharacterModel.setInertia()`:** método opcional en la interfaz para pasar la inercia del personaje a las físicas secundarias.
+- **`GltfCharacter.buildSecondaryPhysics()`:** al cargar el GLB, busca huesos `fis_*`, mide sus posiciones de reposo en espacio del gltfRoot, construye cadenas con `SecondaryPhysics` y registra un observer en `onAfterAnimationsObservable`.
+- **`GltfCharacter.applySecondaryPhysics()`:** tras cada animación, aplica los desplazamientos calculados a los huesos `fis_*` en su espacio local.
+- **`GltfCharacter.setInertia()`:** actualiza el motor con la aceleración y velocidad de giro del personaje.
+- **`PlayerAvatar.sync()`:** calcula la aceleración lineal y la velocidad de giro a partir de `prevSpeed`/`prevYaw` y llama a `m.setInertia?.()`.
+- **`PlayerAvatar.reset()`:** limpia `prevSpeed` y `prevYaw`.
+- **`GltfCharacter.dispose()`:** limpia cadenas, observer y referencias.
+
+**Validación:** 15 pruebas verdes (jl70_secondaryIntegration.test.ts). Suite 3336/3336. Typecheck sin errores nuevos. Vite build OK.
+
+**Evidencia:** `work/junie-jl-70/EVIDENCIA.md`.
+
 ## 2026-11-21 — JL-69: Capturas Electron de JL-59…68 y fix de tipos jl53 (Junie)
 
 **Archivos:** `tests/jl53_chatGrip.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-69/`.

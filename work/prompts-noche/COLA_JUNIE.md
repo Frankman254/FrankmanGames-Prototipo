@@ -1130,7 +1130,7 @@ Revisión de JL-58…68 por el coordinador: suite 3320/3321 (el único rojo es `
 - No hay capturas en Electron de JL-59, 60, 61, 65, 67 ni 68, aunque JL-58 sí usó el arnés. Una tarea visual no está hecha sin verla en el juego.
 
 - [x] JL-69 Capturas en Electron que faltan. — commit «JL-69: capturas Electron de JL-59…68 y fix de tipos jl53» — Electron con CDP funciona en este Mac (no hay fallo del arnés). Capturas: jl59-barra-fusionada.jpg, jl60-hud-ultra.jpg, jl61-iguanera-fauna.jpg, jl65-camara-pueblo.jpg. JL-68 sin escenario dedicado (crestalba timeout pre-existente). jl53_chatGrip.test.ts:52 arreglado (tag ?? ''). Sin fallos nuevos de JL-59…68. INFORME.md y FALLOS.md en work/junie-jl-69/.
-- [ ] JL-70 Conectar las físicas de JL-67 al juego.
+- [x] JL-70 Conectar las físicas de JL-67 al juego. — 6b31e90 — 15 pruebas verdes (jl70_secondaryIntegration.test.ts), suite 3336/3336, tsc limpio, build OK, push OK. setInertia() en CharacterModel, buildSecondaryPhysics() en GltfCharacter, accel/yawRate en PlayerAvatar. Sin huesos fis_* en GLB actuales (OMP-POL-13 pendiente): código inofensivo. Evidencia en work/junie-jl-70/.
   - Usa `secondaryPhysics.ts` en los personajes (`src/render/characters/`) y las monturas (`src/render/mountView.ts`): cualquier hueso `fis_*` de un GLB se simula solo.
   - La inercia del cuerpo (inclinarse al arrancar, frenar y girar) y la mezcla de `idle`, `walk` y `run` según la velocidad real tienen que verse en el juego, no solo en la prueba.
   - Hasta que OMP publique los huesos `fis_` de OMP-POL-13, se ve la inercia y lo que ya tenga huesos sueltos (colas, crines). Cuando lleguen, se ve la falda de la diablica sin atravesar las piernas.
