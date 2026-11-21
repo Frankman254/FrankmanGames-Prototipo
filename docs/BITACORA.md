@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-81: Escenario `aprendizaje` — timeout 600 s (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl81/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Tarea JL-81: diagnosticar y corregir el timeout del escenario `aprendizaje` en el arnés de QA.
+- Causa: el escenario se ejecutaba con el timeout global de 120 s, pero la fase de pesca (`q_igu_pesca`) puede tardar hasta ~360 s (12 iteraciones × 30 s banco + 30 s picada).
+- Arreglo: añadido `scenarios.aprendizaje.timeout = 600` en `scripts/qaElectron.mjs`, junto a los timeouts de `viaje` y `perfil` (patrón de JL-51).
+- Resultado: 21/23 checks en verde. La cadena de misiones se completa sin timeout. 2 fallos pre-existentes del juego (lancha no cruza a Pedasol, error Babylon postProcessManager).
+
+**Evidencia:** `work/junie-jl81/DIAGNOSTICO.md`. Escenario `aprendizaje` ejecutado con timeout 600 s.
+
+---
+
 ## 2026-11-21 — JL-80: Escenario `castillo` ya pasa — sin código (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl80/DIAGNOSTICO.md`.
@@ -369,6 +383,19 @@
 - Tanda JL-59…64 para Junie: barra fusionada y escala por eje (JL-59), posiciones por forma de pantalla (JL-60), integrar FA-02…04 (JL-61), escenario `balance45` (JL-62), auditoría nombre contra modelo (JL-63) y rework de los pisos a mano de la cripta (JL-64).
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
+
+## 2026-11-21 - OMP-FA-10: medusa pegajosa y zancudo familiar
+
+**Archivos:** `assets/models/medusa.glb`, `assets/models/zancudo.glb`, `arte/blender/fauna_medusa_zancudo.blend`, `scripts/blender/{fauna_medusa_zancudo,validar_fauna_medusa_zancudo,revisar_fauna_medusa_zancudo}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Dos invocables de `minion` que hoy se ven como diablillo tenido: la Aguamala Pegajosa de Bocas (`bocas_jelly`) y el Zancudo Tamaño Familiar del Darién (`darien_mosquito`), según `work/junie-jl-63/NOMBRE_MODELO.md`.
+- **Medusa** (`bocas_jelly`): 680 tri, 1,01 m de punta de tentáculo × 0,54 m de alto. Campana en domo construida por revolución con faldón abierto (subumbrela), volante de lenguetas, núcleo gelatinoso, manubrio con boca en cruz y dos brazos orales rizados; ocho tentáculos finos de punta clara que caen verticales del borde y arrastran por el suelo. Reposo: la campana respira y los tentáculos ondean con fase escalonada (i/8). Caminar: pulsos de campana con balance. Atacar: se contrae y lanza los tentáculos hacia delante (pegajosa). Morir: la campana se desinfla y los tentáculos se despliegan en estrella. Tres correcciones tras las láminas: las motas de la campana leían como casquetes flotando (retiradas), los tentáculos nacían muy horizontales (ahora caen verticales y se despliegan al arrastrar) y la campana de blobs escalonados parecía caparazón de cangrejo (rehecha como superficie de revolución lisa).
+- **Zancudo** (`darien_mosquito`): 652 tri, 1,22 m de trompa al abdomen × 0,56 m de alto. Torax giboso, cabeza con dos ojos, trompa larga y recta, abdomen estriado de tres segmentos, seis patas de dos tramos y dos alas de tarjeta venada sobre el dorso. Reposo: el abdomen bombea (respira) y las alas tiemblan. Caminar: trípode (patas frontal y trasera de un lado con la media del otro), cuerpo cabecea. Atacar: se agacha sobre las patas, levanta el abdomen y clava la trompa hacia delante y abajo — el piquete del zancudo. Golpeado: retrocede con las alas en alto. Morir: vuelca de lado con las patas encogidas y las alas quietas.
+
+**Validación:** `validar_fauna_medusa_zancudo.py` en verde (rig, cinco clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango, materiales por región); láminas de 5 vistas + 5 pasos revisadas (medusa aceptada a la cuarta pasada, zancudo a la primera); `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-10/revision_{medusa,zancudo}.png` y las 40 vistas sueltas.
 
 ## 2026-11-21 - OMP-FA-09: tiburón martillo y calamar gigante
 

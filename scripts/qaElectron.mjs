@@ -5363,6 +5363,8 @@ scenarios.viaje.timeout = 300;
 scenarios.perfil.timeout = 300;
 scenarios.crestalba.timeout = 300;
 scenarios.mazmorraHonda.timeout = 300;
+// JL-81: aprendizaje necesita más tiempo por la pesca (hasta 12 iteraciones).
+scenarios.aprendizaje.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
