@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-106: Regenerar mundoNodos (Junie)
+
+**Archivos:** `work/claude-map-nod-01/mundo.json`, `work/claude-map-nod-01/mapa_nodos.html`, `work/claude-map-nod-01/CAMBIOS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se regeneró `work/claude-map-nod-01/` con `npx vite-node scripts/audit/mundoNodos.ts` y se comparó con la versión anterior (2026-11-20). Los contadores del mundo no cambiaron (13 provincias, 24 zonas, 23 piedras, 72 criaturas). Las 14 incoherencias de zonas son las mismas que antes. Los 13 cambios de modelo de criatura reflejan las integraciones de OMP de los últimos commits (JL-61, JL-72, JL-86, JL-87, JL-89): criaturas que antes usaban `wolf` o `archer` genéricos ahora apuntan a GLB propios (jaguar, rana, caiman, garza, aguila_arpia, neque, tapir, jabali, pecari, fox, owl, jaguar_anciano).
+
+**Validación:** Script ejecutado sin errores. Informe de comparación en `work/claude-map-nod-01/CAMBIOS.md`. Sin cambios de código: no requiere `npm test` ni `npm run typecheck`.
+
+---
+
 ## 2026-11-21 — JL-105: Consola limpia tras los cambios grandes (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl105/INFORME.md`.
