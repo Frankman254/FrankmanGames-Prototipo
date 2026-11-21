@@ -523,6 +523,24 @@
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
 
+## 2026-11-21 - OMP-FA-12: gotita, jirón, brasita, copito, alma en pena y chitra
+
+**Archivos:** `assets/models/{gotita,jiron,brasita,copito,alma,chitra}.glb`, `arte/blender/fauna_espiritus.blend`, `scripts/blender/{fauna_espiritus,validar_fauna_espiritus,revisar_fauna_espiritus}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Los seis `minion` de `data/enemies.json` que hoy se ven todos como el diablillo tenido (lista de `work/junie-jl-63/NOMBRE_MODELO.md`: espíritu/gota/niebla/brasa/copo/alma/insecto = diablillo). Los cinco espíritus comparten LITERALMENTE el esqueleto `FG_Espiritu` (hips, chest, head, armL, armR, tail, tip) — el validador lo exige hueso por hueso y sin extras — con la cola o manto tocando el suelo, como los tentáculos de la medusa de FA-10; cambia solo la malla y la paleta. La chitra, por ser insecto, lleva su propio rig `FG_Chitra` (cabeza, trompa, abdomen de cuatro anillos, dos alitas y seis patas), en miniatura del zancudo de FA-10. Cinco clips cada uno (Reposo, Caminar, Atacar, Golpeado, Morir); los espíritus no andan: se deslizan meciéndose con la cola barrida.
+- **Gotita de Bajareque** (`boquete_drizzle`, 292 tri): lágrima azul con frente clara, copete de espuma, ondas de agua en la base y estela que gotea hasta una salpicadura con guijarro. Ataque: se recoge en perla, salta estirada y se estampa contra el suelo (plaf), rebota dos veces.
+- **Jirón de Neblina** (`cerropunta_wisp`, 432 tri): tres bolas de niebla escalonadas con flecos de estela, copete remolinado, cara pálida asomada con cejas y ramita atrapada; la bruma lame el suelo. Ataque: se arremolina, sube en tolvanera con la cola por encima de la cabeza y abraza hacia delante envolviendo.
+- **Brasita Saltarina** (`baru_ember`, 332 tri): ascua naranja con núcleo amarillo vivo, llama de tres pavesas, costras de carbón y estela de ceniza gris con pavesa viva. Ataque: rebota dos saltitos, se enciende en el aire y explota hacia delante escupiendo ceniza.
+- **Copito Malcriado** (`fortuna_flake`, 404 tri): bola de nieve con seis púas de cristal en cruz, ceño torcido, tripa pálida, corona de estrellita y falda de escarcha con cristal y piedritas congeladas. Ataque: recoge las púas hacia delante, cabecea en diagonal como una punitiva de hielo y se abre en estrella clavando las púas.
+- **Alma en Pena de la Parada** (`ancon_soul`, 400 tri): fantasma lavanda con capucha hundida, dos óvalos de luz sobre cuencas oscuras, boquita de lamento, mangos caídos con puños de humo, cadena rota y manto roto en picos que barren el suelo. Ataque: se yergue lamentándose con los mangos al cielo y se abalanza atravesando al rival.
+- **Chitra Picadora** (`chame_chitra`, 316 tri): miniatura de zancudo — trompa larga de clavo, ojos compuestos, abdomen estriado que bombea, alitas de humo y seis patas finas que se recogen hacia atrás. Ataque: dos picaditos de tanteo y la estampida final con la trompa extendida.
+- Correcciones tras la primera lámina: las seis patas de la chitra salían hacia delante como minas al recogerse (el tuck ahora dobla muslo atrás y tibie arriba); el remolino del jirón volcaba el cuerpo con el giro (el giro vive ahora en la cola, no en hips) y sus flecos traseros parecían patas (pasan a la estela, con copete remolinado que lee espíritu); las púas laterales del copito parecían aletas de pez (más cortas y diagonales); la llama de la brasita se veía de cartón (pasa al material emisivo del núcleo).
+
+**Validación:** `validar_fauna_espiritus.py` en verde (rig común idéntico hueso por hueso en los cinco + sin huesos extra; rig de insecto en la chitra; cinco clips sin sufijo; ≤1.500 tri; apoyo z≈0 del fotograma 1 por la cola; alto 0,58–0,66 m los espíritus y 0,25 m la chitra; cinco regiones teñibles + ojo y núcleo emisivo); láminas de 5 vistas + 5 pasos de ATAQUE por criatura (la firma es lo que hay que mirar) revisadas y aceptadas; `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-12/revision_{gotita,jiron,brasita,copito,alma,chitra}.png` y las 60 vistas sueltas.
+
 ## 2026-11-21 - OMP-FA-11: búho chismoso, quetzal cascarrabias y pavo gritón
 
 **Archivos:** `assets/models/buho_chismoso.glb`, `assets/models/quetzal.glb`, `assets/models/pavo_griton.glb`, `arte/blender/fauna_aves.blend`, `scripts/blender/{fauna_aves,validar_fauna_aves,revisar_fauna_aves}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
