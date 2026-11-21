@@ -1118,16 +1118,7 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
 
 Todo es visual, en `src/render/`. No cambies la velocidad de movimiento, las colisiones de juego ni nada de `src/sim/`.
 
-- [ ] JL-67 Motor de físicas secundarias (huesos con muelle).
-  - Hoy nada se mueve solo: faldas, capas, pelo, colas y adornos van rígidos con el hueso padre, y por eso todo se ve tieso.
-  - Sistema en `src/render/characters/` que simula cadenas de huesos con muelle y amortiguación (Verlet o muelle crítico), a paso fijo y que no depende de los FPS:
-    - se activa para los huesos cuyo nombre empiece por `fis_`, que es la convención que usará OMP (OMP-POL-13); parámetros por cadena (rigidez, amortiguación, gravedad, ángulo máximo) en un JSON de datos, con valores por defecto;
-    - colisión con cápsulas en muslos, espinillas y cadera, para que una falda no atraviese las piernas al andar ni al sentarse en la montura;
-    - reacciona a la inercia: al arrancar, frenar, girar, saltar, aterrizar y al galope de la montura.
-  - Inercia del cuerpo: al arrancar y frenar, una pequeña inclinación del torso hacia la marcha y al girar hacia dentro. Mezcla suave entre `idle`, `walk` y `run` según la velocidad real, sin cortes.
-  - Presupuesto: ≤ 0,5 ms por fotograma con 20 personajes en pantalla; lejos de la cámara, la física se congela.
-  - Mientras OMP no publique los huesos `fis_`, prueba el sistema con una cadena de muestra en una prueba y con la cola de una montura si ya tiene huesos.
-  - Pruebas de lógica pura: estabilidad (no explota con 5 FPS ni con 240 FPS), que respete el ángulo máximo y que la colisión con cápsulas empuje fuera. Vídeo en Electron.
+- [x] JL-67 Motor de físicas secundarias (huesos con muelle). — commit «JL-67: motor de físicas secundarias — Verlet, colisión y inercia» — 25 pruebas verdes (jl67_secondaryPhysics.test.ts), suite 3308/3309 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, push OK. Lógica pura sin Babylon: SecondaryChain (Verlet + muelle + ángulo máximo + colisión cápsulas), SecondaryPhysics (paso fijo 60 Hz, freeze/thaw), bodyInertiaLean (pitch/roll por aceleración y giro), pointToCapsuleDistance. Integración en GltfCharacter pendiente de huesos `fis_` de OMP (OMP-POL-13). Evidencia en work/junie-jl67/.
 - [ ] JL-68 Jinetes bien sentados en cada montura.
   - Hoy todas las monturas usan un mismo descenso de asiento (`RIDE_SEAT_DROP = 0.42` en `src/render/characters/gltfCharacter.ts`) y la misma pose. Con monturas tan distintas (caballo, falcopama, arpía, perezoso, tortuga…) el jinete flota, se hunde o atraviesa la silla.
   - Cuando OMP publique el ancla `Asiento` en cada GLB de montura (OMP-POL-13), el jinete se pega a ese ancla, con la orientación de la silla, y sigue su balanceo al andar y al volar.

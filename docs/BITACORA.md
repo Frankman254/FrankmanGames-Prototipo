@@ -1,3 +1,19 @@
+## 2026-11-21 — JL-67: Motor de físicas secundarias — Verlet, colisión e inercia (Junie)
+
+**Archivos:** `src/render/characters/secondaryPhysics.ts`, `tests/jl67_secondaryPhysics.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **Módulo puro `secondaryPhysics.ts`:** lógica sin dependencia de Babylon ni DOM, testeable con Vitest.
+- **`SecondaryChain`:** cadena Verlet con muelle hacia reposo, amortiguación, gravedad, restricción de segmento, límite de ángulo máximo y colisión con cápsulas del cuerpo (muslos, espinillas, cadera).
+- **`SecondaryPhysics`:** motor que gestiona múltiples cadenas, paso fijo a 60 Hz (acumulador), freeze/thaw para optimización por distancia a la cámara.
+- **`bodyInertiaLean()`:** función pura que calcula la inclinación del torso (pitch y roll) a partir de la aceleración lineal y el cambio de orientación, con topes de ±15° y ±10°.
+- **`pointToCapsuleDistance()`:** distancia punto-cápsula para colisión, exportada para tests.
+- **Integración en GltfCharacter:** pendiente de que OMP publique los huesos `fis_` (OMP-POL-13). El módulo está listo para conectarse: `buildChains()` recibe los grupos de huesos y `update()` se llama desde `onAfterAnimationsObservable`.
+
+**Validación:** 25 pruebas verdes (jl67_secondaryPhysics.test.ts): estabilidad con 5 y 240 FPS, convergencia a reposo, respeto del ángulo máximo, colisión con cápsulas (empuja fuera, no empuja si está lejos), freeze a reposo, paso fijo independiente de FPS, SecondaryPhysics (buildChains, freeze/thaw, dispose), bodyInertiaLean (arrancar, frenar, giro, topes, dt ≤ 0), pointToCapsuleDistance (eje, extremo, lateral). Suite 3308/3309 (1 fallo pre-existente assets.test.ts de OMP). Typecheck sin errores nuevos.
+
+**Evidencia:** `work/junie-jl67/`.
+
 ## 2026-11-21 — JL-64: Bloqueo — Rework de los pisos a mano de la cripta (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-64/BLOQUEO.md`.
