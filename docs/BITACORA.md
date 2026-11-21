@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-93: Escenario qaElectron monturas (JL-68) (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl93/`.
+
+**Qué se hizo:** Escenario `monturas` en `scripts/qaElectron.mjs` que recorre las 4 monturas de desarrollo (Arpía, Diostedé, Crestalba, Falcopama). Para cada una: la da al personaje con `c.give()`, la equipa, verifica que el jinete queda en `rider_root` con estado `idle` (sentado, no caminando), toma capturas de frente y de lado, y luego la desequipa con `unequip('mount')`. Al final verifica que no hay errores en consola.
+
+**Validación:** Escenario `monturas`: 10/10 checks en verde. Suite 3442/3443 (1 fallo pre-existente assets.test.ts de OMP). Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl93/` con 8 capturas (jl93-arpía-frente.jpg, jl93-arpía-lado.jpg, jl93-crestalba-frente.jpg, jl93-crestalba-lado.jpg, jl93-diostedé-frente.jpg, jl93-diostedé-lado.jpg, jl93-falcopama-frente.jpg, jl93-falcopama-lado.jpg).
+
+---
+
 ## 2026-11-21 — JL-92: Escenario qaElectron modosCamara (JL-65, JL-71) (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-92/`.

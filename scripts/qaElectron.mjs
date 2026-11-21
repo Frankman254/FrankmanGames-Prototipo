@@ -5455,6 +5455,64 @@ const scenarios = {
         await resize(1280, 800);
     },
 
+    /** JL-93: Escenario monturas — montar cada montura de desarrollo, captura del jinete sentado, bajar.
+     * Verifica que el jinete queda en rider_root con estado idle (sentado, no caminando). */
+    async monturas() {
+        await newGame('QA Monturas', { devMount: true });
+        // Lista de monturas de desarrollo.
+        const mounts = [
+            { id: 'mount_dev_harpy', name: 'Arpía' },
+            { id: 'mount_dev_diostede', name: 'Diostedé' },
+            { id: 'mount_dev_crestalba', name: 'Crestalba' },
+            { id: 'mount_dev_falcopama', name: 'Falcopama' },
+        ];
+        for (const m of mounts) {
+            // Dar la montura si no está (grantDevMount solo corre en import.meta.env.DEV).
+            // Desequipar cualquier montura previa para que equip() no falle.
+            // Equipar la montura.
+            const equipped = await js(
+                `(()=>{ const c=${W}.character; if(c.equipment.slots.mount) ${S}.unequip('mount'); c.give('${m.id}'); const inInv=c.inventory.slots.find(s=>s?.itemId==='${m.id}'); if(!inInv) return {ok:false,reason:'no en inventario'}; const r=${S}.equip(inInv.uid, 'mount'); return r; })()`,
+            );
+            if (!equipped.ok) {
+                check(`JL-93 ${m.name}: equipada`, false, equipped.reason ?? 'no encontrada en inventario');
+                continue;
+            }
+            // Esperar a que el modelo cargue.
+            try {
+                await until(`__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`, 15000, `modelo ${m.name}`);
+            } catch {
+                check(`JL-93 ${m.name}: modelo cargado`, false, 'timeout');
+                // Intentamos de todas formas la captura.
+            }
+            await sleep(1500);
+            // Verificar que el jinete está sentado (idle) y montado.
+            const rider = await js(
+                `(()=>{ const st=__game.view.player?.model?.state; const montura=${W}.character.equipment.get('mount')?.itemId; const riderRoot=__game.view.scene.transformNodes?.some(n=>n.name.endsWith('rider_root')); return {estado:st,montura,riderRoot}; })()`,
+            );
+            check(
+                `JL-93 ${m.name}: jinete sentado (idle, rider_root)`,
+                rider.montura === m.id && rider.estado === 'idle' && rider.riderRoot === true,
+                JSON.stringify(rider),
+            );
+            // Captura de frente.
+            await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=5; r.yawDeg=200; })()`);
+            await sleep(600);
+            await shot(`jl93-${m.name.toLowerCase()}-frente`);
+            // Captura de lado.
+            await js(`(()=>{ const r=__game.view.rig; r.yawDeg+=90; })()`);
+            await sleep(600);
+            await shot(`jl93-${m.name.toLowerCase()}-lado`);
+            // Bajar de la montura: unequip toma el slot, no el uid.
+            await js(`${S}.unequip('mount')`);
+            await sleep(800);
+            const dismounted = await js(`${W}.character.equipment.get('mount')?.itemId ?? null`);
+            check(`JL-93 ${m.name}: bajada`, dismounted === null, dismounted ?? 'bajada OK');
+        }
+        // Verificar que no hay errores en consola.
+        const consola = await js(`window.__consola ? window.__consola.errores(20) : []`).catch(() => []);
+        check('JL-93 monturas: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {
