@@ -10,7 +10,7 @@ import { artIconUrl } from '../menus/artIcons';
 export type HudLayoutHost = Pick<UiContext, 'toast' | 'confirm'>;
 import { button, h } from '../menus/dom';
 import { toFraction, type WindowLayout } from '../menus/windows';
-import { clampHudScale, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook } from './hudProfiles';
+import { clampHudScale, clampHudScaleAxis, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook, type HudScale } from './hudProfiles';
 import type { Minimap } from './minimap';
 
 export class HudLayout {
@@ -101,7 +101,7 @@ export class HudLayout {
             grip = h('div.hud-grip', { title: `Mover: ${label}` }, h('span', { text: label }));
             el.appendChild(grip);
         }
-        // Tamaño: un asa en la esquina; el minimapa ya trae la suya (ancho y alto).
+        // Tamaño: asas por eje; el minimapa ya trae la suya (ancho y alto).
         // El chat cambia de ancho y alto con su esquina (creador, 2026-11-06): sin asa de escala, y
         // al cambiarlo se guarda dónde queda, en proporción a la pantalla.
         if (key === 'chat' && typeof ResizeObserver !== 'undefined' && !this.observed.has(el)) {
@@ -118,14 +118,39 @@ export class HudLayout {
             }).observe(el);
         }
         if (key !== 'minimap' && key !== 'chat') this.keepBottom(el, key);
-        if (key !== 'minimap' && key !== 'chat' && !el.querySelector(':scope > .hud-scale')) {
-            const handle = h(
-                'div.hud-scale',
-                { title: `Tamaño: ${label} (arrastra; doble clic, el de siempre)` },
-                h('span', { text: '⇲' }),
-            );
-            el.appendChild(handle);
-            this.bindScale(handle, el, key);
+        if (key !== 'minimap' && key !== 'chat') {
+            // JL-59: asas por eje — derecha (ancho), inferior (alto), esquina (ambos).
+            const existing = el.querySelector(':scope > .hud-scale');
+            if (!existing) {
+                // Asa esquina: ambos ejes (doble clic restaura ambos).
+                const corner = h(
+                    'div.hud-scale',
+                    { title: `Tamaño: ${label} (arrastra esquina; Mayús mantiene proporción; doble clic, el de siempre)` },
+                    h('span', { text: '⇲' }),
+                );
+                el.appendChild(corner);
+                this.bindScale(corner, el, key, 'both');
+            }
+            // Asa derecha: solo ancho.
+            if (!el.querySelector(':scope > .hud-scale-w')) {
+                const wHandle = h(
+                    'div.hud-scale-w',
+                    { title: `Ancho: ${label} (arrastra; doble clic, el de siempre)` },
+                    h('span', { text: '↔' }),
+                );
+                el.appendChild(wHandle);
+                this.bindScale(wHandle, el, key, 'x');
+            }
+            // Asa inferior: solo alto.
+            if (!el.querySelector(':scope > .hud-scale-h')) {
+                const hHandle = h(
+                    'div.hud-scale-h',
+                    { title: `Alto: ${label} (arrastra; doble clic, el de siempre)` },
+                    h('span', { text: '↕' }),
+                );
+                el.appendChild(hHandle);
+                this.bindScale(hHandle, el, key, 'y');
+            }
         }
         this.applyScale(el, key);
         const old = this.els.get(key);
@@ -168,36 +193,61 @@ export class HudLayout {
     /** Mientras se arrastra una esquina de tamaño, el alto cambia a propósito. */
     private scaling = false;
 
-    /** Arrastrar el asa cambia el tamaño: hacia la derecha o abajo crece; doble clic, el de siempre. */
-    private bindScale(handle: HTMLElement, el: HTMLElement, key: string): void {
+    /** Arrastrar el asa cambia el tamaño por eje; doble clic, el de siempre. */
+    private bindScale(handle: HTMLElement, el: HTMLElement, key: string, axis: 'x' | 'y' | 'both'): void {
         handle.addEventListener('dblclick', (e) => {
             e.stopPropagation();
-            this.profiles.setScale(key, null);
+            if (axis === 'x') this.profiles.setScale(key, 1, null);
+            else if (axis === 'y') this.profiles.setScale(key, null, 1);
+            else this.profiles.setScale(key, null);
             this.applyScale(el, key);
         });
         handle.addEventListener('pointerdown', (e) => {
             if (e.button !== 0 || !this.canMove(key)) return;
             e.preventDefault();
             e.stopPropagation();
-            const start = this.profiles.active.scales?.[key] ?? 1;
+            const current = this.profiles.active.scales?.[key] ?? { x: 1, y: 1 };
             const r = el.getBoundingClientRect();
-            // Tamaño a escala 1: la escala nueva es la que hace que la esquina caiga bajo el ratón.
-            const unitW = Math.max(1, r.width / start);
-            const unitH = Math.max(1, r.height / start);
+            // Tamaño a escala 1 por eje.
+            const unitW = Math.max(1, r.width / current.x);
+            const unitH = Math.max(1, r.height / current.y);
             const x0 = e.clientX;
             const y0 = e.clientY;
+            const shiftKey = e.shiftKey; // Mayús = mantener proporción (solo en asa esquina).
             handle.setPointerCapture(e.pointerId);
             this.scaling = true;
             const move = (ev: PointerEvent): void => {
-                const want = Math.max((r.width + ev.clientX - x0) / unitW, (r.height + ev.clientY - y0) / unitH);
-                // Sin salirse de la pantalla por la derecha ni por abajo.
-                const room = Math.min(
-                    (window.innerWidth - 4 - r.left) / unitW,
-                    (window.innerHeight - 4 - r.top) / unitH,
-                );
-                this.profiles.setScale(key, clampHudScale(Math.min(want, room)));
+                let dx = 0;
+                let dy = 0;
+                if (axis === 'x' || axis === 'both') {
+                    dx = (ev.clientX - x0) / unitW;
+                }
+                if (axis === 'y' || axis === 'both') {
+                    dy = (ev.clientY - y0) / unitH;
+                }
+                // Con Mayús en asa esquina, mantener la proporción: usa el mayor desplazamiento.
+                let scaleX = current.x;
+                let scaleY = current.y;
+                if (shiftKey && axis === 'both') {
+                    const maxDelta = Math.max(dx, dy);
+                    scaleX = current.x + maxDelta;
+                    scaleY = current.y + maxDelta;
+                } else {
+                    if (axis === 'x') scaleX = current.x + dx;
+                    else if (axis === 'y') scaleY = current.y + dy;
+                    else {
+                        scaleX = current.x + dx;
+                        scaleY = current.y + dy;
+                    }
+                }
+                // Sin salirse de la pantalla.
+                const roomX = (window.innerWidth - 4 - r.left) / unitW;
+                const roomY = (window.innerHeight - 4 - r.top) / unitH;
+                scaleX = Math.min(scaleX, roomX);
+                scaleY = Math.min(scaleY, roomY);
+                this.profiles.setScale(key, clampHudScale(scaleX), clampHudScale(scaleY));
                 this.applyScale(el, key);
-                // El zoom también escala la posición: se devuelve la esquina de arriba a la izquierda a su sitio.
+                // La transform scale también escala la posición: se devuelve la esquina de arriba a la izquierda a su sitio.
                 const now = el.getBoundingClientRect();
                 this.windows.setPositions([key], {
                     [key]: toFraction(
@@ -224,11 +274,16 @@ export class HudLayout {
         });
     }
 
-    /** Pone el tamaño guardado del elemento (zoom: letras y casillas crecen juntas). */
+    /** Pone el tamaño guardado del elemento por eje (transform: scale(x, y)). */
     private applyScale(el: HTMLElement, key: string): void {
-        const s = this.profiles.active.scales?.[key] ?? 1;
-        if (Math.abs(s - 1) < 0.01) el.style.removeProperty('zoom');
-        else el.style.setProperty('zoom', String(s));
+        const s: HudScale = this.profiles.active.scales?.[key] ?? { x: 1, y: 1 };
+        if (Math.abs(s.x - 1) < 0.01 && Math.abs(s.y - 1) < 0.01) {
+            el.style.removeProperty('transform');
+            el.style.removeProperty('transform-origin');
+        } else {
+            el.style.setProperty('transform', `scale(${s.x}, ${s.y})`);
+            el.style.setProperty('transform-origin', 'bottom left');
+        }
     }
 
     /** Engancha la barra recién creada: sus secciones y los botones de separar y fijar. */

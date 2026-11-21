@@ -1081,7 +1081,7 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
   - Pruebas de `castModes.ts` para cada modo, la cola y la asistencia. Vídeo o capturas en Electron de cada modo.
   - No toques el aspecto del indicador ni de la línea de trayectoria: eso es OMP-POL-12. Tú solo la lógica.
 
-- [ ] JL-59 Barra de hechizos fusionada: tamaño por defecto, y escala por eje en todo el HUD.
+- [x] JL-59 Barra de hechizos fusionada: tamaño por defecto, y escala por eje en todo el HUD. — commit «JL-59: barra fusionada centrada y escala por eje en el HUD» — 12 pruebas verdes (jl59_hudScaleAxis.test.ts), suite 3217/3218 (1 fallo pre-existente assets.test.ts), tsc sin errores nuevos, build OK, push OK. HudScale {x, y} con migración, 3 asas por elemento, barra centrada con fit-content. Evidencia en work/junie-jl59/.
   - Hoy, con las barras fusionadas, `.hud-actionbar` ocupa todo el ancho y queda un hueco marrón vacío a la derecha (captura del creador a 2000×1191). Por defecto debe medir lo que miden sus casillas y quedar centrada abajo.
   - Escala independiente en X y en Y para **todos** los elementos de `HUD_ELEMENTS`:
     - asa en el borde derecho: solo ancho;

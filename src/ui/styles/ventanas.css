@@ -2221,6 +2221,7 @@ input[type='search'].opt-search {
 }
 
 /* Asa de tamaño de «Editar interfaz» (F02): solo se ve editando. */
+/* JL-59: tres asas por eje — esquina (ambos), derecha (ancho), inferior (alto). */
 .hud-scale {
     display: none;
     position: absolute;
@@ -2238,13 +2239,57 @@ input[type='search'].opt-search {
     border-radius: var(--br-md);
     cursor: nwse-resize;
 }
-body.hud-editing .hud-editable > .hud-scale {
+/* Asa derecha: solo ancho. */
+.hud-scale-w {
+    display: none;
+    position: absolute;
+    right: -9px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    font: 700 var(--fs-11) var(--sans);
+    color: #1b140f;
+    background: var(--gold);
+    border: 1px solid #000;
+    border-radius: var(--br-md);
+    cursor: ew-resize;
+}
+/* Asa inferior: solo alto. */
+.hud-scale-h {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: -9px;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    font: 700 var(--fs-11) var(--sans);
+    color: #1b140f;
+    background: var(--gold);
+    border: 1px solid #000;
+    border-radius: var(--br-md);
+    cursor: ns-resize;
+}
+body.hud-editing .hud-editable > .hud-scale,
+body.hud-editing .hud-editable > .hud-scale-w,
+body.hud-editing .hud-editable > .hud-scale-h {
     display: flex;
 }
 /* Barra suelta (sin «Editar interfaz»): la barra o cada sección se mueve por su recuadro y cambia
-   de tamaño por su esquina. */
+   de tamaño por sus asas. */
 body.hud-bar-unpinned .hud-actionbar:not(.split) > .hud-scale,
-body.hud-bar-unpinned .hud-section > .hud-scale {
+body.hud-bar-unpinned .hud-actionbar:not(.split) > .hud-scale-w,
+body.hud-bar-unpinned .hud-actionbar:not(.split) > .hud-scale-h,
+body.hud-bar-unpinned .hud-section > .hud-scale,
+body.hud-bar-unpinned .hud-section > .hud-scale-w,
+body.hud-bar-unpinned .hud-section > .hud-scale-h {
     display: flex;
 }
 /* El nombre de cada elemento va como pestaña encima del recuadro, nunca sobre el contenido. */

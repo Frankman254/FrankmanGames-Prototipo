@@ -57,7 +57,8 @@ describe('mapa y HUD', () => {
         profiles.setBar(true, false);
         const second = profiles.create(' Exploración ');
         expect(second.positions.minimap).toEqual({ x: 900.4, y: 25.6, fx: 0.75, fy: 0.1 });
-        expect(second.scales).toEqual({ chat: 1.4 });
+        // JL-59: scales usa {x, y} en lugar de número único.
+        expect(second.scales).toEqual({ chat: { x: 1.4, y: 1.4 } });
         expect(second).toMatchObject({ barSplit: true, barPinned: false });
         profiles.resetActive();
         expect(profiles.active).toMatchObject({ positions: {}, minimapSize: null });

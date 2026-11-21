@@ -1,3 +1,18 @@
+## 2026-11-21 — JL-59: Barra fusionada centrada y escala por eje en el HUD (Junie)
+
+**Archivos:** `src/ui/map/hudProfiles.ts`, `src/ui/map/hudLayout.ts`, `src/ui/styles/menus.css`, `src/ui/styles/ventanas.css`, `tests/jl59_hudScaleAxis.test.ts`, `tests/ui/windows.test.ts`, `tests/mapLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **Barra fusionada centrada:** `.hud-actionbar` pasa de `left: 0; right: 0` (ancho completo) a `width: fit-content; margin: 0 auto`. La barra mide lo que miden sus casillas y queda centrada abajo, sin hueco vacío a la derecha.
+- **Escala por eje:** `scales` en `HudProfile` cambia de `Record<string, number>` a `Record<string, HudScale>` con `HudScale = { x: number; y: number }`. Los perfiles guardados con número único se migran automáticamente a `{x, y}` iguales.
+- **Tres asas por elemento:** asa esquina (ambos ejes, ⇲), asa derecha (solo ancho, ↔) y asa inferior (solo alto, ↕). Con Mayús en la esquina se mantiene la proporción.
+- **applyScale:** pasa de `zoom` a `transform: scale(x, y)` con `transform-origin: bottom left`.
+- **Pruebas:** 12 pruebas nuevas en `jl59_hudScaleAxis.test.ts` (migración, clamp por eje, valores inválidos). `windows.test.ts` y `mapLogic.test.ts` actualizados al nuevo formato.
+
+**Validación:** 12 pruebas verdes, suite 3217/3218 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, Vite build OK. Electron no disponible para capturas visuales.
+
+**Evidencia:** `work/junie-jl59/`.
+
 ## 2026-11-21 — Monturas, andar y físicas secundarias (Coord)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`; `COLA_OMP.md` (local).

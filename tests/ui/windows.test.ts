@@ -91,6 +91,10 @@ describe('HUD movible y con tamaño (F02)', () => {
             active: 'p1',
             profiles: [{ id: 'p1', name: 'A', positions: {}, scales: { chat: 1.4, roto: 'x', grande: 50 } }],
         });
-        expect(st.profiles[0]!.scales).toEqual({ chat: 1.4, grande: HUD_SCALE_MAX });
+        // JL-59: parseScales migra números a {x, y}.
+        expect(st.profiles[0]!.scales).toEqual({
+            chat: { x: 1.4, y: 1.4 },
+            grande: { x: HUD_SCALE_MAX, y: HUD_SCALE_MAX },
+        });
     });
 });

@@ -31,6 +31,23 @@ export const HUD_SCALE_MIN = 0.6;
 export const HUD_SCALE_MAX = 1.8;
 export const clampHudScale = (v: number): number =>
     Math.round(Math.max(HUD_SCALE_MIN, Math.min(HUD_SCALE_MAX, v)) * 100) / 100;
+
+/** Escala por eje de un elemento del HUD. */
+export interface HudScale {
+    x: number;
+    y: number;
+}
+
+/** Clampear una escala por eje. */
+export function clampHudScaleAxis(s: HudScale): HudScale {
+    return { x: clampHudScale(s.x), y: clampHudScale(s.y) };
+}
+
+/** Migrar una escala antigua (número único) a {x, y}. */
+export function migrateScale(v: number): HudScale {
+    const clamped = clampHudScale(v);
+    return { x: clamped, y: clamped };
+}
 export type HudElementKey = (typeof HUD_ELEMENTS)[number]['key'];
 export const HUD_KEYS: readonly string[] = HUD_ELEMENTS.map((e) => e.key);
 
@@ -41,8 +58,8 @@ export interface HudProfile {
     positions: Record<string, WindowPos>;
     /** Ancho y alto del minimapa en píxeles CSS (null = el cuadrado de los datos). */
     minimapSize: MinimapSize | null;
-    /** Tamaño de cada elemento (1 = el de siempre); el minimapa usa `minimapSize`. */
-    scales?: Record<string, number>;
+    /** Tamaño de cada elemento por eje ({x, y} = el de siempre); el minimapa usa `minimapSize`. */
+    scales?: Record<string, HudScale>;
     /** La barra de abajo separada en secciones sueltas. */
     barSplit?: boolean;
     /** false = suelta: sus asas se ven y se puede arrastrar. Por defecto, fijada. */
@@ -67,12 +84,28 @@ function defaultState(): HudProfileState {
 }
 
 /** Tamaño guardado del minimapa: `{ w, h }`, o un número (perfiles de cuando era cuadrado). */
-/** Escalas guardadas: solo números dentro del rango. */
-export function parseScales(raw: unknown): Record<string, number> {
-    const out: Record<string, number> = {};
+/** Escalas guardadas: migra números únicos a {x, y}. */
+export function parseScales(raw: unknown): Record<string, HudScale> {
+    const out: Record<string, HudScale> = {};
     if (!raw || typeof raw !== 'object') return out;
-    for (const [key, v] of Object.entries(raw as Record<string, unknown>))
-        if (typeof v === 'number' && Number.isFinite(v)) out[key] = clampHudScale(v);
+    for (const [key, v] of Object.entries(raw as Record<string, unknown>)) {
+        if (typeof v === 'number' && Number.isFinite(v)) {
+            // Migración: número único → {x, y}
+            out[key] = migrateScale(v);
+        } else if (
+            v &&
+            typeof v === 'object' &&
+            'x' in v &&
+            'y' in v &&
+            typeof (v as { x: unknown; y: unknown }).x === 'number' &&
+            typeof (v as { x: unknown; y: unknown }).y === 'number'
+        ) {
+            const sv = v as { x: number; y: number };
+            if (Number.isFinite(sv.x) && Number.isFinite(sv.y)) {
+                out[key] = clampHudScaleAxis(sv);
+            }
+        }
+    }
     return out;
 }
 
@@ -200,11 +233,20 @@ export class HudProfileBook {
         this.save();
     }
 
-    setScale(key: string, scale: number | null): void {
+    /**
+     * Cambia la escala de un elemento.
+     * @param key Clave del elemento.
+     * @param sx Escala en X (null = no cambiar).
+     * @param sy Escala en Y (null = no cambiar).
+     */
+    setScale(key: string, sx: number | null, sy?: number | null): void {
         const p = this.active;
         const next = { ...(p.scales ?? {}) };
-        if (scale === null || Math.abs(scale - 1) < 0.01) delete next[key];
-        else next[key] = clampHudScale(scale);
+        const current = next[key] ?? { x: 1, y: 1 };
+        const newX = sx !== null ? clampHudScale(sx) : current.x;
+        const newY = (sy ?? sx) !== null ? clampHudScale(sy ?? sx ?? 1) : current.y;
+        if (Math.abs(newX - 1) < 0.01 && Math.abs(newY - 1) < 0.01) delete next[key];
+        else next[key] = { x: newX, y: newY };
         p.scales = next;
         this.save();
     }
