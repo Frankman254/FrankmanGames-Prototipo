@@ -1045,7 +1045,7 @@ Revisión de JL-49 por el coordinador: suite 3154/3155, el único fallo es `v2Pr
 - [x] JL-55 Tab: el clic en el aire no mueve (FALLOS §8, `tabClic`). — commit «JL-55: clic en el aire durante vuelo» — 8 pruebas verdes (jl55_tabClick.test.ts), tsc sin errores nuevos, build OK. Causa: clickGroundNear rechazaba el clic en vuelo por la cámara elevada. Arreglo: acepta cualquier hit de pickGround en vuelo. Evidencia en work/junie-jl55/.
 - [x] JL-56 Zona hostil sobre pueblo: el área de `azuero` pisa la zona segura de Villa Raspadura (MAP-GEO-01, gravedad alta). — commit «JL-56: prueba guardia — zona hostil no spawnea en zona segura» — 7 pruebas verdes (jl56_safeZoneSpawn.test.ts), suite 3180/3182 (2 fallos pre-existentes), tsc sin errores nuevos, build OK. Ya protegido: `zoneAt()` devuelve Raspadura (safe) en el solape, `ZonePopulation.scan()` los saltea. Evidencia en work/junie-jl56/.
 - [x] JL-57 `balance45` (FALLOS §6): tormenta aún escala con Agilidad y Aguacero no cuesta maná. **Solo diagnóstico.** — commit «JL-57: diagnóstico balance45 — tormenta y Aguacero» — DIAGNOSTICO.md en work/junie-jl-57/. Check 2: el código es correcto (lightning escala con will, no con agility); el check del escenario está desfasado con Balance 45. Check 4: d96bbb9 bajó resourceCost de 50 a 24, rompiendo el umbral ≥ 40. El coordinador decide si restaura el coste o actualiza el escenario.
-- [ ] JL-58 Cierre de la tanda: QA por tandas completa (`QA_SESION`) con el arnés de JL-50/51 y resumen en `work/junie-qa01/RESUMEN.md` (escenarios en verde antes y después). Lo que siga fallando se lista en `work/junie-jl-58/FALLOS.md`. Este commit lleva también la fila JL de TAREAS y la BITACORA de la tanda.
+- [x] JL-58 Cierre de la tanda: QA por tandas completa (`QA_SESION`) con el arnés de JL-50/51 y resumen en `work/junie-qa01/RESUMEN.md` (escenarios en verde antes y después). Lo que siga fallando se lista en `work/junie-jl-58/FALLOS.md`. Este commit lleva también la fila JL de TAREAS y la BITACORA de la tanda. — commit «JL-58: cierre de la tanda — QA completa, 271 OK / 68 FALLA pre-existentes» — 8 tandas (qa_run_1 a qa_run_8), 52 escenarios cubiertos, 0 regresiones. FALLOS.md en work/junie-jl58/.
 
 
 ## Tanda del 2026-11-21, tarde (coordinador, pedida por el creador). Después de JL-58, en este orden.
@@ -1054,6 +1054,32 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
 - HUD: «arreglar la barra de hechizos cuando esta fusionada por defecto aparece demasiado grande […] que todos los elementos puedan crecer horizontalmente y verticalmente independiente de los 2 ejes a la vez, corregir las posiciones por defecto en cada tipo de pantalla».
 - Q27: los cambios de JL-49 en la cripta se quedan. Además, «los pisos iniciales hay que hacerles rework ya que estan horribles y muy simples».
 - Q29: «si hay que integrar todo […] hay muchos mounstruos en el convenio que tienen nombre de una cosa y son otra, muchos con forma de perro».
+
+- [ ] JL-65 **URGENTE, va antes de JL-59.** Cámara: zoom automático que bloquea el juego, y modos de cámara.
+  - Creador (2026-11-21): «la camara hace un zoom automatico en ciertas zonas donde obtruyen los obstaculos y el personaje no puedo moverlo ni alegar el zoom necesito que el movimiento de la camara sea inteligente no solo en el zoom si no en el giro, y que cuando esta en modo manual no haga esos zooms automaticos si no que todo eso sea por el jugador».
+  - Fallo: en exterior, `unblockedDistance()` de `src/render/cameraRig.ts` acerca la cámara en cuanto cualquier caja tapa el rayo (margen 0,6). Cerca de casas, rocas o árboles la cámara se pega al personaje y la rueda no la aleja, porque el tope se recalcula cada fotograma. Además el personaje deja de moverse. Encuentra por qué: lo probable es que el clic caiga en la caja que tapa o que la cámara quede dentro de ella. Reprodúcelo en Electron y guarda la causa en `work/junie-jl-65/`.
+  - Modos (hoy existen `follow`, `autoFocus`, `smart` y `zone` en `src/camera/`). Reorganízalos en estos cuatro, con nombres en español en Opciones → Juego:
+    1. **Manual**: zoom, giro e inclinación solo los mueve el jugador. Ningún zoom automático. Si un obstáculo tapa al personaje, el obstáculo se vuelve semitransparente o se ve su silueta; la cámara no se acerca. Solo se acerca si quedaría dentro de una caja, y vuelve sola a la distancia del jugador al salir.
+    2. **Semiautomático**: como el manual, pero al caminar la cámara gira despacio hacia detrás del personaje y esquiva los obstáculos girando un poco, antes que acercándose. Si el jugador gira a mano, se respeta su giro unos segundos.
+    3. **Automático**: la cámara elige distancia y giro sola, de forma suave: se aleja en espacios abiertos y se acerca en pasillos, sin tirones.
+    4. **Encuadre de combate**: en combate, la cámara encuadra al personaje y a los enemigos que lo atacan, girando y alejándose lo necesario para verlos a todos. Fuera de combate se comporta como el automático. Es el `autoFocus` de hoy, mejorado.
+  - En todos los modos, la rueda del ratón siempre cambia el zoom y nunca queda bloqueada. El personaje nunca deja de responder por culpa de la cámara.
+  - Interiores (cripta, casas) y la cámara por casilla (`zone`) siguen funcionando. `zone` no es un modo del menú: sigue mandando dentro de las casillas que lo piden.
+  - Guardados: un guardado con `follow` pasa a Manual, `smart` a Automático y `autoFocus` a Encuadre de combate.
+  - Pruebas de lógica pura en `src/camera/` para cada modo, en especial que Manual nunca reduce la distancia por obstáculos en exterior. Capturas o vídeo en Electron, en el sitio donde se reproduce el fallo, con cada modo.
+- [ ] JL-66 Combate más fluido: modos de lanzar hechizos y apuntado.
+  - Creador (2026-11-21): «la jugabilidad tozca y no se siente suave y es dificil de apuntar los hechizos, deberiamos agregar varios modos de lanzar hechizos para que sea mas fluidas las peleas, como un modo que al pulsar y soltar lanza el hechizo de una vez sin esperar que vuelvas a pulsar, un modo de pulsar y mantener para ver la zona de efecto y al soltar entonces pega, otro modo como el actual de presionar 2 veces o el clic».
+  - Los tres modos ya existen en `src/sim/castModes.ts` (`press`, `indicator`, `pressClick`) y en Opciones → Juego → «Lanzar hechizos», pero el creador no los ha encontrado o no se sienten bien. Comprueba en Electron que cada uno hace exactamente lo que pide la cita y arregla lo que no.
+  - Hazlos fáciles de encontrar: también en la primera pantalla de Opciones y en el menú contextual de la barra de hechizos, con una frase que explique cada uno.
+  - Opcional por hechizo: clic derecho en una casilla de la barra permite elegirle un modo propio, que gana sobre el general.
+  - Apuntado más suave:
+    - asistencia al apuntar: un hechizo de objetivo lanzado cerca de un enemigo se pega al enemigo más cercano al cursor dentro de un radio pequeño;
+    - si el cursor queda fuera del alcance, el hechizo va al punto más lejano dentro del alcance en esa dirección, en vez de fallar;
+    - el área se dibuja ya en el fotograma de la pulsación, sin retraso.
+  - Pulsar varias teclas seguidas no se pierde: si hay un lanzamiento en curso, la siguiente pulsación queda en cola (un hechizo como máximo).
+  - Sin cambiar cifras de los hechizos: daño, coste, alcance y enfriamiento son los mismos.
+  - Pruebas de `castModes.ts` para cada modo, la cola y la asistencia. Vídeo o capturas en Electron de cada modo.
+  - No toques el aspecto del indicador ni de la línea de trayectoria: eso es OMP-POL-12. Tú solo la lógica.
 
 - [ ] JL-59 Barra de hechizos fusionada: tamaño por defecto, y escala por eje en todo el HUD.
   - Hoy, con las barras fusionadas, `.hud-actionbar` ocupa todo el ancho y queda un hueco marrón vacío a la derecha (captura del creador a 2000×1191). Por defecto debe medir lo que miden sus casillas y quedar centrada abajo.

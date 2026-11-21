@@ -152,6 +152,22 @@
 
 **Evidencia:** `work/junie-jl56/`.
 
+## 2026-11-21 — JL-58: Cierre de la tanda con QA completa (Junie)
+
+**Archivos:** `work/junie-qa01/RESUMEN.md`, `work/junie-jl58/FALLOS.md`, `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`.
+
+**Qué se hizo:** Cierre de la tanda JL-50…58 con recorrido QA completo:
+- 8 tandas de ejecución (qa_run_1 a qa_run_8), 52 escenarios únicos cubiertos.
+- Resultado: 271 OK / 68 FALLA (contando duplicados entre tandas).
+- Todos los fallos son **pre-existentes**: no hay regresiones nuevas introducidas por los commits de JL-50 a JL-57.
+- Los arreglos de esa tanda se mantienen efectivos: botón Nueva partida (JL-50), timeouts por escenario (JL-51), Punta Venada (JL-52), chat grip (JL-53), hechizo de prueba (JL-54), clic en vuelo (JL-55), zona hostil sobre pueblo (JL-56).
+- Escenarios que cortan la ejecución por timeout en cascada: `audio`, `castillo`, `aprendizaje`, `balance45`, `criticoV3`.
+- Los 10 grupos de fallos persistentes están documentados en `work/junie-jl58/FALLOS.md`.
+
+**Validación:** RESUMEN.md actualizado, FALLOS.md creado, COLA_JUNIE.md con JL-58 marcada `[x]`, TAREAS.md con fila JL-50…58 en "Hecho".
+
+**Evidencia:** `work/junie-jl58/` (qa_run_1.log a qa_run_8.log, FALLOS.md).
+
 ## 2026-11-21 — Revisión de JL-45b…49 y tanda JL-50…58 (Coord)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`.
@@ -170,7 +186,7 @@
 - JL-50…55: los fallos de QA de `work/junie-jl-12/FALLOS.md`, que nunca tuvieron tarea.
 - JL-56: el hallazgo alto de MAP-GEO-01, que ningún monstruo nazca en una zona segura; la regla va en el código, sin recortar áreas.
 - JL-57: diagnóstico de `balance45`.
-- JL-58: cierre con QA completa.
+- JL-58: cierre con QA completa — **hecho** (271 OK / 68 FALLA pre-existentes, 0 regresiones).
 
 ## 2026-11-20 — Commits de Junie: uno por tarea, con todo dentro; REF-01 de ranas y águilas (Coord)
 
