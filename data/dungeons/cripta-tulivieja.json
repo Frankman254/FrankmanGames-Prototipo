@@ -23,13 +23,88 @@
         "#............N#",
         "###############"
       ],
-      "doors": [{ "id": "reja-atrio", "tile": [4, 6], "openedBy": "palanca-atrio" }],
-      "triggers": [{ "id": "palanca-atrio", "kind": "lever", "tile": [4, 4], "targets": ["reja-atrio"] }],
+      "doors": [
+        {
+          "id": "reja-atrio",
+          "tile": [
+            4,
+            6
+          ],
+          "openedBy": "palanca-atrio"
+        }
+      ],
+      "triggers": [
+        {
+          "id": "palanca-atrio",
+          "kind": "lever",
+          "tile": [
+            4,
+            4
+          ],
+          "targets": [
+            "reja-atrio"
+          ]
+        }
+      ],
       "spawns": [
-        { "id": "vigia-a", "archetype": "melee", "level": 4, "tile": [10, 4], "levelBonus": 0 },
-        { "id": "vigia-b", "archetype": "ranged", "level": 4, "tile": [11, 10], "levelBonus": 0 },
-        { "id": "rata-atrio-1", "archetype": "cripta_rata", "level": 3, "tile": [3, 7], "levelBonus": 0 },
-        { "id": "rata-atrio-2", "archetype": "cripta_rata", "level": 3, "tile": [8, 12], "levelBonus": 0 }
+        {
+          "id": "vigia-a",
+          "archetype": "melee",
+          "level": 4,
+          "tile": [
+            10,
+            4
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "vigia-b",
+          "archetype": "ranged",
+          "level": 4,
+          "tile": [
+            11,
+            10
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "rata-atrio-1",
+          "archetype": "cripta_rata",
+          "level": 3,
+          "tile": [
+            3,
+            7
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "rata-atrio-2",
+          "archetype": "cripta_rata",
+          "level": 3,
+          "tile": [
+            8,
+            12
+          ],
+          "levelBonus": 0
+        }
+      ],
+      "props": [
+        {
+          "piece": "crip_altar_huaca",
+          "tile": [
+            7,
+            3
+          ],
+          "rotDeg": 0
+        },
+        {
+          "piece": "crip_velas",
+          "tile": [
+            6,
+            3
+          ],
+          "rotDeg": 0
+        }
       ]
     },
     {
@@ -52,16 +127,99 @@
         "#............N#",
         "###############"
       ],
-      "doors": [{ "id": "reja-losetas", "tile": [7, 7], "openedBy": "placa-centro" }],
+      "doors": [
+        {
+          "id": "reja-losetas",
+          "tile": [
+            7,
+            7
+          ],
+          "openedBy": "placa-centro"
+        }
+      ],
       "triggers": [
-        { "id": "placa-centro", "kind": "pressure-plate", "tile": [6, 3], "targets": ["reja-losetas"], "durationSeconds": 8 },
-        { "id": "pinchos-oeste", "kind": "timed-trap", "tile": [3, 9], "targets": [], "durationSeconds": 3 }
+        {
+          "id": "placa-centro",
+          "kind": "pressure-plate",
+          "tile": [
+            6,
+            3
+          ],
+          "targets": [
+            "reja-losetas"
+          ],
+          "durationSeconds": 8
+        },
+        {
+          "id": "pinchos-oeste",
+          "kind": "timed-trap",
+          "tile": [
+            3,
+            9
+          ],
+          "targets": [],
+          "durationSeconds": 3
+        }
       ],
       "spawns": [
-        { "id": "control-a", "archetype": "summoner", "level": 6, "tile": [10, 5], "levelBonus": 0 },
-        { "id": "bruto-a", "archetype": "grave_brute", "level": 6, "tile": [4, 11], "levelBonus": 0 },
-        { "id": "rata-galeria-1", "archetype": "cripta_rata", "level": 5, "tile": [2, 2], "levelBonus": 0 },
-        { "id": "rata-galeria-2", "archetype": "cripta_rata", "level": 5, "tile": [12, 8], "levelBonus": 0 }
+        {
+          "id": "control-a",
+          "archetype": "summoner",
+          "level": 6,
+          "tile": [
+            10,
+            5
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "bruto-a",
+          "archetype": "grave_brute",
+          "level": 6,
+          "tile": [
+            4,
+            11
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "rata-galeria-1",
+          "archetype": "cripta_rata",
+          "level": 5,
+          "tile": [
+            2,
+            2
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "rata-galeria-2",
+          "archetype": "cripta_rata",
+          "level": 5,
+          "tile": [
+            12,
+            8
+          ],
+          "levelBonus": 0
+        }
+      ],
+      "props": [
+        {
+          "piece": "crip_urnas",
+          "tile": [
+            1,
+            5
+          ],
+          "rotDeg": 90
+        },
+        {
+          "piece": "crip_urnas",
+          "tile": [
+            13,
+            5
+          ],
+          "rotDeg": 90
+        }
       ]
     },
     {
@@ -85,25 +243,112 @@
         "###############"
       ],
       "doors": [
-        { "id": "puerta-candil", "tile": [10, 6], "openedBy": "llave-candil" },
-        { "id": "atajo-candil", "tile": [13, 12], "openedBy": "palanca-atajo", "shortcut": true }
+        {
+          "id": "puerta-candil",
+          "tile": [
+            10,
+            6
+          ],
+          "openedBy": "llave-candil"
+        },
+        {
+          "id": "atajo-candil",
+          "tile": [
+            13,
+            12
+          ],
+          "openedBy": "palanca-atajo",
+          "shortcut": true
+        }
       ],
       "triggers": [
-        { "id": "llave-candil", "kind": "lever", "tile": [5, 5], "targets": ["puerta-candil"] },
-        { "id": "palanca-atajo", "kind": "lever", "tile": [5, 10], "targets": ["atajo-candil"] }
+        {
+          "id": "llave-candil",
+          "kind": "lever",
+          "tile": [
+            5,
+            5
+          ],
+          "targets": [
+            "puerta-candil"
+          ]
+        },
+        {
+          "id": "palanca-atajo",
+          "kind": "lever",
+          "tile": [
+            5,
+            10
+          ],
+          "targets": [
+            "atajo-candil"
+          ]
+        }
       ],
       "spawns": [
-        { "id": "custodio-llave", "archetype": "goblin_veteran", "level": 8, "tile": [8, 5], "levelBonus": 0 },
-        { "id": "ronda-candil", "archetype": "alpha_wolf", "level": 8, "tile": [11, 10], "levelBonus": 0 },
-        { "id": "bruto-camara", "archetype": "cripta_bruto", "level": 8, "tile": [2, 10], "levelBonus": 0 }
+        {
+          "id": "custodio-llave",
+          "archetype": "goblin_veteran",
+          "level": 8,
+          "tile": [
+            8,
+            5
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "ronda-candil",
+          "archetype": "alpha_wolf",
+          "level": 8,
+          "tile": [
+            11,
+            10
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "bruto-camara",
+          "archetype": "cripta_bruto",
+          "level": 8,
+          "tile": [
+            2,
+            10
+          ],
+          "levelBonus": 0
+        }
       ],
       "rareSpawn": {
         "id": "silbador-de-cal",
         "archetype": "crypt_warden",
         "chance": 0.06,
-        "tile": [12, 2],
-        "sign": { "message": "Un silbido seco corre por la cal...", "sound": "rare_whistle", "light": "pale-flicker" }
-      }
+        "tile": [
+          12,
+          2
+        ],
+        "sign": {
+          "message": "Un silbido seco corre por la cal...",
+          "sound": "rare_whistle",
+          "light": "pale-flicker"
+        }
+      },
+      "props": [
+        {
+          "piece": "crip_sarcofago",
+          "tile": [
+            5,
+            4
+          ],
+          "rotDeg": 0
+        },
+        {
+          "piece": "crip_telarana_rincon",
+          "tile": [
+            1,
+            11
+          ],
+          "rotDeg": 0
+        }
+      ]
     },
     {
       "id": "patio-del-cerrojo",
@@ -126,27 +371,132 @@
         "###############"
       ],
       "doors": [
-        { "id": "sello-patio", "tile": [3, 6], "closesUntilClear": "patio-central" },
-        { "id": "atajo-patio", "tile": [13, 12], "openedBy": "palanca-patio", "shortcut": true }
+        {
+          "id": "sello-patio",
+          "tile": [
+            3,
+            6
+          ],
+          "closesUntilClear": "patio-central"
+        },
+        {
+          "id": "atajo-patio",
+          "tile": [
+            13,
+            12
+          ],
+          "openedBy": "palanca-patio",
+          "shortcut": true
+        }
       ],
       "triggers": [
-        { "id": "patio-central", "kind": "clear-room", "tile": [6, 5], "targets": ["sello-patio"] },
-        { "id": "palanca-patio", "kind": "lever", "tile": [5, 10], "targets": ["atajo-patio"] }
+        {
+          "id": "patio-central",
+          "kind": "clear-room",
+          "tile": [
+            6,
+            5
+          ],
+          "targets": [
+            "sello-patio"
+          ]
+        },
+        {
+          "id": "palanca-patio",
+          "kind": "lever",
+          "tile": [
+            5,
+            10
+          ],
+          "targets": [
+            "atajo-patio"
+          ]
+        }
       ],
       "spawns": [
-        { "id": "encierro-a", "archetype": "grave_brute", "level": 10, "tile": [6, 6], "levelBonus": 0 },
-        { "id": "encierro-b", "archetype": "summoner", "level": 10, "tile": [8, 6], "levelBonus": 0 },
-        { "id": "encierro-c", "archetype": "goblin_veteran", "level": 11, "tile": [7, 7], "levelBonus": 0 },
-        { "id": "bruto-patio", "archetype": "cripta_bruto", "level": 10, "tile": [10, 2], "levelBonus": 0 },
-        { "id": "guardian-patio", "archetype": "cripta_guardian", "level": 10, "tile": [2, 10], "levelBonus": 0 }
+        {
+          "id": "encierro-a",
+          "archetype": "grave_brute",
+          "level": 10,
+          "tile": [
+            6,
+            6
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "encierro-b",
+          "archetype": "summoner",
+          "level": 10,
+          "tile": [
+            8,
+            6
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "encierro-c",
+          "archetype": "goblin_veteran",
+          "level": 11,
+          "tile": [
+            7,
+            7
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "bruto-patio",
+          "archetype": "cripta_bruto",
+          "level": 10,
+          "tile": [
+            10,
+            2
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "guardian-patio",
+          "archetype": "cripta_guardian",
+          "level": 10,
+          "tile": [
+            2,
+            10
+          ],
+          "levelBonus": 0
+        }
       ],
       "rareSpawn": {
         "id": "silbador-de-cal",
         "archetype": "crypt_warden",
         "chance": 0.09,
-        "tile": [12, 2],
-        "sign": { "message": "La luz tose; algo raspa la piedra.", "sound": "rare_whistle", "light": "pale-flicker" }
-      }
+        "tile": [
+          12,
+          2
+        ],
+        "sign": {
+          "message": "La luz tose; algo raspa la piedra.",
+          "sound": "rare_whistle",
+          "light": "pale-flicker"
+        }
+      },
+      "props": [
+        {
+          "piece": "crip_osario",
+          "tile": [
+            5,
+            5
+          ],
+          "rotDeg": 0
+        },
+        {
+          "piece": "crip_estalagmitas",
+          "tile": [
+            12,
+            2
+          ],
+          "rotDeg": 0
+        }
+      ]
     },
     {
       "id": "santuario-del-hilo-roto",
@@ -168,13 +518,105 @@
         "#.............#",
         "###############"
       ],
-      "doors": [{ "id": "sello-jefe", "tile": [3, 6], "openedBy": "placa-jefe" }],
-      "triggers": [{ "id": "placa-jefe", "kind": "pressure-plate", "tile": [5, 10], "targets": ["sello-jefe"] }],
+      "doors": [
+        {
+          "id": "sello-jefe",
+          "tile": [
+            3,
+            6
+          ],
+          "openedBy": "placa-jefe"
+        }
+      ],
+      "triggers": [
+        {
+          "id": "placa-jefe",
+          "kind": "pressure-plate",
+          "tile": [
+            5,
+            10
+          ],
+          "targets": [
+            "sello-jefe"
+          ]
+        }
+      ],
       "spawns": [
-        { "id": "tejedor-a", "archetype": "grave_brute", "level": 12, "tile": [5, 9], "levelBonus": 0 },
-        { "id": "tejedor-b", "archetype": "summoner", "level": 13, "tile": [9, 9], "levelBonus": 0 },
-        { "id": "matriarca-hilo", "archetype": "crypt_warden", "level": 14, "tile": [7, 5], "guardian": true, "levelBonus": 0 },
-        { "id": "guardian-santuario", "archetype": "cripta_guardian", "level": 11, "tile": [10, 10], "levelBonus": 0 }
+        {
+          "id": "tejedor-a",
+          "archetype": "grave_brute",
+          "level": 12,
+          "tile": [
+            5,
+            9
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "tejedor-b",
+          "archetype": "summoner",
+          "level": 13,
+          "tile": [
+            9,
+            9
+          ],
+          "levelBonus": 0
+        },
+        {
+          "id": "matriarca-hilo",
+          "archetype": "crypt_warden",
+          "level": 14,
+          "tile": [
+            7,
+            5
+          ],
+          "guardian": true,
+          "levelBonus": 0
+        },
+        {
+          "id": "guardian-santuario",
+          "archetype": "cripta_guardian",
+          "level": 11,
+          "tile": [
+            10,
+            10
+          ],
+          "levelBonus": 0
+        }
+      ],
+      "props": [
+        {
+          "piece": "crip_sarcofago_oro",
+          "tile": [
+            7,
+            9
+          ],
+          "rotDeg": 0
+        },
+        {
+          "piece": "crip_raices_muro",
+          "tile": [
+            1,
+            9
+          ],
+          "rotDeg": 90
+        },
+        {
+          "piece": "crip_pila_agua",
+          "tile": [
+            12,
+            9
+          ],
+          "rotDeg": 0
+        },
+        {
+          "piece": "crip_velon",
+          "tile": [
+            7,
+            11
+          ],
+          "rotDeg": 0
+        }
       ]
     }
   ]

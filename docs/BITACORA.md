@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-88: Utilería de la cripta integrada (Junie)
+
+**Archivos:** `src/world/designedDungeon.ts`, `src/world/dungeon.ts`, `src/render/dungeonView.ts`, `data/dungeons/cripta-tulivieja.json`, `tests/jl88_cryptProps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Integración de `utileria_cripta.glb` (12 piezas) en los 5 pisos a mano de la cripta. Se añadió el tipo `DesignedProp` en `designedDungeon.ts`, `DungeonProp` en `dungeon.ts`, y `buildProps()` en `dungeonView.ts` que carga el GLB y clona los nodos declarados. Las 12 piezas se distribuyen: 2 en atrio-del-eco (altar, velas), 2 en galeria-de-las-losetas (urnas), 2 en camara-del-candil (sarcofago, telaraña), 2 en patio-del-cerrojo (osario, estalagmitas), 4 en santuario-del-hilo-roto (sarcofago oro, raíces, pila, velón). Ninguna pisa pasillos, escaleras, cofres, puertas, spawns ni antorchas. Mínimo 1.5 m de escaleras y antorchas.
+
+**Verificación:** 8 pruebas verdes (jl88_cryptProps.test.ts). Pruebas de antorchas intactas: j16_torches 11/11, tor01_regression 5/5, tor01_audit 4/4, jl64b 8/8. Suite 3416/3417 (1 fallo pre-existente assets.test.ts de OMP). Typecheck limpio (solo balM3.ts ajeno). Build OK. Capturas de Electron omitidas (sin display).
+
+---
+
 ## 2026-11-21 — JL-86: Águilas de FA-21 integradas (Junie)
 
 **Archivos:** `data/assets.json`, `tests/jl86_aguilas.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

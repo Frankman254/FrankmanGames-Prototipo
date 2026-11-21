@@ -35,6 +35,17 @@ export interface DesignedTorch {
     dir: [number, number];
 }
 
+export interface DesignedProp {
+    /** Nombre del nodo en el GLB (p. ej. `crip_altar_huaca`). */
+    piece: string;
+    /** Posición en coordenadas de baldosa (centro de la baldosa caminable). */
+    tile: [number, number];
+    /** Giro en grados alrededor de Y (0 = norte). */
+    rotDeg?: number;
+    /** Escala relativa (1 = tamaño del modelo). */
+    scale?: number;
+}
+
 export interface DesignedFloorDef {
     id: string;
     mode: 'hand' | 'seed';
@@ -44,6 +55,8 @@ export interface DesignedFloorDef {
     triggers?: DesignedTrigger[];
     /** Antorchas declaradas explícitamente. Si existen, el generador automático no pone ninguna. */
     torches?: DesignedTorch[];
+    /** Piezas decorativas de utileria_cripta.glb. */
+    props?: DesignedProp[];
     rareSpawn?: {
         id: string;
         archetype: string;

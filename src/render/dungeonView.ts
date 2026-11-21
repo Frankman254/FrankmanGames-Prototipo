@@ -194,6 +194,25 @@ const CHEST_SCALE = 0.85;
 const CHEST_OUTLINE = 0.012;
 const chestModels = new WeakMap<Scene, Promise<AssetContainer>>();
 
+const CRYPT_PROP_URLS: Record<string, string> = import.meta.glob('/assets/models/utileria_cripta.glb', {
+    query: '?url',
+    import: 'default',
+    eager: true,
+});
+const cryptPropModels = new WeakMap<Scene, Promise<AssetContainer>>();
+
+/** Carga utileria_cripta.glb una sola vez por escena. */
+function cryptPropModel(scene: Scene): Promise<AssetContainer> {
+    let p = cryptPropModels.get(scene);
+    if (!p) {
+        p = LoadAssetContainerAsync(CRYPT_PROP_URLS['/assets/models/utileria_cripta.glb']!, scene, {
+            pluginExtension: '.glb',
+        });
+        cryptPropModels.set(scene, p);
+    }
+    return p;
+}
+
 /** El modelo se analiza una sola vez por escena; cada cofre es una copia. */
 export function chestModel(scene: Scene): Promise<AssetContainer> {
     let p = chestModels.get(scene);
@@ -443,6 +462,37 @@ export class DungeonFloorView {
         this.buildPools(floor);
         this.buildDoors(floor, openDoors);
         this.buildBreakables(floor, broken);
+        this.buildProps(floor);
+    }
+
+    /** Piezas decorativas de utilería (crip_* de utileria_cripta.glb). */
+    private buildProps(floor: DungeonFloor): void {
+        if (floor.props.length === 0) return;
+        void cryptPropModel(this.scene).then((container) => {
+            if (this.disposed) {
+                container.dispose();
+                return;
+            }
+            const nodeMap = new Map<string, AbstractMesh>();
+            for (const mesh of container.meshes) {
+                nodeMap.set(mesh.name, mesh);
+            }
+            for (const prop of floor.props) {
+                const node = nodeMap.get(prop.piece);
+                if (!node) continue;
+                const root = new TransformNode(`dProp-${prop.piece}-${hashId(String(prop.pos.x))}`, this.scene);
+                root.parent = this.root;
+                root.position.set(prop.pos.x, 0, prop.pos.y);
+                root.rotation.y = prop.rotation;
+                root.scaling.setAll(prop.scale);
+                const clone = node.clone(prop.piece + '-' + floor.index, root) as AbstractMesh;
+                clone.receiveShadows = true;
+                clone.isPickable = false;
+            }
+            container.dispose();
+        }).catch(() => {
+            // GLB no disponible: sin utilería, sin error.
+        });
     }
 
     /** Estanques: agua oscura a ras de suelo con un corro de piedras de orilla. */

@@ -21,6 +21,7 @@ import {
     validateDesignedFloor,
     type DesignedDungeonDef,
     type DesignedFloorDef,
+    type DesignedProp,
 } from './designedDungeon';
 
 /** Sala en baldosas: [x0, x0 + w) × [y0, y0 + h). */
@@ -93,6 +94,17 @@ export interface DungeonAmbush {
     spawns: DungeonSpawn[];
 }
 
+/** Pieza decorativa de utilería en un piso de mazmorra. */
+export interface DungeonProp {
+    /** Nombre del nodo en el GLB (p. ej. `crip_altar_huaca`). */
+    piece: string;
+    pos: Vec2;
+    /** Giro en radianes alrededor de Y. */
+    rotation: number;
+    /** Escala relativa (1 = tamaño del modelo). */
+    scale: number;
+}
+
 export interface DungeonFloor {
     /** 0 = primer piso. */
     index: number;
@@ -127,6 +139,8 @@ export interface DungeonFloor {
     doors: DungeonDoor[];
     breakables: DungeonBreakable[];
     ambushes: DungeonAmbush[];
+    /** Piezas decorativas de utilería (crip_* de utileria_cripta.glb). */
+    props: DungeonProp[];
     /** Roca como rectángulos fusionados (rejilla de colisión). */
     obstacles: RectObstacle[];
     /** Baldosas de roca que tocan suelo (las únicas que se dibujan como muro). */
@@ -634,6 +648,15 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
         doors,
         breakables: [],
         ambushes: [],
+        props: (hand.props ?? []).map((p) => {
+            const pos = at(p.tile);
+            return {
+                piece: p.piece,
+                pos,
+                rotation: ((p.rotDeg ?? 0) * Math.PI) / 180,
+                scale: p.scale ?? 1,
+            };
+        }),
         obstacles: mergeRects(solid, grid.cols, grid.rows, ts),
         wallTiles,
         wallRects: mergeRects(wallMask, grid.cols, grid.rows, ts),
@@ -961,6 +984,7 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
         doors,
         breakables,
         ambushes,
+        props: [],
         obstacles: mergeRects(solid, cols, rows, ts),
         wallTiles,
         wallRects: mergeRects(wallMask, cols, rows, ts),
