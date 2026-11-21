@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-71: Obstáculos transparentes en cámara Manual (Junie)
+
+**Archivos:** `src/camera/collision.ts`, `src/render/cameraRig.ts`, `src/render/arenaView.ts`, `tests/jl71_occludingBlockers.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **`blockersOccludingRay()` en `src/camera/collision.ts`:** función pura que devuelve los índices de los blockers (cajas AABB) que tapan el rayo entre la cámara y el personaje. Usa intersección rayo-caja analítica con verificación de altura.
+- **`cameraRig.ts`:** cada frame, en modo Manual/Semiautomático, calcula los blockers ocluyentes y los expone en `occludingBlockerIndices`. Parámetros configurables: `occludingTargetAlpha` (0.35) y `occludingFadeRate` (4).
+- **`arenaView.ts`:** `updateOccludingBlockers()` suaviza un radio extra de oclusión (`occludingExtraRadius`) que se suma al radio del jugador en `updateOcclusion()`. Cuando un obstáculo tapa al personaje, el recorte de oclusión existente (OcclusionPlugin) hace un "hoyo" más grande, dejando ver al personaje a través del obstáculo. Transición suave con fadeRate.
+
+**Validación:** 10 pruebas verdes (jl71_occludingBlockers.test.ts). Suite 3346/3346. Typecheck sin errores nuevos (solo balM3.ts ajeno). Vite build OK. Electron previa 6/11 (5 fallos pre-existentes, no relacionados).
+
+**Evidencia:** `work/junie-jl71/INFORME.md`.
+
 ## 2026-11-21 — JL-70: Físicas secundarias conectadas al juego (Junie)
 
 **Archivos:** `src/render/characters/characterModel.ts`, `src/render/characters/gltfCharacter.ts`, `src/render/characters/playerAvatar.ts`, `tests/jl70_secondaryIntegration.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

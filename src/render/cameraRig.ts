@@ -8,6 +8,7 @@ import {
     dampAngle,
     DEFAULT_CAMERA_TUNING,
     DEFAULT_FRAMINGS,
+    blockersOccludingRay,
     distanceBeforeBlocker,
     modeTarget,
     nextZoneCell,
@@ -70,6 +71,16 @@ export class CameraRig {
     blockerMode: 'ray' | 'inside' = 'ray';
     /** Tope de distancia (interiores: la cámara no se aleja tanto); null = el de los datos. */
     distanceCap: number | null = null;
+    /**
+     * Índices de los blockers que tapan al personaje (entre el foco y la cámara).
+     * Se actualiza cada frame en update(). Solo válido en modos Manual y Semiautomático.
+     * arenaView.ts lo lee para ajustar la opacidad de los materiales correspondientes.
+     */
+    occludingBlockerIndices: number[] = [];
+    /** Opacidad objetivo para los obstáculos que tapan (0 = transparente, 1 = opaco). */
+    occludingTargetAlpha = 0.35;
+    /** Suavidad de la transición de opacidad. */
+    occludingFadeRate = 4;
 
     constructor(
         scene: Scene,
@@ -239,6 +250,25 @@ export class CameraRig {
         if (this.ground) p.y = Math.max(p.y, this.ground.sample(p.x, p.z) + this.def.groundClearance);
         // Mira un poco por encima de los pies para que el personaje quede centrado.
         this.camera.setTarget(new Vector3(this.focus.x, this.focus.y + 1, this.focus.z));
+        // JL-71: en Manual y Semiautomático, detecta qué blockers tapan al personaje
+        // para que arenaView.ts los haga semitransparentes.
+        if (this.mode === 'manual' || this.mode === 'semiAuto') {
+            const camDist = this.shownDistance;
+            // El personaje está cerca del foco; usamos un punto a 1/3 de la distancia
+            // como umbral: solo los blockers entre ese punto y la cámara cuentan.
+            const targetDist = camDist * 0.33;
+            const camBlockers = this.blockers.map((b) => ({
+                x: b.x,
+                z: b.z,
+                halfWidth: b.hw,
+                halfDepth: b.hd,
+                top: b.top,
+            }));
+            const ray = { x: this.focus.x, y: this.focus.y + 1, z: this.focus.z, dx, dy, dz };
+            this.occludingBlockerIndices = blockersOccludingRay(ray, camDist, targetDist, camBlockers);
+        } else {
+            this.occludingBlockerIndices.length = 0;
+        }
     }
 
     /** Distancia hasta la primera caja sólida en la dirección (dx, dy, dz) desde el foco.

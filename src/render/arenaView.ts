@@ -577,13 +577,50 @@ export class ArenaView {
             }
         }
         this.updateOcclusion(world, x, y, z, frameSeconds);
+        // JL-71: en Manual/Semiautomático, los obstáculos que tapan al personaje
+        // se recortan más para que se le vea a través de ellos.
+        this.updateOccludingBlockers(x, y, z, frameSeconds);
+    }
+
+    /**
+     * JL-71: Cuando un obstáculo tapa al personaje en modo Manual, se añade un círculo
+     * de oclusión extra en la posición del obstáculo para que el recorte de oclusión
+     * existente (OcclusionPlugin) haga un "hoyo" más grande, dejando ver al personaje.
+     * La transición es suave: el radio crece y decrece con fadeRate.
+     */
+    private occludingExtraRadius = 0;
+    private updateOccludingBlockers(x: number, y: number, z: number, dt: number): void {
+        const indices = this.rig.occludingBlockerIndices;
+        const blockers = this.rig.blockers;
+        const fadeRate = this.rig.occludingFadeRate;
+        const step = dt * fadeRate;
+
+        if (indices.length === 0) {
+            // Sin blockers ocluyentes: reducimos el radio extra.
+            this.occludingExtraRadius = Math.max(0, this.occludingExtraRadius - step);
+            return;
+        }
+
+        // Calculamos el radio necesario: el mayor ancho de los blockers ocluyentes.
+        let maxHalfWidth = 0;
+        for (const idx of indices) {
+            const b = blockers[idx];
+            if (b) maxHalfWidth = Math.max(maxHalfWidth, b.hw, b.hd);
+        }
+        // Radio suficiente para recortar el obstáculo completo alrededor del personaje.
+        const targetRadius = Math.max(maxHalfWidth * 1.5, 2);
+        this.occludingExtraRadius = Math.min(targetRadius, this.occludingExtraRadius + step);
     }
 
     /** Círculos de recorte: el jugador, su objetivo y los enemigos vivos más cercanos. */
     private updateOcclusion(world: World, x: number, y: number, z: number, dt: number): void {
         const o = this.occlusionDef;
         const targets: OcclusionTarget[] = [];
-        if (o.playerRadius > 0) targets.push({ x, y: y + this.player.model.height * 0.5, z, radius: o.playerRadius });
+        // JL-71: en modo Manual/Semiautomático, el radio de oclusión del jugador crece
+        // cuando un obstáculo lo tapa, para que el recorte de oclusión haga un "hoyo"
+        // más grande y se vea al personaje a través del obstáculo.
+        const playerRadius = o.playerRadius + this.occludingExtraRadius;
+        if (playerRadius > 0) targets.push({ x, y: y + this.player.model.height * 0.5, z, radius: playerRadius });
         const p = world.player;
         for (const e of occlusionPicks(
             world.enemies.list,
