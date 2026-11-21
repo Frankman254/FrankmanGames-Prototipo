@@ -265,6 +265,21 @@
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
 
+## 2026-11-21 — OMP-FA-08: ostra mordelona y perla rodante
+
+**Archivos:** `assets/models/ostra.glb`, `assets/models/perla.glb`, `arte/blender/fauna_perlas.blend`, `scripts/blender/{fauna_perlas,validar_fauna_perlas,revisar_fauna_perlas}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Dos criaturas nuevas del Archipiélago de las Perlas, que hoy se ven como lobo tenido y diablillo (prioridad alta de `work/junie-jl-63/NOMBRE_MODELO.md`).
+- **Ostra** (`perlas_oyster`): 666 tri, 0,72 m de borde a barba × 0,86 m de ancho × 0,46 m de alto. Bivalvo de dos valvas en abanico con borde festoneado y gozne; siete dientes por valva que engranan al cerrar (de ahí «mordelona»), cuerpo blando con lengua, manto en fleco, dos ojos en pedúnculo que asoman por el borde delantero y barba de byso arrastrando. Rig `FG_Ostra`: la tapa (`lid`) bate como una quijada; Atacar = abrir en abanico y cerrarse de batazo.
+- **Perla** (`perlas_pearl`, la cría que la ostra escupe): 308 tri, esfera de nácar de ~0,63 m con ojos grandes de caricatura, cejas de cordel, bocita y el nudo del cordel encima. Rig `FG_Perla`: Rodar = la esfera (`hips`) da una vuelta completa por ciclo y los ojos contra-giran para mirar siempre al frente; rueda en el sitio — el juego adelanta la entidad, como con el resto de fauna. Atacar = retrocede girando y se lanza dando dos vueltas.
+- Correcciones tras ver las láminas: el fondo del cuenco clavaba 0,091 m bajo el suelo (subido el cuerpo entero); los ojos de la ostra quedaban enterrados bajo la tapa (movidos al borde delantero); el primer Caminar de la perla trasladaba la raíz 1,9 m y sacaba al bicho del encuadre (ahora gira en el sitio, y el ciclo cierra sin salto porque 360° ≡ reposo).
+- Referencias: no había lámina REF-01 para esta familia; silueta de campo de la ostra de manglar y de la perla de nácar anotada en el generador, clean-room.
+
+**Validación:** `validar_fauna_perlas.py` en verde (rig, cinco clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango); láminas de 5 vistas + 5 pasos revisadas y aceptadas; `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-08/revision_{ostra,perla}.png` y las 40 vistas sueltas.
+
 ## 2026-11-21 — OMP-FA-06: ñeque y tapir del Darién
 
 **Archivos:** `assets/models/neque.glb`, `assets/models/tapir.glb`, `arte/blender/fauna_darien.blend`, `scripts/blender/{fauna_darien,validar_fauna_darien,revisar_fauna_darien}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
