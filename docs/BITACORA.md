@@ -3328,3 +3328,16 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Qué se hizo:** 2 plantillas GLB registradas en `data/assets.json` (`neque`, `tapir`) con clips medidos desde los GLB. `enemy.darien_neque` y `enemy.darien_tapir` cambiados de `wolf` (bestia) a sus propios templates. Ambos usan clips estándar (Reposo/Caminar/Atacar/Golpeado/Morir) con evento hit en t=0.5. Alturas: neque 0.36 m (agutí/roedor), tapir 1.09 m (mamífero forestal).
 
 **Verificación:** 17 pruebas verdes (jl87_nequeTapir.test.ts), tsc limpio (solo balM3.ts ajeno), suite 3408/3409 (1 fallo pre-existente assets.test.ts de OMP). Capturas de Electron omitidas: sin escenario dedicado para Darién Profundo.
+
+## 2026-11-21 — JL-94: Escenario qaElectron hudSinSolapes (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl94/`.
+
+**Qué se hizo:** Escenario `hudSinSolapes` en `scripts/qaElectron.mjs` que verifica en 4 resoluciones (768p, 1080p, 1440p, ultra-wide) que ningún panel del HUD por defecto se solapa con otro. Tres verificaciones por resolución: (1) `uiFaults()` — solapes DOM entre chat, barra de acción y minimapa; (2) `getBoundingClientRect()` directo — solapes entre los mismos elementos fijos; (3) que todos los elementos fijos del HUD caben dentro de la ventana. Capturas de cada resolución.
+
+**Validación:** Escenario `hudSinSolapes`: 13/13 checks en verde. Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl94/` con 4 capturas (jl94-hud-768p.jpg, jl94-hud-1080p.jpg, jl94-hud-1440p.jpg, jl94-hud-ultra.jpg).
+
+---
+

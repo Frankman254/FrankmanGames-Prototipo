@@ -5513,6 +5513,74 @@ const scenarios = {
         check('JL-93 monturas: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
     },
 
+    /** JL-94: Escenario hudSinSolapes — en 768p, 1080p, 1440p y ultra-wide,
+     * ningún panel del HUD por defecto se solapa con otro (cajas del DOM).
+     * Verifica tanto a nivel de DOM (uiFaults) como a nivel de datos (checkDefaultPositionsOverlap). */
+    async hudSinSolapes() {
+        await newGame('QA HUD SinSolapes');
+        const sizes = [
+            [1366, 768, '768p'],
+            [1920, 1080, '1080p'],
+            [2560, 1440, '1440p'],
+            [3440, 1440, 'ultra'],
+        ];
+        for (const [w, h, label] of sizes) {
+            await resize(w, h);
+            await sleep(500);
+            // Cerrar cualquier ventana abierta para que solo queden los elementos fijos del HUD.
+            await js(`(()=>{
+              document.querySelectorAll('.panel-character, .panel-spellbook, .panel-inventory, .panel-journal, .panel-compendium, .panel-professions, .panel-worldmap, .modal').forEach(e=>{
+                const close=e.querySelector('.panel-close, .modal-close, button');
+                if(close) close.click();
+              });
+            })()`);
+            await sleep(300);
+            // Verificación 1: uiFaults() — solapes de DOM reales.
+            const faults = await uiFaults();
+            const overlapFaults = faults.filter((f) => f.includes(' pisa '));
+            check(`JL-94 ${label}: sin solapes DOM`, overlapFaults.length === 0, overlapFaults.join(' | ') || 'limpio');
+            // Verificación 2: solapes entre elementos fijos del HUD (mismo conjunto que uiFaults,
+            // pero con getBoundingClientRect directo para mayor precisión).
+            const hudOverlap = await js(`(()=>{
+              const els=[...document.querySelectorAll('.chat, .hud-actionbar, .minimap')].filter(e=>e.offsetParent);
+              const pairs=[];
+              for(let i=0;i<els.length;i++) for(let j=i+1;j<els.length;j++){
+                const a=els[i].getBoundingClientRect(), b=els[j].getBoundingClientRect();
+                const ox=Math.min(a.right,b.right)-Math.max(a.left,b.left), oy=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);
+                if(ox>4&&oy>4){
+                  const na=els[i].className.split(' ')[0]||els[i].id;
+                  const nb=els[j].className.split(' ')[0]||els[j].id;
+                  pairs.push(na+'↔'+nb+' ('+Math.round(ox)+'×'+Math.round(oy)+' px)');
+                }
+              }
+              return pairs;
+            })()`);
+            check(
+                `JL-94 ${label}: sin solapes HUD fijos`,
+                hudOverlap.length === 0,
+                hudOverlap.join(' | ') || 'limpio',
+            );
+            // Verificación 3: que todos los elementos fijos caben en la ventana.
+            const outside = await js(`(()=>{
+              const els=[...document.querySelectorAll('.chat, .hud-actionbar, .minimap, .hud-bar, .hud-sec-character, .hud-sec-items, .hud-sec-spells, .hud-sec-spells-2, .hud-sec-spells-3, .hud-sec-xp, .hud-sec-menu, .world-info, .combat-bar, .quest-tracker, .combat-log, .hud-pet')].filter(e=>e.offsetParent);
+              const out=[];
+              for(const e of els){
+                const r=e.getBoundingClientRect();
+                if(r.left<-2||r.top<-2||r.right>innerWidth+2||r.bottom>innerHeight+2){
+                  out.push((e.className.split(' ')[0]||e.id)+' fuera ('+Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.right)+','+Math.round(r.bottom)+')');
+                }
+              }
+              return out;
+            })()`);
+            check(
+                `JL-94 ${label}: todos caben en pantalla`,
+                outside.length === 0,
+                outside.join(' | ') || 'caben',
+            );
+            await shot(`jl94-hud-${label}`);
+        }
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {
