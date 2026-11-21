@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-76: Escenario "Tecla" ya resuelto (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl76/EVIDENCIA.md`.
+
+**Qué se hizo:**
+- Tarea JL-76: verificar que el escenario "Tecla" funciona — la segunda pulsación confirma el movimiento.
+- Ejecución del escenario `previa` en Electron: 11/11 comprobaciones en verde.
+- El check "Tecla: la segunda pulsación confirma" pasa correctamente: el jugador se mueve de (127.75, 115.25) a (133.61, 113.98) tras la segunda pulsación de W.
+- El problema ya estaba resuelto por commits anteriores (JUG-06, JL-02, JL-75). Sin cambios de código.
+
+**Evidencia:** `work/junie-jl76/EVIDENCIA.md`.
+
 ## 2026-11-21 — JL-75: Diagnóstico del escenario `previa` — 5 fallos del arnés (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl75/DIAGNOSTICO.md`.

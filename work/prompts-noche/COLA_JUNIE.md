@@ -1164,7 +1164,7 @@ Reglas comunes de toda la bolsa:
   — BLOQUEADA: sin display. El arrastre requiere `setPointerCapture` con puntero real; CDP y JS directo no funcionan sin monitor. `newGame()` borra las posiciones del HUD (JL-73). El solape visual solo se verifica con display. Diagnóstico en work/junie-jl74/BLOQUEO.md.
 - [x] JL-75 Escenario `previa`: los 5 fallos de fantasmas y destino del salto (JL-06). Escenario en verde o informe de cuáles son del arnés y cuáles del juego.
   — commit «JL-75: diagnóstico previa — 5 fallos del arnés, no del juego» — DIAGNOSTICO.md en work/junie-jl75/. Los 5 fallos son del arnés: `clickSlot()` hace click completo (mousedown+mouseup) que en modo `pressClick` confirma y lanza antes de verificar fantasmas. El juego funciona correctamente. Sin cambios de código.
-- [ ] JL-76 Escenario `Tecla`: la segunda pulsación no confirma el movimiento. Corrige y deja el escenario en verde.
+- [x] JL-76 Escenario `Tecla`: la segunda pulsación no confirma el movimiento. — commit «JL-76: escenario Tecla ya resuelto» — Ya resuelto por commits anteriores (JUG-06, JL-02, JL-75). Escenario `previa` 11/11 en verde. Evidencia en work/junie-jl76/EVIDENCIA.md.
 - [ ] JL-77 Escenario `camara`: `TypeError` porque `__game.view.rig` es null. Expón el rig de la cámara a QA o adapta el escenario a los modos de JL-65.
 - [ ] JL-78 El arnés vacía las ranuras de guardado entre escenarios: `balance45` y `criticoV3` fallan porque las 12 ranuras están llenas. Arreglo solo en el arnés (`scripts/qaElectron.mjs` o su carpeta).
 - [ ] JL-79 Tiempo agotado en `audio`: diagnostica y corrige el escenario o el juego. Escenario en verde.
