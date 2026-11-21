@@ -1,3 +1,22 @@
+## 2026-11-21 — JL-63: Auditoría nombre contra modelo (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-63/NOMBRE_MODELO.md`.
+
+**Qué se hizo:**
+- **Auditoría completa:** los 78 arquetipos de `data/rpg/enemies.json` cruzados con `data/assets.json` y `assets/models/`.
+- **Hallazgo principal:** 34 arquetipos con desajuste crítico entre nombre y modelo visual. Los 5 modelos genéricos concentran el problema:
+  - 15 usan `bestia`/`wolf` (perro) aunque son jaguares, tigrillos, águilas, tapires, ranas, ostras, tiburones, calamares, coyotes, monos, etc.
+  - 13 usan `arquero`/`archer` (humanoide con arco) aunque son quetzales, búhos, pavos, sirenas, etc.
+  - 13 usan `personaje`/`humanoid` (humanoide genérico) aunque son yetis, diablos, colosos, etc.
+  - 10 usan `diablillo`/`imp` (diablillo) aunque son chitras, gotas, mosquitos, medusas, perlas, etc.
+- **16 arquetipos ya tienen GLB propio** (cangrejo, garza, caimán, pecarí, jabalí, cripta_rata/bruto/guardian, espejo).
+- **5 candidatos provisionales** con GLB y clips de enemigo disponibles: `jaguar.glb` (baru_jaguar, baru_elder, ash_alpha), `buho.glb` (boquete_owl), `zorro.glb` (fortuna_coyote). No aplicados: requieren plantillas en assets.json y autorización del coordinador.
+- **Lista de prioridades para OMP:** 7 alta (harpy, tapir, shark, squid, oyster, frog, titi), 10 media (espíritus, insectos, gotas), 2 media (aves sin clips), 5 baja (cambios provisionales).
+
+**Validación:** Sin código modificado. Suite 3283/3284 (1 fallo pre-existente assets.test.ts de OMP). Typecheck sin errores nuevos.
+
+**Evidencia:** `work/junie-jl-63/NOMBRE_MODELO.md`.
+
 ## 2026-11-21 — JL-60: Posiciones por defecto según proporción de pantalla (Junie)
 
 **Archivos:** `src/ui/map/hudProfiles.ts`, `src/ui/map/hudLayout.ts`, `tests/jl60_aspectDefaults.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
