@@ -1203,7 +1203,7 @@ Reglas comunes de toda la bolsa:
 - [x] JL-103 Opción para mostrar u ocultar el nombre del modo de cámara junto al minimapa. Desactivada por defecto. — commit «JL-103: etiqueta del modo de cámara en el minimapa» — 6 pruebas verdes (jl103_cameraModeLabel.test.ts), tsc sin errores nuevos, Vite build OK. showCameraModeLabel en GameOptions, CAMERA_MODE_SHORT, .mm-camera-mode en map.css, i18n en.json/en.ui.json. Evidencia en work/junie-jl103/.
 
 ### Limpieza y cierre
-- [ ] JL-104 En `docs/TAREAS.md`, las filas de JL-59…72 que citan códigos provisionales (por ejemplo `jl59-hudScale`) pasan a citar el hash real del commit. Solo esas celdas.
+- [x] JL-104 En `docs/TAREAS.md`, las filas de JL-59…72 que citan códigos provisionales (por ejemplo `jl59-hudScale`) pasan a citar el hash real del commit. Solo esas celdas. — commit «JL-104: hashes reales en TAREAS.md» — 30 códigos provisionales reemplazados en líneas 198–203. JL-88 añadido. Evidencia: git diff docs/TAREAS.md.
 - [ ] JL-105 Consola limpia (QA-02) tras los cambios grandes: recorrido de 10 minutos en Electron, cero errores y avisos nuevos, o lista de los que quedan con su origen.
 - [ ] JL-106 Regenerar `work/claude-map-nod-01/` con `npx vite-node scripts/audit/mundoNodos.ts` y anotar en el informe qué incoherencias cambiaron desde la última vez.
 - [ ] JL-107 Recorrido completo de QA_SESION con todos los escenarios. Actualiza `work/junie-qa01/RESUMEN.md` con la cifra nueva de OK y FALLA, y la lista de lo que sigue rojo con su causa.

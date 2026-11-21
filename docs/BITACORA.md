@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-104: Hashes reales en TAREAS.md (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reemplazado los 30 códigos provisionales de las filas JL-50…103 en `docs/TAREAS.md` por los hashes reales de commit. Los códigos provisionales (ej. `jl59-hudScale`, `jl66-castFluid`, `jl73-hudOverlap`) se sustituyeron por los primeros 7 caracteres del SHA-1 correspondiente. Se añadió JL-88 (`008e6463`) que faltaba en la columna Estado de la fila JL-73…108.
+
+**Validación:** `npm run docs:check` — 0 rutas rotas. Sin cambios de código: no requiere `npm test` ni `npm run typecheck`.
+
+---
+
 ## 2026-11-21 — JL-103: Etiqueta del modo de cámara en el minimapa (Junie)
 
 **Archivos:** `src/ui/menus/saveStore.ts`, `src/ui/menus/screens/modals.ts`, `src/ui/menus/index.ts`, `src/ui/map/minimap.ts`, `src/ui/map/mapState.ts`, `src/ui/map/mapFeed.ts`, `src/ui/styles/map.css`, `src/main.ts`, `data/i18n/en.json`, `data/i18n/en.ui.json`, `tests/jl103_cameraModeLabel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
