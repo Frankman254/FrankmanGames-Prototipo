@@ -3507,3 +3507,11 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Evidencia:** `tests/jl96_migration.test.ts` (archivo existente corregido).
 
 **JL-99: auditoría nombre↔modelo automatizada.** Script `scripts/audit/nombreModelo.ts` que cruza los nombres de criaturas de `data/rpg/enemies.json` con los modelos 3D de `data/assets.json` y genera la tabla de discordancias en `work/junie-jl-99/`. 78 arquetipos auditados: 19 discordancias (6 alta, 7 media, 6 baja), 59 correctos. 11 pruebas en `tests/jl99_nombreModelo.test.ts` que limitan las discordancias a ≤24. Typecheck limpio, build OK.
+
+## 2026-11-21 — JL-108: Propuestas para la bolsa siguiente (Junie)
+
+**Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Última tarea de la bolsa grande (JL-73…108). Se escribió `work/junie-propuestas/BOLSA_SIGUIENTE.md` con 15 tareas pequeñas propuestas (JL-109…JL-123) derivadas de hallazgos durante el trabajo: escenarios QA nuevos (muerte_y_revivir, lancha, editorMazmorra, compendio, opciones, criptaPiso100, guardadoCargar), pruebas que faltan (rankLadder con maxRank 6, content:check efectos, Buhonero devOnly, equipar nivel insuficiente, reacciones apagadas, hotbarFillOrder 30 slots), y arreglos de calidad (assets.test.ts GLB de ranas, balM3.ts typecheck). Son **propuestas**: no están autorizadas, no se empiezan sin autorización explícita.
+
+**Evidencia:** BOLSA_SIGUIENTE.md con 15 tareas, cada una con por qué, criterio de hecho y evidencia esperada. Sin código cambiado.
