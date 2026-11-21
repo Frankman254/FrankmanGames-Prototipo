@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-85: Diagnóstico `crestalba` — BLOQUEADA sin display (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl85/DIAGNOSTICO.md`.
+
+**Qué se hizo:** Diagnóstico completo del escenario `crestalba`. Verificado que `crestalba.glb` existe (467 KB), está en el glob de Vite (89 modelos), `hasModelFile('crestalba')` devuelve true, y el código de `mountView.ts` es correcto. El fallo es puramente de infraestructura: sin display físico, Babylon.js no inicializa WebGL, los meshes `mount:*` nunca aparecen y el timeout de 15 s agota. CDP cae al reiniciar Electron.
+
+**Evidencia:** `work/junie-jl85/DIAGNOSTICO.md`. Sin cambio de código.
+
+---
+
 ## 2026-11-21 — JL-84: Diagnóstico `casa` — timeout ya resuelto (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl84/DIAGNOSTICO.md`.
