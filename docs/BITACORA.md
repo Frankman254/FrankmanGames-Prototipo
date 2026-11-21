@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-74: Bloqueada — sin display (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl74/BLOQUEO.md`.
+
+**Qué se hizo:**
+- Tarea JL-74: escenario `barra` — las secciones del personaje y de la mascota se solapan al arrastrar.
+- Diagnóstico: el escenario falla en 2/6 checks. El arrastre por CDP solo mueve en X (+200px), no en Y (y:0). La persistencia falla porque `newGame()` borra las posiciones del HUD (JL-73).
+- Causas investigadas: `setPointerCapture` requiere puntero real (sin display, ni CDP ni JS directo funcionan). `keepBottom()` corrige Y pero no es la causa principal. `Page.reload` pierde el contexto CDP.
+- **Bloqueada:** sin display, el arrastre no se puede simular ni verificar. El solape visual entre personaje y mascota solo se confirma con monitor real.
+
+**Evidencia:** `work/junie-jl74/BLOQUEO.md`.
+
 ## 2026-11-21 — JL-73: Chat y minimapa usan CSS por defecto, no setPosition (Junie)
 
 **Archivos:** `src/ui/map/hudLayout.ts`, `src/ui/map/hudProfiles.ts`, `src/ui/styles/menus.css`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
