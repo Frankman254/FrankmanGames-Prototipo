@@ -1564,13 +1564,14 @@ const scenarios = {
         check('B01: F11 sale de pantalla completa', !(await isFs()), String(await isFs()));
     },
 
-    /** B02 y B03: casilla entera a la vista y cambio de modo con Espacio. */
+    /** B02 y B03: casilla entera a la vista y cambio de modo con Z (cameraNextMode). */
     async camara() {
         await newGame('QA Camara');
         // JL-08: esperar a que el rig esté listo antes de acceder a .mode.
         await until('__game.view.rig != null', 15000, 'rig de la cámara');
-        for (let i = 0; i < 4 && (await js('__game.view.rig.mode')) !== 'zone'; i++) await key('Space', ' ');
-        check('B03: Espacio cambia el modo hasta la casilla', (await js('__game.view.rig.mode')) === 'zone');
+        // JL-77: cameraNextMode está bound a KeyZ (no a Espacio).
+        for (let i = 0; i < 4 && (await js('__game.view.rig.mode')) !== 'zone'; i++) await key('KeyZ', 'z');
+        check('B03: Z cambia el modo hasta la casilla', (await js('__game.view.rig.mode')) === 'zone');
         await sleep(2500);
         await shot('b02-casilla');
         const sky = await js(`document.querySelector('.wi-sky')?.textContent`);

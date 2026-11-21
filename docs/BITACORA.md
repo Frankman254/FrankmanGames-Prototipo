@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-77: Escenario `camara` adaptado a los bindings de JL-65 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Tarea JL-77: el escenario `camara` fallaba porque enviaba la tecla Espacio para cambiar el modo de cámara, pero `cameraNextMode` está bound a `KeyZ` y `MouseMiddle` en `data/ui/keybindings.json`.
+- JL-65 cambió los modos de cámara (follow→manual, smart→auto, autoFocus→combat) pero el escenario seguía usando Espacio, que ya no estaba bound a `cameraNextMode`.
+- Cambio: `key('Space', ' ')` → `key('KeyZ', 'z')` en el escenario `camara` de `scripts/qaElectron.mjs`.
+- Mensaje del check actualizado: "B03: Z cambia el modo hasta la casilla".
+
+**Validación:** Escenario `camara` 4/4 checks en verde (B03, B09, B02, sin errores consola). Escenario `piedrasLejanas` 5/5 como control.
+
+**Evidencia:** `work/junie-jl77/` (salida del escenario).
+
 ## 2026-11-21 — JL-76: Escenario "Tecla" ya resuelto (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl76/EVIDENCIA.md`.
