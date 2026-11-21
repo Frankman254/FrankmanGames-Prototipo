@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-90: fantasma.glb — guard defensivo y PARA_OMP.md (Junie)
+
+**Archivos:** `src/render/characters/ghostBody.ts`, `tests/jl90_ghostBody.test.ts`, `work/junie-jl-90/PARA_OMP.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `fantasma.glb` solo tiene los clips `Reposo` y `Avanzar` (para el cuerpo espectral del jugador en `ghostBody.ts`), pero no los clips estándar de enemigo (`Caminar`, `Atacar`, `Golpeado`, `Morir`). Se añadió un guard defensivo (`if (g)`) antes de `g.start()` para que el fantasma no lance error si un clip falta. Se documentó en `work/junie-jl-90/PARA_OMP.md` qué clips debe añadir OMP si el fantasma se usa como enemigo en el futuro.
+
+**Validación:** 5 pruebas verdes (jl90_ghostBody.test.ts): GLB existe, tiene Reposo y Avanzar, no tiene clips de enemigo, ghostBody.ts protege g.start(). Typecheck limpio.
+
+**Evidencia:** `work/junie-jl-90/PARA_OMP.md` con la lista de clips faltantes.
+
 ## 2026-11-21 — JL-89: Remapeos provisionales de nombre contra modelo (Junie)
 
 **Archivos:** `data/assets.json`, `tests/jl89_nameModelRemap.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

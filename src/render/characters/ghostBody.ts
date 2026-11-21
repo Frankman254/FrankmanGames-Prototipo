@@ -57,6 +57,10 @@ export class GhostBody {
         this.moving = moving;
         (moving ? this.idle : this.move).stop();
         const g = moving ? this.move : this.idle;
-        g.start(true, 1, g.from, g.to);
+        // JL-90: si un clip falta (fantasma.glb sin los clips de enemigo),
+        // el fantasma sigue flotando quieto sin lanzar error.
+        if (g) {
+            g.start(true, 1, g.from, g.to);
+        }
     }
 }
