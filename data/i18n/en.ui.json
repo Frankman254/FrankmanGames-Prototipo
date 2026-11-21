@@ -370,5 +370,13 @@
   "Empezar en el piso 1": "Start on floor 1",
   "Camuflaje (color de tu ropa)": "Camouflage (your clothes color)",
   "Color fijo": "Fixed color",
-  "Pausa de impacto y sacudida de cámara:": "Hit pause and camera shake:"
+  "Pausa de impacto y sacudida de cámara:": "Hit pause and camera shake:",
+  "Cofre": "Chest",
+  "Cofre abierto": "Opened chest",
+  "Escalera de bajada": "Stairs down",
+  "Escalera de subida": "Stairs up",
+  "Fila {n}: {state}": "Row {n}: {state}",
+  "Hilo de retorno": "Return thread",
+  "Marca de {element}": "{element} mark",
+  "Reaparecer en {where}": "Respawn at {where}"
 }

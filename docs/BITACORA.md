@@ -1,3 +1,19 @@
+## 2026-11-21 — JL-98: Cobertura i18n — todas las claves tr()/trf() con traducción (Junie)
+
+**Archivos:** `tests/jl98_i18nCoverage.test.ts`, `data/i18n/en.ui.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Prueba automática que recorre todos los archivos `.ts` de `src/`, extrae las cadenas literales de `tr()` y `trf()`, y verifica que cada una exista en al menos una de las tres tablas de inglés (`en.json`, `en.ui.json`, `en.content.json`). Se encontraron 8 claves sin traducir y se añadieron a `en.ui.json`:
+- `Cofre` → Chest, `Cofre abierto` → Opened chest (DUN-06, mapa del piso).
+- `Escalera de bajada` → Stairs down, `Escalera de subida` → Stairs up (DUN-06).
+- `Hilo de retorno` → Return thread (DUN-01).
+- `Fila {n}: {state}` → Row {n}: {state} (JL-59, barra fusionada).
+- `Marca de {element}` → {element} mark (HZ-05, pestaña Reacciones).
+- `Reaparecer en {where}` → Respawn at {where} (MUE-01/MUE-02).
+
+La prueba tiene 3 tests: cobertura general (101 claves, 0 faltantes), sin traducciones vacías, y las 8 claves específicas.
+
+**Validación:** `npx vitest run tests/jl98_i18nCoverage.test.ts` → 3/3 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
 ## 2026-11-21 — JL-97: Pruebas de guardado y recuperación del modo de lanzar (Junie)
 
 **Archivos:** `tests/jl97_castModeSave.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
