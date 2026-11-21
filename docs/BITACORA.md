@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-83: Diagnóstico `botin` — timeout ya resuelto (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl83/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Tarea JL-83: diagnosticar el timeout del escenario `botin` en el arnés de QA.
+- Resultado: el escenario ya pasa sin timeout. 5/5 comprobaciones en verde, sin errores de consola.
+- El timeout original fue resuelto por los arreglos anteriores del arnés: JL-09 (timeouts específicos por escenario), JL-51 (timeouts propios y relanzar Electron tras timeout) y JL-78 (newGame() vacía las ranuras de guardado).
+- Sin cambio de código.
+
+**Evidencia:** `work/junie-jl83/DIAGNOSTICO.md`. Escenario `botin` ejecutado: 5/5 OK.
+
+---
+
 ## 2026-11-21 — JL-82: Diagnóstico `bancoDetalle` — timeout ya resuelto (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl82/DIAGNOSTICO.md`.
