@@ -1,3 +1,20 @@
+## 2026-11-21 — JL-68: Jinetes bien sentados — seatDrop por montura (Junie)
+
+**Archivos:** `src/rpg/contracts.ts`, `src/rpg/content.ts`, `src/render/arenaView.ts`, `data/rpg/items.json`, `tests/jl68_riderSeat.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **`seatDrop` en `MountLook`:** campo opcional que declara la fracción de la altura del jinete que baja desde la silla. Sin él se usa `RIDE_SEAT_DROP` (0.42) como respaldo.
+- **Parser en `content.ts`:** lee `seatDrop` (rango 0.1–1.0) de los datos de montura.
+- **`arenaView.ts`:** la posición del jinete usa `look.seatDrop ?? RIDE_SEAT_DROP` en lugar de la constante fija.
+- **Datos:** cada montura declara su `seatDrop`:
+  - Cuadrúpedos: mula 0.35, tapir 0.35, caballo 0.38.
+  - Aves: arpía 0.25, diostedé 0.28, crestalba 0.28, falcopama 0.28 (y las 7 variantes elementales).
+- **Pruebas:** 12 pruebas verifican que cada montura tiene los pies por encima del suelo, que el respaldo funciona y que los valores calibrados están en rangos razonables.
+
+**Validación:** 12 pruebas verdes (jl68_riderSeat.test.ts). Suite 3320/3321 (1 fallo pre-existente assets.test.ts de OMP). Typecheck sin errores nuevos. Vite build OK.
+
+**Evidencia:** `work/junie-jl68/`.
+
 ## 2026-11-21 — JL-67: Motor de físicas secundarias — Verlet, colisión e inercia (Junie)
 
 **Archivos:** `src/render/characters/secondaryPhysics.ts`, `tests/jl67_secondaryPhysics.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -488,8 +488,9 @@ export class ArenaView {
             frameSeconds,
             !!p.flight,
         );
-        // Sentado: la cadera baja hasta la silla (la altura de la montura es la de unos pies de pie).
-        const seat = look ? this.player.model.height * RIDE_SEAT_DROP : 0;
+        // Sentado: la cadera baja hasta la silla. Cada montura define su fracción (seatDrop);
+        // sin ella usa el valor por defecto (RIDE_SEAT_DROP = 0.42).
+        const seat = look ? this.player.model.height * (look.seatDrop ?? RIDE_SEAT_DROP) : 0;
         this.animEvents = this.player.sync(p, x, y + ride - seat, z, frameSeconds, simulationRunning, look !== null);
         this.spellFx.sync(world, frameSeconds);
         this.pets.sync(world, alpha, frameSeconds);

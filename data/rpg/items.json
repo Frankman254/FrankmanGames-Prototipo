@@ -1320,7 +1320,8 @@
         "color": "#7d6a55",
         "accent": "#3f342a",
         "scale": 0.9,
-        "rideHeight": 0.85
+        "rideHeight": 0.85,
+        "seatDrop": 0.35
       },
       "dropWeight": 0
     },
@@ -1353,7 +1354,8 @@
         "color": "#4a4640",
         "accent": "#26231f",
         "scale": 0.95,
-        "rideHeight": 0.9
+        "rideHeight": 0.9,
+        "seatDrop": 0.35
       },
       "dropWeight": 0
     },
@@ -1386,7 +1388,8 @@
         "color": "#8a4f2a",
         "accent": "#2b1a10",
         "scale": 1.1,
-        "rideHeight": 1.1
+        "rideHeight": 1.1,
+        "seatDrop": 0.38
       },
       "dropWeight": 0
     },
@@ -1421,6 +1424,7 @@
         "accent": "#e8e4dc",
         "scale": 0.72,
         "rideHeight": 1.56,
+        "seatDrop": 0.25,
         "model": "aguila_arpia",
         "flying": true
       },
@@ -1457,6 +1461,7 @@
         "accent": "#ffd84a",
         "scale": 1,
         "rideHeight": 1.36,
+        "seatDrop": 0.28,
         "model": "diostede",
         "variant": "turquesa_clasica",
         "variants": [
@@ -1506,6 +1511,7 @@
         "accent": "#103d49",
         "scale": 1,
         "rideHeight": 1.43,
+        "seatDrop": 0.28,
         "model": "crestalba",
         "variant": "turquesa_clasica",
         "variants": [
@@ -1555,6 +1561,7 @@
         "accent": "#103d49",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "turquesa_clasica",
         "variants": [
@@ -46583,6 +46590,7 @@
         "accent": "#3e2614",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "pardo_tierra",
         "variants": [
@@ -46623,6 +46631,7 @@
         "accent": "#5a1723",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "rojo_carmesi",
         "variants": [
@@ -46663,6 +46672,7 @@
         "accent": "#17462d",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "verde_esmeralda",
         "variants": [
@@ -46703,6 +46713,7 @@
         "accent": "#092d4d",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "oceano_profundo",
         "variants": [
@@ -46743,6 +46754,7 @@
         "accent": "#1c4772",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "azul_celeste",
         "variants": [
@@ -46783,6 +46795,7 @@
         "accent": "#7b4617",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "dorado_solar",
         "variants": [
@@ -46823,6 +46836,7 @@
         "accent": "#35234f",
         "scale": 1,
         "rideHeight": 1.37,
+        "seatDrop": 0.28,
         "model": "falcopama",
         "variant": "violeta_arcano",
         "variants": [

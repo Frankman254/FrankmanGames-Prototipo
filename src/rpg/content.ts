@@ -780,6 +780,7 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
             scale: mr.num(mo, 'scale', { min: 0.3, max: 3 }),
             rideHeight: mr.num(mo, 'rideHeight', { min: 0, max: 5 }),
         };
+        if (mo['seatDrop'] !== undefined) it.mount.seatDrop = mr.num(mo, 'seatDrop', { min: 0.1, max: 1 });
         if (mo['model'] !== undefined) it.mount.model = mr.str(mo, 'model');
         if (mo['variant'] !== undefined) it.mount.variant = mr.str(mo, 'variant');
         if (Array.isArray(mo['variants']))
