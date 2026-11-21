@@ -1,3 +1,19 @@
+## 2026-11-21 — JL-60: Posiciones por defecto según proporción de pantalla (Junie)
+
+**Archivos:** `src/ui/map/hudProfiles.ts`, `src/ui/map/hudLayout.ts`, `tests/jl60_aspectDefaults.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **Clases de proporción:** `getAspectClass()` clasifica el viewport en 16:9 (≤1.78), 16:10 (≤1.85), 21:9 (≤2.4) o 32:9 (>2.4).
+- **Zona segura ultrawide:** `safeZone()` devuelve un rectángulo centrado de proporción 16:9 dentro de pantallas 21:9 y 32:9, para que el HUD no se vaya a los extremos del monitor.
+- **Tablas de posiciones:** `ASPECT_TABLES` declara la posición de cada elemento del HUD (minimap, quest-tracker, world-info, combat-bar, chat, hud-bar, hud-pet) sobre una resolución de referencia por clase. `getDefaultPositions()` escala posiciones y tamaños al viewport real y devuelve `WindowPos` (fracciones).
+- **Elementos centrados:** world-info, combat-bar y hud-bar se centran dentro de la zona segura (o del viewport completo en 16:9/16:10).
+- **Integración en hudLayout.ts:** `apply()` fusiona las posiciones del perfil (movidas por el usuario) con las posiciones por defecto de la proporción actual. `attach()` usa la posición de la tabla cuando el perfil no tiene posición guardada.
+- **Pruebas:** 30 pruebas puras en `jl60_aspectDefaults.test.ts`: clases de proporción, zona segura, sin solapamiento en 6 resoluciones, todos los elementos caben, estructura, ultrawide dentro de zona segura, elementos centrados.
+
+**Validación:** 30 pruebas verdes, suite 3247/3248 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, Vite build OK. Electron no disponible para capturas visuales.
+
+**Evidencia:** `work/junie-jl60/`.
+
 ## 2026-11-21 — JL-59: Barra fusionada centrada y escala por eje en el HUD (Junie)
 
 **Archivos:** `src/ui/map/hudProfiles.ts`, `src/ui/map/hudLayout.ts`, `src/ui/styles/menus.css`, `src/ui/styles/ventanas.css`, `tests/jl59_hudScaleAxis.test.ts`, `tests/ui/windows.test.ts`, `tests/mapLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

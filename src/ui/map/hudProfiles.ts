@@ -308,3 +308,350 @@ export function uiViewportBounds(
         height: Math.max(1, (h - padding) / s),
     };
 }
+
+// ─── Posiciones por defecto según proporción de pantalla (JL-60) ───────────
+
+/**
+ * Clase de proporción de pantalla. Se elige comparando el aspect ratio con
+ * umbrales: ≤1.7 → 16:9 (incluye 4:3 y similares); ≤1.85 → 16:10; ≤2.4 → 21:9;
+ * >2.4 → 32:9.
+ */
+export type AspectClass = '16:9' | '16:10' | '21:9' | '32:9';
+
+/**
+ * Devuelve la clase de proporción para un viewport dado.
+ */
+export function getAspectClass(w: number, h: number): AspectClass {
+    if (h <= 0 || w <= 0) return '16:9';
+    const ratio = w / h;
+    if (ratio <= 1.78) return '16:9';      // 16:9 = 1.777…
+    if (ratio <= 1.85) return '16:10';    // 16:10 = 1.6 — pero 2000/1191 = 1.679 → 16:9
+    if (ratio <= 2.4) return '21:9';      // 21:9 = 2.333…
+    return '32:9';                        // 32:9 = 3.555…
+}
+
+/**
+ * Rectángulo de zona segura: en pantallas ultrawide (21:9 y 32:9) el HUD
+ * se mantiene dentro de una zona centrada de proporción 16:9 para que los
+ * elementos no se vayan a los extremos del monitor.
+ *
+ * Devuelve { left, top, right, bottom } en píxeles CSS dentro del viewport.
+ */
+export function safeZone(w: number, h: number, aspect: AspectClass): { left: number; top: number; right: number; bottom: number } {
+    if (aspect === '21:9' || aspect === '32:9') {
+        // Zona segura centrada de proporción 16:9.
+        const safeH = h; // ocupa todo el alto
+        const safeW = Math.min(w, safeH * (16 / 9));
+        const left = Math.round((w - safeW) / 2);
+        return { left, top: 0, right: w - left, bottom: h };
+    }
+    return { left: 0, top: 0, right: w, bottom: h };
+}
+
+/**
+ * Posición por defecto de un elemento del HUD, expresada como fracción del
+ * viewport (mismo formato que WindowPos). Cada clase de proporción tiene su
+ * tabla; los valores son fracciones del hueco libre (0 = borde, 1 = borde opuesto).
+ *
+ * Fórmula: f = v / (view - size) donde v es la coordenada de la esquina superior
+ * izquierda y size es el ancho/alto del elemento.
+ *
+ * Para simplificar, las tablas declaran la esquina superior izquierda en píxeles
+ * relativos a una resolución de referencia por clase, y `getDefaultPositions()`
+ * las convierte a fracciones para el viewport real.
+ */
+
+/** Posición en píxeles CSS relativos al viewport (esquina superior izquierda). */
+interface PosPx {
+    x?: number;
+    y?: number;
+    top?: number;
+    right?: number;
+    bottom?: number;
+}
+
+/** Tabla de posiciones por defecto para una clase de proporción. */
+interface AspectDefaults {
+    /** Resolución de referencia para calcular fracciones. */
+    refW: number;
+    refH: number;
+    /** Posición de cada elemento en píxeles CSS sobre la referencia. */
+    positions: Record<string, PosPx>;
+}
+
+/**
+ * Tablas de posiciones por defecto por clase de proporción.
+ *
+ * Las posiciones se expresan sobre una resolución de referencia y se escalan
+ * proporcionalmente al viewport real. Los elementos que no aparecen en la tabla
+ * usan su posición CSS (hoja de estilos).
+ *
+ * Diseño de referencia 16:9 (1920×1080):
+ * - minimap: arriba-derecha, 14 px del borde
+ * - quest-tracker: debajo del minimapa, 8 px del borde derecho
+ * - world-info: centrado arriba, 6 px del tope
+ * - combat-bar: centrado arriba, 34 px del tope
+ * - chat: abajo-izquierda, 6 px del borde, 136 px del fondo
+ * - hud-bar: centrado abajo, 8 px del fondo
+ * - hud-pet: junto a la barra
+ *
+ * En 21:9 y 32:9 todo se coloca dentro de la zona segura centrada (16:9).
+ */
+const ASPECT_TABLES: Record<AspectClass, AspectDefaults> = {
+    '16:9': {
+        refW: 1920,
+        refH: 1080,
+        positions: {
+            minimap: { right: 14, top: 14 },
+            'quest-tracker': { right: 8, top: 234 },
+            'world-info': { x: 0, y: 6 },
+            'combat-bar': { x: 0, y: 34 },
+            chat: { x: 6, bottom: 136 },
+            'hud-bar': { x: 0, bottom: 8 },
+            'hud-pet': { right: 8, bottom: 8 },
+        },
+    },
+    '16:10': {
+        refW: 2000,
+        refH: 1191,
+        positions: {
+            minimap: { right: 14, top: 14 },
+            'quest-tracker': { right: 8, top: 234 },
+            'world-info': { x: 0, y: 6 },
+            'combat-bar': { x: 0, y: 34 },
+            chat: { x: 6, bottom: 136 },
+            'hud-bar': { x: 0, bottom: 8 },
+            'hud-pet': { right: 8, bottom: 8 },
+        },
+    },
+    '21:9': {
+        refW: 2560,
+        refH: 1080,
+        positions: {
+            // Dentro de zona segura centrada (16:9 dentro de 2560×1080 → 1920 px centrados).
+            // Zona segura: left=320, right=2240 (ancho 1920).
+            minimap: { right: 320 + 14, top: 14 },
+            'quest-tracker': { right: 320 + 8, top: 240 },
+            'world-info': { x: 320, y: 6 },
+            'combat-bar': { x: 320, y: 34 },
+            chat: { x: 320 + 6, bottom: 136 },
+            'hud-bar': { x: 320, bottom: 8 },
+            'hud-pet': { right: 320 + 8, bottom: 8 },
+        },
+    },
+    '32:9': {
+        refW: 5120,
+        refH: 1440,
+        positions: {
+            // Zona segura centrada (16:9 dentro de 5120×1440 → 2880 px centrados).
+            // Zona segura: left=1120, right=4000 (ancho 2880).
+            minimap: { right: 1120 + 14, top: 14 },
+            'quest-tracker': { right: 1120 + 8, top: 240 },
+            'world-info': { x: 1120, y: 6 },
+            'combat-bar': { x: 1120, y: 34 },
+            chat: { x: 1120 + 6, bottom: 136 },
+            'hud-bar': { x: 1120, bottom: 8 },
+            'hud-pet': { right: 1120 + 8, bottom: 8 },
+        },
+    },
+};
+
+/**
+ * Convierte una posición de referencia (píxeles sobre la resolución de la tabla)
+ * a WindowPos (fracción del hueco libre) para un viewport real.
+ *
+ * `elW` y `elH` son el ancho y alto estimados del elemento en píxeles CSS
+ * del viewport real. Si no se conocen, se usan los valores por defecto.
+ */
+function posToWindowPos(
+    pos: PosPx,
+    elW: number,
+    elH: number,
+    vw: number,
+    vh: number,
+): WindowPos {
+    const f = (v: number, size: number, view: number): number =>
+        view - size > 1 ? Math.max(0, Math.min(1, v / (view - size))) : 0;
+
+    let x = 0;
+    let y = 0;
+
+    if (pos.right !== undefined) {
+        x = vw - pos.right - elW;
+    } else if (pos.x !== undefined) {
+        x = pos.x;
+    }
+
+    if (pos.bottom !== undefined) {
+        y = vh - pos.bottom - elH;
+    } else if (pos.top !== undefined) {
+        y = pos.top;
+    } else if (pos.y !== undefined) {
+        y = pos.y;
+    }
+
+    return {
+        x: f(x, elW, vw),
+        y: f(y, elH, vh),
+    };
+}
+
+/**
+ * Anchos y altos estimados de cada elemento del HUD en píxeles CSS a escala 1.
+ * Se usan para convertir posiciones absolutas a fracciones cuando el elemento
+ * aún no está en el DOM.
+ */
+const ESTIMATED_SIZE: Record<string, { w: number; h: number }> = {
+    minimap: { w: 220, h: 220 },
+    'quest-tracker': { w: 206, h: 120 },
+    'world-info': { w: 200, h: 20 },
+    'combat-bar': { w: 400, h: 28 },
+    chat: { w: 340, h: 200 },
+    'hud-bar': { w: 640, h: 128 },
+    'hud-pet': { w: 160, h: 40 },
+    'hud-sec-character': { w: 120, h: 100 },
+    'hud-sec-items': { w: 200, h: 46 },
+    'hud-sec-spells': { w: 400, h: 46 },
+    'hud-sec-spells-2': { w: 400, h: 46 },
+    'hud-sec-spells-3': { w: 400, h: 46 },
+    'hud-sec-xp': { w: 100, h: 20 },
+    'hud-sec-menu': { w: 80, h: 46 },
+};
+
+/**
+ * Devuelve las posiciones por defecto para un viewport dado, como mapa
+ * clave → WindowPos. Solo incluye los elementos que tienen posición en la
+ * tabla de la proporción del viewport.
+ *
+ * Los elementos centrados (world-info, combat-bar, hud-bar) necesitan
+ * calcular el centro; `posToWindowPos` recibe `x` como coordenada izquierda,
+ * pero para centrado se pasa la coordenada ya centrada.
+ */
+export function getDefaultPositions(vw: number, vh: number): Record<string, WindowPos> {
+    const aspect = getAspectClass(vw, vh);
+    const table = ASPECT_TABLES[aspect];
+    const sz = safeZone(vw, vh, aspect);
+    const out: Record<string, WindowPos> = {};
+    // Escalar posiciones y tamaños de la referencia al viewport real.
+    const scaleX = vw / table.refW;
+    const scaleY = vh / table.refH;
+
+    for (const [key, pos] of Object.entries(table.positions)) {
+        const base = ESTIMATED_SIZE[key] ?? { w: 200, h: 100 };
+        const est = { w: Math.round(base.w * scaleX), h: Math.round(base.h * scaleY) };
+
+        const scaled: PosPx = {};
+        if (pos.x !== undefined) scaled.x = Math.round(pos.x * scaleX);
+        if (pos.y !== undefined) scaled.y = Math.round(pos.y * scaleY);
+        if (pos.top !== undefined) scaled.top = Math.round(pos.top * scaleY);
+        if (pos.right !== undefined) scaled.right = Math.round(pos.right * scaleX);
+        if (pos.bottom !== undefined) scaled.bottom = Math.round(pos.bottom * scaleY);
+
+        // Para elementos centrados horizontalmente (world-info, combat-bar, hud-bar),
+        // calcular el centro dentro de la zona segura.
+        if ((key === 'world-info' || key === 'combat-bar' || key === 'hud-bar') && scaled.x !== undefined) {
+            const safeCenter = (sz.left + sz.right) / 2;
+            scaled.x = Math.round(safeCenter - est.w / 2);
+        }
+
+        out[key] = posToWindowPos(scaled, est.w, est.h, vw, vh);
+    }
+
+    return out;
+}
+
+/**
+ * Verifica que dos rectángulos no se solapan. Los rectángulos se expresan
+ * como { x, y, w, h } en píxeles CSS del viewport.
+ */
+function rectsOverlap(
+    a: { x: number; y: number; w: number; h: number },
+    b: { x: number; y: number; w: number; h: number },
+): boolean {
+    return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+}
+
+/**
+ * Verifica que las posiciones por defecto de un viewport no producen
+ * solapamientos entre elementos del HUD. Devuelve un array de pares
+ * que se solapan (vacío = todo limpio).
+ *
+ * Los tamaños estimados se escalan según el factor del viewport respecto
+ * a la resolución de referencia de la clase de proporción, para que la
+ * prueba refleje el tamaño real de los elementos en esa pantalla.
+ */
+export function checkDefaultPositionsOverlap(vw: number, vh: number): [string, string][] {
+    const defaults = getDefaultPositions(vw, vh);
+    const aspect = getAspectClass(vw, vh);
+    const table = ASPECT_TABLES[aspect];
+    const scaleX = vw / table.refW;
+    const scaleY = vh / table.refH;
+    const overlaps: [string, string][] = [];
+
+    const entries = Object.entries(defaults);
+    for (let i = 0; i < entries.length; i++) {
+        for (let j = i + 1; j < entries.length; j++) {
+            const [ka, pa] = entries[i]!;
+            const [kb, pb] = entries[j]!;
+            const eaBase = ESTIMATED_SIZE[ka] ?? { w: 200, h: 100 };
+            const ebBase = ESTIMATED_SIZE[kb] ?? { w: 200, h: 100 };
+            // Escalar tamaños al viewport real.
+            const ea = { w: Math.round(eaBase.w * scaleX), h: Math.round(eaBase.h * scaleY) };
+            const eb = { w: Math.round(ebBase.w * scaleX), h: Math.round(ebBase.h * scaleY) };
+
+            // Convertir WindowPos a píxeles.
+            const fromF = (frac: number, size: number, view: number): number =>
+                Math.round(frac * (view - size));
+
+            const ra = {
+                x: fromF(pa.x, ea.w, vw),
+                y: fromF(pa.y, ea.h, vh),
+                w: ea.w,
+                h: ea.h,
+            };
+            const rb = {
+                x: fromF(pb.x, eb.w, vw),
+                y: fromF(pb.y, eb.h, vh),
+                w: eb.w,
+                h: eb.h,
+            };
+
+            if (rectsOverlap(ra, rb)) {
+                overlaps.push([ka, kb]);
+            }
+        }
+    }
+
+    return overlaps;
+}
+
+/**
+ * Verifica que todas las posiciones por defecto caben dentro del viewport.
+ * Devuelve un array de claves que salen fuera (vacío = todo dentro).
+ *
+ * Los tamaños estimados se escalan al viewport real.
+ */
+export function checkDefaultPositionsFit(vw: number, vh: number): string[] {
+    const defaults = getDefaultPositions(vw, vh);
+    const aspect = getAspectClass(vw, vh);
+    const table = ASPECT_TABLES[aspect];
+    const sx = vw / table.refW;
+    const sy = vh / table.refH;
+    const outside: string[] = [];
+
+    for (const [key, p] of Object.entries(defaults)) {
+        const base = ESTIMATED_SIZE[key] ?? { w: 200, h: 100 };
+        const est = { w: Math.round(base.w * sx), h: Math.round(base.h * sy) };
+        const fromF = (frac: number, size: number, view: number): number =>
+            Math.round(frac * (view - size));
+
+        const x = fromF(p.x, est.w, vw);
+        const y = fromF(p.y, est.h, vh);
+
+        if (x < 0 || y < 0 || x + est.w > vw || y + est.h > vh) {
+            outside.push(key);
+        }
+    }
+
+    return outside;
+}

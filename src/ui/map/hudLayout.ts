@@ -10,7 +10,7 @@ import { artIconUrl } from '../menus/artIcons';
 export type HudLayoutHost = Pick<UiContext, 'toast' | 'confirm'>;
 import { button, h } from '../menus/dom';
 import { toFraction, type WindowLayout } from '../menus/windows';
-import { clampHudScale, clampHudScaleAxis, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook, type HudScale } from './hudProfiles';
+import { clampHudScale, clampHudScaleAxis, getDefaultPositions, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook, type HudScale } from './hudProfiles';
 import type { Minimap } from './minimap';
 
 export class HudLayout {
@@ -157,7 +157,8 @@ export class HudLayout {
         if (old && old !== el) this.windows.detach(old);
         this.els.set(key, el);
         this.windows.attach(el, grip, key);
-        const p = this.profiles.active.positions[key];
+        // JL-60: usa la posición del perfil si existe, sino la de la tabla de proporción.
+        const p = this.profiles.active.positions[key] ?? getDefaultPositions(window.innerWidth, window.innerHeight)[key];
         if (p) requestAnimationFrame(() => this.windows.setPositions([key], { [key]: p }));
     }
 
@@ -434,7 +435,11 @@ export class HudLayout {
     apply(): void {
         this.minimap?.setSize(this.profiles.active.minimapSize);
         for (const [key, el] of this.els) this.applyScale(el, key);
-        this.windows.setPositions(HUD_KEYS, this.profiles.active.positions);
+        // JL-60: fusiona las posiciones del perfil (movidas por el usuario) con
+        // las posiciones por defecto de la proporción actual. El perfil gana.
+        const defaults = getDefaultPositions(window.innerWidth, window.innerHeight);
+        const merged = { ...defaults, ...this.profiles.active.positions };
+        this.windows.setPositions(HUD_KEYS, merged);
         this.applyBar();
     }
 

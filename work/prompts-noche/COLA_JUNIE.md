@@ -1092,7 +1092,7 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
   - `applyScale` y `bindScale` en `src/ui/map/hudLayout.ts`. Las barras que reparten casillas (acción, mascota, consumibles) crecen en casillas por fila al ensanchar, no estirando los iconos; los paneles de texto (chat, registro de combate) crecen en área.
   - Pruebas: migración del número a `{x, y}`, límites por eje y que la barra fusionada por defecto mida lo mismo que sus casillas (±8 px).
   - Captura en Electron: barra fusionada por defecto, y la misma estirada solo en X y solo en Y.
-- [ ] JL-60 Posiciones por defecto según la forma de la pantalla.
+- [x] JL-60 Posiciones por defecto según la forma de la pantalla. — commit «JL-60: posiciones por defecto según proporción de pantalla» — 30 pruebas verdes (jl60_aspectDefaults.test.ts), suite 3247/3248 (1 fallo pre-existente assets.test.ts), tsc sin errores nuevos, build OK. getAspectClass(), safeZone(), getDefaultPositions() en hudProfiles.ts; integración en hudLayout.ts (apply + attach). Capturas de Electron omitidas (CDP no disponible). Evidencia en work/junie-jl60/.
   - Clases de proporción, cada una con su tabla de posiciones por defecto en `hudProfiles.ts`:
     - 16:9 (1920×1080, 1366×768);
     - 16:10 (2000×1191 es la pantalla del creador hoy);
