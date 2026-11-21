@@ -1,3 +1,9 @@
+## 2026-11-21 — Monturas, andar y físicas secundarias (Coord)
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`; `COLA_OMP.md` (local).
+
+**Qué se hizo:** tareas JL-67 (motor de huesos con muelle `fis_*` e inercia del cuerpo), JL-68 (asiento por montura en vez de `RIDE_SEAT_DROP` fijo) y OMP-POL-13 (andar, pesos y huesos de falda empezando por el set de la diablica, y ancla `Asiento` en cada montura).
+
 ## 2026-11-21 — JL-66: Combate más fluido — modos de lanzamiento, asistencia y fallback (Junie)
 
 **Archivos:** `src/sim/castModes.ts`, `src/ui/menus/hud.ts`, `src/ui/menus/screens/modals.ts`, `src/main.ts`, `src/sim/world.ts`, `src/data/schema.ts`, `data/player.json`, `tests/jl66_castModes.test.ts`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
