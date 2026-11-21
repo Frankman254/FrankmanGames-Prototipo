@@ -1,3 +1,18 @@
+## 2026-11-21 — JL-82: Diagnóstico `bancoDetalle` — timeout ya resuelto (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl82/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Tarea JL-82: diagnosticar el timeout del escenario `bancoDetalle` en el arnés de QA.
+- Resultado: el escenario ya no da timeout. Completa con 14/16 checks en verde.
+- Los 2 fallos restantes (amuleto invoca mascota, depositar amuleto retira mascota) son pre-existentes, ya identificados por JL-09 (commit d6d4304).
+- El timeout original fue resuelto por JL-09: `clickMesh('bank-chest')` tras `saveAndLoad()` no encontraba el cofre; se arregló exponiendo `menus` en `__game` y abriendo el panel directamente.
+- Sin cambio de código.
+
+**Evidencia:** `work/junie-jl82/DIAGNOSTICO.md`. Escenario `bancoDetalle` ejecutado: 14/16 OK.
+
+---
+
 ## 2026-11-21 — JL-81: Escenario `aprendizaje` — timeout 600 s (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl81/DIAGNOSTICO.md`.

@@ -1170,7 +1170,7 @@ Reglas comunes de toda la bolsa:
 - [x] JL-79 Tiempo agotado en `audio`: diagnostica y corrige el escenario o el juego. Escenario en verde. — commit «JL-79: escenario audio ya pasa — sin código» — 5/5 en verde, sin cambio de código. DIAGNOSTICO.md en work/junie-jl79/.
 - [x] JL-80 Tiempo agotado en `castillo`: lo mismo. — commit «JL-80: escenario castillo ya pasa — sin código» — 7/7 en verde, sin cambio de código. DIAGNOSTICO.md en work/junie-jl80/.
 - [x] JL-81 Tiempo agotado en `aprendizaje`: lo mismo. — commit «JL-81: timeout 600 s para escenario aprendizaje» — 21/23 checks en verde, 2 fallos pre-existentes del juego (lancha no cruza, error Babylon postProcessManager). DIAGNOSTICO.md en work/junie-jl81/.
-- [ ] JL-82 Tiempo agotado en `bancoDetalle`: lo mismo.
+- [x] JL-82 Tiempo agotado en `bancoDetalle`: lo mismo. — commit «JL-82: diagnóstico bancoDetalle — timeout ya resuelto por JL-09» — 14/16 en verde, 2 fallos pre-existentes del amuleto (JL-09). DIAGNOSTICO.md en work/junie-jl82/.
 - [ ] JL-83 Tiempo agotado en `botin`: lo mismo.
 - [ ] JL-84 Tiempo agotado en `casa`: lo mismo.
 - [ ] JL-85 Escenario `crestalba`: el modelo no carga y CDP cae (JL-51). Diagnóstico con la causa y arreglo si es pequeño.
