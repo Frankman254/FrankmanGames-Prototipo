@@ -1,0 +1,643 @@
+{
+  "timestamp": "2026-11-21T20:41:56.163Z",
+  "total": 78,
+  "bySeverity": {
+    "alta": 6,
+    "media": 7,
+    "baja": 6,
+    "ok": 59
+  },
+  "byTemplate": {
+    "bestia": 7,
+    "arquero": 12,
+    "chaman": 11,
+    "diablillo": 10,
+    "personaje": 13
+  },
+  "mismatches": [
+    {
+      "id": "melee",
+      "name": "Sato Cimarrón",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "ranged",
+      "name": "Duende Tirapiedras",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "trapper",
+      "name": "Trampero del Matorral",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "summoner",
+      "name": "Curandero de Huesos",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "alpha_wolf",
+      "name": "Sato Jefe de la Jauría",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "goblin_veteran",
+      "name": "Duende Tirapiedras Veterano",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "minion",
+      "name": "Diablico Sucio",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "No diablillo",
+      "severity": "media"
+    },
+    {
+      "id": "grave_brute",
+      "name": "Matón de la Tulivieja",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "crypt_warden",
+      "name": "El Sacristán Sin Cabeza",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "ash_alpha",
+      "name": "Tigrillo de Ceniza",
+      "template": "jaguar",
+      "glb": "assets/models/jaguar.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "chame_crab",
+      "name": "Cangrejo Machetero",
+      "template": "cangrejo",
+      "glb": "assets/models/cangrejo.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "chame_heron",
+      "name": "Garza Flechera",
+      "template": "garza",
+      "glb": "assets/models/garza.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "chame_witch",
+      "name": "Brujo del Manglar",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "chame_chitra",
+      "name": "Chitra Picadora",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Animal ≠ diablillo",
+      "severity": "media"
+    },
+    {
+      "id": "chame_grandcrab",
+      "name": "Cangrejo Abuelo",
+      "template": "cangrejo",
+      "glb": "assets/models/cangrejo.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "chame_caiman",
+      "name": "Caimán Trasnochador",
+      "template": "caiman",
+      "glb": "assets/models/caiman.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "boquete_picker",
+      "name": "Recolector de Café Rabioso",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "boquete_quetzal",
+      "name": "Quetzal Cascarrabias",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Ave ≠ humanoide",
+      "severity": "media"
+    },
+    {
+      "id": "boquete_witch",
+      "name": "Bruja del Bajareque",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "boquete_drizzle",
+      "name": "Gotita de Bajareque",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "boquete_foreman",
+      "name": "Capataz del Cafetal",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "boquete_owl",
+      "name": "Búho Chismoso",
+      "template": "buho",
+      "glb": "assets/models/buho.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cerropunta_peccary",
+      "name": "Saíno Escarchado",
+      "template": "pecari",
+      "glb": "assets/models/pecari.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cerropunta_farmer",
+      "name": "Fresero Francotirador",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "cerropunta_shaman",
+      "name": "Chamán de la Neblina",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "cerropunta_wisp",
+      "name": "Jirón de Neblina",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Espíritu ≈ diablillo",
+      "severity": "baja"
+    },
+    {
+      "id": "cerropunta_boar",
+      "name": "Saíno Mayor de la Fría",
+      "template": "jabali",
+      "glb": "assets/models/jabali.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cerropunta_wraith",
+      "name": "Espanto de la Neblina",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Espíritu ≈ humanoide",
+      "severity": "baja"
+    },
+    {
+      "id": "baru_jaguar",
+      "name": "Jaguar Friolento del Barú",
+      "template": "jaguar",
+      "glb": "assets/models/jaguar.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "baru_lookout",
+      "name": "Vigía del Cráter",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "baru_sorcerer",
+      "name": "Hechicero del Volcán",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "baru_ember",
+      "name": "Brasita Saltarina",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Espíritu ≈ diablillo",
+      "severity": "baja"
+    },
+    {
+      "id": "baru_elder",
+      "name": "Gran Jaguar del Barú",
+      "template": "jaguar_anciano",
+      "glb": "assets/models/jaguar_anciano.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "baru_yeti",
+      "name": "Abominable Turista del Barú",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "darien_neque",
+      "name": "Ñeque Guerrero",
+      "template": "neque",
+      "glb": "assets/models/neque.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "darien_blowgun",
+      "name": "Cerbatanero del Tapón",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "darien_witch",
+      "name": "Brujo del Tapón",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "darien_mosquito",
+      "name": "Zancudo Tamaño Familiar",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Animal ≠ diablillo",
+      "severity": "media"
+    },
+    {
+      "id": "darien_harpy",
+      "name": "Águila Harpía Real",
+      "template": "aguila_arpia",
+      "glb": "assets/models/aguila_arpia.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "darien_tapir",
+      "name": "Macho de Monte Insomne",
+      "template": "tapir",
+      "glb": "assets/models/tapir.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "bocas_frog",
+      "name": "Rana Dorada Venenosa",
+      "template": "rana",
+      "glb": "assets/models/rana_venenosa.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "bocas_pirate",
+      "name": "Pirata de Isla Colón",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Animal ≠ humanoide",
+      "severity": "alta"
+    },
+    {
+      "id": "bocas_siren",
+      "name": "Sirena Desafinada",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Animal ≠ humanoide",
+      "severity": "alta"
+    },
+    {
+      "id": "bocas_jelly",
+      "name": "Aguamala Pegajosa",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "bocas_captain",
+      "name": "Capitán Calipso",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "bocas_drowned",
+      "name": "Marinero Ahogado",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "perlas_oyster",
+      "name": "Ostra Mordelona",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Animal ≠ bestia genérica",
+      "severity": "alta"
+    },
+    {
+      "id": "perlas_fisher",
+      "name": "Pescador Fantasma de las Perlas",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Espíritu ≈ humanoide",
+      "severity": "baja"
+    },
+    {
+      "id": "perlas_witch",
+      "name": "Bruja de las Perlas",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "perlas_pearl",
+      "name": "Perla Rodante",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Esfera ≠ diablillo",
+      "severity": "media"
+    },
+    {
+      "id": "perlas_shark",
+      "name": "Tiburón Martillo Patrón",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Animal ≠ bestia genérica",
+      "severity": "alta"
+    },
+    {
+      "id": "perlas_squid",
+      "name": "Calamar Gigante Madrugador",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Animal ≠ bestia genérica",
+      "severity": "alta"
+    },
+    {
+      "id": "fortuna_gale",
+      "name": "Ventarrón Andante",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "No humanoide en personaje",
+      "severity": "media"
+    },
+    {
+      "id": "fortuna_archer",
+      "name": "Arquero de la Ventisca",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "fortuna_shaman",
+      "name": "Brujo Escarchado de Fortuna",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "fortuna_flake",
+      "name": "Copito Malcriado",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Espíritu ≈ diablillo",
+      "severity": "baja"
+    },
+    {
+      "id": "fortuna_titan",
+      "name": "Coloso del Embalse",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "fortuna_coyote",
+      "name": "Coyote de la Helada",
+      "template": "zorro",
+      "glb": "assets/models/zorro.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "ancon_bus",
+      "name": "Diablo Rojo Desbocado",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "ancon_pavo",
+      "name": "Pavo Gritón",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Ave ≠ humanoide",
+      "severity": "media"
+    },
+    {
+      "id": "ancon_tulivieja",
+      "name": "Tulivieja Mayor",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "ancon_soul",
+      "name": "Alma en Pena de la Parada",
+      "template": "diablillo",
+      "glb": "assets/models/diablillo.glb",
+      "category": "Espíritu ≈ diablillo",
+      "severity": "baja"
+    },
+    {
+      "id": "ancon_driver",
+      "name": "El Chofer Sin Frenos",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "ancon_titi",
+      "name": "Mono Tití Trasnochado",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Animal ≠ bestia genérica",
+      "severity": "alta"
+    },
+    {
+      "id": "night_sato",
+      "name": "Sato Aullador de Medianoche",
+      "template": "bestia",
+      "glb": "assets/models/bestia.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_rata",
+      "name": "Ratón de la Cripta",
+      "template": "cripta_rata",
+      "glb": "assets/models/cripta_rata.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_rata_cueva",
+      "name": "cripta_rata_cueva",
+      "template": "cripta_rata_cueva",
+      "glb": "assets/models/cripta_rata_cueva.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_rata_huaca",
+      "name": "cripta_rata_huaca",
+      "template": "cripta_rata_huaca",
+      "glb": "assets/models/cripta_rata_huaca.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_guardian",
+      "name": "Guardián de la Cripta",
+      "template": "cripta_guardian",
+      "glb": "assets/models/cripta_guardian.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_guardian_cueva",
+      "name": "cripta_guardian_cueva",
+      "template": "cripta_guardian_cueva",
+      "glb": "assets/models/cripta_guardian_cueva.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_guardian_huaca",
+      "name": "cripta_guardian_huaca",
+      "template": "cripta_guardian_huaca",
+      "glb": "assets/models/cripta_guardian_huaca.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_bruto",
+      "name": "Bruto de la Cripta",
+      "template": "cripta_bruto",
+      "glb": "assets/models/cripta_bruto.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_bruto_cueva",
+      "name": "cripta_bruto_cueva",
+      "template": "cripta_bruto_cueva",
+      "glb": "assets/models/cripta_bruto_cueva.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "cripta_bruto_huaca",
+      "name": "cripta_bruto_huaca",
+      "template": "cripta_bruto_huaca",
+      "glb": "assets/models/cripta_bruto_huaca.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "la_espeja",
+      "name": "La Diablica Espejo",
+      "template": "espejo",
+      "glb": "assets/models/diablica_espejo.glb",
+      "category": "GLB propio",
+      "severity": "ok"
+    },
+    {
+      "id": "espejo_bailarin",
+      "name": "Bailarín del Diablo Espejo",
+      "template": "personaje",
+      "glb": "assets/models/personaje.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "espejo_cascabelero",
+      "name": "Cascabelero del Diablo Espejo",
+      "template": "arquero",
+      "glb": "assets/models/arquero.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    },
+    {
+      "id": "espejo_llamador",
+      "name": "Llamador de la Ronda",
+      "template": "chaman",
+      "glb": "assets/models/chaman.glb",
+      "category": "Correcto",
+      "severity": "ok"
+    }
+  ]
+}

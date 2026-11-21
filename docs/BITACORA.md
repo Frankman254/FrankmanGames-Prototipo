@@ -3409,3 +3409,5 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** 19 pruebas verdes (jl96_migration.test.ts). Suite 3461/3462 (1 fallo pre-existente assets.test.ts de OMP). Typecheck limpio (solo balM3.ts ajeno).
 
 **Evidencia:** `tests/jl96_migration.test.ts` (archivo existente corregido).
+
+**JL-99: auditoría nombre↔modelo automatizada.** Script `scripts/audit/nombreModelo.ts` que cruza los nombres de criaturas de `data/rpg/enemies.json` con los modelos 3D de `data/assets.json` y genera la tabla de discordancias en `work/junie-jl-99/`. 78 arquetipos auditados: 19 discordancias (6 alta, 7 media, 6 baja), 59 correctos. 11 pruebas en `tests/jl99_nombreModelo.test.ts` que limitan las discordancias a ≤24. Typecheck limpio, build OK.
