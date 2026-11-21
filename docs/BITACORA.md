@@ -280,7 +280,21 @@
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
 
-## 2026-11-21 — OMP-FA-08: ostra mordelona y perla rodante
+## 2026-11-21 - OMP-FA-09: tiburón martillo y calamar gigante
+
+**Archivos:** `assets/models/tiburon.glb`, `assets/models/calamar.glb`, `arte/blender/fauna_perlas2.blend`, `scripts/blender/{fauna_perlas2,validar_fauna_perlas2,revisar_fauna_perlas2}.py`, fila FA-01...20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Dos criaturas más del Archipiélago de las Perlas, prioridad alta de `work/junie-jl-63/NOMBRE_MODELO.md` (hoy se ven como lobo tenido y diablillo).
+- **Tiburón martillo** (`perlas_shark`, elite): 626 tri, 1,90 m de punta de martillo a lóbulo de cola × 0,88 m de envergadura × 1,11 m de alto. Cefalolobo en T con los ojos en las puntas y ollares, boca ventral con diez dientes triangulares que se abren con la mandíbula, cinco branquias por flanco, dorsal alta, cola de dos lóbulos desiguales y cicatrices de anzuelo. Como el juego anda por el suelo (convención de la casa, igual que el caimán de FA-02), se apoya en las puntas de las aletas pectorales y pélvicas rígidas; Caminar ondula el cuerpo de lado de la cabeza a la cola. Atacar: mandoble de cabeza con las pectorales abiertas.
+- **Calamar gigante** (`perlas_squid`, melee nocturno): 768 tri, 1,37 m de los brazos al ápice del manto × 1,41 m de alto. Manto cónico inclinado con sus aletas y manchas de cromatóforos, cabeza con dos ojos enormes de iris dorado y pupila vertical, pico asomando, corona de seis brazos que ondulan con fase escalonada (i/6) y dos brazos alimentadores con maza de ventosas que clava por delante al atacar; al morir se desploma de brazos.
+- Corrección tras la primera lámina: las mazas de los brazos alimentadores se desprendían al animar (el `fangTip` giraba con el brazo pero la maza estaba anclada más lejos); añadido un tramo de tubo `cloth` del codo a la maza para que el brazo siga entero.
+
+**Validación:** `validar_fauna_perlas2.py` en verde (rig, cinco clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango); láminas de 5 vistas + 5 pasos revisadas y aceptadas; `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-09/revision_{tiburon,calamar}.png` y las 40 vistas sueltas.
+
+## 2026-11-21 - OMP-FA-08: ostra mordelona y perla rodante
 
 **Archivos:** `assets/models/ostra.glb`, `assets/models/perla.glb`, `arte/blender/fauna_perlas.blend`, `scripts/blender/{fauna_perlas,validar_fauna_perlas,revisar_fauna_perlas}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
 
