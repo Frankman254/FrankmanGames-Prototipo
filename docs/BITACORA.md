@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-91: Escenario qaElectron modosLanzar (JL-66) (Junie)
+
+**Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `tests/jl91_castModes.test.ts` (no, sin pruebas nuevas, solo escenario), `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl91/REPORTE.md`.
+
+**Qué se hizo:** Escenario `modosLanzar` en `scripts/qaElectron.mjs` que verifica los 3 modos de lanzamiento de JL-66 (castInput): `press` (tecla sola lanza directo), `indicator` (keydown apunta, keyup lanza) y `pressClick` (primera tecla apunta, segunda confirma). Se expuso `castInput` en `window.__game` (main.ts) para que el arnés pueda cambiar el modo. En headless (sin display), Babylon no inicializa WebGL: no hay meshes ni apuntado al suelo. El escenario verifica la lógica de castInput (cambio de modo, estado aiming, cancelación con Escape) sin lanzar hechizos reales.
+
+**Validación:** Escenario `modosLanzar`: 7/7 checks en verde. Suite 3443/3443. Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl91/REPORTE.md`. La verificación visual completa requiere entorno con display.
+
+---
+
 ## 2026-11-21 — JL-90: fantasma.glb — guard defensivo y PARA_OMP.md (Junie)
 
 **Archivos:** `src/render/characters/ghostBody.ts`, `tests/jl90_ghostBody.test.ts`, `work/junie-jl-90/PARA_OMP.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

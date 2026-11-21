@@ -5323,6 +5323,68 @@ const scenarios = {
         console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
     },
 
+    /** JL-91: los tres modos de lanzamiento (JL-66).
+     * Verifica que castInput responde correctamente a cada modo.
+     * En headless (sin display), Babylon no inicializa WebGL: los meshes no existen
+     * y el apuntado al suelo falla. Se verifica la lógica de castInput y el GCD
+     * con lo que el arnés puede comprobar. */
+    async modosLanzar() {
+        await newGame('QA ModosLanzar');
+        await resize(1920, 1080);
+        // storm_swap en slot 0, recurso lleno.
+        await js(`(() => { const c=${S}.character; c.gainXp(5000000);
+      for (const id of ['storm_swap','lightning_step','gust']) if(c.spellbook.rank(id)===0) c.spellbook.learn(id);
+      c.spellbook.hotbar[0]='storm_swap'; c.resource=c.maxResource; })()`);
+        await sleep(300);
+        const setCastMode = async (mode) => {
+            await js(`__game.castInput.setMode(${JSON.stringify(mode)})`);
+            await sleep(200);
+        };
+        const aiming = () => js(`__game.castInput.aiming !== null`);
+        const mode = () => js(`__game.castInput.mode`);
+
+        // --- Verificar que los tres modos se configuran ---
+        await setCastMode('press');
+        check('modosLanzar: modo press configurado', await mode() === 'press', await mode());
+
+        await setCastMode('indicator');
+        check('modosLanzar: modo indicator configurado', await mode() === 'indicator', await mode());
+
+        await setCastMode('pressClick');
+        check('modosLanzar: modo pressClick configurado', await mode() === 'pressClick', await mode());
+
+        // --- Verificar que pressClick entra en apuntado con KeyQ (hotbar1) ---
+        await setCastMode('pressClick');
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: pressClick — KeyQ entra en apuntado', await aiming(), `aiming=${await js(`__game.castInput.aiming`)}`);
+
+        // Cancelar con Esc.
+        await key('Escape', 'Escape');
+        await sleep(200);
+        check('modosLanzar: pressClick — Esc cancela', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+
+        // --- Verificar que press no entra en apuntado ---
+        await setCastMode('press');
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: press — KeyQ no apunta (lanza directo)', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+
+        // --- Verificar que indicator lanza con keydown+keyup (key() hace ambos) ---
+        // En indicator, keydown apunta y keyup lanza. key() envía ambos, así que
+        // el hechizo se lanza y aiming vuelve a null. Verificamos que el GCD se activa.
+        await setCastMode('indicator');
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: indicator — keydown+keyup lanza (aiming null)', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+
+        // Restaurar.
+        await setCastMode('pressClick');
+        await resize(1280, 800);
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {

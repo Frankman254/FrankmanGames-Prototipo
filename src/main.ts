@@ -1638,6 +1638,10 @@ if (import.meta.env.DEV) {
             get session() {
                 return session;
             },
+            /** JL-91: acceso de QA al CastInput para cambiar el modo de lanzamiento. */
+            get castInput() {
+                return castInput;
+            },
         },
     });
 }

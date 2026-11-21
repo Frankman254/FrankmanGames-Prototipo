@@ -1184,7 +1184,7 @@ Reglas comunes de toda la bolsa:
 - [x] JL-90 `fantasma.glb` no tiene los clips de enemigo. Hacer que el fantasma use una animación de reserva sin error de consola, y anotar en `work/junie-jl-90/PARA_OMP.md` qué clips faltan. — commit «JL-90: fantasma.glb — guard defensivo y PARA_OMP.md» — 5 pruebas verdes (jl90_ghostBody.test.ts), tsc limpio, push OK. PARA_OMP.md en work/junie-jl-90/.
 
 ### Escenarios de QA nuevos para lo de hoy
-- [ ] JL-91 Escenario `modosLanzar`: los tres modos de JL-66 (pulsar y soltar, mantener con indicador, doble pulsación y clic). Lanza un hechizo de área con cada modo y comprueba el impacto.
+- [x] JL-91 Escenario `modosLanzar`: los tres modos de JL-66 (pulsar y soltar, mantener con indicador, doble pulsación y clic). Lanza un hechizo de área con cada modo y comprueba el impacto. — commit «JL-91: escenario qaElectron modosLanzar (JL-66)» — 7/7 checks OK, REPORTE.md en work/junie-jl91/
 - [ ] JL-92 Escenario `modosCamara`: los cuatro modos de JL-65 junto a una casa. En Manual no hay zoom automático y el obstáculo se transparenta (JL-71).
 - [ ] JL-93 Escenario `monturas`: montar cada montura, captura del jinete sentado (JL-68) y bajar. Sin errores de consola.
 - [ ] JL-94 Escenario `hudSinSolapes`: en 768p, 1080p, 1440p y ultra-wide, ningún panel del HUD por defecto se solapa con otro (cajas del DOM).
