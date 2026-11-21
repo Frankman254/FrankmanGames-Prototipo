@@ -745,6 +745,11 @@ let holdEnemy: number | null = null;
 
 // ─── Lanzar hechizos (combate v2): pulsar y clic, con indicador o al pulsar ──
 const castInput = new CastInput(startOptions.castMode);
+// JL-66: el menú contextual de la barra emite un evento para cambiar el modo de un hueco.
+window.addEventListener('frankmangames:slotCastMode', (e: Event) => {
+    const detail = (e as CustomEvent).detail as { slot: number; mode: string };
+    castInput.setSlotMode(detail.slot, detail.mode as import('./sim/castModes').CastMode);
+});
 /**
  * Botón primario (izquierdo de fábrica): andar, atacar, hablar, recoger y usar. Se puede
  * intercambiar con el botón de cámara sin cambiar su comportamiento al mantenerlo.
@@ -1409,10 +1414,25 @@ function saveTelemetry(): void {
 
 /** Punto del suelo y enemigo bajo el cursor, para apuntar habilidades. */
 function cursorAim(): { point: { x: number; y: number }; targetId: number | null } {
-    return {
-        point: view.pickGround(input.x, input.y) ?? { ...world.player.pos },
-        targetId: view.pickEnemy(input.x, input.y),
-    };
+    const ground = view.pickGround(input.x, input.y) ?? { ...world.player.pos };
+    let targetId = view.pickEnemy(input.x, input.y);
+    // JL-66: asistencia al apuntar — si el cursor está cerca de un enemigo, se pega al más cercano.
+    if (targetId === null && world.data.player.aimAssistRadius > 0) {
+        const r = world.data.player.aimAssistRadius;
+        const r2 = r * r;
+        let bestId: number | null = null;
+        let bestDist2 = r2;
+        for (const e of world.enemies.list) {
+            if (e.state === 'dead') continue;
+            const d2 = (e.pos.x - ground.x) ** 2 + (e.pos.y - ground.y) ** 2;
+            if (d2 < bestDist2) {
+                bestDist2 = d2;
+                bestId = e.id;
+            }
+        }
+        targetId = bestId;
+    }
+    return { point: ground, targetId };
 }
 canvas.addEventListener(
     'wheel',

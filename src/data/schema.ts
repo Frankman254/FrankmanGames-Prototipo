@@ -206,6 +206,8 @@ export interface PlayerDef {
   clickTalkRadius: number;
   /** Ventana (s) para encolar un hechizo pulsado durante una animación. 0 = desactivado. */
   commandQueueWindow: number;
+  /** Radio (m) de asistencia al apuntar. Si el cursor cae dentro de este radio de un enemigo, se pega al más cercano. 0 = desactivado. */
+  aimAssistRadius: number;
 }
 
 function parseClassCost(r: Reader, raw: unknown): Record<string, number> {
@@ -242,6 +244,7 @@ export function parsePlayer(raw: unknown): PlayerDef {
     clickAttackRadius: r.num(o, 'clickAttackRadius', { min: 0.1, max: 10 }),
     clickTalkRadius: r.num(o, 'clickTalkRadius', { min: 0.1, max: 10 }),
     commandQueueWindow: r.num(o, 'commandQueueWindow', { min: 0, max: 2, def: 0.3 }),
+    aimAssistRadius: r.num(o, 'aimAssistRadius', { min: 0, max: 5, def: 1.5 }),
   };
 }
 

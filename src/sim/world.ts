@@ -991,6 +991,21 @@ export class World implements SessionWorld {
         return Boolean(e && this.grid.lineOfSight(p.pos, e.pos));
     }
 
+    /** JL-66: clamping del punto aim al radio máximo del hechizo. Devuelve null si no aplica. */
+    private clampAimToRange(s: CompiledSpell, aim: Vec2): Vec2 | null {
+        const p = this.player;
+        // Solo para hechizos que apuntan al suelo (no single target).
+        if (s.area.type === 'single' || s.area.type === 'self') return null;
+        const d = dist(p.pos, aim);
+        if (d <= s.range) return null; // ya está en rango
+        // Proyecta el punto al borde del radio.
+        const angle = Math.atan2(aim.y - p.pos.y, aim.x - p.pos.x);
+        return {
+            x: p.pos.x + Math.cos(angle) * (s.range - p.radius),
+            y: p.pos.y + Math.sin(angle) * (s.range - p.radius),
+        };
+    }
+
     /** Motivo por el que no se puede lanzar ahora mismo, o null. */
     checkCast(s: CompiledSpell, targetId: number | null, aim?: Vec2): CastBlock | null {
         if (this.character.spectral.active) return 'spectral';
@@ -1094,6 +1109,17 @@ export class World implements SessionWorld {
             p.pickupTarget = null;
             this.attackRepath = 0;
             return null;
+        }
+        // JL-66: fallback de alcance — si está fuera de rango, el hechizo va al punto más lejano dentro del alcance.
+        if (block === 'range' && !this.approachToCast) {
+            const clamped = this.clampAimToRange(s, aim.point);
+            if (clamped) {
+                const newBlock = this.checkCast(s, targetId, clamped);
+                if (newBlock !== 'range') {
+                    aim = { point: clamped, targetId: aim.targetId };
+                    return this.commandCast(spellId, aim);
+                }
+            }
         }
         if (block) {
             // JUG-06: si el bloqueo es por ocupado o GCD y estamos dentro de la ventana, encolar.

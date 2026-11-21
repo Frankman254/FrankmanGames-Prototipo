@@ -16,6 +16,12 @@
 export const CAST_MODES = ['pressClick', 'indicator', 'press'] as const;
 export type CastMode = (typeof CAST_MODES)[number];
 
+export const CAST_MODE_NAMES: Record<CastMode, string> = {
+    pressClick: 'Pulsar dos veces',
+    indicator: 'Mantener y soltar',
+    press: 'Pulsar una vez',
+};
+
 /** Qué hacer tras una tecla o un clic. */
 export type CastStep =
     | { kind: 'none' }
@@ -29,9 +35,28 @@ export class CastInput {
     /** Hueco que se está apuntando, o null. */
     aiming: number | null = null;
 
-    constructor(public mode: CastMode = 'pressClick') {}
+    /** Modo por defecto. */
+    public mode: CastMode = 'pressClick';
 
-    /** Cambiar de modo cancela lo que se estuviera apuntando. */
+    /** JL-66: modo propio por hueco (opcional). Si un hueco tiene modo propio, gana sobre el global. */
+    private slotModes = new Map<number, CastMode>();
+
+    constructor(mode: CastMode = 'pressClick') {
+        this.mode = mode;
+    }
+
+    /** Modo efectivo de un hueco: propio si existe, global si no. */
+    effectiveMode(slot: number): CastMode {
+        return this.slotModes.get(slot) ?? this.mode;
+    }
+
+    /** JL-66: establece el modo propio de un hueco. `null` = vuelve al global. */
+    setSlotMode(slot: number, mode: CastMode | null): void {
+        if (mode === null) this.slotModes.delete(slot);
+        else this.slotModes.set(slot, mode);
+    }
+
+    /** Cambiar el modo global cancela lo que se estuviera apuntando. */
     setMode(mode: CastMode): void {
         if (mode !== this.mode) this.aiming = null;
         this.mode = mode;
@@ -39,11 +64,12 @@ export class CastInput {
 
     /** Tecla de un hueco pulsada. `needsAim` = el hechizo se apunta al suelo o a un objetivo. */
     press(slot: number, needsAim: boolean): CastStep {
-        if (!needsAim || this.mode === 'press') {
+        const m = this.effectiveMode(slot);
+        if (!needsAim || m === 'press') {
             this.aiming = null;
             return { kind: 'cast', slot };
         }
-        if (this.mode === 'pressClick' && this.aiming === slot) {
+        if (m === 'pressClick' && this.aiming === slot) {
             this.aiming = null;
             return { kind: 'cast', slot };
         }
@@ -54,7 +80,8 @@ export class CastInput {
 
     /** Tecla de un hueco soltada: en «con indicador» lanza lo que se apuntaba con ella. */
     release(slot: number): CastStep {
-        if (this.mode !== 'indicator' || this.aiming !== slot) return NONE;
+        const m = this.effectiveMode(slot);
+        if (m !== 'indicator' || this.aiming !== slot) return NONE;
         this.aiming = null;
         return { kind: 'cast', slot };
     }

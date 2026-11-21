@@ -9,6 +9,7 @@ import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/cont
 import { itemTip, type UiContext } from './context';
 import { h, clear } from './dom';
 import { dropAttr } from './drag';
+import { CAST_MODE_NAMES, CAST_MODES, type CastMode } from '../../sim/castModes';
 import { pulseText, spellTooltip, type TipLine } from './format';
 import { itemIcon, namedIcon, spellIcon, statusIcon } from './icons';
 import { HOTBAR_ROW, HOTBAR_SLOTS, type Action } from './keybindings';
@@ -248,6 +249,12 @@ export class GameHud {
         const slot: HotSlot = { root, icon, sweep, time, cost, rank, spellId: undefined };
         this.slots.push(slot);
         root.addEventListener('click', () => this.cast(index));
+        // JL-66: clic derecho abre el menú de modo de lanzamiento para este hueco.
+        root.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.showCastModeMenu(e.clientX, e.clientY, index);
+        });
         this.ctx.drag.draggable(
             root,
             () => (slot.spellId ? { kind: 'hotbar', index, spellId: slot.spellId } : null),
@@ -256,6 +263,56 @@ export class GameHud {
         this.ctx.tooltip.bind(root, () => this.spellTip(slot.spellId ?? null));
         return slot;
     }
+
+    /** JL-66: menú contextual para elegir el modo de lanzamiento de un hueco. */
+    private showCastModeMenu(x: number, y: number, slotIndex: number): void {
+        // Cierra cualquier menú anterior.
+        this.closeCastModeMenu?.();
+        const menu = h('div.hot-slot-cast-mode-menu', { role: 'menu', 'aria-label': 'Modo de lanzamiento', tabindex: '-1' });
+        menu.style.cssText =
+            'position:fixed;display:flex;flex-direction:column;gap:2px;padding:4px;min-width:180px;font-size:12px;background:var(--paper-1);color:var(--ink);border:1px solid #000;border-radius:6px;box-shadow:0 8px 24px #0009;pointer-events:auto;z-index:10000';
+        // Posición: asegura que quepa en pantalla.
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const mw = 180;
+        const mh = CAST_MODES.length * 28 + 8;
+        menu.style.left = `${Math.min(x, vw - mw - 8)}px`;
+        menu.style.top = `${Math.min(y, vh - mh - 8)}px`;
+        for (const mode of CAST_MODES) {
+            const item = h('div', {
+                role: 'menuitem',
+                tabindex: '0',
+                text: CAST_MODE_NAMES[mode],
+                'data-mode': mode,
+            });
+            item.style.cssText = 'padding:6px 10px;cursor:pointer;border-radius:3px;';
+            item.addEventListener('mouseenter', () => (item.style.background = 'var(--paper-2)'));
+            item.addEventListener('mouseleave', () => (item.style.background = ''));
+            item.addEventListener('click', () => {
+                // Emite evento custom para que main.ts lo capture.
+                window.dispatchEvent(new CustomEvent('frankmangames:slotCastMode', {
+                    detail: { slot: slotIndex, mode },
+                }));
+                this.closeCastModeMenu?.();
+            });
+            menu.appendChild(item);
+        }
+        document.body.appendChild(menu);
+        this.closeCastModeMenu = () => {
+            menu.remove();
+            this.closeCastModeMenu = undefined;
+        };
+        // Cierra al hacer clic fuera.
+        const onClose = (e: MouseEvent) => {
+            if (!menu.contains(e.target as Node)) {
+                this.closeCastModeMenu?.();
+                document.removeEventListener('mousedown', onClose);
+            }
+        };
+        document.addEventListener('mousedown', onClose);
+    }
+
+    private closeCastModeMenu: (() => void) | undefined;
 
     private itemSlot(index: number, key: string): ItemBarSlot {
         const root = h('div.hot-slot.item-slot.empty');

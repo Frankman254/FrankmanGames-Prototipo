@@ -33,7 +33,7 @@ import {
     type ThemeId,
     type DecorId,
 } from '../saveStore';
-import { CAST_MODES, type CastMode } from '../../../sim/castModes';
+import { CAST_MODE_NAMES, CAST_MODES, type CastMode } from '../../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../../sim/lock';
 import { DAY_LENGTH_MINUTES } from '../../../world/dayNight';
 
@@ -159,10 +159,10 @@ const BAR_NAMES: Record<EnemyBarMode, string> = {
     nunca: 'Nunca',
 };
 
-const CAST_MODE_NAMES: Record<CastMode, string> = {
-    pressClick: 'Pulsar y clic para confirmar',
-    indicator: 'Con indicador (mantener y soltar)',
-    press: 'Al pulsar (sale hacia el cursor)',
+const CAST_MODE_HINTS: Record<CastMode, string> = {
+    pressClick: 'Pulsa la tecla para apuntar, luego pulsa de nuevo o haz clic para lanzar. Esc o clic derecho cancelan.',
+    indicator: 'Mantén la tecla pulsada para ver el área de efecto, suéltala para lanzar. Esc o clic derecho cancelan.',
+    press: 'Pulsa la tecla y el hechizo sale al instante hacia donde apunta el cursor. Sin vista previa.',
 };
 
 const LOCK_MODE_NAMES: Record<LockMode, string> = {
@@ -368,7 +368,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                 h('h4', { text: 'Combate' }),
                 select('Lanzar hechizos', 'castMode', CAST_MODES, (v) => CAST_MODE_NAMES[v]),
                 h('p.hint', {
-                    text: 'Con indicador y con clic: Esc o clic derecho cancelan. Los hechizos sobre ti salen al pulsar.',
+                    text: 'Pulsar dos veces: apunta, luego confirma. Mantener y soltar: ves el área y sueltas. Pulsar una vez: sale al instante. Los hechizos sobre ti salen al momento en cualquier modo. Clic derecho en un hueco de la barra para elegir el modo de ese hechizo.',
                 }),
                 select('Placaje (experimental)', 'lockMode', LOCK_MODES, (v) => LOCK_MODE_NAMES[v]),
                 h('p.hint', {

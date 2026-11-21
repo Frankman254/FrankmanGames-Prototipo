@@ -1,3 +1,19 @@
+## 2026-11-21 — JL-66: Combate más fluido — modos de lanzamiento, asistencia y fallback (Junie)
+
+**Archivos:** `src/sim/castModes.ts`, `src/ui/menus/hud.ts`, `src/ui/menus/screens/modals.ts`, `src/main.ts`, `src/sim/world.ts`, `src/data/schema.ts`, `data/player.json`, `tests/jl66_castModes.test.ts`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **Modos de lanzamiento más visibles:** los nombres en Opciones → Juego → Combate pasaron a "Pulsar dos veces", "Mantener y soltar" y "Pulsar una vez" (antes más técnicos). El hint explica los tres modos y menciona el clic derecho en la barra.
+- **Menú contextual en la barra:** clic derecho en un hueco de la barra de hechizos abre un menú con los 3 modos; elegir uno aplica el modo solo a ese hechizo. `CastInput` ahora soporta `setSlotMode()` y `effectiveMode()`.
+- **Asistencia al apuntar:** `cursorAim()` en `main.ts` busca el enemigo más cercano dentro de `aimAssistRadius` (1.5 m, en `data/player.json`) y lo usa como targetId si el cursor no cae directamente sobre un enemigo.
+- **Fallback de alcance:** `commandCast()` en `world.ts` llama a `clampAimToRange()` cuando el punto está fuera de rango y no hay `approachToCast`: proyecta el punto al borde del radio del hechizo en la misma dirección.
+- **Cola de comandos:** ya existía (JUG-06, `commandQueueWindow: 0.3` en `data/player.json`). No se modificó.
+- **Pruebas:** 10 pruebas puras en `tests/jl66_castModes.test.ts` (modos por slot, effectiveMode, press/release con modo propio).
+
+**Validación:** 10 pruebas verdes, suite 3206/3206, tsc sin errores nuevos, Vite build OK. Electron no disponible para capturas visuales.
+
+**Evidencia:** `work/junie-jl66/`.
+
 ## 2026-11-21 — JL-65: Cuatro modos de cámara y colisión que respeta el modo (Junie)
 
 **Archivos:** `src/camera/types.ts`, `src/camera/modes.ts`, `src/render/cameraRig.ts`, `src/render/arenaView.ts`, `src/ui/menus/screens/modals.ts`, `src/ui/menus/saveStore.ts`, `src/main.ts`, `tests/camera.test.ts`, `tests/camera/cameraLogic.test.ts`, `tests/jl65_cameraModes.test.ts`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
