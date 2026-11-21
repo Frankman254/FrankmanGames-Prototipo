@@ -1,3 +1,19 @@
+## 2026-11-21 — OMP-M25: Utilería de la cripta por tramos (OMP, modo Blender)
+
+**Archivos:** `assets/models/utileria_cripta.glb`, `arte/blender/utileria_cripta.blend`, `scripts/blender/utileria_cripta.py`, `scripts/blender/validar_utileria_cripta.py`, `scripts/blender/revisar_utileria_cripta.py`, `tests/modelos.test.ts` (catálogo estático en `FIXED`), `PROCEDENCIA.md`, `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- Catálogo original de 12 piezas estáticas (nodos `crip_<id>`, origen al suelo, mirando a -Y, sin rig ni clips, igual que `utileria.glb`), modelado desde cero con primitivas propias en Blender 5.2:
+  - tramo 1–30 (piedra y raíces): `sarcofago`, `urnas`, `raices_muro`, `velas`;
+  - tramo 31–70 (cueva húmeda): `pila_agua`, `estalagmitas`, `telarana_rincon`, `velon`;
+  - tramo 71–100 (oro y huesos): `sarcofago_oro` (máscara felina de huaca), `osario`, `ofrenda_oro`, `altar_huaca`.
+- 18 materiales procedurales propios (piedra a tres tonos, barro, hueso viejo, oro con emisivo tenue para leerse con la luz de la falcopama, cera con llama emisiva, agua estancada, musgo, hilo de telaraña en tarjetas finas).
+- Tramos según el contrato de OMP-POL-02. La conexión desde `data/dungeons/` la hace el programador: OMP no toca `src/` ni `data/`.
+
+**Validación:** `validar_utileria_cripta.py` en verde (12 piezas, 2.552 triángulos, origen en el suelo, sin rig ni clips, bajo el techo de 3 m). `tests/modelos.test.ts` 12/12 (el catálogo entra en la lista de piezas fijas). Typecheck sin errores nuevos. Clean-room verificado: nada de `reference_assets`.
+
+**Evidencia:** `work/omp-m25/catalogo.png` (lámina de las 12 piezas). El creador tiene que mirar el catálogo y decidir si el estilo encaja antes de que Junie lo conecte a los pisos.
+
 ## 2026-11-21 — JL-72: Integración de modelos OMP — jaguar, ranas y corrección del ñeque (Junie)
 
 **Archivos:** `data/assets.json`, `tests/jl72_fauna.test.ts`, `work/junie-jl-63/NOMBRE_MODELO.md`, `work/junie-jl-72/PROPUESTA_RANAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

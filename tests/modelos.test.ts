@@ -32,6 +32,7 @@ describe('assets/models', () => {
             'objetos.glb',
             'equipo.glb',
             'utileria.glb',
+            'utileria_cripta.glb',
             'simbolos_istmo.glb',
             'naturaleza_modular.glb',
             'naturaleza_suelo.glb',
