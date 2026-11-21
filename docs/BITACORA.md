@@ -1,3 +1,13 @@
+## 2026-11-21 — Bolsa grande de tareas para Junie (JL-73…108)
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`
+
+**Qué se hizo:**
+- El creador: «junie termina todo lo que le dices, pero se para … armes lista gigante de tareas pequeñas». El bucle `scripts/mac/junie_continuo.sh` se detiene cuando la cola se vacía; con 36 tareas pequeñas tiene trabajo para varias noches.
+- Orden: rojos del arnés de QA, modelos ya publicados por OMP, escenarios nuevos de lo de hoy, pruebas que faltan, mejoras pequeñas, limpieza y QA completo. La última tarea (JL-108) deja propuestas para la siguiente bolsa, sin empezarlas.
+- La nota «fallo conocido: v2Product» de la cola pasa a decir que la prueba está en verde desde 81b5a77.
+- Decisión del coordinador: Junie no pasa a ser subagente de OMP. Siguen siendo dos bucles independientes con colas largas que se rellenan por tandas.
+
 ## 2026-11-21 — OMP-M25: Utilería de la cripta por tramos (OMP, modo Blender)
 
 **Archivos:** `assets/models/utileria_cripta.glb`, `arte/blender/utileria_cripta.blend`, `scripts/blender/utileria_cripta.py`, `scripts/blender/validar_utileria_cripta.py`, `scripts/blender/revisar_utileria_cripta.py`, `tests/modelos.test.ts` (catálogo estático en `FIXED`), `PROCEDENCIA.md`, `docs/TAREAS.md`.

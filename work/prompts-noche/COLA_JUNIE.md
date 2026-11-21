@@ -6,8 +6,8 @@ Una ejecución = **una** tarea: la primera marcada `- [ ]`. Al acabarla, cambia 
 
 No toques las demás casillas. El bucle `scripts/mac/junie_continuo.sh` relanza a Junie con la siguiente tarea.
 
-### Fallo conocido: `v2Product` «primaria excesiva» (creador, 2026-11-21)
-El creador aplaza el tope de ×2,5 al balance de lanzamiento: «dejalo asi no te fijes en ese tope de 2.5». Es el único rojo esperado de la suite. No lo arregles, no lo relajes y no lo marques como skip. En los informes, cuéntalo aparte como «fallo conocido».
+### `v2Product` ya está en verde (coordinador, 2026-11-21)
+El tope de ×2,5 ahora mide el equipo sin montura (commit 81b5a77); el creador lo revisa en el balance de lanzamiento (Q28b). La suite completa debe quedar verde: cualquier rojo es tuyo o un hallazgo que se informa.
 
 ### Commits (el creador, 2026-11-20: «que los commits valgan la pena»)
 
@@ -1147,3 +1147,61 @@ Revisión de JL-58…68 por el coordinador: suite 3320/3321 (el único rojo es `
     - un piso a mano puede declarar sus antorchas en el JSON (`torches: [{tile, dir}]`) y entonces el generador no pone las suyas.
   - Luego haz JL-64 tal como está escrita, con `j16_torches`, `tor01_regression` y `tor01_audit` en verde.
 - [x] JL-72 Integrar lo nuevo de OMP, con el procedimiento de JL-61. — commit «JL-72: integración de modelos OMP — jaguar, ranas y corrección del ñeque» — 14 pruebas verdes (jl72_fauna.test.ts), suite sin fallos nuevos, tsc limpio salvo balM3.ts ajeno, build OK, push OK. FA-05: baru_jaguar → jaguar.glb, baru_elder → jaguar_anciano.glb. FA-07: bocas_frog → rana_venenosa.glb. 6 plantillas nuevas (jaguar, jaguar_anciano, rana, rana_ojirroja, sapo, rana_dorada). PROPUESTA_RANAS.md para cocle_frog_poison, cocle_frog_redeye, cocle_toad, cocle_goldenfrog (espera aprobación del creador). Ñeque corregido a roedor (agutí) en NOMBRE_MODELO.md. Evidencia en work/junie-jl-72/.
+
+
+## Bolsa grande del 2026-11-21 (el creador: «armes lista gigante de tareas pequeñas para junie»). En este orden.
+
+Reglas comunes de toda la bolsa:
+- Tareas pequeñas: si una crece más de lo previsto, entrega lo que ya está verificado, marca `[!]` con el resto y pasa a la siguiente.
+- Prohibido cambiar cifras de balance, progresión, economía, clases o hechizos, y reescribir `src/sim/`, `src/rpg/`, `src/world/` o el editor. Un cambio local y pequeño en esas carpetas, solo si la tarea lo pide.
+- Una tarea visual no está hecha sin captura en Electron (`node scripts/qaElectron.mjs <escenario>`) en `work/junie-jl-NN/`.
+- No toques pruebas ajenas para que pasen. Si una prueba ajena se pone en rojo, para y marca `[!]`.
+- Un modelo nuevo solo se usa si su GLB ya está en `assets/models/` y OMP lo publicó. No inventes ids de arquetipo: lo que no exista se propone en `work/`.
+
+### QA: los rojos que quedan del arnés (`work/junie-qa01/RESUMEN.md`, `work/junie-jl-69/FALLOS.md`)
+- [ ] JL-73 Repetir `interfaz` tras JL-60. Si el chat aún pisa la barra de acción en 768p o ultra-wide, corrige la colocación por defecto del chat. Escenario en verde y capturas de las tres resoluciones.
+- [ ] JL-74 Escenario `barra`: las secciones del personaje y de la mascota se solapan al arrastrar. Corrige el solape y deja el escenario en verde.
+- [ ] JL-75 Escenario `previa`: los 5 fallos de fantasmas y destino del salto (JL-06). Escenario en verde o informe de cuáles son del arnés y cuáles del juego.
+- [ ] JL-76 Escenario `Tecla`: la segunda pulsación no confirma el movimiento. Corrige y deja el escenario en verde.
+- [ ] JL-77 Escenario `camara`: `TypeError` porque `__game.view.rig` es null. Expón el rig de la cámara a QA o adapta el escenario a los modos de JL-65.
+- [ ] JL-78 El arnés vacía las ranuras de guardado entre escenarios: `balance45` y `criticoV3` fallan porque las 12 ranuras están llenas. Arreglo solo en el arnés (`scripts/qaElectron.mjs` o su carpeta).
+- [ ] JL-79 Tiempo agotado en `audio`: diagnostica y corrige el escenario o el juego. Escenario en verde.
+- [ ] JL-80 Tiempo agotado en `castillo`: lo mismo.
+- [ ] JL-81 Tiempo agotado en `aprendizaje`: lo mismo.
+- [ ] JL-82 Tiempo agotado en `bancoDetalle`: lo mismo.
+- [ ] JL-83 Tiempo agotado en `botin`: lo mismo.
+- [ ] JL-84 Tiempo agotado en `casa`: lo mismo.
+- [ ] JL-85 Escenario `crestalba`: el modelo no carga y CDP cae (JL-51). Diagnóstico con la causa y arreglo si es pequeño.
+
+### Integrar modelos que OMP ya publicó (procedimiento de JL-61 y JL-72)
+- [ ] JL-86 Águilas de FA-21 (`aguila_negra`, `aguila_ornada`, `aguila_crestada`, `aguila_arpia`): conectar a los arquetipos de águila y a `darien_harpy`. Escala comparada con el jugador, clips revisados, captura.
+- [ ] JL-87 Ñeque y tapir de FA-06 (`neque.glb`, `tapir.glb`): conectar a sus arquetipos con sus cinco clips. Captura de cada uno andando y atacando.
+- [ ] JL-88 Utilería de la cripta de OMP-M25 (`utileria_cripta.glb`, 12 piezas): colocarla en los pisos a mano de la cripta sin tapar pasillos ni antorchas (`j16_torches`, `tor01_*` y `jl64b_*` en verde). Captura de tres pisos.
+- [ ] JL-89 Remapeos provisionales de JL-63: `ash_alpha` → `jaguar.glb`, `boquete_owl` → `buho.glb`, `fortuna_coyote` → `zorro.glb`. Escala de cada uno anotada en `work/junie-jl-89/` y captura.
+- [ ] JL-90 `fantasma.glb` no tiene los clips de enemigo. Hacer que el fantasma use una animación de reserva sin error de consola, y anotar en `work/junie-jl-90/PARA_OMP.md` qué clips faltan.
+
+### Escenarios de QA nuevos para lo de hoy
+- [ ] JL-91 Escenario `modosLanzar`: los tres modos de JL-66 (pulsar y soltar, mantener con indicador, doble pulsación y clic). Lanza un hechizo de área con cada modo y comprueba el impacto.
+- [ ] JL-92 Escenario `modosCamara`: los cuatro modos de JL-65 junto a una casa. En Manual no hay zoom automático y el obstáculo se transparenta (JL-71).
+- [ ] JL-93 Escenario `monturas`: montar cada montura, captura del jinete sentado (JL-68) y bajar. Sin errores de consola.
+- [ ] JL-94 Escenario `hudSinSolapes`: en 768p, 1080p, 1440p y ultra-wide, ningún panel del HUD por defecto se solapa con otro (cajas del DOM).
+- [ ] JL-95 Escenario `fisicas`: 20 personajes con físicas secundarias (JL-70). Medir ms por fotograma y FPS, y guardar la cifra en el informe.
+
+### Pruebas que faltan
+- [ ] JL-96 Prueba de migración de una partida vieja «dorada»: una partida de antes de JL-59 y JL-65 carga con la escala del HUD y el modo de cámara correctos.
+- [ ] JL-97 El modo de lanzar (JL-66) se guarda y se recupera con la partida y las opciones. Prueba.
+- [ ] JL-98 Cobertura i18n: todas las cadenas nuevas de JL-59…72 existen en cada idioma del juego. Prueba que falle si falta alguna.
+- [ ] JL-99 La tabla de JL-63 nombre ↔ modelo pasa a ser un guion (`scripts/audit/nombreModelo.ts`) que la regenera en `work/`, con una prueba que limite el número de discordancias a las de hoy (no puede subir).
+
+### Pequeñas mejoras de juego
+- [ ] JL-100 Una tecla para cambiar el modo de cámara en juego (configurable en Opciones → Controles), con aviso breve del modo elegido.
+- [ ] JL-101 Una tecla para cambiar el modo de lanzar en juego, con aviso breve, igual que JL-100.
+- [ ] JL-102 Botón «Restablecer posiciones por defecto» del HUD para la relación de aspecto actual, con confirmación dentro del juego.
+- [ ] JL-103 Opción para mostrar u ocultar el nombre del modo de cámara junto al minimapa. Desactivada por defecto.
+
+### Limpieza y cierre
+- [ ] JL-104 En `docs/TAREAS.md`, las filas de JL-59…72 que citan códigos provisionales (por ejemplo `jl59-hudScale`) pasan a citar el hash real del commit. Solo esas celdas.
+- [ ] JL-105 Consola limpia (QA-02) tras los cambios grandes: recorrido de 10 minutos en Electron, cero errores y avisos nuevos, o lista de los que quedan con su origen.
+- [ ] JL-106 Regenerar `work/claude-map-nod-01/` con `npx vite-node scripts/audit/mundoNodos.ts` y anotar en el informe qué incoherencias cambiaron desde la última vez.
+- [ ] JL-107 Recorrido completo de QA_SESION con todos los escenarios. Actualiza `work/junie-qa01/RESUMEN.md` con la cifra nueva de OK y FALLA, y la lista de lo que sigue rojo con su causa.
+- [ ] JL-108 Última de la bolsa. Si llegas aquí, escribe `work/junie-propuestas/BOLSA_SIGUIENTE.md` con 15 tareas pequeñas que hayas visto al trabajar: cada una con su evidencia y su criterio de hecho. Son propuestas: no las empieces.
