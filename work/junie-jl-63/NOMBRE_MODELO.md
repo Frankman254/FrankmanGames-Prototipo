@@ -42,13 +42,13 @@ Animales sin clips de enemigo completos (solo decorativos o sin rig):
 |---|---|---|---|---|---|---|
 | `darien_harpy` | Águila Harpía Real | ave de presa | bestia | wolf | Águila = perro | `aguila_arpia.glb` (montura, sin clips enemigo) |
 | `darien_tapir` | Macho de Monte Insomne | tapir (mamífero) | bestia | wolf | Tapir = perro | No hay |
-| `darien_neque` | Ñeque Guerrero | espíritu indígena | bestia | wolf | Espíritu = perro | No hay |
+| `darien_neque` | �ñeque Guerrero | roedor (agutí) | bestia | wolf | Roedor = perro | No hay |
 | `perlas_shark` | Tiburón Martillo Patrón | tiburón | bestia | wolf | Tiburón = perro | No hay |
 | `perlas_squid` | Calamar Gigante Madrugador | calamar | bestia | wolf | Calamar = perro | No hay |
 | `perlas_oyster` | Ostra Mordelona | ostra | bestia | wolf | Ostra = perro | No hay |
-| `bocas_frog` | Rana Dorada Venenosa | rana | bestia | wolf | Rana = perro | `rana_*.glb` (sin registrar en PROCEDENCIA, OMP) |
-| `baru_jaguar` | Jaguar Friolento del Barú | jaguar | bestia | wolf | Jaguar = perro | `jaguar.glb` ✓ |
-| `baru_elder` | Gran Jaguar del Barú | jaguar | bestia | wolf | Jaguar = perro | `jaguar.glb` ✓ |
+| `bocas_frog` | Rana Dorada Venenosa | rana | rana | rana_venenosa.glb | ✓ Corregido (JL-72) |
+| `baru_jaguar` | Jaguar Friolento del Barú | jaguar | jaguar | jaguar.glb | ✓ Corregido (JL-72) |
+| `baru_elder` | Gran Jaguar del Barú | jaguar | jaguar_anciano | jaguar_anciano.glb | ✓ Corregido (JL-72) |
 | `ash_alpha` | Tigrillo de Ceniza | tigrillo (felino) | bestia | wolf | Felino = perro | `jaguar.glb` (aproximado) |
 | `fortuna_coyote` | Coyote de la Helada | coyote | bestia | wolf | Coyote ≈ perro (parecido) | `zorro.glb` (aproximado) |
 | `ancon_titi` | Mono Tití Trasnochado | mono | bestia | wolf | Mono = perro | No hay |
@@ -124,13 +124,15 @@ La tarea JL-63 pide usar modelos propios más parecidos si ya existen en `assets
 
 | ID | Nombre | Modelo actual | Modelo propuesto | Clips del GLB |
 |---|---|---|---|---|
-| `baru_jaguar` | Jaguar Friolento del Barú | wolf | `jaguar.glb` | idle, run, attack, hit, death ✓ |
-| `baru_elder` | Gran Jaguar del Barú | wolf | `jaguar.glb` | idle, run, attack, hit, death ✓ |
+| `baru_jaguar` | Jaguar Friolento del Barú | wolf → jaguar.glb | ✓ Integrado (JL-72) |
+| `baru_elder` | Gran Jaguar del Barú | wolf → jaguar_anciano.glb | ✓ Integrado (JL-72) |
 | `ash_alpha` | Tigrillo de Ceniza | wolf | `jaguar.glb` (aproximado) | idle, run, attack, hit, death ✓ |
 | `boquete_owl` | Búho Chismoso | archer | `buho.glb` | idle, run, attack, hit, death ✓ |
 | `fortuna_coyote` | Coyote de la Helada | wolf | `zorro.glb` (aproximado) | idle, run, attack, hit, death ✓ |
 
-**No aplicados automáticamente:** La tarea dice "Mira antes si el GLB tiene los clips de enemigo; si no los tiene, no lo cambies y anótalo." Los GLB candidatos tienen clips, pero requieren crear plantillas en `data/assets.json` y cambiar las entradas de `enemy.*`. Esto es un cambio de datos que el coordinador debe autorizar. Se deja como propuesta para OMP.
+**Aplicados en JL-72:** `baru_jaguar` → `jaguar.glb`, `baru_elder` → `jaguar_anciano.glb`, `bocas_frog` → `rana_venenosa.glb`. Plantillas creadas en `data/assets.json` y entradas `enemy.*` actualizadas.
+
+**No aplicados automáticamente:** `ash_alpha` (tigrillo → jaguar aproximado), `boquete_owl` (búho → buho.glb), `fortuna_coyote` (coyote → zorro.glb aproximado). Requieren autorización del coordinador.
 
 ## Para OMP — Lista de prioridades
 
@@ -145,7 +147,7 @@ Los arquetipos que más necesitan modelo propio, ordenados por lo mal que se ven
 | `perlas_shark` | Tiburón Martillo Patrón | Modelo de tiburón |
 | `perlas_squid` | Calamar Gigante Madrugador | Modelo de calamar |
 | `perlas_oyster` | Ostra Mordelona | Modelo de ostra |
-| `bocas_frog` | Rana Dorada Venenosa | Modelo de rana (rana_*.glb existen sin registrar) |
+| (ya integrado JL-72: `bocas_frog` → rana_venenosa.glb) |
 | `ancon_titi` | Mono Tití Trasnochado | Modelo de mono |
 
 ### Prioridad media — Criatura no animal con modelo animal
@@ -174,8 +176,8 @@ Los arquetipos que más necesitan modelo propio, ordenados por lo mal que se ven
 
 | ID | Nombre | Modelo actual | Modelo GLB disponible |
 |---|---|---|---|
-| `baru_jaguar` | Jaguar Friolento del Barú | wolf | `jaguar.glb` |
-| `baru_elder` | Gran Jaguar del Barú | wolf | `jaguar.glb` |
+| (ya integrado JL-72) `baru_jaguar` → jaguar.glb |
+| (ya integrado JL-72) `baru_elder` → jaguar_anciano.glb |
 | `ash_alpha` | Tigrillo de Ceniza | wolf | `jaguar.glb` (aproximado) |
 | `boquete_owl` | Búho Chismoso | archer | `buho.glb` |
 | `fortuna_coyote` | Coyote de la Helada | wolf | `zorro.glb` (aproximado) |
@@ -184,4 +186,6 @@ Los arquetipos que más necesitan modelo propio, ordenados por lo mal que se ven
 
 - `darien_harpy` no usa la montura (Q25: la arpía real es montura y mascota). Queda para la familia de águilas de OMP-FA-21.
 - `fantasma.glb` existe pero sin clips de enemigo completos: no sirve para `perlas_fisher`, `bocas_drowned` ni `cerropunta_wraith` hasta que OMP lo complete.
-- `rana_*.glb` existen en `assets/models/` pero sin registrar en PROCEDENCIA.md (cambios sin commit de OMP). No se integran aquí.
+- `rana_*.glb` integrados en JL-72 (FA-07): `bocas_frog` ahora usa `rana_venenosa.glb`.
+- `jaguar.glb` y `jaguar_anciano.glb` integrados en JL-72 (FA-05): `baru_jaguar` y `baru_elder` actualizados.
+- Corrección: `darien_neque` es un roedor (agutí), no un espíritu indígena.

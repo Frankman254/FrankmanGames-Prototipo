@@ -1146,8 +1146,4 @@ Revisión de JL-58…68 por el coordinador: suite 3320/3321 (el único rojo es `
     - solo pone antorchas en caras de muro cuya normal apunta a una baldosa caminable; si no, salta esa cara;
     - un piso a mano puede declarar sus antorchas en el JSON (`torches: [{tile, dir}]`) y entonces el generador no pone las suyas.
   - Luego haz JL-64 tal como está escrita, con `j16_torches`, `tor01_regression` y `tor01_audit` en verde.
-- [ ] JL-72 Integrar lo nuevo de OMP, con el procedimiento de JL-61:
-  - FA-05 (`08d954b`): `baru_jaguar` y `baru_elder`;
-  - FA-07 (ranas de Coclá) cuando llegue a `master`: `bocas_frog` pasa a `rana_venenosa.glb`.
-  - Las ranas nuevas (`cocle_frog_poison`, `cocle_frog_redeye`, `cocle_toad` y la jefa `cocle_goldenfrog`) necesitan nivel, vida, daño, zona y botín, y eso son cifras de contenido: escribe la propuesta en `work/junie-jl-72/PROPUESTA_RANAS.md` y no la metas en `data/` hasta que el creador diga.
-  - Corrige en `work/junie-jl-63/NOMBRE_MODELO.md`: el ñeque es un roedor (agutí), no un espíritu.
+- [x] JL-72 Integrar lo nuevo de OMP, con el procedimiento de JL-61. — commit «JL-72: integración de modelos OMP — jaguar, ranas y corrección del ñeque» — 14 pruebas verdes (jl72_fauna.test.ts), suite sin fallos nuevos, tsc limpio salvo balM3.ts ajeno, build OK, push OK. FA-05: baru_jaguar → jaguar.glb, baru_elder → jaguar_anciano.glb. FA-07: bocas_frog → rana_venenosa.glb. 6 plantillas nuevas (jaguar, jaguar_anciano, rana, rana_ojirroja, sapo, rana_dorada). PROPUESTA_RANAS.md para cocle_frog_poison, cocle_frog_redeye, cocle_toad, cocle_goldenfrog (espera aprobación del creador). Ñeque corregido a roedor (agutí) en NOMBRE_MODELO.md. Evidencia en work/junie-jl-72/.

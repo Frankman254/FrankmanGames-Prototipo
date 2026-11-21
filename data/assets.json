@@ -1067,6 +1067,144 @@
         ]
       }
     },
+    "jaguar": {
+      "kind": "gltf",
+      "file": "assets/models/jaguar.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.5,
+      "height": 0.97,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "jaguar_anciano": {
+      "kind": "gltf",
+      "file": "assets/models/jaguar_anciano.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.0,
+      "height": 1.17,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "rana": {
+      "kind": "gltf",
+      "file": "assets/models/rana_venenosa.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.5,
+      "height": 1.4,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "rana_ojirroja": {
+      "kind": "gltf",
+      "file": "assets/models/rana_ojirroja.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.5,
+      "height": 1.4,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "sapo": {
+      "kind": "gltf",
+      "file": "assets/models/sapo_canaveral.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.0,
+      "height": 1.3,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "rana_dorada": {
+      "kind": "gltf",
+      "file": "assets/models/rana_dorada.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.2,
+      "height": 3.29,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
     "cripta_rata_cueva": {
       "kind": "gltf",
       "file": "assets/models/cripta_rata_cueva.glb",
@@ -2877,9 +3015,7 @@
       }
     },
     "enemy.baru_jaguar": {
-      "template": "bestia",
-      "model": "wolf",
-      "scale": 1.2,
+      "template": "jaguar",
       "palettes": {
         "default": {
           "skin": [
@@ -3013,9 +3149,7 @@
       }
     },
     "enemy.baru_elder": {
-      "template": "bestia",
-      "model": "wolf",
-      "scale": 1.5,
+      "template": "jaguar_anciano",
       "palettes": {
         "default": {
           "skin": [
@@ -3285,9 +3419,7 @@
       }
     },
     "enemy.bocas_frog": {
-      "template": "bestia",
-      "model": "wolf",
-      "scale": 1.2,
+      "template": "rana",
       "palettes": {
         "default": {
           "skin": [

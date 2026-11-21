@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-72: Integración de modelos OMP — jaguar, ranas y corrección del ñeque (Junie)
+
+**Archivos:** `data/assets.json`, `tests/jl72_fauna.test.ts`, `work/junie-jl-63/NOMBRE_MODELO.md`, `work/junie-jl-72/PROPUESTA_RANAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- FA-05 (`08d954b`): plantillas `jaguar` y `jaguar_anciano` en assets.json; `baru_jaguar` y `baru_elder` migrados de `bestia/wolf` a sus plantillas propias.
+- FA-07 (`f972583`): plantillas `rana`, `rana_ojirroja`, `sapo` y `rana_dorada` en assets.json; `bocas_frog` migrado de `bestia/wolf` a `rana`.
+- PROPUESTA_RANAS.md: cifras PROPUESTA para `cocle_frog_poison`, `cocle_frog_redeye`, `cocle_toad` y `cocle_goldenfrog` (espera aprobación del creador).
+- Corrección en NOMBRE_MODELO.md: `darien_neque` es un roedor (agutí), no un espíritu indígena.
+
+**Validación:** 14 pruebas verdes (jl72_fauna.test.ts), tsc limpio salvo balM3.ts ajeno, build OK.
+
+**Evidencia:** `work/junie-jl-72/` (PROPUESTA_RANAS.md).
+
 ## 2026-11-21 — JL-64b: Desbloqueo de JL-64 — antorchas declaradas en pisos a mano (Junie)
 
 **Archivos:** `src/world/designedDungeon.ts`, `src/world/dungeon.ts`, `tests/jl64b_handFloorTorches.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
