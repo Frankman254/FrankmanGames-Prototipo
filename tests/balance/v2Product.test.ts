@@ -154,14 +154,18 @@ describe('balance productivo v2', () => {
             // sube por diseño. EQ-07 (creador, 2026-11-18) fija la primaria de una pieza
             // de nivel 200 en 50–70 / 80–120: en el nivel 95 el equipo ya da ×2,1–2,4
             // (medido en work/claude-items1118/). Tope 2,5; antes 2,0.
-            expect(
-                equipped.stats.get(main) / naked.stats.get(main),
-                `${classId}: primaria excesiva`,
-            ).toBeLessThanOrEqual(2.5);
             const nakedCrit = naked.stats.get('critChance');
             const equippedCrit = equipped.stats.get('critChance');
             expect(equippedCrit, `${classId}: crítico válido`).toBeLessThanOrEqual(1);
             expect(equippedCrit - nakedCrit, `${classId}: crítico excesivo del equipo`).toBeLessThanOrEqual(0.4);
+            // El tope mide el equipo, no la montura: las Falcopama dan un bono fijo de primaria
+            // (+200) que el creador mantiene aparte (2026-11-21: «las mascotas dan eso fijo y
+            // dejalo asi»). El tope se revisa en el balance de lanzamiento (Q28b).
+            if (equipped.equipment.get('mount')) equipped.unequip('mount');
+            expect(
+                equipped.stats.get(main) / naked.stats.get(main),
+                `${classId}: primaria excesiva (sin montura)`,
+            ).toBeLessThanOrEqual(2.5);
         }
     });
 });
