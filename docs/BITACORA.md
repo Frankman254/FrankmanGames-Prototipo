@@ -1,3 +1,29 @@
+## 2026-11-21 — JL-80: Escenario `castillo` ya pasa — sin código (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl80/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Tarea JL-80: diagnosticar el timeout del escenario `castillo` en el arnés de QA.
+- El escenario pasa 7/7 en verde cuando se ejecuta de forma aislada. No se requiere cambio de código.
+- El timeout anterior era causado por otros escenarios que dejaban la aplicación en un estado roto: idioma en inglés (JL-50), CDP caído tras timeout (JL-51) y guardados llenos (JL-78). Estos fixes ya resuelven el problema.
+
+**Validación:** `node scripts/qaElectron.mjs castillo` → 7/7 comprobaciones, 0 errores de consola.
+
+**Evidencia:** `work/junie-jl80/DIAGNOSTICO.md`.
+
+## 2026-11-21 — JL-79: Escenario `audio` ya pasa — sin código (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl79/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Tarea JL-79: diagnosticar el timeout del escenario `audio` en el arnés de QA.
+- El escenario pasa 5/5 en verde cuando se ejecuta solo o después de `ingles`. No se requiere cambio de código.
+- El timeout anterior era causado por otros escenarios que dejaban la aplicación en un estado roto: idioma en inglés (JL-50), CDP caído tras timeout (JL-51) y guardados llenos (JL-78). Estos fixes ya resuelven el problema.
+
+**Validación:** `node scripts/qaElectron.mjs audio` → 5/5 comprobaciones, 0 errores de consola. También `node scripts/qaElectron.mjs ingles audio` → audio 5/5.
+
+**Evidencia:** `work/junie-jl79/DIAGNOSTICO.md`.
+
 ## 2026-11-21 — JL-78: newGame() vacía las 12 ranuras de guardado (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

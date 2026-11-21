@@ -1167,8 +1167,8 @@ Reglas comunes de toda la bolsa:
 - [x] JL-76 Escenario `Tecla`: la segunda pulsación no confirma el movimiento. — commit «JL-76: escenario Tecla ya resuelto» — Ya resuelto por commits anteriores (JUG-06, JL-02, JL-75). Escenario `previa` 11/11 en verde. Evidencia en work/junie-jl76/EVIDENCIA.md.
 - [x] JL-77 Escenario `camara`: `TypeError` porque `__game.view.rig` es null. — commit «JL-77: escenario camara usa KeyZ para cambiar modo de cámara» — 4/4 checks en verde (B03, B09, B02, sin errores consola). Evidencia en work/junie-jl77/.
 - [x] JL-78 El arnés vacía las ranuras de guardado entre escenarios: `balance45` y `criticoV3` fallan porque las 12 ranuras están llenas. Arreglo solo en el arnés (`scripts/qaElectron.mjs` o su carpeta). — commit «JL-78: newGame() vacía las 12 ranuras de guardado» — tsc limpio (solo balM3.ts ajeno), suite sin fallos nuevos, build OK. newGame() borra frankmangames.save.*, frankmangames.backup.* antes de cada partida. Evidencia en work/junie-jl78/.
-- [ ] JL-79 Tiempo agotado en `audio`: diagnostica y corrige el escenario o el juego. Escenario en verde.
-- [ ] JL-80 Tiempo agotado en `castillo`: lo mismo.
+- [x] JL-79 Tiempo agotado en `audio`: diagnostica y corrige el escenario o el juego. Escenario en verde. — commit «JL-79: escenario audio ya pasa — sin código» — 5/5 en verde, sin cambio de código. DIAGNOSTICO.md en work/junie-jl79/.
+- [x] JL-80 Tiempo agotado en `castillo`: lo mismo. — commit «JL-80: escenario castillo ya pasa — sin código» — 7/7 en verde, sin cambio de código. DIAGNOSTICO.md en work/junie-jl80/.
 - [ ] JL-81 Tiempo agotado en `aprendizaje`: lo mismo.
 - [ ] JL-82 Tiempo agotado en `bancoDetalle`: lo mismo.
 - [ ] JL-83 Tiempo agotado en `botin`: lo mismo.
