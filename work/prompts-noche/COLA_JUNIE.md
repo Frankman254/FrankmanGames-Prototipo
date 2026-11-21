@@ -6,6 +6,9 @@ Una ejecución = **una** tarea: la primera marcada `- [ ]`. Al acabarla, cambia 
 
 No toques las demás casillas. El bucle `scripts/mac/junie_continuo.sh` relanza a Junie con la siguiente tarea.
 
+### Fallo conocido: `v2Product` «primaria excesiva» (creador, 2026-11-21)
+El creador aplaza el tope de ×2,5 al balance de lanzamiento: «dejalo asi no te fijes en ese tope de 2.5». Es el único rojo esperado de la suite. No lo arregles, no lo relajes y no lo marques como skip. En los informes, cuéntalo aparte como «fallo conocido».
+
 ### Commits (el creador, 2026-11-20: «que los commits valgan la pena»)
 
 - **Un commit por tarea, con todo dentro:** código, pruebas, la fila de `docs/TAREAS.md`, la entrada de `docs/BITACORA.md` y esta casilla (`git add -f work/prompts-noche/COLA_JUNIE.md`). Prohibido el commit aparte «docs: JL-NN en TAREAS y BITACORA».
