@@ -1,3 +1,18 @@
+## 2026-11-21 - OMP-FA-13: pirata, capitán y marinero ahogado
+
+**Archivos:** `assets/models/{pirata_bocanas,capitan_calipso,marinero_ahogado}.glb`, `arte/blender/gente_del_mar.blend`, `scripts/blender/{gente_del_mar,validar_gente_del_mar,revisar_gente_del_mar}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Los tres `bocas_*` humanoides de `data/enemies.json` que hoy se ven como arquero o personaje teñido (`bocas_pirate` ranged, `bocas_captain` eliteBrute, `bocas_drowned` brute nocturno; `work/junie-jl-63/NOMBRE_MODELO.md`: «No hay»). Los tres sobre el rig humano común de `fg_rig` — 16 huesos, misma jerarquía, los seis clips comunes (Reposo, Caminar, Correr, Rodar, Golpeado, Morir) más el gesto propio: el pirata tira cuchillos (`Disparar`, mismo nombre que el arquero para que el evento de `data/` caiga igual), el capitán mandoblea (`Atacar`) y el ahogado araña con joroba permanente pegada a todos los clips vía el `extra` de `biped_clips` (`Atacar`). Ninguno lleva el `Lanzar`/`Conjurar` que no usa.
+- **Pirata de Isla Colón** (`bocas_pirate`, 680 tri, 1,41 m): flaco y ágil, camisa de manta cruda remangada con solapa en V, pantalón arrecifeado con calcetas dobladas, pañuelo rojo anudado con la punta cruzando atrás, faja roja con cabos, talega al cinto y cuchillo de lanza en la derecha más otro asomando del cinturón. Ataque firma: recoge el brazo atrás (7), lo lanza latigueado al frente (12-14).
+- **Capitán Calipso** (`bocas_captain`, 1.076 tri, 1,69 m): ancho (width 1,16), levita azul-uva con puntera y galones de oro, pechera clara, solapas, hombreras con flequillo, cíngulo ancho con hebilla, barba entrecana hasta el pecho con bigote, tricornio de tres picos con escarapela y alfanje curvo con guarda en D. Ataque firma: levanta el alfanje por encima del hombro (8) y lo baja en mandoble con zancada (13-15).
+- **Marinero Ahogado de la marea baja** (`bocas_drowned`, 804 tri, 1,65 m): cadáver verdoso jorobado, harapos de camisa desteñida en faldita de tres picos, rayas de costillas marcadas en el pecho, algas y cabos colgando de hombro y cadera, gorro de marino calado, dedos huesudos alargados y anzuelo oxidado prendido al hombrón izquierdo. Ataque firma: encoge las dos manos (7) y lanza el zarpazo doble cayendo hacia delante (12-14).
+- Correcciones tras la primera lámina: el tricornio flotaba separado del cráneo y la escarapela colgaba en el aire (copa más ancha y baja, alas que nacen dentro de la copa a la altura de su base); el gorro del ahogado parecía un cartón clavado de lado (base más ancha que el cráneo, asentado, con visera propia); el anzuelo estaba en x negativa ligado al hueso `upperArmL`, que es +x — por eso flotaba fuera del cuerpo (pasa a +x, pegado a la hombrera).
+
+**Validación:** `validar_gente_del_mar.py` en verde (huesos y jerarquía idénticos al humano común, sin extras; siete clips; ≤1.500 tri; apoyo z≈0; altura en rango por rol: pirata/ahogado achaparrados frente al capitán); láminas de 5 vistas + 5 pasos de ATAQUE por modelo revisadas y aceptadas; `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-13/revision_{pirata_bocanas,capitan_calipso,marinero_ahogado}.png` y las 60 vistas sueltas.
+
 ## 2026-11-21 — JL-98: Cobertura i18n — todas las claves tr()/trf() con traducción (Junie)
 
 **Archivos:** `tests/jl98_i18nCoverage.test.ts`, `data/i18n/en.ui.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
