@@ -74,6 +74,8 @@ export interface MapFrame {
     player: Vec;
     /** Giro de la cámara en radianes (avance = (sin, cos)). */
     cameraYaw: number;
+    /** JL-103: modo de cámara actual para la etiqueta del minimapa. */
+    cameraMode?: string;
     /** Dentro de una mazmorra: nombre del lugar (el mapa del exterior no vale). */
     inside: string | null;
     /** Rejilla de paso del interior (F26), para descubrir su mapa al andar. */

@@ -45,6 +45,8 @@ export class Minimap {
     private readonly canvas: HTMLCanvasElement;
     private readonly title: HTMLElement;
     private readonly northBtn: HTMLButtonElement;
+    /** JL-103: etiqueta del modo de cámara junto al minimapa. */
+    private readonly cameraModeLabel: HTMLElement;
     private base: HTMLCanvasElement | null = null;
     private readonly fogLayer: FogLayer;
     private prefs: MinimapPrefs;
@@ -108,6 +110,10 @@ export class Minimap {
         this.el = h('div.minimap.hud-bar-zone', { 'data-hud-label': 'Minimapa' }, head, this.canvas, ...grips);
         this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
         this.el.addEventListener('contextmenu', (e) => e.preventDefault());
+        // JL-103: etiqueta del modo de cámara, oculta por defecto.
+        this.cameraModeLabel = h('div.mm-camera-mode');
+        this.cameraModeLabel.hidden = true;
+        this.el.appendChild(this.cameraModeLabel);
         this.dragHandle = head;
         this.bindResize(grips[0]!, { w: true, h: false });
         this.bindResize(grips[1]!, { w: false, h: true });
@@ -118,6 +124,16 @@ export class Minimap {
 
     /** Cabecera por la que se arrastra (la registra el montaje en WindowLayout). */
     readonly dragHandle: HTMLElement;
+
+    /** JL-103: actualizar la etiqueta del modo de cámara. */
+    setCameraModeLabel(label: string | null, visible: boolean): void {
+        if (visible && label) {
+            this.cameraModeLabel.hidden = false;
+            this.cameraModeLabel.textContent = label;
+        } else {
+            this.cameraModeLabel.hidden = true;
+        }
+    }
 
     private loadPrefs(): MinimapPrefs {
         const d = this.state.def.minimap;

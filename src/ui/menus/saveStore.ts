@@ -475,6 +475,8 @@ export interface GameOptions {
     cameraMode: CameraMode;
     /** Suavidad del movimiento (0 = casi instantánea, 1 = muy suave). */
     cameraSmoothing: number;
+    /** JL-103: mostrar el nombre del modo de cámara junto al minimapa. */
+    showCameraModeLabel: boolean;
     // Pantalla
     fullscreen: boolean;
     windowSize: WindowSizeId;
@@ -646,6 +648,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
     cameraKeySpeed: 120,
     cameraMode: 'manual',
     cameraSmoothing: 0.5,
+    showCameraModeLabel: false,
     fullscreen: false,
     windowSize: '1920x1080',
     devInfo: 'simple',
@@ -736,6 +739,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
         cameraKeySpeed: num('cameraKeySpeed'),
         cameraMode: pick('cameraMode', CAMERA_MODES, LEGACY_CAMERA_MODE_MAP[o['cameraMode'] as string] ?? o['cameraMode']),
         cameraSmoothing: num('cameraSmoothing'),
+        showCameraModeLabel: bool('showCameraModeLabel'),
         fullscreen: bool('fullscreen'),
         windowSize: pick('windowSize', WINDOW_SIZES),
         devInfo: pick(

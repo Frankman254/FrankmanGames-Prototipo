@@ -77,6 +77,7 @@ import {
 } from './saveStore';
 import { creationScreen, type CreationPick } from './screens/creation';
 import {
+    CAMERA_MODE_SHORT,
     confirmModal,
     keybindsModal,
     modal,
@@ -1502,6 +1503,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         },
         setMap(f) {
             mapState.update(f, lastDt);
+            // JL-103: actualizar la etiqueta del modo de cámara en el minimapa.
+            const label = options.showCameraModeLabel && f.cameraMode ? CAMERA_MODE_SHORT[f.cameraMode as keyof typeof CAMERA_MODE_SHORT] ?? null : null;
+            minimap?.setCameraModeLabel(label, options.showCameraModeLabel);
         },
         showDeath(where, onRespawn, energy, ctx) {
             closeModals();

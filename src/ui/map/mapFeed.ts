@@ -62,6 +62,8 @@ export interface MapFrameInput {
     world: World;
     session: GameSession;
     cameraYawDeg: number;
+    /** JL-103: modo de cámara actual para la etiqueta del minimapa. */
+    cameraMode?: string;
     inside: string | null;
     zones: ZonesDef;
     waters: readonly { x: number; y: number }[];
@@ -87,6 +89,7 @@ export function buildMapFrame(i: MapFrameInput): MapFrame {
     return {
         player: { x: w.player.pos.x, y: w.player.pos.y },
         cameraYaw: (i.cameraYawDeg * Math.PI) / 180,
+        cameraMode: i.cameraMode,
         inside: i.inside,
         // F26: solo rejillas de interior (pequeñas); el mundo abierto tiene su propia niebla.
         interiorGrid: i.inside && w.grid.cols * w.grid.rows <= 1 << 20 ? w.grid : null,

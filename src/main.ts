@@ -2512,6 +2512,7 @@ function mapFrame(s: GameSession): MapFrame {
         world,
         session: s,
         cameraYawDeg: view.rig.viewYawDeg,
+        cameraMode,
         inside: bank?.place?.name ?? houses?.place?.name ?? crypt?.place?.name ?? null,
         zones: data.zones,
         waters: overworld.def.ponds,

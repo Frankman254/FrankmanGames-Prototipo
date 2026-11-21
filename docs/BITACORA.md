@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-103: Etiqueta del modo de cámara en el minimapa (Junie)
+
+**Archivos:** `src/ui/menus/saveStore.ts`, `src/ui/menus/screens/modals.ts`, `src/ui/menus/index.ts`, `src/ui/map/minimap.ts`, `src/ui/map/mapState.ts`, `src/ui/map/mapFeed.ts`, `src/ui/styles/map.css`, `src/main.ts`, `data/i18n/en.json`, `data/i18n/en.ui.json`, `tests/jl103_cameraModeLabel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Opción `showCameraModeLabel` en `GameOptions` (desactivada por defecto) que muestra el nombre del modo de cámara actual junto al minimapa. Checkbox en Opciones → Cámara. Etiqueta `.mm-camera-mode` debajo del canvas del minimapa, con nombres cortos (`Cámara: Manual`, `Cámara: Semiauto`, etc.) en `CAMERA_MODE_SHORT`. `cameraMode` pasado desde `main.ts` → `MapFrame` → `menus/index.ts` → `minimap.setCameraModeLabel()`. Traducciones en inglés.
+
+**Validación:** 6 pruebas verdes (`jl103_cameraModeLabel.test.ts`), tsc sin errores nuevos, Vite build OK. Suite 3512/3513 (1 fallo pre-existente `assets.test.ts` de OMP).
+
+**Evidencia:** `tests/jl103_cameraModeLabel.test.ts`, `work/junie-jl103/`.
+
 ## 2026-11-21 — JL-102: Confirmación antes de restablecer posiciones del HUD (Junie)
 
 **Archivos:** `src/ui/menus/index.ts`, `data/i18n/en.json`, `tests/jl102_resetConfirm.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

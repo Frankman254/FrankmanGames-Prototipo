@@ -110,6 +110,15 @@ export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
     zone: 'Estática por casilla del mapa',
 };
 
+/** JL-103: nombres cortos para la etiqueta del minimapa (traducidos con tr()). */
+export const CAMERA_MODE_SHORT: Record<CameraMode, string> = {
+    manual: 'Cámara: Manual',
+    semiAuto: 'Cámara: Semiauto',
+    auto: 'Cámara: Auto',
+    combat: 'Cámara: Combate',
+    zone: 'Cámara: Estática',
+};
+
 /** F05: nombres de las decoraciones en el menú de opciones. */
 export const DECOR_NAMES: Record<DecorId, string> = {
     mola: 'Mola (triángulos y capas)',
@@ -399,6 +408,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                 range('Suavidad', 'cameraSmoothing', (v) => `${Math.round(v * 100)} %`),
                 check('Invertir eje horizontal', 'invertCameraX'),
                 check('Invertir eje vertical', 'invertCameraY'),
+                check('Mostrar modo de cámara en el minimapa', 'showCameraModeLabel'),
                 h('p.hint', {
                     text: `Girar: ${a.keyLabel('cameraDrag')} y arrastrar, rueda pulsada, mantener ${a.keyLabel('cameraOrbit')} y mover el cursor, o ${a.keyLabel('cameraLeft')} / ${a.keyLabel('cameraRight')}. Zoom: rueda o pellizco.`,
                 }),
