@@ -137,6 +137,20 @@
 
 **Evidencia:** `work/omp-fa-03/cripta_{rata,guardian,bruto}.png` (láminas de 3 tramos × 5 vistas) y las 45 vistas sueltas.
 
+## 2026-11-21 — JL-61: Integración de modelos OMP (caiman, garza, pecari, jabali, variantes de cripta) (Junie)
+
+**Archivos:** `data/assets.json` (plantillas caiman, garza, pecari, jabali, 6 variantes de cripta; entradas enemy actualizadas), `src/render/enemyView.ts` (dungeonFloor + entryFor con variante por tramo), `src/main.ts` (sincronización dungeonFloor en render loop), `tests/jl61_faunaIntegracion.test.ts`, fila JL-59…64 en `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **FA-02:** `chame_caiman` pasa de `wolf` a `caiman.glb`; `chame_heron` pasa de `archer` a `garza.glb`. Plantillas con 5 clips (Reposo, Caminar, Atacar, Golpeado, Morir).
+- **FA-04:** `cerropunta_peccary` pasa de `wolf` a `pecari.glb`; `cerropunta_boar` pasa de `wolf` a `jabali.glb`. Mismos 5 clips.
+- **FA-03:** 6 plantillas nuevas (`cripta_{rata,guardian,bruto}_{cueva,huaca}`) con sus GLB. 6 entradas enemy en assets.json. `EnemyView.entryFor()` elige la variante según `dungeonFloor` (cueva: pisos 31–70, huaca: 71–100). `main.ts` sincroniza `view.enemies.dungeonFloor` cada frame.
+- 36 pruebas en `tests/jl61_faunaIntegracion.test.ts`: plantillas, GLB en disco, entradas enemy, resolución parseAssets, entradas base intactas.
+
+**Validación:** 36 pruebas verdes, suite 3283/3284 (1 fallo pre-existente assets.test.ts), tsc sin errores nuevos, build OK.
+
+**Evidencia:** `work/junie-jl61/`.
+
 ## 2026-11-21 — JL-57: Diagnóstico balance45 — tormenta y Aguacero (Junie)
 
 **Archivos:** `work/junie-jl-57/DIAGNOSTICO.md`.

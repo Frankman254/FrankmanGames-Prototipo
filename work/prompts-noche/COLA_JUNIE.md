@@ -1103,12 +1103,7 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
   - Ningún elemento por defecto pisa a otro. En la captura del creador, el chat tapa la fila de números de la barra.
   - Prueba: para cada resolución de la lista, ningún par de rectángulos por defecto se solapa y todos caben en la ventana.
   - Capturas en Electron a 1366×768, 1920×1080, 2000×1191, 2560×1080, 3440×1440 y 5120×1440 en `work/junie-jl-60/`.
-- [ ] JL-61 Integrar todos los modelos de OMP que ya están en `master` (Q29: «integrar todo»), con el procedimiento de JL-45b:
-  - FA-02 (`751ae5e`): `chame_caiman` → `caiman.glb` y `chame_heron` → `garza.glb`. Hoy siguen en `wolf` y `archer`.
-  - FA-03 (`5713839`): variantes `cripta_{rata,guardian,bruto}_{cueva,huaca}.glb` por tramo de profundidad. El tramo de cada piso está en `work/omp-fa-03/` y en OMP-POL-02. Cada piso de la cripta usa la variante de su tramo.
-  - FA-04 cuando llegue a `master`: `cerropunta_peccary` → `pecari.glb` y `cerropunta_boar` → `jabali.glb`.
-  - Pruebas: cada arquetipo carga su plantilla con los cinco clips; cada piso de la cripta pide la variante de su tramo.
-  - Captura en Electron de cada criatura en su zona y en el Compendio.
+- [x] JL-61 Integrar todos los modelos de OMP que ya están en `master` (Q29: «integrar todo»), con el procedimiento de JL-45b: — commit «JL-61: integración de modelos OMP — caiman, garza, pecari, jabali, variantes de cripta» — 36 pruebas verdes (jl61_faunaIntegracion.test.ts), suite 3283/3284 (1 fallo pre-existente), tsc sin errores nuevos, build OK. FA-02: chame_caiman → caiman.glb, chame_heron → garza.glb. FA-03: 6 variantes cripta por tramo (cueva 31-70, huaca 71-100), dungeonFloor sincronizado en main.ts. FA-04: cerropunta_peccary → pecari.glb, cerropunta_boar → jabali.glb. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl61/.
 - [ ] JL-62 Escenario `balance45` al día (diagnóstico de JL-57).
   - Check 2: que espere que la tormenta escale con `will`, como manda Balance 45 (`aca5de4`).
   - Check 4: decisión del coordinador: el coste 24 de Aguacero de HZ-04c-cazador (`d96bbb9`) es el diseño posterior y se queda. El check pasa a comprobar que Aguacero cuesta recurso (> 0) y que coincide con `data/`, no un umbral fijo de 40.

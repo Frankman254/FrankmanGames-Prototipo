@@ -2209,6 +2209,8 @@ view.engine.runRenderLoop(() => {
     const t0 = performance.now();
     const { steps, alpha } = simulationPaused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
     for (let i = 0; i < steps; i++) world.tick(clock.dt);
+    // FA-03: sincronizar el piso de la cripta para que EnemyView elija la variante correcta.
+    view.enemies.dungeonFloor = crypt?.inside ? crypt.floor : null;
     if (!simulationPaused) {
         if (!crypt?.inside && !houses?.inside) bank?.update(frameSeconds);
         if (!bank?.inside && !houses?.inside) crypt?.update(frameSeconds);

@@ -121,6 +121,9 @@ export class EnemyView {
     animEvents: AnimEvent[] = [];
     private readonly proxyMat: StandardMaterial;
 
+    /** Piso actual de la cripta (null = fuera). Lo usa entryFor para elegir variantes. */
+    dungeonFloor: number | null = null;
+
     constructor(
         private readonly scene: Scene,
         private readonly chars: EnemyCharacters | null = null,
@@ -145,7 +148,18 @@ export class EnemyView {
     }
 
     private entryFor(e: Enemy): AssetEntry {
-        const entry = this.chars?.assets[`enemy.${e.def.id}`];
+        // FA-03: si es un enemigo de cripta y hay piso activo, usar la variante por tramo.
+        let key = `enemy.${e.def.id}`;
+        if (this.dungeonFloor !== null && e.def.id.startsWith('cripta_')) {
+            const variant = this.dungeonFloor >= 71 ? 'huaca' : this.dungeonFloor >= 31 ? 'cueva' : null;
+            if (variant) {
+                const variantKey = `enemy.cripta_${variant}_${e.def.id.replace('cripta_', '')}`;
+                if (this.chars?.assets[variantKey]) {
+                    key = variantKey;
+                }
+            }
+        }
+        const entry = this.chars?.assets[key];
         if (entry) return entry;
         // Sin entrada en el manifiesto: humanoide con el color del arquetipo.
         const c = e.def.look.color;

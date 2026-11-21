@@ -975,6 +975,328 @@
         ]
       }
     },
+    "caiman": {
+      "kind": "gltf",
+      "file": "assets/models/caiman.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.8,
+      "height": 0.6,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "garza": {
+      "kind": "gltf",
+      "file": "assets/models/garza.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.0,
+      "height": 1.1,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "pecari": {
+      "kind": "gltf",
+      "file": "assets/models/pecari.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.0,
+      "height": 0.67,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "jabali": {
+      "kind": "gltf",
+      "file": "assets/models/jabali.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.6,
+      "height": 0.89,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "cripta_rata_cueva": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_rata_cueva.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.2,
+      "height": 0.7,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.45,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "cripta_rata_huaca": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_rata_huaca.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.2,
+      "height": 0.7,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.45,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "cripta_guardian_cueva": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_guardian_cueva.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.4,
+      "height": 2.2,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.6,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "cripta_guardian_huaca": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_guardian_huaca.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.4,
+      "height": 2.2,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.6,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "cripta_bruto_cueva": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_bruto_cueva.glb",
+      "yawDeg": 90,
+      "runSpeed": 1.8,
+      "height": 2.15,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Terremoto",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.15,
+            "type": "footstep"
+          },
+          {
+            "t": 0.65,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.47,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.5,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "cripta_bruto_huaca": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_bruto_huaca.glb",
+      "yawDeg": 90,
+      "runSpeed": 1.8,
+      "height": 2.15,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Terremoto",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.15,
+            "type": "footstep"
+          },
+          {
+            "t": 0.65,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.47,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.5,
+            "type": "cast"
+          }
+        ]
+      }
+    },
     "espejo": {
       "kind": "gltf",
       "file": "assets/models/diablica_espejo.glb",
@@ -1982,8 +2304,7 @@
       }
     },
     "enemy.chame_heron": {
-      "template": "arquero",
-      "model": "archer",
+      "template": "garza",
       "scale": 1,
       "palettes": {
         "default": {
@@ -2117,8 +2438,7 @@
       }
     },
     "enemy.chame_caiman": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "caiman",
       "scale": 1.2,
       "palettes": {
         "default": {
@@ -2355,8 +2675,7 @@
       }
     },
     "enemy.cerropunta_peccary": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "pecari",
       "scale": 1.2,
       "palettes": {
         "default": {
@@ -2491,8 +2810,7 @@
       }
     },
     "enemy.cerropunta_boar": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "jabali",
       "scale": 1.5,
       "palettes": {
         "default": {
@@ -3819,11 +4137,29 @@
     "enemy.cripta_rata": {
       "template": "cripta_rata"
     },
+    "enemy.cripta_rata_cueva": {
+      "template": "cripta_rata_cueva"
+    },
+    "enemy.cripta_rata_huaca": {
+      "template": "cripta_rata_huaca"
+    },
     "enemy.cripta_guardian": {
       "template": "cripta_guardian"
     },
+    "enemy.cripta_guardian_cueva": {
+      "template": "cripta_guardian_cueva"
+    },
+    "enemy.cripta_guardian_huaca": {
+      "template": "cripta_guardian_huaca"
+    },
     "enemy.cripta_bruto": {
       "template": "cripta_bruto"
+    },
+    "enemy.cripta_bruto_cueva": {
+      "template": "cripta_bruto_cueva"
+    },
+    "enemy.cripta_bruto_huaca": {
+      "template": "cripta_bruto_huaca"
     },
     "enemy.la_espeja": {
       "template": "espejo"
