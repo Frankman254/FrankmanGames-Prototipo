@@ -60,7 +60,7 @@ describe('modos, encuadres y suavidad en el juego', () => {
     });
 
     it('la inteligente gira hacia el peligro, pero respeta un giro manual reciente', () => {
-        const rig = rigAt({ mode: 'smart' });
+        const rig = rigAt({ mode: 'auto' });
         rig.threats = [{ x: 110, z: 100 }];
         const start = rig.yawDeg;
         rig.update(new Vector3(100, 0, 100), 1);

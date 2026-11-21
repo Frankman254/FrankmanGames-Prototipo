@@ -1,6 +1,6 @@
 // Guardado en 12 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
-import { CAMERA_MODES, type CameraMode } from '../../camera/types';
+import { CAMERA_MODES, LEGACY_CAMERA_MODE_MAP, type CameraMode } from '../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../perfOverlay';
 import { LANGUAGES, type Language } from '../../i18n';
 import {
@@ -644,7 +644,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
     invertCameraX: false,
     invertCameraY: false,
     cameraKeySpeed: 120,
-    cameraMode: 'follow',
+    cameraMode: 'manual',
     cameraSmoothing: 0.5,
     fullscreen: false,
     windowSize: '1920x1080',
@@ -734,7 +734,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
         invertCameraX: bool('invertCameraX'),
         invertCameraY: bool('invertCameraY'),
         cameraKeySpeed: num('cameraKeySpeed'),
-        cameraMode: pick('cameraMode', CAMERA_MODES),
+        cameraMode: pick('cameraMode', CAMERA_MODES, LEGACY_CAMERA_MODE_MAP[o['cameraMode'] as string] ?? o['cameraMode']),
         cameraSmoothing: num('cameraSmoothing'),
         fullscreen: bool('fullscreen'),
         windowSize: pick('windowSize', WINDOW_SIZES),

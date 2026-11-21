@@ -99,9 +99,9 @@ const perfEl = document.getElementById('perf')!;
 const perf = new PerfOverlay(perfEl);
 
 /** Modo de cámara elegido; en interiores siempre se sigue al personaje. */
-let cameraMode: CameraMode = 'follow';
+let cameraMode: CameraMode = 'manual';
 function applyCameraMode(): void {
-    view.rig.mode = world?.interior ? 'follow' : cameraMode;
+    view.rig.mode = world?.interior ? 'manual' : cameraMode;
 }
 const buildStart = performance.now();
 const overworld = buildOverworld(loadWorldData());

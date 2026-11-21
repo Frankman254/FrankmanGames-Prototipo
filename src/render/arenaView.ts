@@ -554,9 +554,9 @@ export class ArenaView {
         this.tmp.set(x, y, z);
         this.atmosphere.cameraDistance = this.rig.viewDistance;
         this.atmosphere.update(frameSeconds, this.tmp, world.timeOfDay);
-        // Autoenfoque e inteligente encuadran a quien pelea contigo; cerca de 18 m.
+        // Encuadre de combate y automático encuadran a quien pelea contigo; cerca de 18 m.
         this.rig.threats =
-            this.rig.mode === 'follow' || this.rig.mode === 'zone'
+            this.rig.mode === 'manual' || this.rig.mode === 'semiAuto' || this.rig.mode === 'zone'
                 ? []
                 : world.enemies.list
                       .filter(

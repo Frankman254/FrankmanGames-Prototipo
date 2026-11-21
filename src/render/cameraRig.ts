@@ -42,8 +42,8 @@ export class CameraRig {
     private shownYaw: number;
     private shownPitch: number;
     private shownDistance: number;
-    /** Seguir, autoenfoque, inteligente o estática por casilla. */
-    mode: CameraMode = 'follow';
+    /** Manual, semiautomático, automático, encuadre de combate o estática por casilla. */
+    mode: CameraMode = 'manual';
     /** Suavidad del movimiento (opción del jugador). */
     smoothing = 0.5;
     /** Enemigos en combate, para el autoenfoque y la cámara inteligente. */
@@ -242,26 +242,13 @@ export class CameraRig {
     }
 
     /** Distancia hasta la primera caja sólida en la dirección (dx, dy, dz) desde el foco.
-     * JUG-05: usa colisión analítica en lugar de muestreo discreto para eliminar tirones. */
+     * JUG-05: usa colisión analítica en lugar de muestreo discreto para eliminar tirones.
+     * JL-65: el modo Manual nunca reduce la distancia por obstáculos; solo se acerca si la cámara
+     * quedaría dentro de una caja (para no meterse en paredes). */
     private unblockedDistance(dx: number, dy: number, dz: number): number {
         const ox = this.focus.x;
         const oy = this.focus.y + 1;
         const oz = this.focus.z;
-        // Por casilla la cámara va alta: acercarla por una casa rompería el encuadre.
-        if (this.blockerMode === 'inside' || this.mode === 'zone') {
-            // Modo interior: solo se acerca si la cámara quedaría dentro de una caja.
-            const blockers = this.blockers.map((b) => ({
-                x: b.x,
-                z: b.z,
-                halfWidth: b.hw,
-                halfDepth: b.hd,
-                top: b.top,
-            }));
-            const ray = { x: ox, y: oy, z: oz, dx, dy, dz };
-            const dist = distanceBeforeBlocker(ray, this.shownDistance, blockers, 0.35);
-            return Math.max(this.def.minDistance * 0.5, dist);
-        }
-        // Modo exterior: la cámara se acerca si cualquier caja tapa el rayo.
         const blockers = this.blockers.map((b) => ({
             x: b.x,
             z: b.z,
@@ -270,7 +257,41 @@ export class CameraRig {
             top: b.top,
         }));
         const ray = { x: ox, y: oy, z: oz, dx, dy, dz };
+
+        // Modo Manual: nunca reduce la distancia por obstáculos. Solo se acerca si la cámara
+        // quedaría dentro de una caja (evita meterse en paredes sin acercar).
+        if (this.mode === 'manual') {
+            const dist = distanceBeforeBlocker(ray, this.shownDistance, blockers, 0.35);
+            // Solo se acerca si la cámara quedaría dentro de una caja; de lo contrario mantiene la distancia.
+            const wouldBeInside = this.wouldCameraBeInside(ray, this.shownDistance, blockers);
+            if (!wouldBeInside) return this.shownDistance;
+            return Math.max(this.def.minDistance * 0.5, dist);
+        }
+
+        // Por casilla la cámara va alta: acercarla por una casa rompería el encuadre.
+        if (this.blockerMode === 'inside' || this.mode === 'zone') {
+            // Modo interior: solo se acerca si la cámara quedaría dentro de una caja.
+            const dist = distanceBeforeBlocker(ray, this.shownDistance, blockers, 0.35);
+            return Math.max(this.def.minDistance * 0.5, dist);
+        }
+
+        // Modos Semiautomático, Automático y Encuadre de combate: la cámara se acerca si cualquier caja tapa el rayo.
         const dist = distanceBeforeBlocker(ray, this.shownDistance, blockers, 0.6);
         return Math.max(this.def.minDistance * 0.5, dist);
+    }
+
+    /** Comprueba si la cámara, a la distancia dada, quedaría dentro de alguna caja sólida. */
+    private wouldCameraBeInside(ray: { x: number; y: number; z: number; dx: number; dy: number; dz: number }, distance: number, blockers: ReadonlyArray<{ x: number; z: number; halfWidth: number; halfDepth: number; top: number }>): boolean {
+        const camX = ray.x + ray.dx * distance;
+        const camY = ray.y + ray.dy * distance;
+        const camZ = ray.z + ray.dz * distance;
+        for (const b of blockers) {
+            if (camX >= b.x - b.halfWidth && camX <= b.x + b.halfWidth &&
+                camZ >= b.z - b.halfDepth && camZ <= b.z + b.halfDepth &&
+                camY <= b.top) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,5 +1,13 @@
-export const CAMERA_MODES = ['follow', 'autoFocus', 'smart', 'zone'] as const;
+export const CAMERA_MODES = ['manual', 'semiAuto', 'auto', 'combat', 'zone'] as const;
 export type CameraMode = (typeof CAMERA_MODES)[number];
+
+/** Migración de modos antiguos (guardados y opciones) a los nuevos. */
+export const LEGACY_CAMERA_MODE_MAP: Record<string, CameraMode> = {
+    follow: 'manual',
+    smart: 'auto',
+    autoFocus: 'combat',
+    zone: 'zone',
+};
 
 export interface CameraPose {
     yawDeg: number;

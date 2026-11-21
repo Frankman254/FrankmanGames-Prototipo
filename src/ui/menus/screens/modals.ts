@@ -103,9 +103,10 @@ export const DEV_INFO_NAMES: Record<DevInfoMode, string> = {
 };
 
 export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
-    follow: 'Seguir al personaje',
-    autoFocus: 'Autoenfoque (encuadra el combate)',
-    smart: 'Inteligente (gira hacia el peligro)',
+    manual: 'Manual (solo el jugador mueve la cámara)',
+    semiAuto: 'Semiautomático (gira solo al caminar)',
+    auto: 'Automático (elige distancia y giro)',
+    combat: 'Encuadre de combate (encuadra a los enemigos)',
     zone: 'Estática por casilla del mapa',
 };
 

@@ -39,9 +39,9 @@ describe('cámara v2: lógica pura', () => {
         expect(heldLongEnough(100, 750)).toBe(true);
     });
 
-    it('auto focus encuadra jugador y amenazas', () => {
+    it('encuadre de combate encuadra jugador y amenazas', () => {
         const result = modeTarget({
-            mode: 'autoFocus',
+            mode: 'combat',
             target: { x: 0, y: 2, z: 0 },
             threats: [{ x: 12, z: 4 }],
             pose: { yawDeg: 0, pitchDeg: 42, distance: 8 },
@@ -66,9 +66,9 @@ describe('cámara v2: lógica pura', () => {
         expect(result.focus).toEqual({ x: -16, y: 3, z: 48 });
     });
 
-    it('el modo inteligente respeta la pausa manual y limita el giro', () => {
+    it('el modo automático respeta la pausa manual y limita el giro', () => {
         const base = {
-            mode: 'smart' as const,
+            mode: 'auto' as const,
             target: { x: 0, y: 0, z: 0 },
             threats: [{ x: 10, z: 0 }],
             pose: { yawDeg: 0, pitchDeg: 40, distance: 12 },

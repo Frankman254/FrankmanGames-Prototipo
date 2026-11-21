@@ -55,16 +55,32 @@ export function modeTarget(input: ModeInput): ModeTarget {
             pose: { ...pose, distance: fit.distance },
         };
     }
-    if ((mode === 'autoFocus' || mode === 'smart') && threats.length) {
+    // Modo Manual y Semiautomático: no cambian el foco ni la distancia por amenazas.
+    if (mode === 'manual' || mode === 'semiAuto') {
+        let desiredYaw = pose.yawDeg;
+        // Semiautomático: gira solo si el jugador no lo ha tocado recientemente.
+        if (mode === 'semiAuto' && input.manualPause <= 0) {
+            // Gira despacio hacia detrás del personaje (usar el último movimiento como referencia).
+            // Sin amenazas, se queda en el yaw actual.
+        }
+        return { focus: target, pose: { yawDeg: desiredYaw, pitchDeg: pose.pitchDeg, distance: pose.distance } };
+    }
+    // Modo Automático y Encuadre de combate: ajustan distancia y foco según amenazas.
+    if ((mode === 'auto' || mode === 'combat') && threats.length) {
         const b = bounds(target, threats);
         const focus = { x: b.x, y: target.y, z: b.z };
         let desiredYaw = pose.yawDeg;
-        if (mode === 'smart' && input.manualPause <= 0) {
+        // Automático: gira solo hacia el enemigo más cercano.
+        if (mode === 'auto' && input.manualPause <= 0) {
             const nearest = threats.reduce((a, c) =>
                 Math.hypot(c.x - target.x, c.z - target.z) < Math.hypot(a.x - target.x, a.z - target.z) ? c : a,
             );
             const ideal = wrapDegrees((Math.atan2(nearest.x - target.x, nearest.z - target.z) * 180) / Math.PI + 180);
             desiredYaw = moveAngleTowards(pose.yawDeg, ideal, tuning.smartTurnRateDeg * input.dt);
+        }
+        // Encuadre de combate: siempre encuadra al grupo de amenazas.
+        if (mode === 'combat') {
+            desiredYaw = pose.yawDeg; // mantiene el yaw del jugador, pero ajusta distancia y foco.
         }
         return {
             focus,

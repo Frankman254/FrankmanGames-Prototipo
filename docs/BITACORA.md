@@ -1,3 +1,23 @@
+## 2026-11-21 — JL-65: Cuatro modos de cámara y colisión que respeta el modo (Junie)
+
+**Archivos:** `src/camera/types.ts`, `src/camera/modes.ts`, `src/render/cameraRig.ts`, `src/render/arenaView.ts`, `src/ui/menus/screens/modals.ts`, `src/ui/menus/saveStore.ts`, `src/main.ts`, `tests/camera.test.ts`, `tests/camera/cameraLogic.test.ts`, `tests/jl65_cameraModes.test.ts`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **Causa del fallo:** `unblockedDistance()` en `cameraRig.ts` siempre acercaba la cámara cuando cualquier caja sólida tapaba el rayo (padding 0.6 en exterior), sin importar el modo. Cerca de casas, rocas o árboles la cámara se pegaba al personaje y la rueda no la alejaba porque el tope se recalculaba cada fotograma.
+- **4 modos de cámara:** reemplazó `follow`/`autoFocus`/`smart`/`zone` por `manual`/`semiAuto`/`auto`/`combat`/`zone`.
+  - **Manual:** nunca reduce la distancia por obstáculos; solo se acerca si la cámara quedaría dentro de una caja sólida.
+  - **Semiautomático:** como Manual, pero gira solo al caminar (respeta el giro manual reciente).
+  - **Automático:** elige distancia y giro solo; gira hacia el enemigo más cercano.
+  - **Encuadre de combate:** ajusta distancia y foco para ver a todos los enemigos, mantiene el yaw del jugador.
+- **Migración de guardados:** `LEGACY_CAMERA_MODE_MAP` en `types.ts` mapea `follow→manual`, `smart→auto`, `autoFocus→combat`, `zone→zone`. `normalizeOptions()` en `saveStore.ts` aplica la migración al cargar.
+- **Colisión:** `unblockedDistance()` ahora respeta el modo: Manual usa `wouldCameraBeInside()` para solo acercarse si la cámara quedaría dentro de una caja; los demás modos conservan el comportamiento de acercarse ante obstáculos.
+- **arenaView.ts:** `threats` se asigna solo en modos `auto` y `combat` (antes se asignaba en todos excepto `follow`/`zone`).
+- **Pruebas:** 14 pruebas puras en `jl65_cameraModes.test.ts` (Manual, Semiautomático, Automático, Encuadre de combate, migración, zona). Tests existentes actualizados (`camera.test.ts`, `cameraLogic.test.ts`).
+
+**Validación:** 14 pruebas verdes, suite 3196/3196, tsc sin errores nuevos, Vite build OK. Electron no disponible para capturas visuales.
+
+**Evidencia:** `work/junie-jl-65/`.
+
 ## 2026-11-21 — Cámara, modos de lanzar y pulido visual (Coord)
 
 **Archivos:** `tests/balance/v2Product.test.ts`, `work/prompts-noche/COLA_JUNIE.md`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`; `COLA_OMP.md` (local).
@@ -18,6 +38,21 @@
 - Tanda JL-59…64 para Junie: barra fusionada y escala por eje (JL-59), posiciones por forma de pantalla (JL-60), integrar FA-02…04 (JL-61), escenario `balance45` (JL-62), auditoría nombre contra modelo (JL-63) y rework de los pisos a mano de la cripta (JL-64).
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
+
+## 2026-11-21 — OMP-FA-05: jaguar del Barú y su anciano
+
+**Archivos:** `assets/models/jaguar.glb`, `assets/models/jaguar_anciano.glb`, `arte/blender/fauna_baru.blend`, `scripts/blender/{fauna_baru,validar_fauna_baru,revisar_fauna_baru}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Un felino bajo y ancho de pecho con esqueleto `FG_Jaguar` (17 huesos: cadera, pecho, cuello, cabeza, mandíbula, tres de cola, cuatro patas) y el mismo cuerpo escalado ×1,22 con `FG_JaguarAnciano` — una sola función de mallas y de clips parametrizada por tamaño; amplitudes ×0,85 en el anciano por peso.
+- **Jaguar** (`baru_jaguar`): 1.048 tri, 1,40 m de morro a cola, 0,97 m de alto. Cabeza grande y redonda, rosetas en placa oscura por los flancos, cola larga de punta clara, biguaríes y orejas redondas.
+- **Anciano** (`baru_elder`, élite): 1.164 tri, 1,71 m, 1,17 m. Cruz y pescuezo de canas hundidas en el manto, colmillos que desbordan el hocico cerrado, cicatriz de colmillo en el morro y collar de presas colgando del cuello.
+- Atacar = salto de emboscada (agacharse, acumular, extensión delantera, aterrizar mordiendo); Reposo, Caminar, Golpeado y Morir sin salto.
+- Correcciones tras ver las láminas: colmillos y biguaríes enterrados en el hocico (flotaban), canas y cicatriz del anciano hundidas en la superficie.
+
+**Validación:** `validar_fauna_baru.py` en verde (rig, cinco clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango); láminas de 5 vistas + 5 pasos revisadas y aceptadas. No toca `data/` ni `src/`: lo integra Junie (JL-61, autorizado hoy).
+
+**Evidencia:** `work/omp-fa-05/revision_{jaguar,jaguar_anciano}.png` y las 20 vistas sueltas.
 
 ## 2026-11-21 — OMP-FA-04: saíno y jabalí de Cerro Punta
 
