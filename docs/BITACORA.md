@@ -474,6 +474,21 @@
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
 
+## 2026-11-21 - OMP-FA-11: búho chismoso, quetzal cascarrabias y pavo gritón
+
+**Archivos:** `assets/models/buho_chismoso.glb`, `assets/models/quetzal.glb`, `assets/models/pavo_griton.glb`, `arte/blender/fauna_aves.blend`, `scripts/blender/{fauna_aves,validar_fauna_aves,revisar_fauna_aves}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Tres ranged de `data/enemies.json` que hoy se ven como arquero tenido: el Búho Chismoso y el Quetzal Cascarrabias de los Cerros de Boquete y el Pavo Gritón del Cerro Ancón Embrujado, según `work/junie-jl-63/NOMBRE_MODELO.md` («Ave = humanoide»). Las tres comparten literalmente el esqueleto de ave de D-17 (`hips > chest > neck > head`, `tail`, pata `leg > shin > foot`, ala `wing > wingTip` modelada extendida que el Reposo pliega) y llevan los cinco clips de enemigo (Reposo, Caminar, Atacar, Golpeado, Morir), no los seis de monte de ave.py.
+- **Búho chismoso** (`boquete_owl`): 788 tri, 1,22 m posado erguido. Cuerpo pardo con vientre jaspeado, dos discos faciales con ojos de ámbar enormes y cejas, pico ganchudo oculto, penachos y garfas curvas de rapaz. Reposo: giro de cabeza de 96° (el chisme). Atacar firma: mira del revés, se lanza en silencio con las dos garras por delante.
+- **Quetzal cascarrabias** (`boquete_quetzal`): 594 tri, 1,82 m del pico a la rastrera. Manto verde, pechuga bermellón, cresta de tres plumas, pico pálido ancho con sierra (frutero) y dos rastreras de cola que doblan el cuerpo. Atacar firma: eriza cresta y cola, aletea furioso en el sitio y estampa el pecho con las rastreras en bandera.
+- **Pavo gritón** (`ancon_pavo`): 948 tri, 1,41 m de mole ocre erguida con cuello de pizarra desnudo, papada y carúnculas en carne roja, cresta de abaniquito en varilla y cola desplegada de nueve plumas con manchas de ojo. Atacar firma: hincha el pecho, alza el abanico y estampa el grito con la cabeza atrás antes de embestir a saltitos.
+- Correcciones tras la primera lámina: sin color por especie las tres parecían la misma ave gris (paletas propias: pardo/ámbar el búho, verde/bermellón el quetzal —el pelo del quetzal pasó a verde muy oscuro y el rojo a la pechuga—, ocre/pizarra/carne el pavo); los dedos posteriores se hundían 4–5 cm con la `tuck` del Reposo (las aves de esta familia van erguidas: tuck de patas a cero); el ancho validado es el del posado con alas plegadas, no la envergadura.
+
+**Validación:** `validar_fauna_aves.py` en verde (esqueleto D-17 hueso por hueso, cinco clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango, materiales por región); láminas de 5 vistas + 5 pasos por ave revisadas y aceptadas; `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-11/revision_{buho_chismoso,quetzal,pavo_griton}.png` y las 60 vistas sueltas.
+
 ## 2026-11-21 - OMP-FA-10: medusa pegajosa y zancudo familiar
 
 **Archivos:** `assets/models/medusa.glb`, `assets/models/zancudo.glb`, `arte/blender/fauna_medusa_zancudo.blend`, `scripts/blender/{fauna_medusa_zancudo,validar_fauna_medusa_zancudo,revisar_fauna_medusa_zancudo}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
