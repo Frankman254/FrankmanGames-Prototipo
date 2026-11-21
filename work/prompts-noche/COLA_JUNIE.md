@@ -1192,7 +1192,7 @@ Reglas comunes de toda la bolsa:
 
 ### Pruebas que faltan
 - [x] JL-96 Prueba de migración de una partida vieja «dorada»: una partida de antes de JL-59 y JL-65 carga con la escala del HUD y el modo de cámara correctos. — commit «JL-96: prueba de migración de partida vieja (HUD scale + cámara)» — 19 pruebas verdes (jl96_migration.test.ts), suite 3461/3462, tsc limpio (solo balM3.ts ajeno), push OK. Evidencia en tests/jl96_migration.test.ts.
-- [ ] JL-97 El modo de lanzar (JL-66) se guarda y se recupera con la partida y las opciones. Prueba.
+- [x] JL-97 El modo de lanzar (JL-66) se guarda y se recupera con la partida y las opciones. Prueba. — commit «JL-97: pruebas de guardado y recuperación del modo de lanzar» — 12 pruebas verdes (jl97_castModeSave.test.ts), tsc sin errores nuevos, suite 3473/3474 (1 fallo pre-existente assets.test.ts de OMP), push OK. Evidencia en tests/jl97_castModeSave.test.ts.
 - [ ] JL-98 Cobertura i18n: todas las cadenas nuevas de JL-59…72 existen en cada idioma del juego. Prueba que falle si falta alguna.
 - [ ] JL-99 La tabla de JL-63 nombre ↔ modelo pasa a ser un guion (`scripts/audit/nombreModelo.ts`) que la regenera en `work/`, con una prueba que limite el número de discordancias a las de hoy (no puede subir).
 

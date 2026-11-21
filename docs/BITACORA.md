@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-97: Pruebas de guardado y recuperación del modo de lanzar (Junie)
+
+**Archivos:** `tests/jl97_castModeSave.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 12 pruebas nuevas que verifican que el modo de lanzar hechizos (JL-66) se guarda y se recupera correctamente:
+- `saveOptions`/`loadOptions` ida y vuelta para los 3 modos (pressClick, indicator, press).
+- `normalizeOptions` valida los modos y rechaza los inválidos.
+- `CastInput` creado con el modo cargado funciona correctamente para cada modo.
+- Los `slotModes` por hueco no persisten al recargar (comportamiento esperado).
+- Migración de guardados antiguos: sin `optionsRev`, `indicator` pasa a `pressClick`; con `optionsRev` vigente, se respeta.
+
+**Validación:** `npx vitest run tests/jl97_castModeSave.test.ts` → 12/12 en verde. `npx tsc --noEmit` sin errores nuevos. Suite completa 3473/3474 (1 fallo pre-existente `assets.test.ts` de OMP).
+
 ## 2026-11-21 — JL-93: Escenario qaElectron monturas (JL-68) (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl93/`.
