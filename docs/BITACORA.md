@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-75: Diagnóstico del escenario `previa` — 5 fallos del arnés (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl75/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Tarea JL-75: diagnosticar los 5 fallos del escenario `previa` (fantasmas y destino del salto).
+- Electron no se pudo ejecutar (sin display en entorno headless). Análisis basado en código del arnés y del juego.
+- **Hallazgo:** los 5 fallos son del arnés de QA, no del juego. `clickSlot()` en `scripts/qaElectron.mjs` hace un click completo (mousedown+mouseup) que en el modo de lanzamiento por defecto (`pressClick`) confirma inmediatamente el apuntado y lanza el hechizo antes de que el QA pueda verificar los fantasmas y las cards.
+- El código del juego funciona correctamente: `CastInput.press()` establece `aiming`, `syncAimPreview()` pinta fantasmas mientras `aiming !== null`, y `previewSpell()` devuelve `casterTo` correcto cuando el objetivo está en alcance.
+- Sin cambios de código. Informe en `work/junie-jl75/DIAGNOSTICO.md`.
+
+**Evidencia:** `work/junie-jl75/DIAGNOSTICO.md`.
+
 ## 2026-11-21 — JL-74: Bloqueada — sin display (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl74/BLOQUEO.md`.
