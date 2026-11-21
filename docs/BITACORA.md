@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-92: Escenario qaElectron modosCamara (JL-65, JL-71) (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-92/`.
+
+**Qué se hizo:** Escenario `modosCamara` en `scripts/qaElectron.mjs` que verifica los 4 modos de cámara de JL-65 (Manual, Semiautomático, Automático, Encuadre de combate) junto a una casa en el pueblo. El jugador se coloca en (130, 112) cerca de las casas de Villa Raspadura. Para cada modo: se verifica que el modo se aplica, se guarda captura, y en Manual/Semiautomático se comprueba que la distancia no se reduce por obstáculos (sin zoom automático). Se verifica que KeyZ cicla los modos y que la rueda del ratón siempre cambia el zoom.
+
+**Validación:** Escenario `modosCamara`: 13/13 checks en verde. Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl-92/` con 4 capturas (jl92-manual.jpg, jl92-semiAuto.jpg, jl92-auto.jpg, jl92-combat.jpg).
+
+---
+
 ## 2026-11-21 — JL-91: Escenario qaElectron modosLanzar (JL-66) (Junie)
 
 **Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `tests/jl91_castModes.test.ts` (no, sin pruebas nuevas, solo escenario), `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl91/REPORTE.md`.

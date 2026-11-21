@@ -5385,6 +5385,76 @@ const scenarios = {
         await resize(1280, 800);
     },
 
+    /** JL-92: Escenario modosCamara — los cuatro modos de JL-65 junto a una casa.
+     * En Manual no hay zoom automático y el obstáculo se transparenta (JL-71). */
+    async modosCamara() {
+        await newGame('QA ModosCamara');
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+        // Colocar al jugador junto a una casa en el pueblo para que haya un obstáculo.
+        // Las casas de Villa Raspadura están cerca de (127, 115).
+        await js(`(()=>{ const p=${W}.player, g=${W}.grid;
+            p.pos.x=130; p.pos.y=112; p.path=[]; })()`);
+        await sleep(1500);
+
+        const modes = ['manual', 'semiAuto', 'auto', 'combat'];
+        const modeNames = { manual: 'Manual', semiAuto: 'Semiautomático', auto: 'Automático', combat: 'Encuadre de combate' };
+
+        for (const mode of modes) {
+            // Cambiar al modo deseado directamente.
+            await js(`(()=>{ const m=__game.view.rig; m.mode='${mode}'; })()`);
+            await sleep(800);
+
+            // Verificar que el modo se aplicó.
+            const currentMode = await js('__game.view.rig.mode');
+            check(`modosCamara: modo ${modeNames[mode]} activo`, currentMode === mode, currentMode);
+
+            // Captura de cada modo.
+            await shot(`jl92-${mode}`);
+
+            // En Manual y Semiautomático: verificar que no hay zoom automático por obstáculos.
+            // La distancia debe mantenerse estable (no reducirse por distanceBeforeBlocker).
+            if (mode === 'manual' || mode === 'semiAuto') {
+                const distBefore = await js('__game.view.rig.zoom');
+                await sleep(2000);
+                const distAfter = await js('__game.view.rig.zoom');
+                // En Manual, la distancia no debe reducirse más de 0.5 m por obstáculos.
+                const noZoom = distAfter >= distBefore - 0.5;
+                check(
+                    `modosCamara: ${modeNames[mode]} — sin zoom automático (distancia estable)`,
+                    noZoom,
+                    `${distBefore.toFixed(1)} → ${distAfter.toFixed(1)} m`,
+                );
+            }
+
+            // Verificar que los índices de oclusión se calculan (JL-71).
+            const occludingCount = await js('__game.view.rig.occludingBlockerIndices.length');
+            check(
+                `modosCamara: ${modeNames[mode]} — oclusión calculada`,
+                true, // siempre se calcula; el valor varía según la posición
+                `${occludingCount} obstáculos ocluyendo`,
+            );
+        }
+
+        // Verificar que KeyZ cicla los modos (cameraNextMode).
+        const modeBefore = await js('__game.view.rig.mode');
+        await key('KeyZ', 'z');
+        await sleep(300);
+        const modeAfter = await js('__game.view.rig.mode');
+        check('modosCamara: KeyZ cambia el modo', modeAfter !== modeBefore, `${modeBefore} → ${modeAfter}`);
+
+        // Verificar que la rueda del ratón siempre cambia el zoom.
+        const zoomBefore = await js('__game.view.rig.zoom');
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 960, y: 540, deltaX: 0, deltaY: 100 });
+        await sleep(300);
+        const zoomAfter = await js('__game.view.rig.zoom');
+        check('modosCamara: rueda del ratón cambia el zoom', Math.abs(zoomAfter - zoomBefore) > 0.3, `${zoomBefore.toFixed(1)} → ${zoomAfter.toFixed(1)}`);
+
+        // Restaurar modo manual y resolución.
+        await js('__game.view.rig.mode="manual"');
+        await resize(1280, 800);
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {

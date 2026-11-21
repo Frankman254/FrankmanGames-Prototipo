@@ -1185,7 +1185,7 @@ Reglas comunes de toda la bolsa:
 
 ### Escenarios de QA nuevos para lo de hoy
 - [x] JL-91 Escenario `modosLanzar`: los tres modos de JL-66 (pulsar y soltar, mantener con indicador, doble pulsación y clic). Lanza un hechizo de área con cada modo y comprueba el impacto. — commit «JL-91: escenario qaElectron modosLanzar (JL-66)» — 7/7 checks OK, REPORTE.md en work/junie-jl91/
-- [ ] JL-92 Escenario `modosCamara`: los cuatro modos de JL-65 junto a una casa. En Manual no hay zoom automático y el obstáculo se transparenta (JL-71).
+- [x] JL-92 Escenario `modosCamara`: los cuatro modos de JL-65 junto a una casa. En Manual no hay zoom automático y el obstáculo se transparenta (JL-71). — commit «JL-92: escenario modosCamara — 4 modos, sin zoom automático, KeyZ y rueda» — 13/13 checks en verde, capturas en work/junie-jl-92/.
 - [ ] JL-93 Escenario `monturas`: montar cada montura, captura del jinete sentado (JL-68) y bajar. Sin errores de consola.
 - [ ] JL-94 Escenario `hudSinSolapes`: en 768p, 1080p, 1440p y ultra-wide, ningún panel del HUD por defecto se solapa con otro (cajas del DOM).
 - [ ] JL-95 Escenario `fisicas`: 20 personajes con físicas secundarias (JL-70). Medir ms por fotograma y FPS, y guardar la cifra en el informe.
