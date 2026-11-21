@@ -21,8 +21,9 @@ describe('atajos de teclado', () => {
 
     it('el JSON del repo es válido y cubre todas las acciones', () => {
         // BAR-01: la fila 3 (hotbar21-30) sale sin tecla por defecto; el resto sí tiene.
+        // JL-101: castModeNext sale sin tecla por defecto; el jugador la asigna en Opciones.
         for (const a of ACTIONS) {
-            if (/^hotbar(2[1-9]|30)$/.test(a)) {
+            if (/^hotbar(2[1-9]|30)$/.test(a) || a === 'castModeNext') {
                 expect(kb[a].length).toBe(0);
             } else {
                 expect(kb[a].length).toBeGreaterThan(0);

@@ -62,6 +62,7 @@
     "cameraIsometric": ["Numpad7"],
     "cameraCinematic": ["Numpad8"],
     "cameraNextMode": ["KeyZ", "MouseMiddle"],
+    "castModeNext": [],
     "toggleFlight": ["Tab"],
     "moveClick": ["MouseLeft"],
     "cameraDrag": ["MouseRight"],

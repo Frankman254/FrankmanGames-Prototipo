@@ -272,6 +272,21 @@ La prueba tiene 3 tests: cobertura general (101 claves, 0 faltantes), sin traduc
 
 **Evidencia:** `work/junie-jl-73/` (capturas de las 3 resoluciones).
 
+## 2026-11-21 — JL-101: Tecla para cambiar el modo de lanzar (Junie)
+
+**Archivos:** `src/ui/menus/keybindings.ts`, `src/main.ts`, `data/ui/keybindings.json`, `tests/ui/keybindings.test.ts`, `tests/jl101_castModeKey.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- `castModeNext` añadido a `ACTIONS` y `ACTION_GROUPS` en `keybindings.ts`, junto a `cameraNextMode`.
+- `data/ui/keybindings.json`: `"castModeNext": []` — sin tecla por defecto; el jugador la asigna en Opciones → Controles.
+- `main.ts`: handler que cicla `CAST_MODES` (pressClick → indicator → press → pressClick) y muestra toast `Lanzar: <nombre>`.
+- `tests/ui/keybindings.test.ts`: la prueba de cobertura acepta `castModeNext` sin tecla, igual que hotbar21-30.
+- `tests/jl101_castModeKey.test.ts`: 8 pruebas (CAST_MODES, CAST_MODE_NAMES, castModeNext en ACTIONS y ACTION_GROUPS, ciclo de modos, setMode cancela apuntado, toast).
+
+**Validación:** 8 pruebas verdes (jl101_castModeKey.test.ts). Suite 3496/3496. Typecheck limpio (solo balM3.ts ajeno). Vite build OK.
+
+**Evidencia:** `tests/jl101_castModeKey.test.ts`.
+
 ## 2026-11-21 — Bolsa grande de tareas para Junie (JL-73…108)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`

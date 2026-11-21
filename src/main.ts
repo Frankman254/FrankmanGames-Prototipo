@@ -31,7 +31,7 @@ import { needsAim, World } from './sim/world';
 import { AimCards, aimText, type AimCardData } from './ui/aimCards';
 import { AimGhosts, type AimGhost } from './render/fx/aimGhosts';
 import type { LockMode } from './sim/lock';
-import { CastInput } from './sim/castModes';
+import { CastInput, CAST_MODES, CAST_MODE_NAMES } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
 import { button } from './ui/menus/dom';
 import { hotbarIndex } from './ui/menus/keybindings';
@@ -1827,6 +1827,12 @@ menus?.onAction((a) => {
         cameraMode = CAMERA_MODES[(CAMERA_MODES.indexOf(cameraMode) + 1) % CAMERA_MODES.length]!;
         applyCameraMode();
         menus?.toast(`Cámara: ${CAMERA_MODE_NAMES[cameraMode]}`, 'info');
+        return;
+    }
+    if (a === 'castModeNext') {
+        const next = CAST_MODES[(CAST_MODES.indexOf(castInput.mode) + 1) % CAST_MODES.length]!;
+        castInput.setMode(next);
+        menus?.toast(`Lanzar: ${CAST_MODE_NAMES[next]}`, 'info');
         return;
     }
     switch (a) {
