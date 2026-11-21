@@ -1044,3 +1044,60 @@ Revisión de JL-49 por el coordinador: suite 3154/3155, el único fallo es `v2Pr
 - [x] JL-57 `balance45` (FALLOS §6): tormenta aún escala con Agilidad y Aguacero no cuesta maná. **Solo diagnóstico.** — commit «JL-57: diagnóstico balance45 — tormenta y Aguacero» — DIAGNOSTICO.md en work/junie-jl-57/. Check 2: el código es correcto (lightning escala con will, no con agility); el check del escenario está desfasado con Balance 45. Check 4: d96bbb9 bajó resourceCost de 50 a 24, rompiendo el umbral ≥ 40. El coordinador decide si restaura el coste o actualiza el escenario.
 - [ ] JL-58 Cierre de la tanda: QA por tandas completa (`QA_SESION`) con el arnés de JL-50/51 y resumen en `work/junie-qa01/RESUMEN.md` (escenarios en verde antes y después). Lo que siga fallando se lista en `work/junie-jl-58/FALLOS.md`. Este commit lleva también la fila JL de TAREAS y la BITACORA de la tanda.
 
+
+## Tanda del 2026-11-21, tarde (coordinador, pedida por el creador). Después de JL-58, en este orden.
+
+Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin reformatear archivos, sin cambiar cifras de balance. Respuestas del creador que la autorizan (2026-11-21):
+- HUD: «arreglar la barra de hechizos cuando esta fusionada por defecto aparece demasiado grande […] que todos los elementos puedan crecer horizontalmente y verticalmente independiente de los 2 ejes a la vez, corregir las posiciones por defecto en cada tipo de pantalla».
+- Q27: los cambios de JL-49 en la cripta se quedan. Además, «los pisos iniciales hay que hacerles rework ya que estan horribles y muy simples».
+- Q29: «si hay que integrar todo […] hay muchos mounstruos en el convenio que tienen nombre de una cosa y son otra, muchos con forma de perro».
+
+- [ ] JL-59 Barra de hechizos fusionada: tamaño por defecto, y escala por eje en todo el HUD.
+  - Hoy, con las barras fusionadas, `.hud-actionbar` ocupa todo el ancho y queda un hueco marrón vacío a la derecha (captura del creador a 2000×1191). Por defecto debe medir lo que miden sus casillas y quedar centrada abajo.
+  - Escala independiente en X y en Y para **todos** los elementos de `HUD_ELEMENTS`:
+    - asa en el borde derecho: solo ancho;
+    - asa en el borde inferior: solo alto;
+    - asa en la esquina: ambos ejes;
+    - con Mayús, la esquina mantiene la proporción.
+  - Datos: `scales` en `src/ui/map/hudProfiles.ts` pasa de `number` a `{ x, y }`. Al leer un perfil guardado con un número `n`, conviértelo en `{ x: n, y: n }`; no se pierde ningún perfil del jugador. Mismos límites `HUD_SCALE_MIN`/`HUD_SCALE_MAX` por eje.
+  - `applyScale` y `bindScale` en `src/ui/map/hudLayout.ts`. Las barras que reparten casillas (acción, mascota, consumibles) crecen en casillas por fila al ensanchar, no estirando los iconos; los paneles de texto (chat, registro de combate) crecen en área.
+  - Pruebas: migración del número a `{x, y}`, límites por eje y que la barra fusionada por defecto mida lo mismo que sus casillas (±8 px).
+  - Captura en Electron: barra fusionada por defecto, y la misma estirada solo en X y solo en Y.
+- [ ] JL-60 Posiciones por defecto según la forma de la pantalla.
+  - Clases de proporción, cada una con su tabla de posiciones por defecto en `hudProfiles.ts`:
+    - 16:9 (1920×1080, 1366×768);
+    - 16:10 (2000×1191 es la pantalla del creador hoy);
+    - 21:9 (2560×1080, 3440×1440);
+    - 32:9 (5120×1440).
+  - En 21:9 y 32:9, el HUD va dentro de una zona segura centrada de proporción 16:9: barras, chat, retrato y minimapa no se van a las esquinas del monitor. El mundo sí se ve a todo lo ancho.
+  - Los elementos que el jugador no ha movido siguen la tabla de su pantalla al cambiar de resolución. Los que movió, no se tocan, pero se reencajan dentro de la ventana si quedarían fuera.
+  - Ningún elemento por defecto pisa a otro. En la captura del creador, el chat tapa la fila de números de la barra.
+  - Prueba: para cada resolución de la lista, ningún par de rectángulos por defecto se solapa y todos caben en la ventana.
+  - Capturas en Electron a 1366×768, 1920×1080, 2000×1191, 2560×1080, 3440×1440 y 5120×1440 en `work/junie-jl-60/`.
+- [ ] JL-61 Integrar todos los modelos de OMP que ya están en `master` (Q29: «integrar todo»), con el procedimiento de JL-45b:
+  - FA-02 (`751ae5e`): `chame_caiman` → `caiman.glb` y `chame_heron` → `garza.glb`. Hoy siguen en `wolf` y `archer`.
+  - FA-03 (`5713839`): variantes `cripta_{rata,guardian,bruto}_{cueva,huaca}.glb` por tramo de profundidad. El tramo de cada piso está en `work/omp-fa-03/` y en OMP-POL-02. Cada piso de la cripta usa la variante de su tramo.
+  - FA-04 cuando llegue a `master`: `cerropunta_peccary` → `pecari.glb` y `cerropunta_boar` → `jabali.glb`.
+  - Pruebas: cada arquetipo carga su plantilla con los cinco clips; cada piso de la cripta pide la variante de su tramo.
+  - Captura en Electron de cada criatura en su zona y en el Compendio.
+- [ ] JL-62 Escenario `balance45` al día (diagnóstico de JL-57).
+  - Check 2: que espere que la tormenta escale con `will`, como manda Balance 45 (`aca5de4`).
+  - Check 4: decisión del coordinador: el coste 24 de Aguacero de HZ-04c-cazador (`d96bbb9`) es el diseño posterior y se queda. El check pasa a comprobar que Aguacero cuesta recurso (> 0) y que coincide con `data/`, no un umbral fijo de 40.
+  - Solo el escenario de `scripts/qaElectron.mjs`. No toques `data/`.
+- [ ] JL-63 Auditoría nombre contra modelo (Q29: «tienen nombre de una cosa y son otra, muchos con forma de perro»).
+  - Tabla en `work/junie-jl-63/NOMBRE_MODELO.md` con cada arquetipo: id, nombre, qué es (animal, persona, espíritu…), modelo que usa hoy y modelo propio que le tocaría. Marca los que no cuadran.
+  - Hoy 18 usan `wolf`: perros cimarrones, pero también un tigrillo, caimán, saínos, jaguares, ñeque, águila harpía, tapir, rana, ostra, tiburón, calamar, coyote y mono tití.
+  - Arreglo provisional, mientras OMP hace su familia: si ya existe en `assets/models/` un modelo propio más parecido que el genérico, úsalo. Ejemplos a comprobar: `buho.glb` para `boquete_owl`, `zorro.glb` para `fortuna_coyote`, `tortuga.glb`, `ave_*.glb`. Mira antes si el GLB tiene los clips de enemigo; si no los tiene, no lo cambies y anótalo.
+  - `darien_harpy` no usa la montura (Q25: la arpía real es montura y mascota). Queda para la familia de águilas de OMP-FA-21.
+  - Sin cambiar niveles, vida, daño ni botín.
+  - La tabla, ordenada por lo mal que se ve hoy, es la lista de prioridades para OMP: deja una sección «Para OMP» al final.
+- [ ] JL-64 Rework de los pisos a mano de la cripta (Q27: «estan horribles y muy simples»).
+  - Pisos de `data/dungeons/cripta-tulivieja.json`: atrio del eco, galería, cámara de la llave, patio de las celdas y santuario de la matriarca.
+  - Por piso:
+    - salas con forma: ábsides, columnas, nichos, escalones, pasillos que se ensanchan, no rectángulos;
+    - una pieza central que lo haga reconocible: el eco en el atrio, osarios en la galería, la llave en su altar, celdas con rejas en el patio, el trono de hilo de la matriarca;
+    - luz que guíe hacia la salida.
+  - Usa la utilería que ya existe (`utileria.glb`, `interiores.glb`, `mazmorra.glb`). Deja anotado dónde irá la de OMP-M25 (sarcófagos, osarios, ofrendas, velas, raíces, telarañas) cuando llegue.
+  - Conserva puertas, triggers y el recorrido de la llave: las pruebas de DUN-05 siguen verdes sin tocarlas.
+  - Mismos monstruos, niveles y botín que dejó JL-49.
+  - Capturas antes y después de cada piso en `work/junie-jl-64/`. El creador decide si le gusta.

@@ -1,3 +1,14 @@
+## 2026-11-21 — Respuestas Q27–Q30, HUD por pantalla y tanda JL-59…64 (Coord)
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`; `COLA_OMP.md` (local).
+
+**Qué se hizo:**
+- Revisión de JL-50…57 de Junie: todo aceptado. JL-55 solo cambió el arnés (`clickGroundNear`); JL-52 corrigió la coordenada del escenario, no los datos.
+- Respuestas del creador copiadas en ACCIONES_CREADOR. Q27, Q29 y Q30 cerradas; Q28 explicada con un dibujo en el chat, sigue abierta.
+- Tanda JL-59…64 para Junie: barra fusionada y escala por eje (JL-59), posiciones por forma de pantalla (JL-60), integrar FA-02…04 (JL-61), escenario `balance45` (JL-62), auditoría nombre contra modelo (JL-63) y rework de los pisos a mano de la cripta (JL-64).
+- Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
+- COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
+
 ## 2026-11-21 — OMP-FA-04: saíno y jabalí de Cerro Punta
 
 **Archivos:** `assets/models/pecari.glb`, `assets/models/jabali.glb`, `arte/blender/fauna_cerropunta.blend`, `scripts/blender/{fauna_cerropunta,validar_fauna_cerropunta,revisar_fauna_cerropunta}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
