@@ -1,3 +1,12 @@
+## 2026-11-21 — JL-89: Remapeos provisionales de nombre contra modelo (Junie)
+
+**Archivos:** `data/assets.json`, `tests/jl89_nameModelRemap.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Tres arquetipos de enemigo que usaban modelos genéricos (wolf, archer) pasan a usar sus modelos propios: ash_alpha (Tigrillo de Ceniza) → jaguar.glb, boquete_owl (Búho Chismoso) → buho.glb, fortuna_coyote (Coyote de la Helada) → zorro.glb. Los templates ya existían en assets.json; solo cambié template y model en cada entry. Las palettes y escalas se conservan.
+
+**Verificación:** 21 pruebas verdes (jl89_nameModelRemap.test.ts): GLB existen, templates correctos, clips verificados, parseAssets sin error, escalas y palettes conservadas. Typecheck limpio (solo balM3.ts ajeno). Build OK.
+
+**Falta:** Capturas en Electron (sin display).
 ## 2026-11-21 — JL-88: Utilería de la cripta integrada (Junie)
 
 **Archivos:** `src/world/designedDungeon.ts`, `src/world/dungeon.ts`, `src/render/dungeonView.ts`, `data/dungeons/cripta-tulivieja.json`, `tests/jl88_cryptProps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

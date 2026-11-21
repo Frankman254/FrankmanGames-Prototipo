@@ -2376,8 +2376,8 @@
       }
     },
     "enemy.ash_alpha": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "jaguar",
+      "model": "jaguar",
       "scale": 1.5,
       "palettes": {
         "default": {
@@ -2917,8 +2917,8 @@
       }
     },
     "enemy.boquete_owl": {
-      "template": "arquero",
-      "model": "archer",
+      "template": "buho",
+      "model": "owl",
       "scale": 1,
       "palettes": {
         "default": {
@@ -4128,8 +4128,8 @@
       }
     },
     "enemy.fortuna_coyote": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "zorro",
+      "model": "fox",
       "scale": 1.5,
       "palettes": {
         "default": {
