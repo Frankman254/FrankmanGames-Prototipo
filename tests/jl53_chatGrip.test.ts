@@ -49,12 +49,12 @@ class FakeElement {
 
 function h(spec: string, attrs?: Record<string, string>, ...children: FakeElement[]): FakeElement {
     const [tag, ...classes] = spec.split('.');
-    const el = new FakeElement(tag);
+    const el = new FakeElement(tag ?? '');
     if (classes.length) el.className = classes.join(' ');
     if (attrs) {
         for (const [k, v] of Object.entries(attrs)) {
-            if (k === 'text') el.textContent = v;
-            else el.setAttribute(k, v);
+            if (k === 'text') el.textContent = v!;
+            else el.setAttribute(k, v!);
         }
     }
     for (const c of children) el.appendChild(c);

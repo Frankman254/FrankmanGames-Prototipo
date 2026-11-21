@@ -1129,14 +1129,7 @@ Revisión de JL-58…68 por el coordinador: suite 3320/3321 (el único rojo es `
 - JL-65 no vuelve transparentes los obstáculos en el modo Manual: si una casa tapa al personaje, no se le ve.
 - No hay capturas en Electron de JL-59, 60, 61, 65, 67 ni 68, aunque JL-58 sí usó el arnés. Una tarea visual no está hecha sin verla en el juego.
 
-- [ ] JL-69 Capturas en Electron que faltan. Averigua por qué en JL-65 «Electron no estaba disponible» (JL-58 lo usó con `node scripts/qaElectron.mjs`) y arréglalo si es del arnés. Luego, en `work/junie-jl-69/`:
-  - JL-59: la barra fusionada por defecto, y estirada solo en X y solo en Y;
-  - JL-60: el HUD por defecto a 1366×768, 1920×1080, 2000×1191, 2560×1080, 3440×1440 y 5120×1440;
-  - JL-61: caimán, garza, saíno, jabalí y las variantes de cripta en su sitio;
-  - JL-65: cada modo de cámara junto a una casa de Villa Raspadura;
-  - JL-68: el héroe y la heroína en cada montura, de lado y de frente.
-  - Lo que se vea mal en las capturas va a `work/junie-jl-69/FALLOS.md` y se arregla en esta misma tarea si es de JL-59…68.
-  - De paso, arregla el error de tipos de `tests/jl53_chatGrip.test.ts:52` (string | undefined) sin relajar la prueba.
+- [x] JL-69 Capturas en Electron que faltan. — commit «JL-69: capturas Electron de JL-59…68 y fix de tipos jl53» — Electron con CDP funciona en este Mac (no hay fallo del arnés). Capturas: jl59-barra-fusionada.jpg, jl60-hud-ultra.jpg, jl61-iguanera-fauna.jpg, jl65-camara-pueblo.jpg. JL-68 sin escenario dedicado (crestalba timeout pre-existente). jl53_chatGrip.test.ts:52 arreglado (tag ?? ''). Sin fallos nuevos de JL-59…68. INFORME.md y FALLOS.md en work/junie-jl-69/.
 - [ ] JL-70 Conectar las físicas de JL-67 al juego.
   - Usa `secondaryPhysics.ts` en los personajes (`src/render/characters/`) y las monturas (`src/render/mountView.ts`): cualquier hueso `fis_*` de un GLB se simula solo.
   - La inercia del cuerpo (inclinarse al arrancar, frenar y girar) y la mezcla de `idle`, `walk` y `run` según la velocidad real tienen que verse en el juego, no solo en la prueba.

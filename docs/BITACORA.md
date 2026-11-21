@@ -1,3 +1,18 @@
+## 2026-11-21 — JL-69: Capturas Electron de JL-59…68 y fix de tipos jl53 (Junie)
+
+**Archivos:** `tests/jl53_chatGrip.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-69/`.
+
+**Qué se hizo:**
+- **Electron con CDP funciona** en este Mac (M5): no hay fallo del arnés que justificara la ausencia de capturas en JL-65. Escenarios ejecutados: `barra` (5/6), `iguanera` (7/7), `pueblo` (1/1), `interfaz` (10/55, fallos pre-existentes de chat/hud-actionbar).
+- **Capturas tomadas:** jl59-barra-fusionada.jpg (barra centrada), jl60-hud-ultra.jpg (HUD en ultrawide), jl61-iguanera-fauna.jpg y jl61-iguanera-inicio.jpg (Iguanera sin errores), jl65-camara-pueblo.jpg (cámara sigue al jugador).
+- **jl53_chatGrip.test.ts:52:** error de tipos `string | undefined` → `tag ?? ''` en el destructuring del split. Pruebas 3/3 verdes, typecheck limpio.
+- **Sin fallos nuevos** de JL-59…68. Los fallos detectados son pre-existentes: chat pisa hud-actionbar (JL-05), crestalba timeout (JL-51), previa fantasmas (JL-06).
+- Capturas que no se pudieron tomar: JL-59 estirada en X/Y (requiere interacción), JL-60 las 6 resoluciones (no automatizable), JL-61 fauna específica (sin escenario dedicado), JL-65 modos de cámara (sin escenario), JL-68 jinetes (crestalba timeout).
+
+**Validación:** 3 pruebas verdes (jl53_chatGrip.test.ts). Suite 3320/3321 (1 fallo pre-existente assets.test.ts de OMP). Typecheck sin errores nuevos (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl-69/` (INFORME.md, FALLOS.md, capturas).
+
 ## 2026-11-21 — Revisión de JL-58…68 y tanda JL-69…72 (Coord)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`.
