@@ -255,6 +255,22 @@
 - Decisión del coordinador en JL-62: el coste 24 de Aguacero (`d96bbb9`, HZ-04c) es posterior y se queda; el escenario deja de exigir ≥ 40.
 - COLA_OMP: variantes de rana aprobadas en FA-07, familia de águilas FA-21 y orden FA-07 → FA-21 → OMP-M25 → resto.
 
+## 2026-11-21 — OMP-FA-06: ñeque y tapir del Darién
+
+**Archivos:** `assets/models/neque.glb`, `assets/models/tapir.glb`, `arte/blender/fauna_darien.blend`, `scripts/blender/{fauna_darien,validar_fauna_darien,revisar_fauna_darien}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Dos especies nuevas con esqueleto propio `FG_Neque`/`FG_Tapir` (mismos nombres de hueso entre sí; el del tapir añade `trunk1`/`trunk2` para la trompa): una sola función de clips, amplitudes ×0,85 en el tapir por peso.
+- **Ñeque** (`darien_neque`): roedor grande — el creador lo confirmó roedor, no espíritu (Q25) —, 572 tri, 0,58 m de morro a grupa, 0,35 m de alto. Cabeza ancha de mandíbula potente, incisivos que asoman, oreja corta redondeada, crin erizada y bigotes en tarjeta; pelaje rojizo con vientre claro.
+- **Tapir** (`darien_tapir`, élite): 620 tri, 1,52 m de punta de trompa a grupa, 1,07 m de alto con la cruz en ~0,83 m. Cuerpo de barril con la grupa tan alta como la cruz, trompa corta colgante de dos tramos, crin rígida en la nuca, manchas y listas claras en carrillo y garganta, calcetines claros y pezuñas.
+- Atacar: el ñeque se alza sobre las traseras y muerde; el tapir embiste con trompazo (acumula erguido, lanza la trompa abajo). Reposo, Caminar, Golpeado y Morir sin salto; apoyo z≈0.
+- Correcciones tras ver las láminas: el primer tapir quedó corto (1,16 m) y se alargó el cuerpo en huesos y malla; la crin nucal pasaba de 1,10 m y se bajó; los bigotes del ñeque asomaban como palos y se acortaron.
+- Referencias: no había lámina REF-01 para esta familia; silueta de campo (Dasyprocta / tapir centroamericano) anotada en el generador, clean-room.
+
+**Validación:** `validar_fauna_darien.py` en verde (rig, cinco clips sin sufijo, ≤1.500 tri, apoyo z≈0, dimensiones en rango); láminas de 5 vistas + 5 pasos de andar revisadas y aceptadas; `npx vitest run tests/modelos.test.ts` 12/12. No toca `data/` ni `src/`: lo integra Junie (JL-45).
+
+**Evidencia:** `work/omp-fa-06/revision_{neque,tapir}.png` y las 40 vistas sueltas.
+
 ## 2026-11-21 — OMP-FA-05: jaguar del Barú y su anciano
 
 **Archivos:** `assets/models/jaguar.glb`, `assets/models/jaguar_anciano.glb`, `arte/blender/fauna_baru.blend`, `scripts/blender/{fauna_baru,validar_fauna_baru,revisar_fauna_baru}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
