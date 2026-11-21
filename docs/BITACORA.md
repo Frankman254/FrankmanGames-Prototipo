@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-105: Consola limpia tras los cambios grandes (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl105/INFORME.md`.
+
+**Qué se hizo:** Recorrido de Electron con 13 escenarios representativos (pueblo, Iguanera, cripta, combate, audio, mazmorra, viaje, banco, interfaz, previa, muerte, botin, mazmorraCompleta) para verificar que no hay errores ni avisos nuevos en la consola tras los cambios grandes de JL-59…JL-72.
+
+**Resultado:** 133/140 checks en verde, **0 errores nuevos de consola**. Los fallos son pre-existentes: error Babylon `postProcessManager` en cripta (documentado en JL-81), fallos del arnés en previa (documentados en JL-75) y timeout de banco (documentado en JL-09).
+
+**Validación:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs <escenario>` para cada uno de los 13 escenarios. INFORME.md en `work/junie-jl105/`.
+
+---
+
 ## 2026-11-21 — JL-104: Hashes reales en TAREAS.md (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
