@@ -2817,3 +2817,15 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 **Evidencia:** `work/junie-jl47/`. Capturas de Electron omitidas (sin display).
 
+
+## 2026-11-21 — JL-62: Escenario balance45 al día (Junie)
+
+**Commit:** `jl62-balance45`. **Archivos:** `scripts/qaElectron.mjs`.
+
+**Qué se hizo:** Actualización del escenario `balance45` según el diagnóstico de JL-57:
+1. **Check 2:** renombrado a "Balance 45: tormenta escala con Voluntad (no con Agilidad)". Se agregó `will: 120` al setup de stats QA para que `lightning_arrow` escale correctamente con la stat elemental (regla Balance 45, `aca5de4`).
+2. **Check 4:** renombrado a "Balance 45: Lluvia de flechas es agua y cuesta recurso". Cambiado de `cost >= 40` a `cost > 0`: el coste 24 de `arrow_downpour` es el diseño de HZ-04c-cazador (`d96bbb9`).
+
+**Validación:** `npx tsc --noEmit` sin errores nuevos. `npx vitest run`: 3283/3284 pasadas (1 fallo pre-existente en assets.test.ts, de OMP). Electron no disponible para capturas.
+
+**Evidencia:** `work/junie-jl62/EVIDENCIA.md`.

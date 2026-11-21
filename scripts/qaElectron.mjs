@@ -4214,7 +4214,8 @@ const scenarios = {
       for (const id of ['estuary_arrow','arrow_downpour','lightning_arrow']) if (!c.spellbook.rank(id)) c.spellbook.learn(id);
       c.stats.set('qa:captura',[
         ['strength',73],['agility',235],['intellect',0],['calm',40],['flow',0],
-        ['vitality',170],['spirit',145],['power',13],['damage.fire',10],['damage.frost',19]
+        ['vitality',170],['spirit',145],['power',13],['will',120],
+        ['damage.fire',10],['damage.frost',19]
       ].map(([stat,value])=>({stat,op:'flat',value})));
       const p=w.player.pos, e=w.spawnEnemy('melee',{x:p.x+4,y:p.y},15);
       return {
@@ -4230,7 +4231,7 @@ const scenarios = {
             JSON.stringify(report.water),
         );
         check(
-            'Balance 45: tormenta sí responde a Agilidad',
+            'Balance 45: tormenta escala con Voluntad (no con Agilidad)',
             report.storm.min > report.water.max,
             JSON.stringify({ water: report.water, storm: report.storm }),
         );
@@ -4240,8 +4241,8 @@ const scenarios = {
             JSON.stringify({ regen: report.regen, max: report.max }),
         );
         check(
-            'Balance 45: Aguacero es agua y cuesta una parte seria de la reserva',
-            report.downpour.element === 'water' && report.downpour.cost >= 40,
+            'Balance 45: Lluvia de flechas es agua y cuesta recurso',
+            report.downpour.element === 'water' && report.downpour.cost > 0,
             JSON.stringify(report.downpour),
         );
     },

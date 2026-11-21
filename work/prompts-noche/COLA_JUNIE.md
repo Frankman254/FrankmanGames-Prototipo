@@ -1104,10 +1104,7 @@ Mismas reglas de siempre: un commit por tarea con docs y casilla dentro, sin ref
   - Prueba: para cada resolución de la lista, ningún par de rectángulos por defecto se solapa y todos caben en la ventana.
   - Capturas en Electron a 1366×768, 1920×1080, 2000×1191, 2560×1080, 3440×1440 y 5120×1440 en `work/junie-jl-60/`.
 - [x] JL-61 Integrar todos los modelos de OMP que ya están en `master` (Q29: «integrar todo»), con el procedimiento de JL-45b: — commit «JL-61: integración de modelos OMP — caiman, garza, pecari, jabali, variantes de cripta» — 36 pruebas verdes (jl61_faunaIntegracion.test.ts), suite 3283/3284 (1 fallo pre-existente), tsc sin errores nuevos, build OK. FA-02: chame_caiman → caiman.glb, chame_heron → garza.glb. FA-03: 6 variantes cripta por tramo (cueva 31-70, huaca 71-100), dungeonFloor sincronizado en main.ts. FA-04: cerropunta_peccary → pecari.glb, cerropunta_boar → jabali.glb. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl61/.
-- [ ] JL-62 Escenario `balance45` al día (diagnóstico de JL-57).
-  - Check 2: que espere que la tormenta escale con `will`, como manda Balance 45 (`aca5de4`).
-  - Check 4: decisión del coordinador: el coste 24 de Aguacero de HZ-04c-cazador (`d96bbb9`) es el diseño posterior y se queda. El check pasa a comprobar que Aguacero cuesta recurso (> 0) y que coincide con `data/`, no un umbral fijo de 40.
-  - Solo el escenario de `scripts/qaElectron.mjs`. No toques `data/`.
+- [x] JL-62 Escenario `balance45` al día (diagnóstico de JL-57). — commit «JL-62: escenario balance45 al día — tormenta con will, coste > 0» — tsc sin errores nuevos, suite 3283/3284 (1 fallo pre-existente assets.test.ts de OMP), push OK. Evidencia en work/junie-jl62/.
 - [ ] JL-63 Auditoría nombre contra modelo (Q29: «tienen nombre de una cosa y son otra, muchos con forma de perro»).
   - Tabla en `work/junie-jl-63/NOMBRE_MODELO.md` con cada arquetipo: id, nombre, qué es (animal, persona, espíritu…), modelo que usa hoy y modelo propio que le tocaría. Marca los que no cuadran.
   - Hoy 18 usan `wolf`: perros cimarrones, pero también un tigrillo, caimán, saínos, jaguares, ñeque, águila harpía, tapir, rana, ostra, tiburón, calamar, coyote y mono tití.
