@@ -1188,7 +1188,7 @@ Reglas comunes de toda la bolsa:
 - [x] JL-92 Escenario `modosCamara`: los cuatro modos de JL-65 junto a una casa. En Manual no hay zoom automático y el obstáculo se transparenta (JL-71). — commit «JL-92: escenario modosCamara — 4 modos, sin zoom automático, KeyZ y rueda» — 13/13 checks en verde, capturas en work/junie-jl-92/.
 - [x] JL-93 Escenario `monturas`: montar cada montura, captura del jinete sentado (JL-68) y bajar. Sin errores de consola. — commit «JL-93: escenario monturas — 4 monturas, jinete idle, rider_root» — 10/10 en verde, 8 capturas (frente y lado) en work/junie-jl93/. Suite 3442/3443 (1 fallo pre-existente assets.test.ts de OMP).
 - [x] JL-94 Escenario `hudSinSolapes`: en 768p, 1080p, 1440p y ultra-wide, ningún panel del HUD por defecto se solapa con otro (cajas del DOM). — commit «JL-94: escenario hudSinSolapes — 4 resoluciones, 13/13 OK» — 13/13 checks en verde, tsc sin errores nuevos. Capturas en work/junie-jl94/.
-- [ ] JL-95 Escenario `fisicas`: 20 personajes con físicas secundarias (JL-70). Medir ms por fotograma y FPS, y guardar la cifra en el informe.
+- [x] JL-95 Escenario `fisicas`: 20 personajes con físicas secundarias (JL-70). Medir ms por fotograma y FPS, y guardar la cifra en el informe. — commit «JL-95: escenario fisicas — 20 personajes, 63 fps, delta 5.8 ms» — 4/4 checks en verde, INFORME.md y datos.json en work/junie-jl-95/.
 
 ### Pruebas que faltan
 - [ ] JL-96 Prueba de migración de una partida vieja «dorada»: una partida de antes de JL-59 y JL-65 carga con la escala del HUD y el modo de cámara correctos.

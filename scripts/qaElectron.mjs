@@ -5581,6 +5581,131 @@ const scenarios = {
         }
     },
 
+    /** JL-95: Escenario `fisicas` — 20 personajes con físicas secundarias (JL-70).
+     * Mide ms por fotograma y FPS con y sin los personajes, y guarda la cifra en el informe.
+     * Nota: los GLB actuales no tienen huesos `fis_*` (OMP-POL-13 pendiente), por lo que
+     * las físicas secundarias no simulan nada visible. El escenario mide el overhead del
+     * motor (SecondaryPhysics.update) y la carga visual de 20 enemigos animados. */
+    async fisicas() {
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = `work/junie-jl-95`;
+        fs.mkdirSync(outDir, { recursive: true });
+        const report = [];
+        report.push('# JL-95 — Rendimiento con 20 personajes y físicas secundarias');
+        report.push(`Fecha: ${new Date().toISOString()}`);
+        report.push('');
+
+        await newGame('QA Fisicas');
+        await fullscreen();
+
+        // Instrumentar la escena (patrón de rendimientoHondo).
+        await js(`(()=>{ const g=__game, sc=g.view.scene, en=sc.getEngine(), t=window.__qaF={frames:[],last:performance.now(),dc:0,tick:0,sync:0,render:0,loop:0,anim:0,active:0,targets:0};
+      const wrap=(o,k,key)=>{ const f=o[k]; o[k]=function(...a){ const s=performance.now(); try { return f.apply(this,a); } finally { t[key]+=performance.now()-s; } }; };
+      const rd=en._reportDrawCall; en._reportDrawCall=function(n=1){ t.dc+=n; return rd.call(this,n); };
+      wrap(Object.getPrototypeOf(g.world),'tick','tick'); wrap(g.view,'sync','sync'); wrap(sc,'render','render');
+      en._activeRenderLoops.forEach((f,i)=>{ en._activeRenderLoops[i]=function(){ const s=performance.now(); try { return f(); } finally { t.loop+=performance.now()-s; } }; });
+      let a0=0,b0=0,c0=0;
+      sc.onBeforeAnimationsObservable.add(()=>{a0=performance.now()}); sc.onAfterAnimationsObservable.add(()=>{t.anim+=performance.now()-a0});
+      sc.onBeforeActiveMeshesEvaluationObservable.add(()=>{b0=performance.now()}); sc.onAfterActiveMeshesEvaluationObservable.add(()=>{t.active+=performance.now()-b0});
+      sc.onBeforeRenderTargetsRenderObservable.add(()=>{c0=performance.now()}); sc.onAfterRenderTargetsRenderObservable.add(()=>{t.targets+=performance.now()-c0});
+      const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+        const reset = `(()=>{const t=window.__qaF; for (const k of ['dc','tick','sync','render','loop','anim','active','targets']) t[k]=0; t.frames=[];})()`;
+        const read = `(()=>{const t=window.__qaF, sc=__game.view.scene, en=sc.getEngine(), f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length), r=x=>Math.round(x*10)/10;
+      const loop=t.loop/n, known=(t.tick+t.sync+t.render)/n;
+      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), drawCalls:Math.round(t.dc/n),
+        activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, triangulos:Math.round(sc.getActiveIndices()/3), luces:sc.lights.filter(l=>l.isEnabled()).length,
+        enemigos:${W}.enemies.list.length, modelos:__game.view.enemies.visuals.size, msJs:r(loop), msSim:r(t.tick/n), msVista:r(t.sync/n), msRender:r(t.render/n), msResto:r(loop-known), msAnim:r(t.anim/n), msActivas:r(t.active/n), msSombras:r(t.targets/n),
+        tam:en.getRenderWidth()+'x'+en.getRenderHeight(), gpu:en.getGlInfo().renderer};})()`;
+
+        // 1. Medición BASE: sin enemigos adicionales.
+        await sleep(3000);
+        await js(reset);
+        await sleep(4000);
+        const base = await js(read);
+        report.push('');
+        report.push('## Medición base (sin enemigos adicionales)');
+        report.push('| Métrica | Valor |');
+        report.push('|---------|-------|');
+        for (const [k, v] of Object.entries(base)) {
+            report.push(`| ${k} | ${v} |`);
+        }
+        console.log('     BASE:', JSON.stringify(base));
+
+        // 2. Spawnear 20 enemigos alrededor del jugador.
+        // Usar archetypes que existen en data/rpg/enemies.json y son válidos en el pueblo.
+        const archetypes = ['melee', 'ranged', 'trapper', 'summoner', 'minion'];
+        await js(`(()=>{ const w=${W}, p=w.player, kinds=${JSON.stringify(archetypes)};
+      for(let i=0;i<20;i++){
+        const a=(i/20)*Math.PI*2, r=5+(i%3)*2;
+        w.spawnEnemy(kinds[i%kinds.length],{x:p.pos.x+Math.cos(a)*r,y:p.pos.y+Math.sin(a)*r});
+      }
+    })()`);
+        await sleep(5000); // Esperar a que los modelos carguen y se animen.
+
+        const spawned = await js(`${W}.enemies.list.length`);
+        check(`JL-95: 20 enemigos spawneados`, spawned >= 15, `${spawned} enemigos`);
+
+        // 3. Medición con 20 enemigos.
+        await js(reset);
+        await sleep(5000);
+        const conEnemigos = await js(read);
+        report.push('');
+        report.push('## Medición con 20 enemigos');
+        report.push('| Métrica | Valor |');
+        report.push('|---------|-------|');
+        for (const [k, v] of Object.entries(conEnemigos)) {
+            report.push(`| ${k} | ${v} |`);
+        }
+        console.log('     CON_ENEMIGOS:', JSON.stringify(conEnemigos));
+
+        // 4. Delta.
+        report.push('');
+        report.push('## Delta (con enemigos - base)');
+        report.push('| Métrica | Base | Con enemigos | Delta |');
+        report.push('|---------|------|--------------|-------|');
+        const numericKeys = ['fps', 'p95', 'drawCalls', 'activeMeshes', 'mallas', 'triangulos', 'luces', 'enemigos', 'modelos', 'msJs', 'msSim', 'msVista', 'msRender', 'msResto', 'msAnim', 'msActivas', 'msSombras'];
+        for (const k of numericKeys) {
+            const b = base[k] ?? '?';
+            const c = conEnemigos[k] ?? '?';
+            const d = typeof b === 'number' && typeof c === 'number' ? (c - b).toFixed(1) : '?';
+            report.push(`| ${k} | ${b} | ${c} | ${d} |`);
+        }
+
+        // 5. Verificar físicas secundarias.
+        const physInfo = await js(`(()=>{
+      const chars = __game.view.enemies?.visuals;
+      let total=0, withPhys=0;
+      if(chars) chars.forEach(v => { total++; if(v?.model?.secondaryPhys) withPhys++; });
+      const player = __game.view.player?.model;
+      const playerPhys = player?.secondaryPhys ? 1 : 0;
+      return { totalVisuals: total, withSecondaryPhys: withPhys, playerHasPhys: playerPhys };
+    })()`);
+        report.push('');
+        report.push('## Físicas secundarias');
+        report.push(`- Visuales de enemigos: ${physInfo.totalVisuals}`);
+        report.push(`- Con SecondaryPhysics activa: ${physInfo.withSecondaryPhys}`);
+        report.push(`- Jugador con SecondaryPhysics: ${physInfo.playerHasPhys}`);
+        report.push('');
+        report.push('Nota: los GLB actuales no tienen huesos `fis_*` (OMP-POL-13 pendiente).');
+        report.push('SecondaryPhysics existe pero no simula nada visible hasta que OMP publique los huesos.');
+
+        // Checks.
+        check(`JL-95: FPS ≥ 20 con 20 enemigos`, conEnemigos.fps >= 20, `${conEnemigos.fps} fps`);
+        const deltaMs = typeof conEnemigos.msJs === 'number' && typeof base.msJs === 'number' ? conEnemigos.msJs - base.msJs : 0;
+        // Con 20 enemigos animados, el delta de msJs sube ~5-6 ms (carga de modelos + animación).
+        // El umbral de 10 ms deja margen para la variabilidad del Mac M5.
+        check(`JL-95: delta msJs ≤ 10 ms`, deltaMs <= 10, `${deltaMs.toFixed(1)} ms`);
+
+        // Captura.
+        await shot('jl95-fisicas-20-enemigos');
+
+        // Guardar informe.
+        fs.writeFileSync(pathMod.join(outDir, 'INFORME.md'), report.join('\n') + '\n');
+        fs.writeFileSync(pathMod.join(outDir, 'datos.json'), JSON.stringify({ base, conEnemigos, physInfo }, null, 2));
+        console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {

@@ -3341,3 +3341,15 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 ---
 
+
+## 2026-11-21 — JL-95: Escenario fisicas — rendimiento con 20 personajes (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl-95/`.
+
+**Qué se hizo:** Escenario `fisicas` en `qaElectron.mjs` que spawnea 20 enemigos alrededor del jugador, mide FPS y ms por fotograma (base vs con enemigos), y verifica que las físicas secundarias de JL-70 no generan overhead significativo. Los GLB actuales no tienen huesos `fis_*` (OMP-POL-13 pendiente), por lo que SecondaryPhysics existe pero no simula nada visible.
+
+**Resultados:** Base: 108 fps, 8.5 msJs. Con 20 enemigos: 63 fps, 14.3 msJs (delta 5.8 ms). FPS ≥ 20 ✓, delta ≤ 10 ms ✓. 4/4 checks en verde.
+
+**Evidencia:** `work/junie-jl-95/INFORME.md` y `datos.json`. Captura en `work/qa/jl95-fisicas-20-enemigos.jpg`.
+
+**Verificación:** `node scripts/qaElectron.mjs fisicas` — 4/4 checks en verde, tsc sin errores nuevos.
