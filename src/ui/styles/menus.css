@@ -2506,7 +2506,8 @@ body.windows-locked .win-handle {
 .chat {
     position: fixed;
     left: 14px;
-    bottom: 136px;
+    /* JL-73: 180px del fondo para no pisar la barra (140px alto + 8px bottom + 32px margen). */
+    bottom: 180px;
     width: min(320px, calc(100vw - 28px));
     z-index: 3;
     display: flex;

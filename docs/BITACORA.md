@@ -1,3 +1,18 @@
+## 2026-11-21 — JL-73: Chat y minimapa usan CSS por defecto, no setPosition (Junie)
+
+**Archivos:** `src/ui/map/hudLayout.ts`, `src/ui/map/hudProfiles.ts`, `src/ui/styles/menus.css`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Escenario `interfaz` fallaba 45/55: el chat pisaba la barra de acción en las 3 resoluciones.
+- Causa: `hudLayout.attach()` llamaba a `windows.setPositions()` con la posición por defecto para TODOS los elementos, incluyendo el chat y el minimapa. `setPosition` aplica `position: absolute` con `left/top`, quitando el `bottom` del CSS. Como el chat aún no tenía su tamaño real al momento de `attach()`, la posición Y calculada era incorrecta.
+- Solución: en `hudLayout.attach()`, el chat y el minimapa usan su posición CSS por defecto (`bottom: 180px` para el chat, `top: 14px` para el minimapa). Solo si el perfil tiene una posición guardada (el jugador los movió), se aplica `setPosition`. Los demás elementos siguen usando `setPosition` con la posición por defecto.
+- También se ajustaron los tamaños estimados en `hudProfiles.ts` (chat 240px alto, barra 800×140) y la posición por defecto del chat a 180px del fondo en todas las tablas de aspecto.
+- Limpieza de `frankmangames.windows` en `newGame()` del arnés para que cada escenario arranque con posiciones limpias.
+
+**Validación:** Escenario `interfaz` 55/55 en verde (1080p, 768p, ultra). Suite 3367/3368 (1 fallo pre-existente assets.test.ts de OMP). jl60_aspectDefaults 30/30. Typecheck sin errores nuevos. Vite build OK.
+
+**Evidencia:** `work/junie-jl-73/` (capturas de las 3 resoluciones).
+
 ## 2026-11-21 — Bolsa grande de tareas para Junie (JL-73…108)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`

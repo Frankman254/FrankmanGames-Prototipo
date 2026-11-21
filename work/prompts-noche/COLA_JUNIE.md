@@ -1159,7 +1159,7 @@ Reglas comunes de toda la bolsa:
 - Un modelo nuevo solo se usa si su GLB ya está en `assets/models/` y OMP lo publicó. No inventes ids de arquetipo: lo que no exista se propone en `work/`.
 
 ### QA: los rojos que quedan del arnés (`work/junie-qa01/RESUMEN.md`, `work/junie-jl-69/FALLOS.md`)
-- [ ] JL-73 Repetir `interfaz` tras JL-60. Si el chat aún pisa la barra de acción en 768p o ultra-wide, corrige la colocación por defecto del chat. Escenario en verde y capturas de las tres resoluciones.
+- [x] JL-73 Repetir `interfaz` tras JL-60. Si el chat aún pisa la barra de acción en 768p o ultra-wide, corrige la colocación por defecto del chat. Escenario en verde y capturas de las tres resoluciones. — commit «JL-73: chat y minimapa usan CSS por defecto, no setPosition» — interfaz 55/55 en verde (1080p, 768p, ultra), suite 3367/3368 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, build OK. Capturas en work/junie-jl-73/.
 - [ ] JL-74 Escenario `barra`: las secciones del personaje y de la mascota se solapan al arrastrar. Corrige el solape y deja el escenario en verde.
 - [ ] JL-75 Escenario `previa`: los 5 fallos de fantasmas y destino del salto (JL-06). Escenario en verde o informe de cuáles son del arnés y cuáles del juego.
 - [ ] JL-76 Escenario `Tecla`: la segunda pulsación no confirma el movimiento. Corrige y deja el escenario en verde.

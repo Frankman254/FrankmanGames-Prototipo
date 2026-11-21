@@ -430,8 +430,12 @@ async function newGame(name, { island = false, crossed = false, devMount = false
     // JL-50: resetear idioma a español antes de cada partida, para que el escenario `ingles`
     // no deje los siguientes buscando "Nueva partida" en inglés.
     await js(`(()=>{ try{ const o=JSON.parse(localStorage.getItem('frankmangames.options')||'null'); if(o){o.language='es'; localStorage.setItem('frankmangames.options',JSON.stringify(o)); } }catch(e){} })()`);
+    // JL-73: borrar las posiciones del HUD guardadas para que cada escenario use las por defecto.
+    await js(`(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); if(s){ for(const p of (s.profiles||[])) p.positions={}; localStorage.setItem('frankmangames.hudProfiles',JSON.stringify(s)); } }catch(e){} })()`);
     // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
+    // JL-73: recargar para que las nuevas posiciones por defecto se apliquen.
     if (!firstGame) await cdp('Page.navigate', { url });
+    if (!firstGame) await sleep(500);
     firstGame = false;
     // F21: sin la montura de pruebas, salvo que el recorrido la pida (anda a otra velocidad).
     await js(`localStorage.setItem('frankmangames.devMount', ${JSON.stringify(devMount ? '1' : '0')})`).catch(() => {});

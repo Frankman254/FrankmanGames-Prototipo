@@ -158,8 +158,16 @@ export class HudLayout {
         this.els.set(key, el);
         this.windows.attach(el, grip, key);
         // JL-60: usa la posición del perfil si existe, sino la de la tabla de proporción.
-        const p = this.profiles.active.positions[key] ?? getDefaultPositions(window.innerWidth, window.innerHeight)[key];
-        if (p) requestAnimationFrame(() => this.windows.setPositions([key], { [key]: p }));
+        // JL-73: el chat y el minimapa usan su posición CSS por defecto; setPosition solo si el perfil
+        // tiene una posición guardada (el jugador los movió). De lo contrario, setPosition aplica
+        // left/top antes de que el elemento tenga su tamaño real y lo coloca mal.
+        const p = this.profiles.active.positions[key];
+        if (p) {
+            requestAnimationFrame(() => this.windows.setPositions([key], { [key]: p }));
+        } else if (key !== 'chat' && key !== 'minimap') {
+            const def = getDefaultPositions(window.innerWidth, window.innerHeight)[key];
+            if (def) requestAnimationFrame(() => this.windows.setPositions([key], { [key]: def }));
+        }
     }
 
     /**

@@ -406,7 +406,8 @@ const ASPECT_TABLES: Record<AspectClass, AspectDefaults> = {
             'quest-tracker': { right: 8, top: 234 },
             'world-info': { x: 0, y: 6 },
             'combat-bar': { x: 0, y: 34 },
-            chat: { x: 6, bottom: 136 },
+            // JL-73: chat a 180px del fondo (barra a 8px + 140px alto + 32px margen).
+            chat: { x: 6, bottom: 180 },
             'hud-bar': { x: 0, bottom: 8 },
             'hud-pet': { right: 8, bottom: 8 },
         },
@@ -419,7 +420,8 @@ const ASPECT_TABLES: Record<AspectClass, AspectDefaults> = {
             'quest-tracker': { right: 8, top: 234 },
             'world-info': { x: 0, y: 6 },
             'combat-bar': { x: 0, y: 34 },
-            chat: { x: 6, bottom: 136 },
+            // JL-73: chat a 180px del fondo.
+            chat: { x: 6, bottom: 180 },
             'hud-bar': { x: 0, bottom: 8 },
             'hud-pet': { right: 8, bottom: 8 },
         },
@@ -434,7 +436,8 @@ const ASPECT_TABLES: Record<AspectClass, AspectDefaults> = {
             'quest-tracker': { right: 320 + 8, top: 240 },
             'world-info': { x: 320, y: 6 },
             'combat-bar': { x: 320, y: 34 },
-            chat: { x: 320 + 6, bottom: 136 },
+            // JL-73: chat a 180px del fondo.
+            chat: { x: 320 + 6, bottom: 180 },
             'hud-bar': { x: 320, bottom: 8 },
             'hud-pet': { right: 320 + 8, bottom: 8 },
         },
@@ -449,7 +452,8 @@ const ASPECT_TABLES: Record<AspectClass, AspectDefaults> = {
             'quest-tracker': { right: 1120 + 8, top: 240 },
             'world-info': { x: 1120, y: 6 },
             'combat-bar': { x: 1120, y: 34 },
-            chat: { x: 1120 + 6, bottom: 136 },
+            // JL-73: chat a 180px del fondo.
+            chat: { x: 1120 + 6, bottom: 180 },
             'hud-bar': { x: 1120, bottom: 8 },
             'hud-pet': { right: 1120 + 8, bottom: 8 },
         },
@@ -506,8 +510,9 @@ const ESTIMATED_SIZE: Record<string, { w: number; h: number }> = {
     'quest-tracker': { w: 206, h: 120 },
     'world-info': { w: 200, h: 20 },
     'combat-bar': { w: 400, h: 28 },
-    chat: { w: 340, h: 200 },
-    'hud-bar': { w: 640, h: 128 },
+    // JL-73: tamaños reales del DOM — chat más alto (240px con input), barra más ancha (800px con 3 filas).
+    chat: { w: 340, h: 240 },
+    'hud-bar': { w: 800, h: 140 },
     'hud-pet': { w: 160, h: 40 },
     'hud-sec-character': { w: 120, h: 100 },
     'hud-sec-items': { w: 200, h: 46 },
