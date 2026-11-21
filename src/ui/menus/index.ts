@@ -977,10 +977,19 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                         'overlay',
                     ),
                 resetWindows: () => {
-                    windows.reset();
-                    hudLayout.profiles.resetActive();
-                    hudLayout.apply();
-                    toast('Ventanas en su sitio de siempre');
+                    ctx.confirm({
+                        title: trf('Restablecer posiciones'),
+                        text: trf(
+                            '¿Volver a colocar todos los elementos del HUD en su posición por defecto para esta pantalla? Se perderá la disposición actual.',
+                        ),
+                        yes: trf('Restablecer'),
+                        onYes: () => {
+                            windows.reset();
+                            hudLayout.profiles.resetActive();
+                            hudLayout.apply();
+                            toast(trf('Ventanas en su sitio de siempre'));
+                        },
+                    });
                 },
                 keyLabel: (a) => keys.label(a),
                 editHud: () => {

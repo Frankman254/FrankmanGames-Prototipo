@@ -1199,7 +1199,7 @@ Reglas comunes de toda la bolsa:
 ### Pequeñas mejoras de juego
 - [x] JL-100 Una tecla para cambiar el modo de cámara en juego (configurable en Opciones → Controles), con aviso breve del modo elegido. — Ya implementado: cameraNextMode en keybindings.ts (Z/clic rueda), handler en main.ts con toast, selector en modals.ts. Evidencia en work/junie-jl100/EVIDENCIA.md.
 - [x] JL-101 Una tecla para cambiar el modo de lanzar en juego, con aviso breve, igual que JL-100. — commit «JL-101: tecla castModeNext cicla modos de lanzar» — 8 pruebas verdes (jl101_castModeKey.test.ts), suite 3496/3496, tsc limpio, build OK, push OK. castModeNext en ACTIONS sin tecla por defecto (el jugador la asigna en Opciones → Controles). Handler en main.ts cicla CAST_MODES y muestra toast. Evidencia en tests/jl101_castModeKey.test.ts.
-- [ ] JL-102 Botón «Restablecer posiciones por defecto» del HUD para la relación de aspecto actual, con confirmación dentro del juego.
+- [x] JL-102 Botón «Restablecer posiciones por defecto» del HUD para la relación de aspecto actual, con confirmación dentro del juego. — commit «JL-102: confirmación antes de restablecer posiciones del HUD» — 11 pruebas verdes (jl102_resetConfirm.test.ts), suite 3506/3507 (1 fallo pre-existente assets.test.ts de OMP), tsc sin errores nuevos, build OK, push OK. ctx.confirm en resetWindows, clave i18n en en.json. Evidencia en tests/jl102_resetConfirm.test.ts.
 - [ ] JL-103 Opción para mostrar u ocultar el nombre del modo de cámara junto al minimapa. Desactivada por defecto.
 
 ### Limpieza y cierre

@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-102: Confirmación antes de restablecer posiciones del HUD (Junie)
+
+**Archivos:** `src/ui/menus/index.ts`, `data/i18n/en.json`, `tests/jl102_resetConfirm.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El botón "Restablecer posiciones" del menú Opciones → Interfaz ahora muestra una confirmación antes de ejecutar el reset. Antes, pulsar el botón reseteaba inmediatamente las posiciones del HUD sin aviso. Ahora aparece un modal de confirmación con el título "Restablecer posiciones" y el texto "¿Volver a colocar todos los elementos del HUD en su posición por defecto para esta pantalla? Se perderá la disposición actual." Al aceptar, se ejecuta `windows.reset()`, `profiles.resetActive()` y `hudLayout.apply()`, y se muestra un toast "Ventanas en su sitio de siempre". Las claves i18n se añadieron a `en.json` (español e inglés).
+
+**Validación:** 11 pruebas verdes (jl102_resetConfirm.test.ts): resetWindows llama a ctx.confirm, title/text/yes con trf(), onYes ejecuta los tres pasos del reset y muestra toast, getDefaultPositions devuelve posiciones para los elementos principales, claves i18n presentes. Suite 3506/3507 (1 fallo pre-existente assets.test.ts de OMP). Typecheck limpio (solo balM3.ts ajeno). Build OK.
+
+---
+
 ## 2026-11-21 - OMP-FA-13: pirata, capitán y marinero ahogado
 
 **Archivos:** `assets/models/{pirata_bocanas,capitan_calipso,marinero_ahogado}.glb`, `arte/blender/gente_del_mar.blend`, `scripts/blender/{gente_del_mar,validar_gente_del_mar,revisar_gente_del_mar}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
