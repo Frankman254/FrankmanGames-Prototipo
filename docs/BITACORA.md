@@ -1,3 +1,13 @@
+## 2026-11-21 — Cámara, modos de lanzar y pulido visual (Coord)
+
+**Archivos:** `tests/balance/v2Product.test.ts`, `work/prompts-noche/COLA_JUNIE.md`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`; `COLA_OMP.md` (local).
+
+**Qué se hizo:**
+- `v2Product` en verde (`81b5a77`): el tope ×2,5 mide el equipo sin la montura, que da su bono fijo por decisión del creador (Q28b). No cambia ninguna cifra.
+- JL-65 (urgente, antes de JL-59): la cámara exterior se acerca en cuanto una caja tapa el rayo y bloquea zoom y movimiento. Cuatro modos pedidos por el creador.
+- JL-66: los tres modos de lanzar ya existían (`src/sim/castModes.ts`); se revisan, se hacen visibles y se añade asistencia al apuntar.
+- OMP-POL-12: skins de indicador, marcador, trayectoria e iconos laterales, sin tocar la lógica de Junie.
+
 ## 2026-11-21 — Respuestas Q27–Q30, HUD por pantalla y tanda JL-59…64 (Coord)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`; `COLA_OMP.md` (local).
