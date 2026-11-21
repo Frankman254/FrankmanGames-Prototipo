@@ -100,7 +100,7 @@ def pirata():
     # Talega al cinto.
     b.blob((0.16 * k, 0.10 * k, 0.90 * k), (0.055 * k, 0.04 * k, 0.07 * k), m['gear'], 'hips', subdiv=1)
     # Cuchillo de lanza en la derecha: mango corto, hoja recta hacia atras.
-    hx, hy, hz2 = 0.27 * k, -0.05 * k, 0.79 * k
+    hx, hy, hz2 = -0.27 * k, -0.05 * k, 0.79 * k
     b.tube((hx, hy, hz2 + 0.03 * k), (hx, hy - 0.02 * k, hz2 + 0.15 * k), 0.016 * k, 0.014 * k, m['wood'], 'handR', sides=4)
     b.tube((hx, hy - 0.02 * k, hz2 + 0.16 * k), (hx, hy - 0.05 * k, hz2 + 0.40 * k), 0.014 * k, 0.003 * k, m['gear'], 'handR', sides=4)
     # Segundo cuchillon asomando del cinturon.
@@ -177,7 +177,7 @@ def capitan():
     b.tube((0, 0, 0.99 * k), (0, 0, 0.93 * k), 0.245 * k, 0.245 * k, m['gear'], 'hips', sides=9, flat=0.75)
     b.box((0, -0.21 * k, 0.96 * k), (0.06 * k, 0.02 * k, 0.055 * k), m['trim'], 'hips')
     # Alfanje en la derecha: guarda en D y hoja ancha curva.
-    hx, hy, hz2 = 0.27 * k, -0.05 * k, 0.79 * k
+    hx, hy, hz2 = -0.27 * k, -0.05 * k, 0.79 * k
     b.tube((hx, hy, hz2 - 0.02 * k), (hx, hy, hz2 + 0.12 * k), 0.020 * k, 0.017 * k, m['wood'], 'handR', sides=4)
     b.tube((hx, hy + 0.02 * k, hz2 + 0.12 * k), (hx, hy - 0.06 * k, hz2 + 0.12 * k), 0.010 * k, 0.010 * k, m['trim'], 'handR', sides=4)
     hoja = [(hx, hy - 0.03 * k, hz2 + 0.14 * k), (hx + 0.01 * k, hy - 0.09 * k, hz2 + 0.40 * k),
