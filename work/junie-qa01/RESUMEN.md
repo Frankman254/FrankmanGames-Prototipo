@@ -94,3 +94,19 @@ se mantienen efectivos.
 
 Escenarios que cortan la ejecución por timeout en cascada (no se completan):
 `audio`, `castillo`, `aprendizaje`, `balance45`, `criticoV3`. Ver `work/junie-jl58/FALLOS.md`.
+
+## JL-107 — Recorrido completo (2026-11-21)
+
+14 tandas con `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs` y `--desde` para
+continuar tras cada timeout. **321 OK / 25 FALLA**, todos pre-existentes.
+
+Mejoras respecto a JL-58:
+- `previa` pasa 11/11 (JL-06 arreglado: transparencyMode MATERIAL_ALPHABLEND).
+- `banco` ya no timeout en cascada (JL-51: restart Electron tras timeout).
+- `castillo`, `botin`, `audio`, `casa` pasan sin timeout (JL-09, JL-51, JL-78).
+- `pantallaCompleta` mantiene 3 fallos (sin display, pre-existente).
+- `barra` mantiene 2 fallos (arrastre sin puntero real, JL-74 bloqueada).
+- Escenarios de editor (editorCaliente, editorMazmorra, editor_play, casco_capa, emotes,
+  curas_dialogo) fallan por timeout esperando `.name-input` (arnés sin display).
+
+Ver `work/junie-jl107/RESUMEN.md` para la tabla completa por escenario.

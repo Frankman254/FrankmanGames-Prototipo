@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-107: Recorrido completo de QA_SESION (Junie)
+
+**Archivos:** `work/junie-qa01/RESUMEN.md`, `work/junie-jl107/RESUMEN.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Recorrido completo de todos los escenarios de `scripts/qaElectron.mjs` en 14 tandas con `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs` y `--desde` para continuar tras cada timeout.
+
+**Resultado:** 321 OK / 25 FALLA, todos pre-existentes. No hay regresiones nuevas.
+
+**Mejoras respecto a JL-58:** `previa` pasa 11/11 (JL-06), `banco` ya no timeout en cascada (JL-51), `castillo`, `botin`, `audio`, `casa` sin timeout (JL-09, JL-51, JL-78). Los fallos persistentes son: pantalla completa sin display (3), arrastre sin puntero real (2, JL-74), timeouts del arnés sin display (editor, emotes, curas_dialogo, etc.) y hallazgos documentados (amuleto, contraste, ingles, modelos, santos).
+
+**Evidencia:** `work/junie-jl107/RESUMEN.md` con tabla completa por escenario.
+
+---
+
 ## 2026-11-21 — JL-106: Regenerar mundoNodos (Junie)
 
 **Archivos:** `work/claude-map-nod-01/mundo.json`, `work/claude-map-nod-01/mapa_nodos.html`, `work/claude-map-nod-01/CAMBIOS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
