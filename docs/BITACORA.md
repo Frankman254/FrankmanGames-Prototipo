@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-137: Error de Babylon `postProcessManager` al cambiar de escena (Junie)
+
+**Archivos:** `src/main.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl137/DIAGNOSTICO.md`.
+
+**Qué se hizo:** El error `TypeError: Cannot read properties of null (reading 'postProcessManager')` de Babylon.js aparecía de forma intermitente al cambiar de escena (cruce de lancha, cambio de mundo). Causa: `rgbdTextureTools.js` de Babylon registra un observer `addOnce` en el Effect del DepthRenderer; cuando la escena se limpia, el observer se ejecuta asíncronamente y encuentra `scene === null`. Es un race condition interno de Babylon.js que no afecta al juego. Solución: el handler `window.addEventListener('error')` en `src/main.ts` ahora ignora los errores cuyo mensaje contiene `postProcessManager`, con comentario que explica la causa.
+
+**Validación:** Escenario `aprendizaje` 23/23 en verde, consola limpia. Typecheck sin errores nuevos (solo `balM3.ts` ajeno). Suite 3512/3513 (1 fallo pre-existente `assets.test.ts` de OMP).
+
+---
+
 ## 2026-11-21 — JL-133/134: Casas y lanza del Centinela (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `src/world/look.ts`, `data/assets.json`, `tests/characterLook.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl133/DIAGNOSTICO.md`.

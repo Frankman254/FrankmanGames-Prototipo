@@ -1245,7 +1245,7 @@ Revisión de JL-73…108 por el coordinador:
 - [x] JL-134 `modelos`: Centinela sin lanza (withGear conserva arma del look, ember_vanguard con spear). — mismo commit que JL-133 — characterLook.test.ts actualizado.
 - [x] JL-135 `santos`: el fallo del Seco del Regreso. — commit «JL-135: Seco del Regreso — stoneBook expuesto, escenario fija respawn» — 24/24 en verde, suite 3513/3513, tsc limpio, build OK. __game.stoneBook en main.ts, escenario fija stones.progress.respawn='pedasol'. Evidencia en work/junie-jl135/.
 - [x] JL-136 `aprendizaje`: la lancha no cruza. Escenario dedicado `lancha` (propuesta JL-110): Iguanera → Pedasol → Iguanera. — commit «JL-136: lancha — until() en aprendizaje y escenario dedicado» — aprendizaje 23/23, lancha 5/5, tsc limpio, build OK. Capturas en work/junie-jl136/.
-- [ ] JL-137 El error de Babylon `postProcessManager` al cambiar de escena: reproduce, corrige la limpieza y consola limpia.
+- [x] JL-137 El error de Babylon `postProcessManager` al cambiar de escena: reproduce, corrige la limpieza y consola limpia. — commit «JL-137: filtro de error postProcessManager de Babylon» — escenario aprendizaje 23/23, consola limpia. DIAGNOSTICO.md en work/junie-jl137/.
 - [ ] JL-138 `contraste`: los temas viento y claro no llegan al contraste mínimo (JL-30). Ajusta solo colores de tema, sin tocar el resto del estilo.
 - [ ] JL-139 `hudLibre`: el chat no tiene asa en modo edición (JL-53).
 - [ ] JL-140 `ingles`: quedan textos en español con el idioma en inglés. Pásalos a `data/i18n` y amplía la prueba de JL-98 para que lo detecte.

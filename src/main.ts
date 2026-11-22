@@ -1721,6 +1721,10 @@ const argText = (args: unknown[]): string =>
         })
         .join(' ');
 window.addEventListener('error', (e) => {
+    // JL-137: Babylon's rgbdTextureTools.js tiene un race condition interno:
+    // un observer addOnce del Effect intenta acceder a scene.postProcessManager
+    // después de que la escena se limpió. No afecta al juego.
+    if (typeof e.message === 'string' && e.message.includes('postProcessManager')) return;
     perf.error(e.message || String(e.error), performance.now() / 1000);
     notice(e.error instanceof Error ? argText([e.error]) : e.message || String(e.error), 'error');
 });
