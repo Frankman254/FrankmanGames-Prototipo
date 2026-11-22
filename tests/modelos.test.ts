@@ -33,6 +33,7 @@ describe('assets/models', () => {
             'equipo.glb',
             'utileria.glb',
             'utileria_cripta.glb',
+            'huacas_cocle.glb',
             'simbolos_istmo.glb',
             'naturaleza_modular.glb',
             'naturaleza_suelo.glb',

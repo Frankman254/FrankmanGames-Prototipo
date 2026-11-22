@@ -158,6 +158,16 @@ Escenario `guardadoCargar` en `scripts/qaElectron.mjs`: nueva partida, entrada a
 
 ---
 
+## 2026-11-22 - OMP-POL-06: seis huacas de oro en 3D (OMP)
+
+**Archivos:** `scripts/blender/huacas_cocle.py` (nuevo), `scripts/blender/validar_huacas_cocle.py` (nuevo), `scripts/blender/revisar_huacas_cocle.py` (nuevo), `assets/models/huacas_cocle.glb`, `PROCEDENCIA.md`, `tests/modelos.test.ts` (una línea: el catálogo va con los estáticos, como `utileria_cripta.glb`).
+
+**Qué se hizo:** seis figuritas de mano (12-20 cm) en estilo Gran Coclé inventado desde cero —hocico abierto, ojos de dona, extremos en gancho—: **rana** sentada (246 tri), **jaguar** agazapado con fauces y cola en espiral (272), **aguilucho** de alas desplegadas (200), **caimán** reptando con escamas de diente (189), **tortuga** de caparazón repujado (293), **murciélago** colgante con membranas de uña (176); 1.376 tri en total, todas ≤ 300. Oro con brillo suave (`strength` 0,5) y ojos encendidos para la vitrina del altar y el botín en el suelo del tramo 71-100. Origen al suelo, mirando a -Y, sin rig ni clips, mismo contrato que `utileria_cripta.glb`. El primer render salió con alas y garras flotando en el águila y orejas despegadas en el murciélago: corregidas anclando cada pluma al torso y metiendo las orejas en la cabeza antes de entregar.
+
+**Validación:** `validar_huacas_cocle.py` en verde (nodos exactos, ≤300 tri, apoyo en 0, escala de mano, frente alineado, sin armadura); `tests/modelos.test.ts` 12/12. Catálogo de tres vistas por pieza en `work/omp-pol06/catalogo.png`. La conexión a vitrina/botín (`data/` y `src/`) es de Junie por nombre de malla `huaca_<animal>`; OMP no toca `data/` ni `src/`.
+
+---
+
 ## 2026-11-22 - OMP-POL-05: falcopamas que se distingan en la oscuridad (OMP, PROPUESTA)
 
 **Archivos:** `scripts/blender/revisar_pol05_falcopama.py` (nuevo). Nada en `assets/`, `src/` ni `data/`: es una propuesta con renders, como pide la cola.
