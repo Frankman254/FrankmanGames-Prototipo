@@ -1,3 +1,17 @@
+## 2026-11-22 — JL-109: escenario muerte_y_revivir (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Escenario `muerte_y_revivir` en `scripts/qaElectron.mjs`: desbloquea Web Audio en la portada (igual que `audio`), inicia partida, verifica música del pueblo ('town'), baja la vida con Pulso alto para que aparezca "Reaparecer en", pulsa el botón y verifica que el jugador revive vivo y no espectral, que la música vuelve al pueblo, que el HUD no tiene solapes y que no hay errores de consola.
+- Capturas: `jl109-caida.jpg` (pantalla de caída), `jl109-revivido.jpg` (jugador revivido con HUD correcto).
+
+**Validación:** Escenario 6/6 en verde. Suite 3514/3514, tsc sin errores nuevos (solo balM3.ts ajeno).
+
+**Evidencia:** Capturas en `work/junie-jl109/`.
+
+---
+
 ## 2026-11-22 — JL-140: textos en español sin inglés (Junie)
 
 **Archivos:** `data/i18n/en.ui.json`, `scripts/i18nUi.mjs`, `tests/jl98_i18nCoverage.test.ts`, `src/main.ts`, `src/ui/loadingScreen.ts`, `src/ui/menus/screens/modals.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -1092,6 +1092,60 @@ const scenarios = {
         check('T02: la guía se oculta', !(await locate('button', 'Guiar al Alzador')));
     },
 
+    async muerte_y_revivir() {
+        // JL-109: morir, revivir en la Piedra, comprobar música, HUD sin solapes y consola limpia.
+        // Desbloquear Web Audio en la portada (igual que `audio`).
+        await until(
+            `[...document.querySelectorAll('button')].some(b=>b.offsetParent!==null&&b.textContent.trim()==='Opciones')`,
+            30000,
+            'portada visible',
+        );
+        await button('Opciones');
+        await until(`window.__audio?.engine`, 10000, 'motor de audio en portada');
+        await key('Escape');
+        await newGame('QA Revivir');
+        await mouse(640, 300);
+        await until(`window.__audio?.engine`, 10000, 'motor de audio');
+        await until(`__audio?.contextMusic?.active==='town'`, 30000, 'música del pueblo');
+        check('JL-109: música del pueblo al inicio', await js(`__audio.contextMusic.active==='town'`));
+
+        // Bajar la vida con Pulso alto: aparece "Reaparecer en" (no "Continuar como espectro").
+        await js(`${W}.player.health=0`);
+        await until(fallShown, 10000, 'primera caída');
+        await shot('jl109-caida');
+
+        // Pulsar "Reaparecer en" para revivir.
+        const respawnBtn = await js(
+            `[...document.querySelectorAll('button')].find(b=>b.textContent.trim().startsWith('Reaparecer en')).textContent.trim()`,
+        );
+        await button(respawnBtn);
+        await until(`!(${fallShown}) && ${W}.player.alive`, 15000, 'reaparecer vivo');
+        await sleep(1500);
+
+        // Verificar que el jugador está vivo y no espectral.
+        check(
+            'JL-109: tras revivir, el jugador está vivo y no espectral',
+            await js(`${W}.player.alive && !${W}.character.spectral.active`),
+        );
+
+        // Verificar que la música vuelve a la del pueblo.
+        await until(`__audio?.contextMusic?.active==='town'`, 15000, 'música vuelve al pueblo');
+        check(
+            'JL-109: la música vuelve al pueblo tras revivir',
+            await js(`__audio.contextMusic.active==='town'`),
+        );
+
+        // Verificar que el HUD no tiene solapes.
+        const faults = await uiFaults();
+        check('JL-109: HUD sin solapes tras revivir', faults.length === 0, faults.join('; '));
+
+        // Verificar que no hay errores de consola.
+        const errors = await js(`window.__consola?.errores(20) || []`);
+        check('JL-109: sin errores de consola tras revivir', errors.length === 0, errors.join('; '));
+
+        await shot('jl109-revivido');
+    },
+
     async bancoDetalle() {
         await newGame('QA Detalle');
         await js(
