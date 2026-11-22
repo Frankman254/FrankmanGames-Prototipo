@@ -1,3 +1,9 @@
+## 2026-11-22 — JL-121: escenario guardadoCargar — piso 5 de la cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+Escenario `guardadoCargar` en `scripts/qaElectron.mjs`: nueva partida, entrada al piso 5 de la cripta (floor index 4), guardado y carga con `saveAndLoad()`, verificación de que el jugador reaparece en el piso 5 con posición válida. 6/6 checks en verde, sin errores de consola. Capturas en `work/qa/`.
+
 ## 2026-11-22 — JL-119: prueba del Buhonero de pruebas — solo en desarrollo (Junie)
 
 ## 2026-11-22 — JL-120: prueba de nivel mínimo para equipar (Junie)

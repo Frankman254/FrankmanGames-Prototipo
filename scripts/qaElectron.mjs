@@ -6316,6 +6316,49 @@ const scenarios = {
         }
         fs.writeFileSync(pathMod.join(outDir, 'TABLA.md'), '# JL-116 — criptaPiso100\n\n' + tabla.join('\n') + '\n');
     },
+
+    /** JL-121: Guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. */
+    async guardadoCargar() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-121 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        /* 1. Partida nueva. */
+        await newGame('QA Guardado');
+        await js(`${S}.energy.value=100`);
+        await shot('jl121-partida');
+
+        /* 2. Entrar al piso 5 de la cripta (floor index 4). */
+        await js(`__game.crypt.enter(4,'above')`);
+        await until(`__game.crypt.floor===4`, 15000, 'piso 5');
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso 5 listo').catch(() => {});
+        await sleep(1000);
+        const floorBefore = await js(`__game.crypt.floor`);
+        record('2. Entrar: piso 5', floorBefore === 4, `piso ${floorBefore}`);
+        await shot('jl121-piso-5');
+
+        /* 3. Guardar la partida desde la cripta. */
+        await saveAndLoad();
+        await sleep(2000);
+
+        /* 4. Verificar que se recargó en el piso 5. */
+        const floorAfter = await js(`__game.crypt.floor`);
+        const inside = await js(`__game.crypt.inside`);
+        record('3. Guardar y cargar: dentro de la cripta', inside, String(inside));
+        record('4. Guardar y cargar: restaurado en el piso 5', floorAfter === 4, `piso ${floorAfter}`);
+        await shot('jl121-despues-carga');
+
+        /* 5. Verificar que la posición del jugador es válida. */
+        const pos = await js(`(()=>{ const p=${W}.player; return {x:Math.round(p.pos.x*10)/10, y:Math.round(p.pos.y*10)/10}; })()`);
+        record('5. Posición del jugador tras cargar', pos.x !== 0 || pos.y !== 0, JSON.stringify(pos));
+
+        /* 6. Salir de la cripta para limpiar. */
+        await js(`__game.crypt.leave?.()`);
+        await until(`__game.crypt.floor===null`, 10000, 'salida').catch(() => {});
+        record('6. Salida: fuera de la cripta', !(await js(`__game.crypt.inside`)), 'OK');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

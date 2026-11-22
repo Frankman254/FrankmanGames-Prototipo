@@ -1264,7 +1264,7 @@ No se aprueban dos:
 - [x] JL-118 Prueba: `content:check` falla con un tipo de efecto inexistente. Si hoy no falla, añade la validación al script, no al juego. — commit «JL-118: content:check valida tipos de efecto» — 4 pruebas verdes (jl118_effectType.test.ts), suite 3561/3561, tsc sin errores nuevos, content:check OK sobre datos reales. Evidencia en tests/jl118_effectType.test.ts.
 - [x] JL-119 Prueba: el Buhonero de pruebas no existe fuera de `npm run dev`. — commit «JL-119: prueba del Buhonero de pruebas — solo en desarrollo» — 5 pruebas verdes (jl119_devMerchant.test.ts), suite 3566/3566, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl119/.
 - [x] JL-120 Prueba: un personaje de nivel 1 no puede equipar un objeto de nivel 200. — commit «JL-120: prueba de nivel mínimo para equipar» — 4 pruebas verdes (jl120_levelEquip.test.ts), suite 3570/3570, tsc limpio, push OK. canEquip() ya rechaza con "Requiere nivel N" en character.ts:508. equip() también bloquea. Evidencia en tests/jl120_levelEquip.test.ts.
-- [ ] JL-121 Escenario `guardadoCargar`: guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5.
+- [x] JL-121 Escenario `guardadoCargar`: guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. — commit «JL-121: escenario guardadoCargar — piso 5 de la cripta» — 6/6 en verde, tsc sin errores nuevos. Capturas en work/qa/. Evidencia en work/junie-jl121/.
 - [ ] JL-122 Prueba: las reacciones elementales no se activan con `devReactions: false`.
 - [ ] JL-123 Prueba: `hotbarFillOrder` con 30 casillas y 3 filas las cubre todas sin repetir.
 
