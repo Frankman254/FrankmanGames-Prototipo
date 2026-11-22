@@ -2660,8 +2660,10 @@ const scenarios = {
             js(
                 `(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('seco_del_regreso'),true); const it=c.inventory.slots.find(i=>i?.itemId==='seco_del_regreso'); return ${S}.useItem(it.uid).ok; })()`,
             );
+        // JL-135: fijar Pedasol como piedra de regreso antes de usar el Seco.
         await js(`(()=>{ const p=${W}.player; p.pos.x=438; p.pos.y=8; p.path=[]; })()`);
         await sleep(5000);
+        await js(`__game.stoneBook.progress.respawn='pedasol'; __game.stoneBook.progress.known.push('pedasol');`);
         await js(`(()=>{ const p=${W}.player; p.pos.x=-300; p.pos.y=100; p.path=[]; })()`);
         await sleep(5000);
         check('Santos: el Seco del Regreso se puede usar', await use());

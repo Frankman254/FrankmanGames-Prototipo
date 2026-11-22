@@ -3693,3 +3693,10 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 **Evidencia:** `work/junie-jl132/` (diagnóstico del fallo).
 
+
+## 2026-11-21 — JL-135: Seco del Regreso en escenario `santos`
+
+**Qué se hizo:** El escenario `santos` fallaba al usar el Seco del Regreso: el jugador volvía a Villa Raspadura (131.25, 115.75) en vez de a la Piedra de Pedasol (438, 6). Causa: `stones.progress.respawn` nunca se fijaba en `pedasol`; el escenario teletransportaba al jugador a Pedasol pero no activaba la piedra. Arreglo: (1) `__game.stoneBook` expuesto en `src/main.ts` para que QA acceda al progreso de piedras; (2) el escenario fija `stones.progress.respawn='pedasol'` antes de teletransportarse lejos y usar el Seco.
+
+**Validación:** Escenario `santos` 24/24 en verde (2 ejecuciones). Suite 3513/3513, tsc limpio (solo balM3.ts ajeno), build OK.
+

@@ -1621,6 +1621,10 @@ if (import.meta.env.DEV) {
             get stones() {
                 return stonesDef;
             },
+            /** JL-135: libro de piedras con progreso (para que QA fije el respawn). */
+            get stoneBook() {
+                return stones;
+            },
             view,
             perf,
             clickLatency,
