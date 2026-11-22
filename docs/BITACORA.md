@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-85b: Escenario `crestalba` en verde (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl85b/DIAGNOSTICO.md`.
+
+**Qué se hizo:** Reasignación de JL-85. El escenario `crestalba` fallaba con timeout esperando "modelo Crestalba". Dos causas: (1) el predicate `m.name.endsWith('body')&&m.name.startsWith('mount:')` era demasiado específico — los meshes del GLB de Crestalba no terminan en `body`; (2) `newGame('QA Crestalba')` sin `{ devMount: true }` no activaba las monturas de desarrollo. Arreglo: predicate simplificado a `m.name.startsWith('mount:')` (igual que el escenario `monturas` que funciona) y añadido `{ devMount: true }`.
+
+**Validación:** Escenario `crestalba` 5/5 en verde (33 meshes, 7 clips, rider_root, 119.9 FPS, vuelo con alas animadas). Typecheck limpio (solo balM3.ts ajeno). Suite 3512/3513 (1 fallo pre-existente modelos.test.ts de OMP).
+
+**Evidencia:** `work/junie-jl85b/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-21 — JL-74b: Escenario barra en verde (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl74b/REPORTE.md`.

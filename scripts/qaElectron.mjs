@@ -3306,12 +3306,12 @@ const scenarios = {
 
     async crestalba() {
         // F34: el GLB propio carga, conserva al jinete en reposo y anima alas en vuelo.
-        await newGame('QA Crestalba');
+        await newGame('QA Crestalba', { devMount: true });
         await js(
             `(()=>{ const c=${W}.character; let it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba'); if(!it){c.give('mount_dev_crestalba'); it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba');} return ${S}.equip(it.uid, 'mount'); })()`,
         );
         await until(
-            `__game.view.scene.meshes.some(m=>m.name.endsWith('body')&&m.name.startsWith('mount:'))`,
+            `__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`,
             15000,
             'modelo Crestalba',
         );

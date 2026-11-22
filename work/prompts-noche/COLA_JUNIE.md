@@ -1224,9 +1224,7 @@ Revisión de JL-73…108 por el coordinador:
 
 ### Reasignadas: lo que no quedó hecho
 - [x] JL-74b Escenario `barra` en verde (reasignación de JL-74). — commit «JL-74b: escenario barra — desbloquear, arrastrar por grip, conservar por perfil» — 6/6 en verde (2 ejecuciones), tsc sin errores nuevos, push OK. Evidencia en work/junie-jl74b/REPORTE.md.
-- [ ] JL-85b Escenario `crestalba` en verde (reasignación de JL-85). El diagnóstico «WebGL no arranca sin pantalla» no cuadra: otros escenarios dibujan modelos.
-  - Busca la causa real: el nombre del mesh (`mount:*`), el momento de la espera o la carga del GLB.
-  - Que CDP no se caiga al reiniciar.
+- [x] JL-85b Escenario `crestalba` en verde (reasignación de JL-85). — commit «JL-85b: escenario crestalba — predicate y devMount» — 5/5 en verde (33 meshes, 7 clips, rider_root, 119.9 FPS). Dos causas: predicate `endsWith('body')` demasiado específico y falta `{ devMount: true }`. DIAGNOSTICO.md en work/junie-jl85b/.
 - [ ] JL-91b Escenario `modosLanzar` con apuntado real al suelo. Hoy solo comprueba la lógica de `castInput` porque supuso que no había WebGL.
   - Lanza un hechizo de área con cada uno de los tres modos sobre un enemigo y comprueba que recibe daño.
 
