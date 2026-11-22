@@ -1230,7 +1230,7 @@ Revisión de JL-73…108 por el coordinador:
   — commit «JL-91b: escenario modosLanzar — apuntado real, daño en 3 modos» — 13/13 en verde (searing_mark, commandCastSlot con aim del enemigo), tsc sin errores nuevos, push OK. Evidencia en work/qa/modosLanzar-final.jpg.
 
 ### Rojos del arnés de JL-107 (cada uno: causa, arreglo y escenario en verde tres veces seguidas)
-- [ ] JL-124 `audio`: JL-79 lo dio 5/5 y JL-107 se agotó esperando la portada. Es intermitente: hazlo robusto.
+- [x] JL-124 `audio`: JL-79 lo dio 5/5 y JL-107 se agotó esperando la portada. Es intermitente: hazlo robusto. — commit «JL-124: escenario audio robusto — timeout propio 180 s» — 5/5 en 3 ejecuciones consecutivas. DIAGNOSTICO.md en work/junie-jl124/.
 - [ ] JL-125 `banco`: se agota esperando el panel del banco. Antes pasaba 5/5.
 - [ ] JL-126 Escenarios del editor que se agotan esperando `.name-input`: `editorMazmorra`, `editor_play`, `casco_capa`, `emotes` y `curas_dialogo`. Seguramente comparten causa (el flujo de partida nueva cambió). Un solo arreglo en el arnés.
 - [ ] JL-127 `editorCaliente` (escena lista) y `editorWorldBuilder` (guardado exterior): los tiempos agotados.

@@ -5835,6 +5835,8 @@ scenarios.crestalba.timeout = 300;
 scenarios.mazmorraHonda.timeout = 300;
 // JL-81: aprendizaje necesita más tiempo por la pesca (hasta 12 iteraciones).
 scenarios.aprendizaje.timeout = 600;
+// JL-124: audio es intermitente en batch (20 s de muestreo + carga de portada tras restart).
+scenarios.audio.timeout = 180;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

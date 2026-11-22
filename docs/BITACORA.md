@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-124: Escenario `audio` robusto (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl124/DIAGNOSTICO.md`.
+
+**Qué se hizo:** El escenario `audio` pasaba 5/5 en ejecución aislada pero fallaba intermitentemente en batch (QA_SESION) con "Timeout: portada visible". Causa: el escenario tarda ~28 s solo en muestreo de audio (20 × 1 s + 16 × 500 ms para Iguanera), más el tiempo de cargar la portada y la partida nueva. Sin un timeout propio, el límite global de 120 s se agotaba cuando Electron se reiniciaba tras un timeout anterior. Solución: añadido `scenarios.audio.timeout = 180` en `scripts/qaElectron.mjs`.
+
+**Validación:** Escenario `audio` 5/5 en 3 ejecuciones consecutivas. Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl124/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-21 — JL-91b: Escenario `modosLanzar` con apuntado real (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
