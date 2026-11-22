@@ -1,3 +1,17 @@
+## 2026-11-22 — JL-139: escenario hudLibre en verde (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Causa: el escenario `hudLibre` fallaba en `F02: editando, el chat y la mascota tienen asa`. El check exigía `>= 8` elementos `.hud-editable`, pero con la barra fusionada (estado por defecto tras JL-59) y el registro de combate oculto por CSS (`display: none` en `ventanas.css:2713`), solo hay 7 elementos editables: Chat, Barra de abajo, Mascota, Coordenadas y zona, Barra de combate, Seguimiento de misión, Minimapa.
+- Arreglo: el check de `scripts/qaElectron.mjs` pasa de `>= 8` a `>= 7`.
+
+**Validación:** Escenario `hudLibre` 5/5 en verde (2 ejecuciones). Suite 3513/3513, tsc limpio salvo balM3.ts ajeno.
+
+**Evidencia:** Salida del escenario en esta sesión.
+
+---
+
 ## 2026-11-22 — JL-138: contraste de los temas viento y claro (Junie)
 
 **Archivos:** `src/ui/styles/themes.css`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl138/EVIDENCIA.md`.

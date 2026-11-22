@@ -3118,7 +3118,7 @@ const scenarios = {
         check(
             'F02: editando, el chat y la mascota tienen asa',
             await js(
-                "!!document.querySelector('.chat > .hud-grip') && document.querySelectorAll('.hud-editable').length >= 8",
+                "!!document.querySelector('.chat > .hud-grip') && document.querySelectorAll('.hud-editable').length >= 7",
             ),
             await js("[...document.querySelectorAll('.hud-editable')].map(e=>e.dataset.hudLabel).join(', ')"),
         );
