@@ -1,3 +1,9 @@
+## 2026-11-22 — AUD-CTX-05: música propia por región y pelea en el camino (Claude)
+
+**Archivos:** `src/audio/contextMusic.ts`, `src/audio/director.ts`, `tests/audio.test.ts`, `assets/audio/music/region/*.ogg`, `PROCEDENCIA.md`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`.
+
+El creador seguía oyendo la partitura generativa fuera de los pueblos. Compositor paramétrico propio (`work/claude-aud-regiones/regiones.py`): por región se fijan tonalidad, modo, compás, tempo, progresiones y orquesta, y la melodía sale de un motivo con semilla. Forma de 56 compases en bucle sin costura. Se hicieron 9 piezas (1:42–3:44, de −15 a −18 LUFS, Ogg/Opus 160k): `los_santos`, `herrera`, `iguanera`, `tierras_altas`, `chame`, `darien`, `islas`, `ancon` y `campo_pelea`. `musicContext` recibe la zona: la región da `region:<pieza>` y en pelea `field_fight`. Pueblo y cripta mandan sobre la región. Pruebas: 3571/3571. QA Electron 6/6 en Azuero, Sarigua e Iguanera (`work/claude-aud-regiones/qa_resultado.txt`). El mapa actual no tiene todavía Darién, Bocas, Chiriquí, Chame ni Ancón. Para escuchar están las muestras de 30 s en `work/claude-aud-regiones/salida/`, y también van catalogadas en `work/musica-generada/`.
+
 ## 2026-11-22 — JL-121: escenario guardadoCargar — piso 5 de la cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

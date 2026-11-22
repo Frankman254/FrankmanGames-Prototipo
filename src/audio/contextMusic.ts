@@ -1,7 +1,8 @@
 // Piezas terminadas para contextos (creador, 2026-11-19: «según sea la zona: un
 // pueblo, pelea en un pueblo, la mazmorra y pelea de jefe en mazmorra»). Cada una
 // suena en bucle: portada, pueblo (zonas `safe`), pelea en pueblo, cripta y
-// guardián. Las regiones sin pueblo siguen con su partitura generativa.
+// guardián. Desde 2026-11-22 las regiones del mundo abierto también tienen pieza propia
+// (REGION_TRACK) y una de pelea en el camino; la partitura generativa queda de respaldo.
 // Los tres OGG de `assets/dev_dungeon/` son de otro juego (PROCEDENCIA.md: no
 // aptos para publicación). Su rotación solo existe con `npm run dev` y solo si se
 // pide (`devDungeon`), y se piden por una ruta de texto que Vite no procesa, así
@@ -9,8 +10,52 @@
 import type { MenuScreen } from '../ui/menus';
 import type { AudioEngine } from './engine';
 
-export type MusicContext = 'title' | 'town' | 'town_fight' | 'crypt' | 'guardian';
+/** Piezas propias del mundo abierto (creador, 2026-11-22): work/claude-aud-regiones/regiones.py. */
+export type RegionTrack =
+    | 'los_santos'
+    | 'herrera'
+    | 'iguanera'
+    | 'tierras_altas'
+    | 'chame'
+    | 'darien'
+    | 'islas'
+    | 'ancon';
+export type MusicContext =
+    | 'title'
+    | 'town'
+    | 'town_fight'
+    | 'crypt'
+    | 'guardian'
+    | 'field_fight'
+    | `region:${RegionTrack}`;
 type TrackId = MusicContext | 'dungeon1' | 'dungeon2' | 'dungeon3';
+
+/** Zona no segura → pieza de su región. Las zonas que no estén aquí siguen con la partitura generativa. */
+export const REGION_TRACK: Readonly<Record<string, RegionTrack>> = {
+    azuero: 'los_santos',
+    canajagua: 'los_santos',
+    sabanas: 'los_santos',
+    cane_pese: 'herrera',
+    parrita: 'herrera',
+    ocua: 'herrera',
+    macanas: 'herrera',
+    sarigua: 'herrera',
+    iguanera: 'iguanera',
+    baru: 'tierras_altas',
+    boquete: 'tierras_altas',
+    cerro_punta: 'tierras_altas',
+    fortuna: 'tierras_altas',
+    chame: 'chame',
+    darien: 'darien',
+    bocas: 'islas',
+    perlas: 'islas',
+    ancon: 'ancon',
+};
+
+/** Contextos del mundo abierto: la música local que el jugador asigne a la zona puede taparlos. */
+export function isOpenWorldContext(context: MusicContext | null): boolean {
+    return context === null || context === 'field_fight' || context.startsWith('region:');
+}
 
 // Experimento de desarrollo: rutas del servidor de Vite, sin `new URL(...)` para
 // que el build no copie los archivos, y tras `import.meta.env.DEV` para que el
@@ -33,6 +78,16 @@ const TRACK_URL: Partial<Record<TrackId, string>> = {
         .href,
     crypt: new URL('../../assets/audio/music/cripta/mazmorra_hondo.ogg?no-inline', import.meta.url).href,
     guardian: new URL('../../assets/audio/music/guardian/musica1_propia.ogg?no-inline', import.meta.url).href,
+    field_fight: new URL('../../assets/audio/music/region/campo_pelea.ogg?no-inline', import.meta.url).href,
+    'region:los_santos': new URL('../../assets/audio/music/region/los_santos.ogg?no-inline', import.meta.url).href,
+    'region:herrera': new URL('../../assets/audio/music/region/herrera.ogg?no-inline', import.meta.url).href,
+    'region:iguanera': new URL('../../assets/audio/music/region/iguanera.ogg?no-inline', import.meta.url).href,
+    'region:tierras_altas': new URL('../../assets/audio/music/region/tierras_altas.ogg?no-inline', import.meta.url)
+        .href,
+    'region:chame': new URL('../../assets/audio/music/region/chame.ogg?no-inline', import.meta.url).href,
+    'region:darien': new URL('../../assets/audio/music/region/darien.ogg?no-inline', import.meta.url).href,
+    'region:islas': new URL('../../assets/audio/music/region/islas.ogg?no-inline', import.meta.url).href,
+    'region:ancon': new URL('../../assets/audio/music/region/ancon.ogg?no-inline', import.meta.url).href,
     ...DEV_DUNGEON_URL,
 };
 
@@ -82,12 +137,16 @@ export function musicContext(
     guardian: boolean,
     town = false,
     fighting = false,
+    zone: string | null = null,
 ): MusicContext | null {
     if (screen !== 'game') return 'title';
     // Creador (2026-11-19): la mazmorra suena a caverna y misterio. En un piso con guardián la
     // canción de jefe entra solo cuando hay pelea; el resto del piso sigue con la de la cripta.
     if (floor !== null) return guardian && fighting ? 'guardian' : 'crypt';
     if (town) return fighting ? 'town_fight' : 'town';
+    // Creador (2026-11-22): cada región con su música propia, y pelea en el camino fuera de los pueblos.
+    const region = zone ? REGION_TRACK[zone] : undefined;
+    if (region) return fighting ? 'field_fight' : `region:${region}`;
     return null;
 }
 

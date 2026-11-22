@@ -24,7 +24,7 @@ import { AudioEngine } from './engine';
 import { loadSamples } from './samples';
 import { AmbiencePlayer, MusicPlayer } from './players';
 import { ambienceMix, moodTargets } from './score';
-import { ContextMusicPlayer, musicContext, type MusicContext } from './contextMusic';
+import { ContextMusicPlayer, isOpenWorldContext, musicContext, type MusicContext } from './contextMusic';
 import type { UiSoundEvent } from '../ui/menus/uiSound';
 import type { MenuScreen } from '../ui/menus';
 
@@ -60,9 +60,9 @@ export interface AudioMount {
 
 const ENGAGED = new Set(['pursue', 'telegraph', 'attack', 'recover']);
 
-/** La música local sólo sustituye la partitura regional, nunca un contexto empaquetado. */
+/** La música local sólo sustituye la música del mundo abierto (región o pelea en el camino), nunca portada, pueblo ni cripta. */
 export function localMusicOverrides(context: MusicContext | null, active: boolean): boolean {
-    return context === null && active;
+    return isOpenWorldContext(context) && active;
 }
 
 export class AudioDirector {
@@ -296,12 +296,13 @@ export class AudioDirector {
         const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null, guardian: false };
         const screen = this.m.menus?.screen ?? 'game';
         const town = here.floor === null && (world.currentZone?.safe ?? false);
-        const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false, town, threat > 0);
+        const zone = here.floor === null ? here.zone : null;
+        const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false, town, threat > 0, zone);
         if (this.localMusic) {
             // Portada, pueblos, cripta y guardián tienen piezas empaquetadas propias. Una vieja
             // asignación local `dungeon` no debe tapar la música de cripta ni dejarla
             // mudas; la música local queda para las zonas del mundo abierto.
-            if (screen === 'game' && context === null) this.localMusic.updatePlace(null, here.zone);
+            if (screen === 'game' && isOpenWorldContext(context)) this.localMusic.updatePlace(null, here.zone);
             else this.localMusic.update(['__contexto_empaquetado__']);
         }
         this.contextMusic?.update(context, localMusicOverrides(context, this.localMusic?.active ?? false));

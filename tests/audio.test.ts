@@ -7,7 +7,7 @@ import { loadAudioData, parseMusic, parseSfx } from '../src/audio/data';
 import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
-import { ContextMusicPlayer, DungeonPlaylist, musicContext } from '../src/audio/contextMusic';
+import { ContextMusicPlayer, DungeonPlaylist, musicContext, REGION_TRACK } from '../src/audio/contextMusic';
 import { localMusicOverrides } from '../src/audio/director';
 import {
     ambienceMix,
@@ -468,6 +468,35 @@ describe('audio: música por zona', () => {
             expect(bytes.subarray(0, 64).includes(Buffer.from('OpusHead')), id).toBe(true);
             expect(readFileSync('PROCEDENCIA.md', 'utf8'), id).toContain(`assets/audio/music/${id}`);
         }
+    });
+
+    it('cada región del mundo abierto tiene su pieza propia y la pelea en el camino la suya', () => {
+        const zones = (
+            JSON.parse(readFileSync('data/zones.json', 'utf8')) as { zones: { id: string; safe?: boolean }[] }
+        ).zones;
+        const wild = zones.filter((z) => !z.safe).map((z) => z.id);
+        expect(wild.length).toBeGreaterThan(10);
+        for (const id of wild) {
+            expect(REGION_TRACK[id], `${id} sin pieza: sonaría la generativa`).toBeDefined();
+            expect(musicContext('game', null, false, false, false, id)).toBe(`region:${REGION_TRACK[id]}`);
+            expect(musicContext('game', null, false, false, true, id)).toBe('field_fight');
+        }
+        // El pueblo y la cripta mandan sobre la región; una zona desconocida conserva la generativa.
+        expect(musicContext('game', null, false, true, false, 'azuero')).toBe('town');
+        expect(musicContext('game', 3, false, false, false, 'azuero')).toBe('crypt');
+        expect(musicContext('game', null, false, false, false, 'zona_inexistente')).toBeNull();
+        const pieces = [...new Set(Object.values(REGION_TRACK)), 'campo_pelea'];
+        for (const name of pieces) {
+            const path = `assets/audio/music/region/${name}.ogg`;
+            const bytes = readFileSync(path);
+            expect(bytes.subarray(0, 4).toString('ascii'), path).toBe('OggS');
+            expect(bytes.subarray(0, 64).includes(Buffer.from('OpusHead')), path).toBe(true);
+            expect(readFileSync('PROCEDENCIA.md', 'utf8'), path).toContain(path);
+        }
+        // La música local del jugador puede sustituir la de una región, nunca la de pueblo o cripta.
+        expect(localMusicOverrides('region:darien', true)).toBe(true);
+        expect(localMusicOverrides('field_fight', true)).toBe(true);
+        expect(localMusicOverrides('town', true)).toBe(false);
     });
 
     it('la pista empaquetada funde la generativa y cede ante la música local', async () => {
