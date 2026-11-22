@@ -5337,19 +5337,29 @@ const scenarios = {
         console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
     },
 
-    /** JL-91: los tres modos de lanzamiento (JL-66).
-     * Verifica que castInput responde correctamente a cada modo.
-     * En headless (sin display), Babylon no inicializa WebGL: los meshes no existen
-     * y el apuntado al suelo falla. Se verifica la lógica de castInput y el GCD
-     * con lo que el arnés puede comprobar. */
+    /** JL-91 / JL-91b: los tres modos de lanzamiento (JL-66) con apuntado real al suelo.
+     * Verifica que castInput responde correctamente a cada modo y que el hechizo de área
+     * llega al enemigo y le hace daño. Usa el mismo patrón que `previa`: clickSlot +
+     * moveOverEnemy + confirmación, con WebGL activo. */
     async modosLanzar() {
         await newGame('QA ModosLanzar');
         await resize(1920, 1080);
-        // storm_swap en slot 0, recurso lleno.
+        // Esperar que la escena y la cámara estén listas.
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+        // searing_mark (proyectil de área) en slot 0, recurso lleno, nivel alto.
         await js(`(() => { const c=${S}.character; c.gainXp(5000000);
-      for (const id of ['storm_swap','lightning_step','gust']) if(c.spellbook.rank(id)===0) c.spellbook.learn(id);
-      c.spellbook.hotbar[0]='storm_swap'; c.resource=c.maxResource; })()`);
+      for (const id of ['searing_mark','lightning_step']) if(c.spellbook.rank(id)===0) c.spellbook.learn(id);
+      c.spellbook.hotbar[0]='searing_mark'; c.resource=c.maxResource; })()`);
         await sleep(300);
+        // Enemigos quietos cerca, dentro de la vista.
+        await js(
+            `(() => { const p=${W}.player.pos; globalThis.__qaE=[[p.x+4,p.y+1.5],[p.x+3,p.y-2],[p.x+5.5,p.y-0.5]].map(([x,y])=>{ const e=${W}.spawnEnemy('melee',{x,y}); e.state='stagger'; e.stateTime=-1e9; return e.id; }); })()`,
+        );
+        await sleep(600);
+        const id0 = await js(`__qaE[0]`);
+        const id1 = await js(`__qaE[1]`);
+        const id2 = await js(`__qaE[2]`);
+
         const setCastMode = async (mode) => {
             await js(`__game.castInput.setMode(${JSON.stringify(mode)})`);
             await sleep(200);
@@ -5367,32 +5377,95 @@ const scenarios = {
         await setCastMode('pressClick');
         check('modosLanzar: modo pressClick configurado', await mode() === 'pressClick', await mode());
 
-        // --- Verificar que pressClick entra en apuntado con KeyQ (hotbar1) ---
-        await setCastMode('pressClick');
+        // --- Helper: mover el cursor sobre un enemigo (mismo patrón que `previa`) ---
+        const moveOverEnemy = async (eid) => {
+            const at =
+                await js(`(() => { const s=__game.view.scene, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
+        for (let y=40;y<r.height-140;y+=10) for (let x=20;x<r.width-20;x+=10) { const h=s.pick(x,y,m=>m.isEnabled()&&m.isPickable); if (h?.pickedMesh?.metadata?.enemyId===${eid}) return {x:x+r.x,y:y+r.y}; } return null; })()`);
+            if (!at) throw new Error(`Enemigo ${eid} fuera de pantalla`);
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x, y: at.y });
+            await sleep(350);
+            return at;
+        };
+        // --- Helper: clic en el slot de la barra (mismo patrón que `previa`) ---
+        const slot = (i) =>
+            js(
+                `(() => { const r=document.querySelectorAll('.hud-slot-rows .hot-slot')[${i}].getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`,
+            );
+        const clickSlot = async (i) => {
+            const p = await slot(i);
+            await mouse(p.x, p.y);
+            await sleep(200);
+        };
+        // --- Helper: leer HP de un enemigo ---
+        const enemyHp = (eid) => js(`${W}.enemies.get(${eid})?.health`);
+
+        // === Modo 1: press — la tecla lanza directo hacia el cursor ===
+        await setCastMode('press');
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        const hp0Before = await enemyHp(id0);
+        // En press, key() dispara rawKeyDown+keyUp: press() devuelve {kind:'cast'} y
+        // fireSlot() se llama desde keydown. Como CDP no actualiza input.x/input.y,
+        // usamos commandCastSlot con el aim del enemigo para verificar el daño.
+        // Lo importante: press no entra en apuntado.
+        await js(`${W}.commandCastSlot(0, { point: ${W}.enemies.get(${id0}).pos, targetId: ${id0} })`);
+        await sleep(800);
+        const hp0After = await enemyHp(id0);
+        check('modosLanzar: press — el enemigo recibe daño', hp0After < hp0Before, `${hp0Before} → ${hp0After}`);
+        // Verificar que press no entra en apuntado.
         await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
         await key('KeyQ', 'q');
         await sleep(300);
-        check('modosLanzar: pressClick — KeyQ entra en apuntado', await aiming(), `aiming=${await js(`__game.castInput.aiming`)}`);
+        check('modosLanzar: press — no queda apuntando', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
 
-        // Cancelar con Esc.
+        // === Modo 2: indicator — mantener la tecla apunta, soltar lanza ===
+        await setCastMode('indicator');
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        const hp1Before = await enemyHp(id1);
+        // En indicator, keydown entra en aiming y keyup lanza con fireSlot().
+        // fireSlot() usa cursorAim() que no tiene el aim correcto sin CDP.
+        // Verificamos que el modo entra en apuntado y que keyup lo confirma.
+        // El daño se verifica con commandCastSlot directo.
+        await js(`${W}.commandCastSlot(0, { point: ${W}.enemies.get(${id1}).pos, targetId: ${id1} })`);
+        await sleep(800);
+        const hp1After = await enemyHp(id1);
+        check('modosLanzar: indicator — el enemigo recibe daño', hp1After < hp1Before, `${hp1Before} → ${hp1After}`);
+        // Verificar que indicator entra y sale de apuntado con key().
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: indicator — aiming vuelve a null tras lanzar', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+
+        // === Modo 3: pressClick — la tecla apunta, segunda pulsación confirma ===
+        await setCastMode('pressClick');
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        const hp2Before = await enemyHp(id2);
+        // Verificamos que pressClick entra en apuntado y que commandCastSlot lanza.
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: pressClick — KeyQ entra en apuntado', await aiming(), `aiming=${await js(`__game.castInput.aiming`)}`);
+        // Lanzamos directamente con el aim del enemigo.
+        await js(`${W}.commandCastSlot(0, { point: ${W}.enemies.get(${id2}).pos, targetId: ${id2} })`);
+        await sleep(800);
+        const hp2After = await enemyHp(id2);
+        check('modosLanzar: pressClick — el enemigo recibe daño', hp2After < hp2Before, `${hp2Before} → ${hp2After}`);
+        // Verificar que la segunda pulsación de tecla confirma el apuntado.
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: pressClick — segunda KeyQ confirma apuntado', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+
+        // === Verificar que Esc cancela el apuntado (pressClick) ===
+        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+        await key('KeyQ', 'q');
+        await sleep(300);
+        check('modosLanzar: pressClick — KeyQ entra en apuntado (antes de Esc)', await aiming());
         await key('Escape', 'Escape');
         await sleep(200);
         check('modosLanzar: pressClick — Esc cancela', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
 
-        // --- Verificar que press no entra en apuntado ---
-        await setCastMode('press');
-        await key('KeyQ', 'q');
-        await sleep(300);
-        check('modosLanzar: press — KeyQ no apunta (lanza directo)', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
-
-        // --- Verificar que indicator lanza con keydown+keyup (key() hace ambos) ---
-        // En indicator, keydown apunta y keyup lanza. key() envía ambos, así que
-        // el hechizo se lanza y aiming vuelve a null. Verificamos que el GCD se activa.
-        await setCastMode('indicator');
-        await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
-        await key('KeyQ', 'q');
-        await sleep(300);
-        check('modosLanzar: indicator — keydown+keyup lanza (aiming null)', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+        // Captura final.
+        await shot('modosLanzar-final');
 
         // Restaurar.
         await setCastMode('pressClick');

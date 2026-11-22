@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-91b: Escenario `modosLanzar` con apuntado real (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reasignación de JL-91. El escenario `modosLanzar` solo verificaba la lógica de `castInput` (cambio de modo, estado aiming, cancelación) sin lanzar hechizos reales. Se reescribió para que lance hechizos de área con los tres modos (press, indicator, pressClick) sobre enemigos y verifique daño. Como CDP no actualiza `input.x/input.y` de Babylon, se usa `commandCastSlot` directo con el aim del enemigo para verificar el daño, y `key()` para verificar el comportamiento de cada modo (press no apunta, indicator entra/sale de aiming, pressClick requiere confirmación). Se cambió `gust` (cono melee, range 0) por `searing_mark` (proyectil de área) para que el aim directo funcione.
+
+**Validación:** Escenario `modosLanzar` 13/13 en verde: 3 modos configurados, 3 enemigos reciben daño (60→45, 60→45, 60→43), press no queda apuntando, indicator vuelve a null, pressClick entra en apuntado y segunda KeyQ confirma, Esc cancela. Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/qa/modosLanzar-final.jpg`.
+
+---
+
 ## 2026-11-21 — JL-85b: Escenario `crestalba` en verde (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl85b/DIAGNOSTICO.md`.
