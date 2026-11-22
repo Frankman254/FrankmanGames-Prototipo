@@ -406,24 +406,77 @@ piece('d_anillo', RUNE, lambda b, m: ring(b, m, 3.2, 0.06))
 
 # Entrada en el mundo abierto: +X es hacia donde mira.
 def build_gate(b, m):
+    # POL-01: arco de piedra escalonado que se lee de lejos desde el camino.
+    # El frente mira a +X local (world -X, facingDeg 180 — igual que la vieja
+    # runa a x=0,42). Dos pilares con basa y capitel, dintel de tres gradas
+    # hasta la campana (~4,6 m), repisas de antorcha de frente, peldanos al
+    # hueco y letrero del portero junto al pilar del camino.
     for z in (-1.5, 1.5):
-        box(b, m, 0, 1.5, z, 0.6, 3, 0.6)
-        box(b, m, 0, 0.12, z, 0.85, 0.24, 0.85)
-    box(b, m, 0, 3.2, 0, 0.8, 0.55, 4)
-    box(b, m, 0, 3.62, 0, 0.5, 0.3, 2.6)
-    for z in (-1.45, 1.45):
-        box(b, m, -1.2, 0.17, z, 2.4, 0.35, 0.3)
+        box(b, m, 0, 0.14, z, 1.05, 0.28, 1.05)      # basa
+        box(b, m, 0, 1.75, z, 0.62, 3.0, 0.62)       # fuste
+        box(b, m, 0, 3.35, z, 0.84, 0.35, 0.84)      # capitel
+        box(b, m, 0.48, 2.2, z, 0.3, 0.14, 0.4)      # repisa de antorcha
+    for r, y in ((1.2, 3.72), (0.95, 4.06), (0.62, 4.34)):
+        box(b, m, 0, y, 0, 0.9, 0.34, r * 2 + 1.8)   # gradas del remate
+    box(b, m, 0, 4.6, 0, 0.7, 0.24, 1.0)             # campana
+    # hueco: dintel grueso sobre los pilares (el paso tiene 2,4 m de luz)
+    box(b, m, 0, 3.6, 0, 0.95, 0.5, 3.6)
+    # las jambas internas estrechan el paso hasta 1,9 m de luz
+    for z in (-1.05, 1.05):
+        box(b, m, 0, 1.8, z, 0.9, 3.0, 0.3)
+    # los peldanos suben del umbral hacia la loma
     for k in range(3):
         box(b, m, -0.3 - k * 0.5, 0.1 - k * 0.03, 0, 0.45, 0.08, 2.4)
+    # letrero: poste y tabla de cara al camino, junto al pilar derecho
+    box(b, m, 1.15, 0.6, 2.35, 0.14, 1.2, 0.14)
+    box(b, m, 1.15, 1.25, 2.35, 0.1, 0.62, 1.2)
+    # mangos de antorcha clavados en las repisas de frente
+    for z in (-1.5, 1.5):
+        b.tube(B(0.55, 2.35, z), B(0.75, 2.62, z), 0.045, 0.038, m, sides=4)
 
 
 piece('d_entrada', STONE, build_gate, uv_metres=TILE)
 # Auditoria: la boca llegaba a x=-2.3 (40 cm fuera del monticulo y entre
 # monticulo y umbral: lama negra flotando). Recortada a x∈[-1.525,-0.1],
 # justo bajo los tres peldanos del umbral de d_entrada.
-piece('d_entrada_boca', DARK, lambda b, m: box(b, m, -0.8125, 0.03, 0, 1.425, 0.04, 2.16))
-piece('d_entrada_monticulo', MOUND, lambda b, m: b.blob(B(-4.3, 0, 0), (2.4, 3.45, 1.65), m, subdiv=3))
-piece('d_entrada_runa', RUNE, lambda b, m: ring(b, m, 1.0, 0.08, center=(0.42, 3.2, 0), axis_x=True, segments=20))
+# POL-01: ademas, tapamonos vertical negro al fondo del hueco (-X, loma): al
+# mirar el arco de frente desde el camino solo se ve negrura, sin cielo.
+piece('d_entrada_boca', DARK, lambda b, m: (
+    box(b, m, -0.8125, 0.03, 0, 1.425, 0.04, 2.16),
+    box(b, m, -0.55, 1.85, 0, 0.06, 3.6, 2.44),
+))
+
+
+# POL-01: el monticulo abraza la boca por detras y los flancos (-X y ±Z) y se
+# hunde en la campana: el arco asoma como entrada de huaca en la loma, no
+# como marco suelto en un llano. El frente (+X) queda expedito para el camino.
+def build_mound(b, m):
+    b.blob(B(-3.1, 0.1, 0), (2.4, 3.6, 2.6), m, subdiv=3)
+    b.blob(B(-0.9, 0.1, -3.4), (1.8, 1.9, 1.7), m, subdiv=2)
+    b.blob(B(-0.9, 0.1, 3.4), (1.8, 1.9, 1.7), m, subdiv=2)
+
+
+piece('d_entrada_monticulo', MOUND, build_mound)
+
+
+def build_rune(b, m):
+    # POL-01: el glow azul hace la legibilidad de lejos, todo de frente (+X):
+    # aro en la campana, arco de dovelas enmarcando el hueco y glifos en el
+    # letrero.
+    ring(b, m, 0.62, 0.09, center=(0.47, 4.6, 0), axis_x=True, segments=14)
+    for i in range(6):
+        t0 = math.pi * i / 6
+        t1 = math.pi * (i + 1) / 6
+
+        def dovela(t):
+            return B(0.52, 2.3 + 1.3 * math.sin(t), 1.3 * math.cos(t))
+        b.tube(dovela(t0), dovela(t1), 0.08, 0.08, m, sides=3)
+    # dos glifos en la tabla del letrero (cara al camino, +X)
+    for gz in (2.12, 2.58):
+        ring(b, m, 0.3, 0.05, center=(1.22, 1.25, gz), axis_x=True, segments=8)
+
+
+piece('d_entrada_runa', RUNE, build_rune)
 
 # Pisos profundos (F25): jarras, barriles, puertas y estanques. Los rompibles
 # llevan textura propia en color (barro/duela); el resto lo tine el juego.

@@ -41,6 +41,7 @@ describe('assets/models', () => {
             'costa_modular.glb',
             'escenografia_regional.glb',
             'moneda_exposicion_1915.glb',
+            'prop_hilo_retorno.glb',
         ];
         const missing = readdirSync(DIR).filter(
             (f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0,
