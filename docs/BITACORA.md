@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-122: prueba de reacciones desactivadas por defecto (Junie)
+
+**Archivos:** `tests/jl122_reactionsDisabled.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Prueba que las reacciones elementales (HZ-04b) no se activan cuando `devReactions` está en `false` (valor por defecto). 8 pruebas en `tests/jl122_reactionsDisabled.test.ts`: `devReactions` es false por defecto, true cuando se activa; el tracker se inicializa siempre en el constructor pero no se usa sin la bandera; al atacar con `devReactions=false` no hay eventos `reaction` ni marcas registradas; con `devReactions=true` el tracker registra marcas y dispara reacciones; las 15 reacciones están cargadas pero inactivas sin la bandera.
+
+**Cómo se verificó:** `npx vitest run tests/jl122_reactionsDisabled.test.ts` → 8/8 verdes. Suite completa 3579/3579, tsc sin errores nuevos, build OK.
+
+---
+
 ## 2026-11-22 — AUD-CTX-05: música propia por región y pelea en el camino (Claude)
 
 **Archivos:** `src/audio/contextMusic.ts`, `src/audio/director.ts`, `tests/audio.test.ts`, `assets/audio/music/region/*.ogg`, `PROCEDENCIA.md`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`.
