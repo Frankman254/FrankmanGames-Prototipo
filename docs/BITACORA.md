@@ -3670,3 +3670,14 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Qué:** Última tarea de la bolsa grande (JL-73…108). Se escribió `work/junie-propuestas/BOLSA_SIGUIENTE.md` con 15 tareas pequeñas propuestas (JL-109…JL-123) derivadas de hallazgos durante el trabajo: escenarios QA nuevos (muerte_y_revivir, lancha, editorMazmorra, compendio, opciones, criptaPiso100, guardadoCargar), pruebas que faltan (rankLadder con maxRank 6, content:check efectos, Buhonero devOnly, equipar nivel insuficiente, reacciones apagadas, hotbarFillOrder 30 slots), y arreglos de calidad (assets.test.ts GLB de ranas, balM3.ts typecheck). Son **propuestas**: no están autorizadas, no se empiezan sin autorización explícita.
 
 **Evidencia:** BOLSA_SIGUIENTE.md con 15 tareas, cada una con por qué, criterio de hecho y evidencia esperada. Sin código cambiado.
+
+## 2026-11-21 — JL-132: `bancoDetalle` — amuleto que invoca mascota (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario `bancoDetalle` fallaba en 2 checks del amuleto que invoca mascota (`charm_ash_fox`). Causa: `sleep(500)` después de `useItem()` no esperaba el tick de `syncPets()` en el mundo — tras `saveAndLoad()`, el mundo recargaba y la simulación tardaba en hacer el primer tick. Reemplazado por `until()` que espera a que la mascota aparezca en `world.pets`.
+
+**Validación:** Escenario `bancoDetalle` 16/16 en verde (2 ejecuciones). Suite 3513/3513, tsc limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl132/` (diagnóstico del fallo).
+

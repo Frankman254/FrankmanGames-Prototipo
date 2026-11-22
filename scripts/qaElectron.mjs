@@ -1217,7 +1217,8 @@ const scenarios = {
         const charmUid = await js(
             `(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('charm_ash_fox'),true); const it=c.inventory.slots.find(i=>i?.itemId==='charm_ash_fox'); return ${S}.useItem(it.uid).ok ? it.uid : null; })()`,
         );
-        await sleep(500);
+        // JL-132: esperar a que syncPets() cree la mascota (al menos un tick con activePetId).
+        await until(`${W}.pets.filter(p=>p.itemUid!==null).length > 0`, 5000, 'mascota invocada');
         check(
             'C05: el amuleto invoca su mascota',
             !!charmUid && (await js(`${W}.pets.filter(p=>p.itemUid!==null).length`)) === 1,

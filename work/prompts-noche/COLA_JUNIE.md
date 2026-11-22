@@ -1240,7 +1240,7 @@ Revisión de JL-73…108 por el coordinador:
 - [x] JL-131 `sondaSucio` sale con 0 comprobaciones: o se arregla para que compruebe algo, o el informe explica por qué está vacío. — commit «JL-131: sondaSucio con 3 comprobaciones y informe JSON» — 4/4 en verde (mallas activas, sonda pueblo, sonda piso 20, sin errores). dirtyCalls=0 confirma freeze activo. INFORME.md en work/junie-jl131/.
 
 ### Fallos del juego que encontró QA (cada uno: prueba que lo reproduzca, arreglo pequeño, escenario en verde)
-- [ ] JL-132 `bancoDetalle`: el amuleto que invoca mascota (2 comprobaciones rojas). Sin cambiar cifras.
+- [x] JL-132 `bancoDetalle`: el amuleto que invoca mascota (2 comprobaciones rojas). — commit «JL-132: bancoDetalle — esperar syncPets antes de verificar mascota» — 16/16 en verde, tsc sin errores nuevos, suite 3513/3513. Causa: sleep(500) no esperaba el tick de syncPets(). Reemplazado por until() que espera la mascota. Evidencia en work/junie-jl132/.
 - [ ] JL-133 `modelos`: el pueblo muestra 17 casas y espera 18. Averigua cuál falta y por qué.
 - [ ] JL-134 `modelos`: el Centinela sale sin lanza. Comprueba el nodo de la mano y el arma del GLB.
 - [ ] JL-135 `santos`: el fallo del Seco del Regreso. Diagnóstico y arreglo.
