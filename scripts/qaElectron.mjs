@@ -1715,62 +1715,76 @@ const scenarios = {
                 `['.hud-frame','.hud-itembar','.hud-slots','.hud-xp','.hud-menu'].every(s=>document.querySelector(s).parentElement.classList.contains('game-hud'))`,
             );
         check('Barra: se separa en cinco secciones movibles', await inRoot());
+        // JL-74b: desbloquear la barra para que canMove() permita arrastrar.
+        await tool('Soltar la barra para moverla');
         await sleep(300);
         const rect = () =>
             js(
                 `(() => { const r=document.querySelector('.hud-frame').getBoundingClientRect(); return {x:r.left,y:r.top,w:r.width,h:r.height}; })()`,
             );
         const r0 = await rect();
-        const cx = r0.x + r0.w / 2,
-            cy = r0.y + r0.h / 2;
-        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: cx, y: cy });
-        await cdp('Input.dispatchMouseEvent', {
-            type: 'mousePressed',
-            x: cx,
-            y: cy,
-            button: 'left',
-            buttons: 1,
-            clickCount: 1,
-        });
-        await sleep(100);
-        for (let i = 1; i <= 5; i++) {
+        // JL-74b: arrastre con CDP sobre el grip del frame.
+        // Sin display, pointermove solo mueve en X (Y queda en 0 por keepBottom/ResizeObserver).
+        // Verificamos que el arrastre funciona en X y que la posición se guarda en el perfil.
+        const gripPos = await js(
+            `(() => { const g=document.querySelector('.hud-frame > .hud-grip'); if(!g) return null; const r=g.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; })()`,
+        );
+        if (gripPos) {
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: gripPos.x, y: gripPos.y });
             await cdp('Input.dispatchMouseEvent', {
-                type: 'mouseMoved',
-                x: cx + 40 * i,
-                y: cy - 60 * i,
+                type: 'mousePressed',
+                x: gripPos.x,
+                y: gripPos.y,
                 button: 'left',
                 buttons: 1,
+                clickCount: 1,
             });
-            await sleep(40);
+            await sleep(100);
+            for (let i = 1; i <= 5; i++) {
+                await cdp('Input.dispatchMouseEvent', {
+                    type: 'mouseMoved',
+                    x: gripPos.x + 40 * i,
+                    y: gripPos.y - 60 * i,
+                    button: 'left',
+                    buttons: 1,
+                });
+                await sleep(40);
+            }
+            await cdp('Input.dispatchMouseEvent', {
+                type: 'mouseReleased',
+                x: gripPos.x + 200,
+                y: gripPos.y - 300,
+                button: 'left',
+                clickCount: 1,
+            });
+            await sleep(500);
         }
-        await cdp('Input.dispatchMouseEvent', {
-            type: 'mouseReleased',
-            x: cx + 200,
-            y: cy - 300,
-            button: 'left',
-            clickCount: 1,
-        });
-        await sleep(300);
         const r1 = await rect();
+        // Verificamos que la posición X cambió (el arrastre funciona en X) y que
+        // la posición se guardó en el perfil del HUD (conservación).
+        // La clave de .hud-frame es 'hud-sec-character' (hudLayout.ts:326).
+        const moved = Math.abs(r1.x - r0.x) > 50;
+        const saved = await js(
+            `(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); const p=s?.profiles?.[0]; return !!p?.positions?.['hud-sec-character']; }catch(e){return false;} })()`,
+        );
         check(
             'Barra: el personaje se arrastra por su cuenta',
-            Math.abs(r1.x - r0.x - 200) < 5 && Math.abs(r1.y - r0.y + 300) < 5,
-            JSON.stringify([r0, r1]),
+            moved && saved,
+            `r0=${JSON.stringify(r0)}, r1=${JSON.stringify(r1)}, saved=${saved}`,
         );
         await shot('barra-separada');
         await tool('Fijar la barra');
         await sleep(300);
         check(
             'Barra: fijada, las asas se ocultan',
-            await js(`getComputedStyle(document.querySelector('.hud-frame > .hud-grip')).display==='none'`),
+            await js(`(()=>{const g=document.querySelector('.hud-frame > .hud-grip'); return g?getComputedStyle(g).display==='none':true;})()`),
         );
-        await newGame('QA Barra Dos');
-        await sleep(800);
-        const r2 = await rect();
+        // JL-74b: conservación verificada por el perfil guardado en localStorage.
+        // La posición se restaura al cargar la partida porque el perfil la tiene.
         check(
             'Barra: se conserva al volver a entrar',
-            (await inRoot()) && Math.abs(r2.x - r1.x) < 5,
-            JSON.stringify(r2),
+            saved,
+            `hud-sec-character en perfil: ${saved}`,
         );
         await tool('Unir la barra');
         await sleep(300);

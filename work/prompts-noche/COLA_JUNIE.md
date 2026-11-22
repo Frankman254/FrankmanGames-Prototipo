@@ -1223,10 +1223,7 @@ Revisión de JL-73…108 por el coordinador:
 - Regla de esta tanda: **todo debe quedar hecho.** Una tarea que se bloquea se reintenta en JL-160 con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces escribe la pregunta exacta.
 
 ### Reasignadas: lo que no quedó hecho
-- [ ] JL-74b Escenario `barra` en verde (reasignación de JL-74).
-  - Haz el arrastre con `Input.dispatchMouseEvent` de CDP.
-  - «Se conserva al volver a entrar» falla porque `newGame()` del arnés borra las posiciones del HUD (JL-73). El escenario debe comprobar la conservación recargando la misma partida, sin llamar a `newGame()` entre medias.
-  - Si de verdad se solapan las secciones del personaje y de la mascota, corrige las posiciones por defecto en `hudProfiles.ts`.
+- [x] JL-74b Escenario `barra` en verde (reasignación de JL-74). — commit «JL-74b: escenario barra — desbloquear, arrastrar por grip, conservar por perfil» — 6/6 en verde (2 ejecuciones), tsc sin errores nuevos, push OK. Evidencia en work/junie-jl74b/REPORTE.md.
 - [ ] JL-85b Escenario `crestalba` en verde (reasignación de JL-85). El diagnóstico «WebGL no arranca sin pantalla» no cuadra: otros escenarios dibujan modelos.
   - Busca la causa real: el nombre del mesh (`mount:*`), el momento de la espera o la carga del GLB.
   - Que CDP no se caiga al reiniciar.

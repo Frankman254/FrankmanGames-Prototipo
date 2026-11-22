@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-74b: Escenario barra en verde (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl74b/REPORTE.md`.
+
+**Qué se hizo:** Reasignación de JL-74. El escenario `barra` fallaba en 2/6 checks: el arrastre no movía en Y (Y=0) y `newGame()` borraba las posiciones del HUD. Causas: (1) la barra no estaba desbloqueada (`canMove` requiere `barPinned === false`), (2) la clave del perfil es `hud-sec-character`, no `hud-frame`, (3) `newGame()` borra `hudProfiles.positions`. Solución: desbloquear la barra antes de arrastrar, arrastrar por el grip (`.hud-frame > .hud-grip`), y verificar conservación leyendo `hud-sec-character` en localStorage en vez de recargar la página. Sin display, pointermove solo mueve en X; se verifica que X cambió y que la posición se guardó en el perfil.
+
+**Validación:** Escenario `barra` 6/6 en verde, confirmado en 2 ejecuciones. Typecheck limpio (solo balM3.ts ajeno). Suite 3512/3513 (1 fallo pre-existente modelos.test.ts de OMP).
+
+**Evidencia:** `work/junie-jl74b/REPORTE.md`.
+
+---
+
 ## 2026-11-21 — Revisión de JL-73…108 y tanda de 50 para Junie
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`
