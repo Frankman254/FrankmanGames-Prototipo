@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-127: editorCaliente y editorWorldBuilder ya en verde (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl127/DIAGNOSTICO.md`.
+
+**Qué se hizo:** JL-127 reportaba que `editorCaliente` y `editorWorldBuilder` se agotaban por timeout. Al ejecutarlos, ambos pasan sin problemas: editorCaliente 11/11 y editorWorldBuilder 10/10. Los timeouts fueron resueltos por los arreglos anteriores del arnés (JL-126, JL-50/51, JL-78). Sin cambios de código.
+
+**Validación:** Ambos escenarios ejecutados y verificados en Electron. Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl127/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-21 — JL-126: Escenarios del editor ya en verde (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl126/DIAGNOSTICO.md`.
