@@ -1,3 +1,15 @@
+## 2026-11-22 — JL-118: content:check valida tipos de efecto (Junie)
+
+**Archivos:** `scripts/contentCheck.ts`, `tests/jl118_effectType.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** El script `content:check` no validaba los tipos de efecto de los hechizos. Si un hechizo declaraba `{ type: "efecto_falso" }`, el script no lo detectaba. Se añadió la lista `KNOWN_EFFECT_TYPES` (26 tipos, extraída de `parseEffect` en `content.ts`) y la función `spellEffectTypes()` que recorre efectos y sub-efectos (trap/zone). Ahora `checkContent()` reporta cada tipo no reconocido.
+
+**Cómo se verificó:** 4 pruebas nuevas en `tests/jl118_effectType.test.ts`: efecto falso simple, sub-efecto en trampa, tipos válidos sin falso positivo, varios tipos falsos en un hechizo. Suite 3561/3561, tsc sin errores nuevos, `content:check` OK sobre datos reales.
+
+**Evidencia:** `tests/jl118_effectType.test.ts`.
+
+---
+
 ## 2026-11-22 — JL-117: pruebas de rankLadder con maxRank 6 y hechizos tardíos (Junie)
 
 **Archivos:** `tests/jl117_rankLadder.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

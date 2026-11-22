@@ -93,7 +93,37 @@ function checkRefs(problems: Problem[], file: string, contextId: string, refIds:
 // Recolección de referencias de cada colección
 // ---------------------------------------------------------------------------
 
-/** Extrae los statusIds referenciados en los efectos de un hechizo. */
+/** Tipos de efecto que el motor reconoce (parseEffect en content.ts). */
+const KNOWN_EFFECT_TYPES = new Set([
+  'damage',
+  'heal',
+  'status',
+  'shield',
+  'knockback',
+  'dash',
+  'teleport',
+  'restoreResource',
+  'summon',
+  'zone',
+  'blink',
+  'swap',
+  'pull',
+  'recoil',
+  'trap',
+  'reveal',
+  'chain',
+  'bonusVsStatus',
+  'selfStack',
+  'power',
+  'critChance',
+  'critDamage',
+  'fixedDamage',
+  'pushDamage',
+  'dispel',
+  'shareDamage',
+]);
+
+/** Extrae los statusIds y los tipos de efecto de un hechizo. */
 function spellStatusIds(spell: Json): string[] {
   const out: string[] = [];
   const effects = spell['effects'];
@@ -103,6 +133,30 @@ function spellStatusIds(spell: Json): string[] {
       if ((fx as Json)['type'] === 'status') {
         const sid = (fx as Json)['statusId'];
         if (typeof sid === 'string') out.push(sid);
+      }
+    }
+  }
+  return out;
+}
+
+/** Extrae los tipos de efecto usados en un hechizo (incluidos los de trap/zone). */
+function spellEffectTypes(spell: Json): string[] {
+  const out: string[] = [];
+  const effects = spell['effects'];
+  if (!Array.isArray(effects)) return out;
+  for (const fx of effects) {
+    if (fx && typeof fx === 'object' && !Array.isArray(fx)) {
+      const t = (fx as Json)['type'];
+      if (typeof t === 'string') out.push(t);
+      // Dentro de trap/zone hay sub-efectos
+      const sub = (fx as Json)['effects'];
+      if (Array.isArray(sub)) {
+        for (const sf of sub) {
+          if (sf && typeof sf === 'object' && !Array.isArray(sf)) {
+            const st = (sf as Json)['type'];
+            if (typeof st === 'string') out.push(st);
+          }
+        }
       }
     }
   }
@@ -442,6 +496,16 @@ export function checkContent(data?: SyntheticData): Problem[] {
   for (const [sid, spell] of Object.entries(spells)) {
     const statusRefs = spellStatusIds(spell);
     checkRefs(problems, 'rpg/spells.json', sid, statusRefs, statusIds, 'statusId');
+  }
+
+  // ---- Tipos de efecto: cada efecto debe ser conocido ----
+  for (const [sid, spell] of Object.entries(spells)) {
+    const types = spellEffectTypes(spell);
+    for (const t of types) {
+      if (!KNOWN_EFFECT_TYPES.has(t)) {
+        problems.push({ file: 'rpg/spells.json', id: sid, detail: `tipo de efecto "${t}" no reconocido` });
+      }
+    }
   }
 
   // ---- Referencias: hechizo → clase ----
