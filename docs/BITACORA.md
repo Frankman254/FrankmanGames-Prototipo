@@ -1,3 +1,13 @@
+## 2026-11-22 — OMP-POL-02: tres juegos de material por profundidad (OMP)
+
+**Archivos:** `scripts/blender/mazmorra.py`, `scripts/blender/validar_tramos_cripta.py` (nuevo), seis PNG en `assets/textures/` (baldosa/muro × raices/humedo/oro), `PROCEDENCIA.md`.
+
+**Qué se hizo:** el contrato de tema por tramos se escribió primero (`work/omp-pol02/CONTRATO.md`, para que el programador lo conecte en POL-02b: `floorTex`/`wallTex` en `DungeonThemeDef` y `staticTexture(scene, th.floorTex ?? 'baldosa')` en dungeonView.ts). `mazmorra.py` genera seis texturas procedurales nuevas con numpy: losas con raíces y astillas (1–30), piedra mojada con charcos, regueros y musgo (31–70), y veta metálica con motas de oro y losa de hueso (71–100). Todas casi blancas y repetibles sin costura (el trazo se envuelve en x e y; las motas se dibujan sobre un toro); viajan por el mismo canal de tinte que las actuales. `mazmorra.glb` NO cambia: mismos 30 nombres de malla y origen; `baldosa.png` y `muro.png` intactas para losa y los pisos a mano.
+
+**Validación:** `validar_tramos_cripta.py` en verde (512², salto de costura ≤1,25× el gradiente interior, media ≥0,55, mallas intactas); `tests/modelos.test.ts` 12/12; lámina antes/después con los tintes del contrato aplicados: `work/omp-pol02/lamina.png` (HOY losa / raíces / húmedo / oro, suelo arriba muro abajo). Los tintes son `PROPUESTA` hasta que el creador los vea en el juego (POL-02b).
+
+---
+
 ## 2026-11-22 — JL-137: Error de Babylon `postProcessManager` al cambiar de escena (Junie)
 
 **Archivos:** `src/main.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl137/DIAGNOSTICO.md`.

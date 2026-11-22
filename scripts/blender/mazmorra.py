@@ -87,8 +87,12 @@ def edge_mask(dist, width):
     return np.clip(dist / width, 0, 1)
 
 
-def brick_texture(size=512, rows=4, columns=2):
-    rng = np.random.default_rng(41)
+def brick_texture(size=512):
+    return save_gray('muro', _brick_base(size=size))
+
+
+def _brick_base(size=512, rows=4, columns=2, seed=41, tone_spread=0.16, tone_low=0.8):
+    rng = np.random.default_rng(seed)
     y, x = np.mgrid[0:size, 0:size]
     row_h = size / rows
     row = (y / row_h).astype(int)
@@ -98,13 +102,17 @@ def brick_texture(size=512, rows=4, columns=2):
     dy = np.minimum(y % row_h, row_h - y % row_h)
     dx = np.minimum(sx % col_w, col_w - sx % col_w)
     mask = edge_mask(np.minimum(dx, dy) - 3, 7)
-    tones = rng.random((rows, columns)) * 0.16 + 0.8
+    tones = rng.random((rows, columns)) * tone_spread + tone_low
     body = tones[row, col] * (0.82 + 0.3 * grain(size, rng))
-    return save_gray('muro', np.clip(0.3 + (body - 0.3) * mask, 0, 1))
+    return np.clip(0.3 + (body - 0.3) * mask, 0, 1)
 
 
 def tile_texture(size=512):
-    rng = np.random.default_rng(73)
+    return save_gray('baldosa', _tile_base(size=size))
+
+
+def _tile_base(size=512, seed=73):
+    rng = np.random.default_rng(seed)
     y, x = np.mgrid[0:size, 0:size]
     half = size // 2
     # Cuatro losas de tamaños distintos, con la junta algo torcida.
@@ -116,7 +124,146 @@ def tile_texture(size=512):
     tones = rng.random((2, 2)) * 0.14 + 0.84
     tone = tones[(cy >= half).astype(int), (cx >= half).astype(int)]
     body = tone * (0.84 + 0.28 * grain(size, rng))
-    return save_gray('baldosa', np.clip(0.26 + (body - 0.26) * mask, 0, 1))
+    return np.clip(0.26 + (body - 0.26) * mask, 0, 1)
+
+
+# POL-02: los tres tramos de profundidad (OMP-POL-02, contrato en
+# work/omp-pol02/CONTRATO.md). Son variantes procedurales de muro y baldosa que
+# el juego tiñe igual que las de arriba, así que van casi blancas y sin color:
+# lo que cambia es el dibujo. Los nombres de PNG son el contrato con el
+# programador (th.wallTex / th.floorTex); las dos originales no se tocan.
+
+
+def _root_lines(size, rng, n, weight, dark):
+    """Rasguños que atraviesan la textura de lado a lado, en torzo, y se
+    repiten sin costura al bordarlos. `n` trazos, grosor `weight`, tono `dark`."""
+    out = np.zeros((size, size))
+    yy, xx = np.mgrid[0:size, 0:size]
+    x1 = np.arange(size)
+    for k in range(n):
+        # curva lenta y periódica en x (frecuencias enteras): sin costura vertical
+        f1 = rng.integers(1, 4)
+        f2 = rng.integers(1, 3)
+        ph1, ph2 = rng.random(2) * 2 * math.pi
+        yline = (size * (k + 0.5) / n
+                 + size * 0.16 * np.sin(x1 * 2 * math.pi * f1 / size + ph1)
+                 + size * 0.07 * np.sin(x1 * 2 * math.pi * f2 / size + ph2))
+        d = np.abs(yy - yline[None, :])
+        d = np.minimum(d, size - d)  # el trazo se envuelve en y: sin costura horizontal
+        stroke = np.clip(1 - d / (weight * (0.7 + 0.6 * rng.random())), 0, 1) ** 2
+        out += stroke
+    out = np.clip(out, 0, 1)
+    # el grosor tiembla, pero el trazo no se corta: máscara con suelo alto
+    out *= 0.35 + 0.65 * np.clip(periodic_noise(size, 12, rng) * 1.8, 0, 1)
+    return out * dark
+
+
+def _speckle(size, rng, n, radius, amount):
+    """Motas suaves dibujadas sobre un toro (se envuelven en x e y): sin
+    costura por construcción."""
+    out = np.zeros((size, size))
+    r = int(radius)
+    yy, xx = np.mgrid[-r:r + 1, -r:r + 1]
+    disc = np.clip(1 - np.hypot(xx, yy) / r, 0, 1)
+    for _ in range(n):
+        cx, cy = rng.integers(0, size, 2)
+        k = disc * (0.5 + rng.random())
+        h, w = k.shape
+        ys = (cy + np.arange(-r, r + 1)) % size
+        xs = (cx + np.arange(-r, r + 1)) % size
+        np.maximum.at(out, np.ix_(ys, xs), k)
+    return out * amount
+
+
+def baldosa_raices_texture(size=512):
+    """Tramo 1-30: losa agrietada con raices finas cruzando las juntas."""
+    rng = np.random.default_rng(91)
+    base = _tile_base(size=size, seed=91)
+    lines = _root_lines(size, rng, 7, 7.5, 0.55) + _root_lines(size, rng, 3, 3.5, 0.3)
+    v = base * (1 - np.clip(lines, 0, 1) * 0.72)
+    # la losa se astilla cerca de las raices
+    v -= np.clip(lines - 0.25, 0, 1) * 0.12 * (0.4 + 0.6 * periodic_noise(size, 32, rng))
+    return save_gray('baldosa_raices', np.clip(v, 0, 1))
+
+
+def muro_raices_texture(size=512):
+    rng = np.random.default_rng(93)
+    base = _brick_base(size=size, seed=93)
+    lines = _root_lines(size, rng, 5, 8.0, 0.5)
+    v = base * (1 - np.clip(lines, 0, 1) * 0.66)
+    v -= _speckle(size, rng, 26, 5, 0.09)
+    return save_gray('muro_raices', np.clip(v, 0, 1))
+
+
+def baldosa_humedo_texture(size=512):
+    """Tramo 31-70: piedra mojada. Manchas oscuras de agua, anillo claro de
+    charco y musgo punteado."""
+    rng = np.random.default_rng(81)
+    base = _tile_base(size=size, seed=81)
+    wet = periodic_noise(size, 3, rng)
+    wet = np.clip((wet - 0.52) * 2.8, 0, 1)
+    v = base * (1 - wet * 0.62)
+    # el charco brilla en el borde, que es donde el agua está más quieta
+    edge = np.clip((wet - 0.42) * 5, 0, 1) - wet * 0.9
+    v += np.clip(edge, 0, 1) * 0.16
+    moss = np.clip((periodic_noise(size, 10, rng) - 0.66) * 4.5, 0, 1)
+    moss *= np.clip(periodic_noise(size, 48, rng) * 1.6, 0, 1)
+    v -= moss * 0.2
+    # el musgo también aclara: esporas
+    v += _speckle(size, rng, 40, 3, 0.07) * (moss > 0.2)
+    return save_gray('baldosa_humedo', np.clip(v, 0, 1))
+
+
+def muro_humedo_texture(size=512):
+    rng = np.random.default_rng(83)
+    base = _brick_base(size=size, seed=83)
+    # regueros: ruido estirado en vertical (poca frecuencia en y, mucha en x)
+    drift = periodic_noise(size, 6, rng)
+    streak = np.clip((drift - 0.62) * 3.2, 0, 1)
+    col = periodic_noise(size, 28, rng)
+    reg = np.zeros((size, size))
+    for y in range(size):
+        reg[y] = np.roll(streak[(y - 90) % size], int(7 * math.sin(y * 0.11) + 9 * col[y, :].mean()))
+    v = base * (1 - np.clip(reg, 0, 1) * 0.55)
+    pool = np.clip((periodic_noise(size, 3, rng) - 0.7) * 3.4, 0, 1)
+    v -= pool * 0.28
+    v -= _speckle(size, rng, 34, 4, 0.12)
+    return save_gray('muro_humedo', np.clip(v, 0, 1))
+
+
+def baldosa_oro_texture(size=512):
+    """Tramo 71-100: veta brillante en vez de raiz, mota clara de oro y losa
+    de hueso mas palida entre las demas."""
+    rng = np.random.default_rng(71)
+    base = _tile_base(size=size, seed=71)
+    lines = _root_lines(size, rng, 5, 6.5, 0.55)
+    v = base.copy()
+    # la veta clarea (el oro refleja); el surco debajo oscurece
+    vein = np.clip(lines, 0, 1)
+    v += vein * 0.45
+    v -= np.clip(vein - 0.62, 0, 1) * 1.1
+    v -= (vein > 0.02) * (vein < 0.3) * 0.45
+    flecks = _speckle(size, rng, 90, 2, 0.5)
+    v += np.clip(flecks - 0.15, 0, 1) * 0.42
+    # una losa de hueso, mas clara: mancha suave centrada, periodica (sin costura)
+    yy, xx = np.mgrid[0:size, 0:size]
+    cx, cy = size * 0.25, size * 0.25
+    dxm = np.minimum(np.abs(xx - cx), size - np.abs(xx - cx))
+    dym = np.minimum(np.abs(yy - cy), size - np.abs(yy - cy))
+    bone = np.clip(1 - np.hypot(dxm, dym) / (size * 0.3), 0, 1)
+    v = v * (1 - bone * 0.14) + bone * 0.1
+    return save_gray('baldosa_oro', np.clip(v, 0, 1))
+
+
+def muro_oro_texture(size=512):
+    rng = np.random.default_rng(73)
+    base = _brick_base(size=size, seed=73, tone_spread=0.22, tone_low=0.76)
+    lines = _root_lines(size, rng, 4, 5.5, 0.5)
+    v = base + np.clip(lines, 0, 1) * 0.42
+    v -= np.clip(lines - 0.62, 0, 1) * 1.0
+    v += np.clip(_speckle(size, rng, 70, 2, 0.45) - 0.12, 0, 1) * 0.34
+    v -= _speckle(size, rng, 18, 6, 0.1)
+    return save_gray('muro_oro', np.clip(v, 0, 1))
 
 
 def clay_texture(size=256):
@@ -171,6 +318,10 @@ def stave_texture(size=256):
 scene = fg.fresh_scene('Mazmorra')
 muro = brick_texture()
 baldosa = tile_texture()
+# POL-02: las seis del contrato de tramos (se regeneran con el catalogo)
+for f in (baldosa_raices_texture, muro_raices_texture, baldosa_humedo_texture,
+          muro_humedo_texture, baldosa_oro_texture, muro_oro_texture):
+    f()
 STONE = fg.textured_material('Piedra_muro', muro)
 FLOOR = fg.textured_material('Piedra_baldosa', baldosa)
 DARK = fg.material('Oscuro', (0.01, 0.01, 0.015))
