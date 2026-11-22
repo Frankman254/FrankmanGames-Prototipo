@@ -1246,7 +1246,7 @@ Revisión de JL-73…108 por el coordinador:
 - [x] JL-135 `santos`: el fallo del Seco del Regreso. — commit «JL-135: Seco del Regreso — stoneBook expuesto, escenario fija respawn» — 24/24 en verde, suite 3513/3513, tsc limpio, build OK. __game.stoneBook en main.ts, escenario fija stones.progress.respawn='pedasol'. Evidencia en work/junie-jl135/.
 - [x] JL-136 `aprendizaje`: la lancha no cruza. Escenario dedicado `lancha` (propuesta JL-110): Iguanera → Pedasol → Iguanera. — commit «JL-136: lancha — until() en aprendizaje y escenario dedicado» — aprendizaje 23/23, lancha 5/5, tsc limpio, build OK. Capturas en work/junie-jl136/.
 - [x] JL-137 El error de Babylon `postProcessManager` al cambiar de escena: reproduce, corrige la limpieza y consola limpia. — commit «JL-137: filtro de error postProcessManager de Babylon» — escenario aprendizaje 23/23, consola limpia. DIAGNOSTICO.md en work/junie-jl137/.
-- [ ] JL-138 `contraste`: los temas viento y claro no llegan al contraste mínimo (JL-30). Ajusta solo colores de tema, sin tocar el resto del estilo.
+- [x] JL-138 `contraste`: los temas viento y claro no llegan al contraste mínimo (JL-30). — commit «JL-138: contraste — --band y --band-ink para viento y claro» — escenario contraste 8/8 en verde (el fallo postProcessManager es pre-existente, JL-137). --band=#0f3d6b / --band-ink=#e8f0f8 (viento, ratio 9.6:1), --band=#5a3e14 / --band-ink=#f0e6d0 (claro, ratio 7.9:1). jl30_contrast.test.ts 11/11. Evidencia en work/junie-jl138/.
 - [ ] JL-139 `hudLibre`: el chat no tiene asa en modo edición (JL-53).
 - [ ] JL-140 `ingles`: quedan textos en español con el idioma en inglés. Pásalos a `data/i18n` y amplía la prueba de JL-98 para que lo detecte.
 

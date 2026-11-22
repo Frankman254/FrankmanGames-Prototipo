@@ -100,7 +100,8 @@
     --paper-2: #d6e5f1;
     --good: #2b7a2a;
     --bad: #b3352a;
-    --band-ink: #17293a;
+    --band: #0f3d6b;
+    --band-ink: #e8f0f8;
     --accent-rgb: 21, 93, 153;
     --accent-hi-rgb: 16, 86, 142;
     --edge-rgb: 154, 182, 205;
@@ -184,7 +185,8 @@
     --paper-2: #dccbaa;
     --good: #267119;
     --bad: #b0392b;
-    --band-ink: #2a2116;
+    --band: #5a3e14;
+    --band-ink: #f0e6d0;
     --accent-rgb: 119, 76, 11;
     --accent-hi-rgb: 110, 68, 10;
     --edge-rgb: 168, 138, 92;

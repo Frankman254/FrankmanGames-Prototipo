@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-138: contraste de los temas viento y claro (Junie)
+
+**Archivos:** `src/ui/styles/themes.css`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl138/EVIDENCIA.md`.
+
+**Qué se hizo:** El escenario Electron `contraste` fallaba en los temas `viento` y `claro`: los H2 de `.panel-head` ("Personaje", "Mochila y equipo") tenían ratio 2.2:1 y 2.7:1 (necesitan 4.5:1). Causa: ambos temas no definían `--band` ni `--band-ink`, heredando el default `--band-ink: #ffffff` (blanco) sobre un fondo claro generado por `color-mix`. Solución: agregar `--band` y `--band-ink` explícitos — viento: `#0f3d6b` / `#e8f0f8` (ratio 9.6:1); claro: `#5a3e14` / `#f0e6d0` (ratio 7.9:1).
+
+**Validación:** Escenario `contraste` 8/8 checks en verde. `jl30_contrast.test.ts` 11/11. Typecheck limpio (solo `balM3.ts` ajeno).
+
+---
+
 ## 2026-11-22 — OMP-POL-02: tres juegos de material por profundidad (OMP)
 
 **Archivos:** `scripts/blender/mazmorra.py`, `scripts/blender/validar_tramos_cripta.py` (nuevo), seis PNG en `assets/textures/` (baldosa/muro × raices/humedo/oro), `PROCEDENCIA.md`.
