@@ -5833,6 +5833,7 @@ const scenarios = {
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
 scenarios.viaje.timeout = 300;
 scenarios.perfil.timeout = 300;
+scenarios.perfilCpu.timeout = 300;
 scenarios.crestalba.timeout = 300;
 scenarios.mazmorraHonda.timeout = 300;
 // JL-81: aprendizaje necesita más tiempo por la pesca (hasta 12 iteraciones).

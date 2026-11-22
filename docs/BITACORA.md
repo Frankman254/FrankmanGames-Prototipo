@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-128: `perfil` y `perfilCpu` — timeouts y caída de CDP (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl128/DIAGNOSTICO.md`.
+
+**Qué se hizo:** JL-128 reportaba que los escenarios `perfil` y `perfilCpu` se agotaban y CDP caía. Diagnóstico: `perfil` ya tenía timeout propio (300 s) y pasa estable. `perfilCpu` no tenía timeout propio: se añadió `scenarios.perfilCpu.timeout = 300`. El escenario completa el perfilado correctamente; el único fallo es el error de consola pre-existente de Babylon `postProcessManager` (JL-137), intermitente y no determinista.
+
+**Validación:** `perfil`: 2/2 ejecuciones en verde. `perfilCpu`: completa el perfilado; el check "Sin errores en la consola" falla intermitentemente por JL-137. Typecheck limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-21 — JL-127: editorCaliente y editorWorldBuilder ya en verde (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl127/DIAGNOSTICO.md`.
