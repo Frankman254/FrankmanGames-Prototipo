@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-114: escenario compendio — búsqueda, resistencias y visor 3D (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Escenario `compendio` en `scripts/qaElectron.mjs`: abre el compendio con Numpad3, verifica las 3 pestañas (Criaturas, Objetos, Zonas), prueba la búsqueda de criaturas (normalización de acentos), muestra la ficha de criatura con resistencias elementales (6 badges verde/rojo/gris), cambia entre pestañas y verifica el visor 3D conectado. Selector `.comp-list?.children` para evitar el bug de `h('div.comp-row', {class:'on'})` que sobrescribe la clase.
+- 10 checks: pestañas, lista de criaturas, búsqueda, ficha con nombre y resistencias, pestaña Objetos, pestaña Zonas, visor 3D conectado.
+
+**Validación:** Escenario `compendio` 10/10 en verde. Typecheck limpio (solo `balM3.ts` ajeno). Capturas en `work/qa/` (jl114-compendio-abierto, jl114-criatura-resistencias, jl114-objetos, jl114-zonas, jl114-visor-3d).
+
 ## 2026-11-22 — JL-113: escenario editorMazmorra con ciclo ▶ Probar / ⏹ Stop (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

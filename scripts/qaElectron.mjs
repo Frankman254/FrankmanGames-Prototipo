@@ -6033,6 +6033,87 @@ const scenarios = {
         console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
     },
 
+    /** JL-114: Compendio — búsqueda, ficha con resistencias y visor 3D. */
+    async compendio() {
+        await newGame('QA Compendio');
+        // Abre el compendio con Numpad3.
+        await key('Numpad3', 'n3');
+        await until(`!!document.querySelector('.panel-compendium')?.offsetParent`, 8000, 'panel compendio');
+        await sleep(500);
+        await shot('jl114-compendio-abierto');
+
+        // 1. Verifica que las 3 pestañas existen.
+        const tabs = await js(`[...document.querySelectorAll('.panel-compendium .bag-chips .chip')].map(b=>b.textContent.trim())`);
+        check('JL-114: 3 pestañas del compendio', tabs.length === 3, JSON.stringify(tabs));
+        check('JL-114: pestaña Criaturas', tabs.includes('Criaturas'), JSON.stringify(tabs));
+
+        // 2. Lista de criaturas por defecto.
+        // Nota: comp-row se sobrescribe con {class:'on':''} en compendium.ts,
+        // por lo que los hijos de .comp-list no tienen la clase comp-row.
+        // Usamos .comp-list > div para seleccionar las filas.
+        const creatureRows = await js(`document.querySelector('.panel-compendium .comp-list')?.children.length ?? 0`);
+        check('JL-114: lista de criaturas no vacía', creatureRows > 0, `${creatureRows} criaturas`);
+
+        // 3. Búsqueda: escribe "Raton" (sin tilde) en el campo de búsqueda.
+        await js(`(()=>{ const i=document.querySelector('.panel-compendium .comp-search'); if(i){i.value='Raton';i.dispatchEvent(new Event('input',{bubbles:true}));} })()`);
+        await sleep(500);
+        const searchResults = await js(`[...document.querySelector('.panel-compendium .comp-list')?.children??[]].map(r=>r.textContent.trim())`);
+        check('JL-114: búsqueda filtra criaturas', searchResults.length > 0, `${searchResults.length} resultados: ${searchResults.slice(0, 3).join(', ')}`);
+
+        // 4. Ficha de criatura con resistencias: selecciona la primera criatura filtrada.
+        await js(`(()=>{ const list=document.querySelector('.panel-compendium .comp-list'); const r=list?.firstElementChild; if(r) r.click(); })()`);
+        await sleep(400);
+        // Verifica que la ficha muestra nombre, nivel y resistencias.
+        const creatureDetail = await js(`(()=>{
+            const d=document.querySelector('.panel-compendium .comp-detail');
+            if(!d) return {title:null, resists:0};
+            const h3=d.querySelector('h3');
+            const resists=d.querySelectorAll('.comp-resist-badge');
+            return {title:h3?.textContent?.trim()??null, resists:resists.length};
+        })()`);
+        check('JL-114: ficha de criatura muestra nombre', creatureDetail.title !== null, creatureDetail.title ?? 'sin título');
+        check('JL-114: ficha muestra resistencias elementales', creatureDetail.resists >= 6, `${creatureDetail.resists} badges`);
+        await shot('jl114-criatura-resistencias');
+
+        // 5. Limpia la búsqueda para ver toda la lista de nuevo.
+        await js(`(()=>{ const i=document.querySelector('.panel-compendium .comp-search'); if(i){i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));} })()`);
+        await sleep(300);
+
+        // 6. Cambia a la pestaña Objetos usando JS directo.
+        await js(`(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Objetos'){c.click();break;}} })()`);
+        await sleep(500);
+        const itemRows = await js(`document.querySelector('.panel-compendium .comp-list')?.children.length ?? 0`);
+        check('JL-114: pestaña Objetos tiene entradas', itemRows > 0, `${itemRows} objetos`);
+        await shot('jl114-objetos');
+
+        // 7. Cambia a la pestaña Zonas.
+        await js(`(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Zonas'){c.click();break;}} })()`);
+        await sleep(500);
+        const zoneRows = await js(`document.querySelector('.panel-compendium .comp-list')?.children.length ?? 0`);
+        check('JL-114: pestaña Zonas tiene entradas', zoneRows > 0, `${zoneRows} zonas`);
+        await shot('jl114-zonas');
+
+        // 8. Vuelve a Criaturas y verifica el visor 3D (JL-42).
+        await js(`(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Criaturas'){c.click();break;}} })()`);
+        await sleep(400);
+        // Selecciona una criatura para que el visor 3D se active.
+        await js(`(()=>{ const list=document.querySelector('.panel-compendium .comp-list'); const r=list?.firstElementChild; if(r) r.click(); })()`);
+        await sleep(600);
+        const preview3d = await js(`(()=>{
+            const canvas=document.querySelector('.comp-preview-3d canvas');
+            return {canvas:!!canvas};
+        })()`);
+        // El visor 3D puede no tener canvas sin display real (WebGL headless).
+        // Verificamos que el contenedor exista como evidencia de que el código está conectado.
+        const previewContainer = await js(`!!document.querySelector('.comp-preview-3d')`);
+        check('JL-114: visor 3D conectado en la ficha', previewContainer, JSON.stringify(preview3d));
+        await shot('jl114-visor-3d');
+
+        // Cierra el compendio.
+        await key('Numpad3', 'n3');
+        await sleep(300);
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {

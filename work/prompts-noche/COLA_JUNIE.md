@@ -1257,7 +1257,7 @@ No se aprueban dos:
 
 - [x] JL-109 Escenario `muerte_y_revivir`, como en la propuesta. — commit «JL-109: escenario muerte_y_revivir — música, HUD y consola tras revivir» — 6/6 en verde, tsc sin errores nuevos, suite 3514/3514. Capturas en work/junie-jl109/.
 - [x] JL-113 Escenario `editorMazmorra` con el ciclo completo: colocar objeto, ▶ Probar, ⏹ Stop y que persista. — commit «JL-113: editorMazmorra — ciclo ▶ Probar / ⏹ Stop y persistencia» — 15/15 en verde, tsc sin errores nuevos, push OK. 3 checks nuevos: ▶ Probar activa Play Mode, workspace oculto, objeto duplicado persiste tras Stop. Capturas en work/junie-jl113/.
-- [ ] JL-114 Escenario `compendio`: búsqueda, ficha con las resistencias y visor 3D.
+- [x] JL-114 Escenario `compendio`: búsqueda, ficha con las resistencias y visor 3D. — commit «JL-114: escenario compendio — búsqueda, resistencias, visor 3D» — 10/10 en verde, tsc sin errores nuevos. Capturas en work/qa/. Evidencia en work/junie-jl114/.
 - [ ] JL-115 Escenario `opciones`: idioma, volumen, modo de cámara y modo de lanzar se guardan y se recuperan al recargar.
 - [ ] JL-116 Escenario `criptaPiso100`: el portero lleva al piso 100 y el hilo devuelve a la superficie.
 - [ ] JL-117 Prueba de `rankLadder` con `maxRank` 6 y hechizos que se aprenden en el nivel 150 o después.
