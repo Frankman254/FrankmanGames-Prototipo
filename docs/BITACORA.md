@@ -1,5 +1,15 @@
 ## 2026-11-22 — JL-119: prueba del Buhonero de pruebas — solo en desarrollo (Junie)
 
+## 2026-11-22 — JL-120: prueba de nivel mínimo para equipar (Junie)
+
+**Archivos:** `tests/jl120_levelEquip.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Prueba que verifica que `canEquip()` y `equip()` en `src/rpg/character.ts` rechazan equipar objetos cuyo nivel supera el del personaje. El juego ya implementaba esta regla (línea 508: `if (def.level > this.level) return fail(...)`). La prueba cubre 4 casos: nivel 1 contra objetos 190+, nivel 200 contra objetos 190+, nivel 50 contra objetos 190+, y `equip()` con objeto en inventario.
+
+**Evidencia:** 4 pruebas verdes (jl120_levelEquip.test.ts), suite 3570/3570, tsc limpio (solo balM3.ts ajeno), push OK.
+
+
+
 **Archivos:** `tests/jl119_devMerchant.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
 
 **Qué se hizo:**
