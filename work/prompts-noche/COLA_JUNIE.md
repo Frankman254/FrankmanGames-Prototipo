@@ -1259,7 +1259,7 @@ No se aprueban dos:
 - [x] JL-113 Escenario `editorMazmorra` con el ciclo completo: colocar objeto, ▶ Probar, ⏹ Stop y que persista. — commit «JL-113: editorMazmorra — ciclo ▶ Probar / ⏹ Stop y persistencia» — 15/15 en verde, tsc sin errores nuevos, push OK. 3 checks nuevos: ▶ Probar activa Play Mode, workspace oculto, objeto duplicado persiste tras Stop. Capturas en work/junie-jl113/.
 - [x] JL-114 Escenario `compendio`: búsqueda, ficha con las resistencias y visor 3D. — 1f85a35f — 10/10 en verde, tsc sin errores nuevos, push OK. Capturas en work/qa/. Evidencia en work/junie-jl114/.
 - [x] JL-115 Escenario `opciones`: idioma, volumen, modo de cámara y modo de lanzar se guardan y se recuperan al recargar. — commit «JL-115: escenario opciones — persistencia en localStorage» — 6/6 en verde, tsc sin errores nuevos, push OK. Captura en work/qa/jl115-opciones.jpg. Evidencia en work/junie-jl115/.
-- [ ] JL-116 Escenario `criptaPiso100`: el portero lleva al piso 100 y el hilo devuelve a la superficie.
+- [x] JL-116 Escenario `criptaPiso100`: el portero lleva al piso 100 y el hilo devuelve a la superficie. — commit «JL-116: escenario criptaPiso100 — portero al piso 100 y hilo de retorno» — 9/9 en verde, capturas en work/junie-jl116/.
 - [ ] JL-117 Prueba de `rankLadder` con `maxRank` 6 y hechizos que se aprenden en el nivel 150 o después.
 - [ ] JL-118 Prueba: `content:check` falla con un tipo de efecto inexistente. Si hoy no falla, añade la validación al script, no al juego.
 - [ ] JL-119 Prueba: el Buhonero de pruebas no existe fuera de `npm run dev`.

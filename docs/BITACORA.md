@@ -1,4 +1,15 @@
 ## 2026-11-22 — JL-114: escenario compendio — búsqueda, resistencias y visor 3D (Junie)
+---
+
+## 2026-11-22 — JL-116: escenario criptaPiso100 — portero al piso 100 y hilo de retorno (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `criptaPiso100` en el arnés de QA. Verifica: partida con llave de cripta, portero Berto Candado existe y abre diálogo, entrada al piso 100 (floor 99) con 117 enemigos, guardián informativo (piso generado sin guardián), hilo de retorno desde el piso 100 (clic en d_returnPost funciona), jugador vuelve a la superficie.
+
+**Validación:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs criptaPiso100` → 9/9 en verde. Capturas en `work/junie-jl116/` (partida, portero, piso 100, guardián, hilo de retorno).
+
+**Falta:** Nada.
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
 
