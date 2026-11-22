@@ -1,3 +1,17 @@
+## 2026-11-22 — JL-113: escenario editorMazmorra con ciclo ▶ Probar / ⏹ Stop (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Escenario `editorMazmorra` en `scripts/qaElectron.mjs`: se añadió el ciclo ▶ Probar / ⏹ Stop al final del recorrido existente (tras la verificación de guardar/reabrir). El ciclo: clic real en ▶ Probar, verificación de que Play Mode se activa y el workspace se oculta, caminar un poco en Play Mode, clic real en ⏹ Stop, verificación de que se vuelve al editor, y confirmación de que el objeto duplicado (barril copia) persiste con la misma posición y clave.
+- 3 checks nuevos: `JL-113 editorMazmorra: clic en ▶ Probar activa Play Mode`, `JL-113 editorMazmorra: workspace oculto en Play Mode`, `JL-113 editorMazmorra: objeto duplicado persiste tras ▶ Probar / ⏹ Stop`.
+
+**Validación:** Escenario `editorMazmorra` 15/15 en verde. Typecheck limpio (solo `balM3.ts` ajeno).
+
+**Evidencia:** Capturas en `work/junie-jl113/` (editor-mazmorra-play-mode.jpg, editor-mazmorra-recorrido-completo.jpg).
+
+---
+
 ## 2026-11-22 — JL-109: escenario muerte_y_revivir (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

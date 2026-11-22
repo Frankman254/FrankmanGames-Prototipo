@@ -4941,6 +4941,70 @@ const scenarios = {
             JSON.stringify(reopened),
         );
 
+        // JL-113: ciclo ▶ Probar / ⏹ Stop en el editor de mazmorra.
+        // Guarda la posición de la copia antes de Play Mode.
+        const copyPosBefore = await js(
+            `__game.editor.objects().find(o=>o.key===${JSON.stringify(copy0?.key)})`,
+        );
+        // Clic real en ▶ Probar.
+        const playBtnMaz = await locate('[data-role="play-btn"]');
+        if (playBtnMaz) {
+            await mouse(playBtnMaz.x, playBtnMaz.y);
+            await sleep(1500);
+            const playModeActive = await js(
+                `document.body.classList.contains('editor-on') && __game.editor?.active === false`,
+            );
+            check(
+                'JL-113 editorMazmorra: clic en ▶ Probar activa Play Mode',
+                playModeActive,
+                String(playModeActive),
+            );
+            if (playModeActive) {
+                // Workspace oculto en Play Mode.
+                const workspaceHidden = await js(`!document.querySelector('.ed-workspace')?.offsetParent`);
+                check(
+                    'JL-113 editorMazmorra: workspace oculto en Play Mode',
+                    workspaceHidden,
+                    String(workspaceHidden),
+                );
+                // Camina un poco en Play Mode.
+                await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await sleep(800);
+                await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await sleep(400);
+                // ⏹ Stop: clic real en el botón de stop.
+                const stopBtnMaz = await locate('[data-role="stop-btn"]');
+                if (stopBtnMaz) {
+                    await mouse(stopBtnMaz.x, stopBtnMaz.y);
+                    await sleep(1500);
+                    const backToEditor = await js(
+                        `__game.editor?.active === true && document.querySelector('.ed-workspace')?.offsetParent`,
+                    );
+                    check(
+                        'JL-113 editorMazmorra: clic en ⏹ Stop vuelve al editor',
+                        backToEditor,
+                        String(backToEditor),
+                    );
+                } else {
+                    // Fallback: F12 para volver.
+                    await key('F12', 'F12');
+                    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor reabierto tras Stop');
+                }
+                // Verifica que la copia persiste con la misma posición tras Play Mode.
+                const copyPosAfter = await js(
+                    `__game.editor.objects().find(o=>o.key===${JSON.stringify(copy0?.key)})`,
+                );
+                check(
+                    'JL-113 editorMazmorra: objeto duplicado persiste tras ▶ Probar / ⏹ Stop',
+                    copyPosAfter?.key === copyPosBefore?.key &&
+                        Math.abs((copyPosAfter?.x ?? 0) - (copyPosBefore?.x ?? 0)) < 0.01 &&
+                        Math.abs((copyPosAfter?.y ?? 0) - (copyPosBefore?.y ?? 0)) < 0.01,
+                    JSON.stringify({ before: copyPosBefore, after: copyPosAfter }),
+                );
+                await shot('editor-mazmorra-play-mode');
+            }
+        }
+
         // Verificar que navpaint exterior y la partida permanecen intactos.
         const overworldNavAfter = await js(`JSON.stringify(__game.overworld.navPaint)`);
         check(
