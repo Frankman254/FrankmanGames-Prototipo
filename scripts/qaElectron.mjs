@@ -4044,19 +4044,33 @@ const scenarios = {
         const probe = `(()=>{ const sc=__game.view.scene; let P=Object.getPrototypeOf(sc.materials[0]); while(P && !Object.prototype.hasOwnProperty.call(P,'_markAllSubMeshesAsDirty')) P=Object.getPrototypeOf(P);
           const m=window.__qaDirty=new Map(); const f=P._markAllSubMeshesAsDirty; P._markAllSubMeshesAsDirty=function(cb){ const st=new Error().stack.split(String.fromCharCode(10)).slice(2,9).map(l=>{ const w=l.trim().split(' '); const u=(w[w.length-1]||'').split('/').pop().split('?')[0].replace(')',''); const q=(w[w.length-1]||'').split(':'); return (w.length>2?w[1]:'')+'@'+u.split(':')[0]+':'+q[q.length-2]; }).join(' < '); m.set(st,(m.get(st)??0)+1); return f.call(this,cb); }; })()`;
         await shot(`sonda-pueblo-${process.env.QA_ETIQUETA ?? 'ultima'}`);
-        console.log('TIPOS', JSON.stringify(await js(`(()=>{ const r={}; for (const x of __game.view.scene.meshes) { const k=x.name.split(':')[0]; if(!/guayacan|indio|corotu|palma|arbol_panama|casa/.test(k)) continue; const t=k+(x.isAnInstance?' inst':x.skeleton?' huesos':x.morphTargetManager?' morph':' clon'); r[t]=(r[t]??0)+1; } return r; })()`)));
-        console.log('MALLAS', JSON.stringify(await js(`(()=>{ const sc=__game.view.scene, m=sc.meshes; const pre={}; for (const x of m) { if(!x.isEnabled()||!x.isVisible) continue; const k=x.name.replace(/[0-9.]+$/,'').slice(0,18); pre[k]=(pre[k]??0)+1; } return {total:m.length, activas:m.filter(x=>x.isEnabled()&&x.isVisible).length, congeladas:m.filter(x=>x.isWorldMatrixFrozen).length, conHuesos:m.filter(x=>x.skeleton).length, instancias:m.filter(x=>x.isAnInstance).length, top:Object.entries(pre).sort((a,b)=>b[1]-a[1]).slice(0,15)}; })()`)));
+        const tipos = await js(`(()=>{ const r={}; for (const x of __game.view.scene.meshes) { const k=x.name.split(':')[0]; if(!/guayacan|indio|corotu|palma|arbol_panama|casa/.test(k)) continue; const t=k+(x.isAnInstance?' inst':x.skeleton?' huesos':x.morphTargetManager?' morph':' clon'); r[t]=(r[t]??0)+1; } return r; })()`);
+        console.log('TIPOS', JSON.stringify(tipos));
+        const mallas = await js(`(()=>{ const sc=__game.view.scene, m=sc.meshes; const pre={}; for (const x of m) { if(!x.isEnabled()||!x.isVisible) continue; const k=x.name.replace(/[0-9.]+$/,'').slice(0,18); pre[k]=(pre[k]??0)+1; } return {total:m.length, activas:m.filter(x=>x.isEnabled()&&x.isVisible).length, congeladas:m.filter(x=>x.isWorldMatrixFrozen).length, conHuesos:m.filter(x=>x.skeleton).length, instancias:m.filter(x=>x.isAnInstance).length, top:Object.entries(pre).sort((a,b)=>b[1]-a[1]).slice(0,15)}; })()`);
+        console.log('MALLAS', JSON.stringify(mallas));
+        check('Sonda: hay mallas activas en el pueblo', mallas.activas > 0, JSON.stringify(mallas));
         await js(probe);
         await sleep(3000);
-        const top = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
-        console.log('PUEBLO', top.join(' | '));
+        const puebloDirty = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
+        const puebloCount = await js(`window.__qaDirty.size`);
+        console.log('PUEBLO', puebloDirty.join(' | '));
+        // 0 llamadas = materiales bien congelados (freeze). Cualquier cifra es valida.
+        check('Sonda: la sonda se instalo y reporto en el pueblo', typeof puebloCount === 'number', `dirtyCalls=${puebloCount} (0 = freeze activo)`);
         await js(`window.__qaDirty.clear(); ${S}.energy.value=20; __game.crypt.enter(19,'above')`);
         await until(`__game.crypt.floor===19`, 15000, 'piso');
         await sleep(6000);
         await js(`window.__qaDirty.clear()`);
         await sleep(3000);
-        const top2 = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
-        console.log('PISO20', top2.join(' | '));
+        const piso20Dirty = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
+        const piso20Count = await js(`window.__qaDirty.size`);
+        console.log('PISO20', piso20Dirty.join(' | '));
+        check('Sonda: la sonda se instalo y reporto en el piso 20', typeof piso20Count === 'number', `dirtyCalls=${piso20Count} (0 = freeze activo)`);
+        // Guardar informe JSON para referencia (igual que rendimientoHondo).
+        const out = { tipos, mallas, pueblo: puebloDirty, piso20: piso20Dirty, puebloDirtyCount: puebloCount, piso20DirtyCount: piso20Count };
+        fs.writeFileSync(
+            path.join(OUT, `sonda-sucio-${process.env.QA_ETIQUETA ?? 'ultima'}.json`),
+            JSON.stringify(out, null, 1),
+        );
     },
     async rendimientoHondo() {
         // Rendimiento en pantalla completa en el pueblo, Iguanera y pisos de la cripta (hecho a mano y hondos):

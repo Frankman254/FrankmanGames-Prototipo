@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-131: Escenario `sondaSucio` con comprobaciones (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl131/INFORME.md`.
+
+**Qué se hizo:** El escenario `sondaSucio` salía con 0 comprobaciones — no llamaba a `check()`. Se añadieron 3 `check()`: (1) mallas activas en el pueblo > 0; (2) sonda instalada y reportando en el pueblo; (3) sonda instalada y reportando en el piso 20. Además se guarda el informe JSON en `work/qa/sonda-sucio-<etiqueta>.json`. Hallazgo: `dirtyCalls=0` en ambos escenarios, confirmando que todos los materiales están correctamente congelados con `.freeze()` (ambientView, dungeonView, materials, vegetationView).
+
+**Validación:** Escenario `sondaSucio` 4/4 en verde. Typecheck limpio (solo balM3.ts ajeno). Build OK.
+
+---
+
 ## 2026-11-21 — JL-130: Escenario `pantallaCompleta` robusto sin display (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl130/DIAGNOSTICO.md`.
@@ -5,6 +15,16 @@
 **Qué se hizo:** El escenario `pantallaCompleta` fallaba 3/5 porque `win.setFullScreen()` de Electron requiere display físico en macOS. Sin monitor, la animación de pantalla completa no se ejecuta y `isFullScreen()` siempre devuelve `false`. Reescrito el escenario para verificar la lógica del juego (IPC `frankmanDesktop`, opciones, eventos) sin depender de pantalla completa real. La verificación visual la hace el creador en Windows.
 
 **Validación:** Escenario `pantallaCompleta` 8/8 en verde. Typecheck limpio (solo balM3.ts ajeno).
+
+---
+
+## 2026-11-21 — OMP-POL-01: la boca de la cripta se lee como entrada (OMP)
+
+**Archivos:** `scripts/blender/mazmorra.py`, `assets/models/mazmorra.glb`, `scripts/blender/validar_entrada_cripta.py` (nuevo), `tests/modelos.test.ts` (fila `prop_hilo_retorno.glb` en FIXED).
+
+**Qué se hizo:** rediseño del frente de `d_entrada`: dos pilares con basa y capitel, dintel de tres gradas y arco de dovelas luminosas que enmarca el hueco, llave emisiva coronando a 4,95 m; montículo de 10,6 m que abraza la boca por detrás y los flancos sin asomar al hueco; tapón negro que cierra el vano a negrura (antes se veía el cielo a través); peldanos al umbral, mangos de antorcha en las repisas y letrero de cara al camino. Vanos de 1,9 m de luz por 3,6 m: el portero (DUN-03) cabe de pie. `mazmorra.glb`: 3.944 tri (antes 3.472), nombres de malla y origen intactos — `data/` y `src/` no se tocaron.
+
+**Validación:** `validar_entrada_cripta.py` en verde; `tests/modelos.test.ts` 12/12 (prop_hilo_retorno añadido a FIXED como catálogo estático, igual que utileria.glb). Capturas en Electron con la cámara de juego desde el camino (lejos 46 m / cerca 7,5 m, yaw mirando a la boca), antes y después: `work/omp-pol01/comparativa_boca.jpg` — de lejos pasó de portículo suelto a cueva en la loma con arco luminoso; de cerca, hueco negro legible.
 
 ---
 
