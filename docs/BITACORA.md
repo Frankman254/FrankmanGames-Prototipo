@@ -158,6 +158,16 @@ Escenario `guardadoCargar` en `scripts/qaElectron.mjs`: nueva partida, entrada a
 
 ---
 
+## 2026-11-22 - OMP-POL-05: falcopamas que se distingan en la oscuridad (OMP, PROPUESTA)
+
+**Archivos:** `scripts/blender/revisar_pol05_falcopama.py` (nuevo). Nada en `assets/`, `src/` ni `data/`: es una propuesta con renders, como pide la cola.
+
+**Qué se hizo:** las siete variantes en venta (`data/rpg/items.json`) se tintan en memoria sobre `falcopama.glb` y se fotografían de noche (fondo de cripta + antorcha) y de día, con y sin propuesta: máscara facial emisiva a 0,55 y plumaje secundario a 0,30 con color aclarado a suelo 0,5, más suelo de brillo 0,18 en el difuso de todas las regiones. De noche la variante se lee por su brillo propio; de día el cambio es mínimo (verificado en la lámina). Contrato para el programador (`emisivo` opcional por variante en `data/art/falcopama_variantes.json` + `paint()` en `mountView.ts`): `work/omp-pol05/PROPUESTA.md`.
+
+**Validación:** lámina `work/omp-pol05/falcopamas_pol05.png` (7 filas × oscuro HOY/oscuro PROP/día HOY/día PROP), Cycles 24 muestras. La captura Electron de la implementación será del programador en POL-05b.
+
+---
+
 ## 2026-11-22 - OMP-POL-03: cuatro guardianes de la cripta, uno por tramo (OMP, PROTOTIPOS)
 
 **Archivos:** `scripts/blender/guardianes_cripta.py` (nuevo), `scripts/blender/revisar_guardianes_cripta.py` (nuevo). Los GLB **no** van al repo: son prototipos en `work/omp-pol03/` hasta el visto del creador, así que no hay fila nueva en `PROCEDENCIA.md` (se registrará al promover).
