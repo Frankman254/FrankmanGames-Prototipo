@@ -1,3 +1,20 @@
+## 2026-11-22 — JL-119: prueba del Buhonero de pruebas — solo en desarrollo (Junie)
+
+**Archivos:** `tests/jl119_devMerchant.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Prueba `tests/jl119_devMerchant.test.ts` con 5 tests que verifican que el Buhonero de pruebas (`dev_buhonero`) solo aparece en modo desarrollo:
+  - `dev_buhonero` tiene `devOnly=true` en los datos parseados.
+  - El NPC `dev_buhonero` está vinculado al mercader.
+  - Un `World` recién creado no incluye al Buhonero sin `placeDevNpc`.
+  - Ningún mercader `devOnly` aparece en los NPCs de un World sin `placeDevNpc`.
+  - Solo `dev_buhonero` tiene `devOnly` entre los mercaderes.
+- El mecanismo ya estaba implementado: `placeNpcs()` en `src/sim/world.ts` saltea los mercaderes con `devOnly`, y solo `main.ts` los coloca con `placeDevNpc()` cuando `import.meta.env.DEV` es true.
+
+**Validación:** 5 pruebas verdes (jl119_devMerchant.test.ts), suite 3566/3566, tsc sin errores nuevos. Evidencia en `work/junie-jl119/`.
+
+---
+
 ## 2026-11-22 — JL-118: content:check valida tipos de efecto (Junie)
 
 **Archivos:** `scripts/contentCheck.ts`, `tests/jl118_effectType.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

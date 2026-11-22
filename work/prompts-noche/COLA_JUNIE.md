@@ -1262,7 +1262,7 @@ No se aprueban dos:
 - [x] JL-116 Escenario `criptaPiso100`: el portero lleva al piso 100 y el hilo devuelve a la superficie. — commit «JL-116: escenario criptaPiso100 — portero al piso 100 y hilo de retorno» — 9/9 en verde, capturas en work/junie-jl116/.
 - [x] JL-117 Prueba de `rankLadder` con `maxRank` 6 y hechizos que se aprenden en el nivel 150 o después. — commit «JL-117: pruebas rankLadder con maxRank 6 y hechizos tardíos» — 43 pruebas verdes (jl117_rankLadder.test.ts), suite 3557/3557, tsc limpio. Evidencia en tests/.
 - [x] JL-118 Prueba: `content:check` falla con un tipo de efecto inexistente. Si hoy no falla, añade la validación al script, no al juego. — commit «JL-118: content:check valida tipos de efecto» — 4 pruebas verdes (jl118_effectType.test.ts), suite 3561/3561, tsc sin errores nuevos, content:check OK sobre datos reales. Evidencia en tests/jl118_effectType.test.ts.
-- [ ] JL-119 Prueba: el Buhonero de pruebas no existe fuera de `npm run dev`.
+- [x] JL-119 Prueba: el Buhonero de pruebas no existe fuera de `npm run dev`. — commit «JL-119: prueba del Buhonero de pruebas — solo en desarrollo» — 5 pruebas verdes (jl119_devMerchant.test.ts), suite 3566/3566, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl119/.
 - [ ] JL-120 Prueba: un personaje de nivel 1 no puede equipar un objeto de nivel 200. **Si hoy sí puede, no lo cambies:** anótalo como pregunta para el creador en `work/junie-jl-120/PREGUNTA.md` y marca `[x]` con el hallazgo.
 - [ ] JL-121 Escenario `guardadoCargar`: guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5.
 - [ ] JL-122 Prueba: las reacciones elementales no se activan con `devReactions: false`.
