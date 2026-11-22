@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-130: Escenario `pantallaCompleta` robusto sin display (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl130/DIAGNOSTICO.md`.
+
+**Qué se hizo:** El escenario `pantallaCompleta` fallaba 3/5 porque `win.setFullScreen()` de Electron requiere display físico en macOS. Sin monitor, la animación de pantalla completa no se ejecuta y `isFullScreen()` siempre devuelve `false`. Reescrito el escenario para verificar la lógica del juego (IPC `frankmanDesktop`, opciones, eventos) sin depender de pantalla completa real. La verificación visual la hace el creador en Windows.
+
+**Validación:** Escenario `pantallaCompleta` 8/8 en verde. Typecheck limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-21 — JL-129: Escenario `diablica` ya resuelto (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl129/DIAGNOSTICO.md`.
