@@ -675,6 +675,14 @@
           ],
           "scale": 0.85
         }
+      },
+      "looks": {
+        "ember_vanguard": {
+          "weapon": "spear"
+        },
+        "ember_vanguard_f": {
+          "weapon": "spear"
+        }
       }
     },
     "bestia": {
@@ -1442,8 +1450,14 @@
       "runSpeed": 1.4,
       "height": 1.77,
       "spellClips": [
-        { "clip": "Danza_Reflejo", "t": 0.775 },
-        { "clip": "Danza_Brinco", "t": 0.521 }
+        {
+          "clip": "Danza_Reflejo",
+          "t": 0.775
+        },
+        {
+          "clip": "Danza_Brinco",
+          "t": 0.521
+        }
       ],
       "clips": {
         "idle": "Reposo",
@@ -1485,7 +1499,7 @@
       "file": "assets/models/aguila_negra.glb",
       "yawDeg": 90,
       "runSpeed": 4,
-      "height": 0.40,
+      "height": 0.4,
       "clips": {
         "idle": "Reposo",
         "walk": "Caminar",
@@ -1554,7 +1568,7 @@
       "file": "assets/models/aguila_arpia.glb",
       "yawDeg": 90,
       "runSpeed": 3,
-      "height": 3.20,
+      "height": 3.2,
       "clips": {
         "idle": "idle_ground",
         "walk": "walk",

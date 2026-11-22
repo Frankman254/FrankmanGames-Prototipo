@@ -1920,7 +1920,7 @@ const scenarios = {
             );
         const nodes = (model) => `__game.view.scene.transformNodes.filter(n=>n.name==='landmark:${model}').length`;
         await until(`${nodes('casa')}>0 && ${nodes('trapiche')}>0 && ${nodes('farola')}>0`, 20000, 'modelos del mapa');
-        check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 16, await js(nodes('casa')));
+        check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 17, await js(nodes('casa')));
         check('Modelos: casa dorada', Number(await js(nodes('casa_dorada'))) === 1, await js(nodes('casa_dorada')));
         check(
             'Modelos: farolas, pozo y trapiche',

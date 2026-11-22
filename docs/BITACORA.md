@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-133/134: Casas y lanza del Centinela (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `src/world/look.ts`, `data/assets.json`, `tests/characterLook.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl133/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- **JL-133:** El escenario `modelos` esperaba 16 casas (`=== 16`) pero hay 17 en `data/vegetation.json` (17 default + 1 golden). La casa extra `(250.41, 234.29)` es de Iguanera, añadida sin actualizar el check. Corregido a `=== 17`.
+- **JL-134:** El Centinela (ember_vanguard) no mostraba su lanza. Causa: `withGear()` en `src/world/look.ts` establecía `weapon: 'none'` cuando no había arma equipada, sobrescribiendo el arma del look de clase. `holdGear()` en `gltfCharacter.ts` eliminaba la pieza de diseño (Lanza) porque `look.weapon === 'none'`. Arreglo: `withGear()` conserva `look.weapon` cuando no hay arma equipada. Se añadió `looks.ember_vanguard` y `looks.ember_vanguard_f` con `weapon: 'spear'` en el template `personaje` de `data/assets.json`. Prueba `characterLook.test.ts` actualizada.
+
+**Validación:** Suite 3513/3513 en verde. Typecheck limpio (solo balM3.ts ajeno). Electron: escenario `modelos` no ejecutable sin display (error localStorage pre-existente del arnés).
+
+---
+
 ## 2026-11-21 — JL-131: Escenario `sondaSucio` con comprobaciones (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl131/INFORME.md`.

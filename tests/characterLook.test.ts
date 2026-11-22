@@ -79,7 +79,8 @@ describe('aspecto del humanoide (datos)', () => {
         const gear = { oak_staff: 'staff', oak_buckler: 'shield' } as const;
         const base: CharacterLook = { ...DEFAULT_LOOK, weapon: 'sword', offhand: 'none' };
         expect(withGear(base, gear, 'oak_staff', 'oak_buckler')).toMatchObject({ weapon: 'staff', offhand: 'shield' });
-        expect(withGear(base, gear, null, null)).toMatchObject({ weapon: 'none', offhand: 'none' });
+        // Sin arma equipada, conserva el arma del look de clase (la pieza de diseño del modelo).
+        expect(withGear(base, gear, null, null)).toMatchObject({ weapon: 'sword', offhand: 'none' });
         // Un arma sin dibujo propio pinta una espada; un escudo puesto como arma, nada.
         expect(withGear(base, gear, 'mystery_blade', null).weapon).toBe('sword');
         expect(withGear(base, gear, 'oak_buckler', null).weapon).toBe('none');

@@ -140,7 +140,7 @@ export function withGear(
     kindOf: (itemId: string) => string | undefined = () => undefined,
     worn?: WornItems,
 ): CharacterLook {
-    const w = weaponItem === null ? 'none' : (gearLookFor(gear, weaponItem, kindOf(weaponItem)) ?? 'sword');
+    const w = weaponItem === null ? look.weapon : (gearLookFor(gear, weaponItem, kindOf(weaponItem)) ?? 'sword');
     const o = offhandItem === null ? undefined : gearLookFor(gear, offhandItem, kindOf(offhandItem));
     return {
         ...look,

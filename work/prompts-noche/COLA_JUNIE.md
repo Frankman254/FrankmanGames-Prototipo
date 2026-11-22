@@ -1241,8 +1241,8 @@ Revisión de JL-73…108 por el coordinador:
 
 ### Fallos del juego que encontró QA (cada uno: prueba que lo reproduzca, arreglo pequeño, escenario en verde)
 - [x] JL-132 `bancoDetalle`: el amuleto que invoca mascota (2 comprobaciones rojas). — commit «JL-132: bancoDetalle — esperar syncPets antes de verificar mascota» — 16/16 en verde, tsc sin errores nuevos, suite 3513/3513. Causa: sleep(500) no esperaba el tick de syncPets(). Reemplazado por until() que espera la mascota. Evidencia en work/junie-jl132/.
-- [ ] JL-133 `modelos`: el pueblo muestra 17 casas y espera 18. Averigua cuál falta y por qué.
-- [ ] JL-134 `modelos`: el Centinela sale sin lanza. Comprueba el nodo de la mano y el arma del GLB.
+- [x] JL-133 `modelos`: 17 casas en el mapa (check 16→17). — commit «JL-133/134: casas y lanza del Centinela» — suite 3513/3513, tsc limpio. DIAGNOSTICO.md en work/junie-jl133/.
+- [x] JL-134 `modelos`: Centinela sin lanza (withGear conserva arma del look, ember_vanguard con spear). — mismo commit que JL-133 — characterLook.test.ts actualizado.
 - [ ] JL-135 `santos`: el fallo del Seco del Regreso. Diagnóstico y arreglo.
 - [ ] JL-136 `aprendizaje`: la lancha no cruza. Escenario dedicado `lancha` (propuesta JL-110): Iguanera → Pedasol → Iguanera.
 - [ ] JL-137 El error de Babylon `postProcessManager` al cambiar de escena: reproduce, corrige la limpieza y consola limpia.
