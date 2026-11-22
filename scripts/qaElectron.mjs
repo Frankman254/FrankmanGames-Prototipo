@@ -2896,13 +2896,76 @@ const scenarios = {
         await sleep(3000);
         check('Aprendizaje: guardar y cargar conserva la cadena', (await state('q_igu_marcas')) === 'completed');
         await js(`__game.board('iguanera_pedasol')`);
-        await sleep(5000);
+        // Esperar a que el jugador llegue al muelle y cruce (puede tardar si está lejos tras cargar).
+        await until(
+            `(()=>{ const p=${W}.player.pos; return Math.hypot(p.x-478,p.y-14)<3; })()`,
+            30000,
+            'cruce a Pedasol',
+        );
         const now = await js(`${W}.player.pos`);
         check(
             'Aprendizaje: terminada, la lancha cruza a Pedasol',
             Math.hypot(now.x - 478, now.y - 14) < 3,
             JSON.stringify(now),
         );
+        await js('clearInterval(window.__qaVida)');
+    },
+
+    /** JL-136: Escenario dedicado — la lancha cruza Iguanera → Pedasol → Iguanera. */
+    async lancha() {
+        await newGame('QA Lancha', { island: true, crossed: true });
+        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.invulnerable=1; },50)`);
+        await sleep(4000);
+
+        // 1) Desde Iguanera a Pedasol.
+        const pos = () => js(`${W}.player.pos`);
+        check('Lancha: empieza en Iguanera', (await pos()).x > 500);
+
+        await js(`__game.board('iguanera_pedasol')`);
+        await until(
+            `(()=>{ const p=${W}.player.pos; return Math.hypot(p.x-478,p.y-14)<3; })()`,
+            30000,
+            'cruce Iguanera → Pedasol',
+        );
+        const enPedasol = await pos();
+        check(
+            'Lancha: llega a Pedasol',
+            Math.hypot(enPedasol.x - 478, enPedasol.y - 14) < 3,
+            JSON.stringify(enPedasol),
+        );
+        await shot('lancha-pedasol');
+
+        // 2) De vuelta: Pedasol → Iguanera.
+        await js(`__game.board('pedasol_iguanera')`);
+        await until(
+            `(()=>{ const p=${W}.player.pos; return Math.hypot(p.x-592,p.y-236)<3; })()`,
+            30000,
+            'cruce Pedasol → Iguanera',
+        );
+        const enIguanera = await pos();
+        check(
+            'Lancha: vuelve a Iguanera',
+            Math.hypot(enIguanera.x - 592, enIguanera.y - 236) < 3,
+            JSON.stringify(enIguanera),
+        );
+        await shot('lancha-iguanera');
+
+        // 3) Guardar y cargar: que la lancha siga funcionando.
+        await saveAndLoad();
+        await sleep(3000);
+        await js(`__game.board('iguanera_pedasol')`);
+        await until(
+            `(()=>{ const p=${W}.player.pos; return Math.hypot(p.x-478,p.y-14)<3; })()`,
+            30000,
+            'cruce tras guardar y cargar',
+        );
+        const trasCargar = await pos();
+        check(
+            'Lancha: cruza tras guardar y cargar',
+            Math.hypot(trasCargar.x - 478, trasCargar.y - 14) < 3,
+            JSON.stringify(trasCargar),
+        );
+
         await js('clearInterval(window.__qaVida)');
     },
 

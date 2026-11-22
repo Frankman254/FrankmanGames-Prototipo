@@ -3700,3 +3700,17 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 **Validación:** Escenario `santos` 24/24 en verde (2 ejecuciones). Suite 3513/3513, tsc limpio (solo balM3.ts ajeno), build OK.
 
+
+## 2026-11-21 — JL-136: Lancha — until() en aprendizaje y escenario dedicado (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl136/`.
+
+**Qué se hizo:**
+- **Causa:** El escenario `aprendizaje` llamaba a `__game.board('iguanera_pedasol')` tras `saveAndLoad()`, pero solo esperaba `sleep(5000)`. El jugador, tras cargar, estaba lejos del muelle (592, 236) y no llegaba a tiempo para que `canBoard()` devolviera true. El jugador quedaba a ~8.7 m del muelle sin cruzar.
+- **Arreglo:** Reemplazado `sleep(5000)` por `until()` que espera hasta que el jugador llegue a Pedasol (478, 14), con timeout de 30 s.
+- **Escenario `lancha`:** Nuevo escenario dedicado que verifica Iguanera → Pedasol → Iguanera, con `until()` en cada cruce, y un cruce tras `saveAndLoad()` para confirmar que la lancha sigue funcionando.
+
+**Validación:** Escenario `aprendizaje` 23/23 en verde (antes 22/23). Escenario `lancha` 5/5 en verde. Typecheck limpio (solo balM3.ts ajeno). Build OK.
+
+---
+
