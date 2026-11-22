@@ -1,4 +1,5 @@
 import { loadGameData } from './data';
+import { tr } from './i18n';
 import { dayLengthSeconds, dayPhaseName } from './world/dayNight';
 import type { GameOptions } from './ui/menus/saveStore';
 import { loadWorldData } from './data/worldData';
@@ -312,7 +313,7 @@ function openStones(): void {
                 saveStones();
             }
             audio?.cue('stone_travel');
-            veil({ kicker: 'Viajando a', title: z.name, sub: 'Piedra Pintada' }, () => teleport(arriveAt(z)));
+            veil({ kicker: tr('Viajando a'), title: z.name, sub: tr('Piedra Pintada') }, () => teleport(arriveAt(z)));
         },
         saveHome,
         all,
@@ -578,7 +579,7 @@ const menus = benchMode
               );
               if (res.message) ch.emit({ type: 'message', text: res.message });
               if (res.ok) {
-                  const label = floor !== null && floor > 0 ? `Retomando en` : 'Entrando en';
+                  const label = floor !== null && floor > 0 ? tr('Retomando en') : tr('Entrando en');
                   crypt.veil(label, target, () => crypt!.enter(target, 'above'));
               }
           },
@@ -667,8 +668,8 @@ function editorApply(
     let summary = '';
     return veil(
         {
-            kicker: 'Aplicando el editor',
-            title: 'Actualizando el mundo',
+            kicker: tr('Aplicando el editor'),
+            title: tr('Actualizando el mundo'),
             sub: `${files.length} archivo${files.length === 1 ? '' : 's'}`,
         },
         () => {
@@ -1194,7 +1195,7 @@ function spellCatalogGroup(
     presets: ReturnType<typeof spellCatalogPresets>,
 ): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
     return {
-        name: 'Catálogo completo · hechizos, iconos y efectos',
+        name: tr('Catálogo completo · hechizos, iconos y efectos'),
         entries: presets.map((p) => ({
             id: p.id,
             name: p.name,
@@ -1212,7 +1213,7 @@ function setShowcaseGroup(
     presets: ReturnType<typeof setShowcasePresets>,
 ): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
     return {
-        name: 'Conjuntos · Ajuar de la Diablica Espeja',
+        name: tr('Conjuntos · Ajuar de la Diablica Espeja'),
         entries: presets.map((p) => ({
             id: p.id,
             name: p.name,
@@ -1230,7 +1231,7 @@ function itemCatalogGroup(
     presets: ReturnType<typeof itemCatalogPresets>,
 ): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
     return {
-        name: 'Catálogo completo · objetos e iconos',
+        name: tr('Catálogo completo · objetos e iconos'),
         entries: presets.map((p) => ({
             id: p.id,
             name: p.name,
@@ -1254,7 +1255,7 @@ function regionCoverageGroup(
             name: `${p.band.label} · ${data.rpg.classes[p.classId]!.name}`,
             description: `${p.band.territory === 'playable' ? 'Llegada real caminable' : 'Lugar planificado: abre en el hogar hasta que tenga geografía jugable'} · build equilibrada y equipo obtenible.`,
             group: 'regions',
-            role: 'exploración · lugar y clase',
+            role: tr('exploración · lugar y clase'),
             classId: p.classId,
             level: p.level,
             place: p.band.territory === 'playable' ? p.band.label : `${p.band.label} · planificado`,
@@ -1266,13 +1267,13 @@ function guardianCoverageGroup(
     profiles: GuardianCoverageProfile[],
 ): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
     return {
-        name: 'Cripta · jefes (nivel del guardián)',
+        name: tr('Cripta · jefes (nivel del guardián)'),
         entries: profiles.map((p) => ({
             id: p.profile.id,
             name: `Jefe piso ${p.floor + 1} · ${data.rpg.enemies[p.guardian.archetype]?.name ?? p.guardian.archetype} · ${data.rpg.classes[p.profile.classId]!.name}`,
             description: `Guardián nivel ${p.guardian.level} (piso ${p.floorLevelMin}–${p.floorLevelMax}) · personaje al nivel del guardián, build equilibrada y equipo optimizado obtenible · pociones y llaves.`,
             group: 'dungeon',
-            role: 'mazmorra · jefe',
+            role: tr('mazmorra · jefe'),
             classId: p.profile.classId,
             level: p.profile.level,
             place: floorTitle(dungeonDef, p.floor),
@@ -1760,7 +1761,7 @@ perf.features = () => {
     const z = world.currentZone;
     const state =
         [p.flight ? 'volando' : null, aimingSpell() !== null ? 'apuntando' : null].filter(Boolean).join(', ') ||
-        'a pie';
+        tr('a pie');
     return (
         `GPU ${gpu} · ${engine.getRenderWidth()}×${engine.getRenderHeight()} · mallas ${view.scene.getActiveMeshes().length}/${view.scene.meshes.length}\n` +
         (o
@@ -1826,7 +1827,7 @@ menus?.onAction((a) => {
             );
         else if (!world.player.flight)
             menus?.toast(
-                world.canFly() ? 'Aterrizas' : 'Hace falta una montura que vuele',
+                world.canFly() ? tr('Aterrizas') : tr('Hace falta una montura que vuele'),
                 world.canFly() ? 'info' : 'warn',
             );
         return;
@@ -1876,7 +1877,7 @@ menus?.onAction((a) => {
 function recallToStone(): void {
     const stone = stones.respawn;
     const at = arriveAt(stone);
-    veil({ kicker: 'Volviendo a', title: stone.name, sub: 'Piedra Pintada' }, () => {
+    veil({ kicker: tr('Volviendo a'), title: stone.name, sub: tr('Piedra Pintada') }, () => {
         if (world.interior) newWorld(data.loadTest.seed + ++runIndex, at);
         else teleport(at);
     });
@@ -1939,7 +1940,7 @@ menus?.onSession((s) => {
     meter.reset();
     runIndex++;
     const seed = data.loadTest.seed + runIndex;
-    veil({ kicker: place ? 'Cargando partida' : 'Partida nueva', title: s.player().name, sub: place?.name }, () =>
+    veil({ kicker: place ? tr('Cargando partida') : tr('Partida nueva'), title: s.player().name, sub: place?.name }, () =>
         enterPlace(place, seed, loadedDungeonState),
     );
 });
@@ -2302,7 +2303,7 @@ view.engine.runRenderLoop(() => {
     spectralGuide.hidden = !world.character.spectral.active || !world.player.alive;
     if (!spectralGuide.hidden)
         spectralText.textContent =
-            'Forma espectral · Busca ' +
+            tr('Forma espectral · Busca ') +
             (nearestAltar()?.name ?? 'un Alzador') +
             '. No puedes combatir, hablar ni usar casi nada.';
     layoutTopStack();

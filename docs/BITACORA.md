@@ -1,3 +1,17 @@
+## 2026-11-22 — JL-140: textos en español sin inglés (Junie)
+
+**Archivos:** `data/i18n/en.ui.json`, `scripts/i18nUi.mjs`, `tests/jl98_i18nCoverage.test.ts`, `src/main.ts`, `src/ui/loadingScreen.ts`, `src/ui/menus/screens/modals.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- 127 traducciones nuevas en `data/i18n/en.ui.json`: textos de loadingScreen (consejos y estados), modals (modos de cámara, modos de lanzamiento, opciones de desarrollo), main.ts (viajes, cripta, vuelo), character (enfoques), compendium (filtros), hud (barra de objetos), inventory (huacas), keybindings (acciones), saveStore (migración), format (dispel, efectos), bankPanel (enfoque), chat (mover), dungeonFloorMap (mapa del piso), worldMap (capas), itemContextMenu (apariencias), compendiumPreview (visor 3D), y más.
+- `scripts/i18nUi.mjs`: filtros mejorados para excluir falsos positivos (SVG paths, CSS classes, teclas, fragmentos de código, HTML tags, nombres propios).
+- `tests/jl98_i18nCoverage.test.ts`: nueva prueba que ejecuta `i18nUi.mjs` y falla si quedan textos sin traducir.
+- `src/main.ts`, `src/ui/loadingScreen.ts`, `src/ui/menus/screens/modals.ts`: los textos ahora pasan por `tr()`.
+
+**Validación:** `i18nUi.mjs` reporta 0 textos sin inglés. Suite 3514/3514 en verde. Typecheck limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-22 — JL-139: escenario hudLibre en verde (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

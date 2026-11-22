@@ -1248,7 +1248,7 @@ Revisión de JL-73…108 por el coordinador:
 - [x] JL-137 El error de Babylon `postProcessManager` al cambiar de escena: reproduce, corrige la limpieza y consola limpia. — commit «JL-137: filtro de error postProcessManager de Babylon» — escenario aprendizaje 23/23, consola limpia. DIAGNOSTICO.md en work/junie-jl137/.
 - [x] JL-138 `contraste`: los temas viento y claro no llegan al contraste mínimo (JL-30). — commit «JL-138: contraste — --band y --band-ink para viento y claro» — escenario contraste 8/8 en verde (el fallo postProcessManager es pre-existente, JL-137). --band=#0f3d6b / --band-ink=#e8f0f8 (viento, ratio 9.6:1), --band=#5a3e14 / --band-ink=#f0e6d0 (claro, ratio 7.9:1). jl30_contrast.test.ts 11/11. Evidencia en work/junie-jl138/.
 - [x] JL-139 `hudLibre`: el chat no tiene asa en modo edición (JL-53). — commit «JL-139: escenario hudLibre — check >= 7 elementos editables» — Escenario 5/5 en verde. Causa: el check exigía >= 8, pero con barra fusionada y registro de combate oculto solo hay 7. Ajustado a >= 7.
-- [ ] JL-140 `ingles`: quedan textos en español con el idioma en inglés. Pásalos a `data/i18n` y amplía la prueba de JL-98 para que lo detecte.
+- [x] JL-140 `ingles`: quedan textos en español con el idioma en inglés. Pásalos a `data/i18n` y amplía la prueba de JL-98 para que lo detecte. — commit «JL-140: 127 traducciones i18n + prueba automática» — 127 claves en en.ui.json, i18nUi.mjs 0 textos sin inglés, prueba jl98_i18nCoverage.test.ts 4/4, suite 3514/3514, tsc limpio. tr() en main.ts, loadingScreen.ts, modals.ts. Evidencia en work/junie-jl140/.
 
 ### Propuestas de Junie que el coordinador aprueba (`work/junie-propuestas/BOLSA_SIGUIENTE.md`)
 No se aprueban dos:

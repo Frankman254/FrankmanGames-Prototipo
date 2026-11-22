@@ -1,7 +1,7 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../../perfOverlay';
-import { LANGUAGE_NAMES, LANGUAGES } from '../../../i18n';
+import { LANGUAGE_NAMES, LANGUAGES, tr } from '../../../i18n';
 import { button, h } from '../dom';
 import { devVisualOptions } from './devVisualOptions';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
@@ -103,10 +103,10 @@ export const DEV_INFO_NAMES: Record<DevInfoMode, string> = {
 };
 
 export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
-    manual: 'Manual (solo el jugador mueve la cámara)',
-    semiAuto: 'Semiautomático (gira solo al caminar)',
-    auto: 'Automático (elige distancia y giro)',
-    combat: 'Encuadre de combate (encuadra a los enemigos)',
+    manual: tr('Manual (solo el jugador mueve la cámara)'),
+    semiAuto: tr('Semiautomático (gira solo al caminar)'),
+    auto: tr('Automático (elige distancia y giro)'),
+    combat: tr('Encuadre de combate (encuadra a los enemigos)'),
     zone: 'Estática por casilla del mapa',
 };
 
@@ -152,7 +152,7 @@ const PRESET_NAMES: Record<GraphicsPresetId | 'personalizado', string> = {
     bajo: 'Bajo',
     medio: 'Medio',
     alto: 'Alto',
-    ultra: 'Ultra',
+    ultra: tr('Ultra'),
     personalizado: 'Personalizado',
 };
 const SHADOW_NAMES: Record<ShadowLevel, string> = { no: 'Sin sombras', bajas: 'Bajas', altas: 'Altas' };
@@ -169,9 +169,9 @@ const BAR_NAMES: Record<EnemyBarMode, string> = {
 };
 
 const CAST_MODE_HINTS: Record<CastMode, string> = {
-    pressClick: 'Pulsa la tecla para apuntar, luego pulsa de nuevo o haz clic para lanzar. Esc o clic derecho cancelan.',
-    indicator: 'Mantén la tecla pulsada para ver el área de efecto, suéltala para lanzar. Esc o clic derecho cancelan.',
-    press: 'Pulsa la tecla y el hechizo sale al instante hacia donde apunta el cursor. Sin vista previa.',
+    pressClick: tr('Pulsa la tecla para apuntar, luego pulsa de nuevo o haz clic para lanzar. Esc o clic derecho cancelan.'),
+    indicator: tr('Mantén la tecla pulsada para ver el área de efecto, suéltala para lanzar. Esc o clic derecho cancelan.'),
+    press: tr('Pulsa la tecla y el hechizo sale al instante hacia donde apunta el cursor. Sin vista previa.'),
 };
 
 const LOCK_MODE_NAMES: Record<LockMode, string> = {
@@ -373,11 +373,11 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                 select('Barras de vida', 'enemyBars', ENEMY_BAR_MODES, (v) => BAR_NAMES[v]),
                 check('Nombre y nivel', 'enemyLabels'),
                 check('Números de daño flotantes', 'damageNumbers'),
-                check('Pausa de impacto y sacudida de cámara', 'hitPause'),
+                check(tr('Pausa de impacto y sacudida de cámara'), 'hitPause'),
                 h('h4', { text: 'Combate' }),
                 select('Lanzar hechizos', 'castMode', CAST_MODES, (v) => CAST_MODE_NAMES[v]),
                 h('p.hint', {
-                    text: 'Pulsar dos veces: apunta, luego confirma. Mantener y soltar: ves el área y sueltas. Pulsar una vez: sale al instante. Los hechizos sobre ti salen al momento en cualquier modo. Clic derecho en un hueco de la barra para elegir el modo de ese hechizo.',
+                    text: tr('Pulsar dos veces: apunta, luego confirma. Mantener y soltar: ves el área y sueltas. Pulsar una vez: sale al instante. Los hechizos sobre ti salen al momento en cualquier modo. Clic derecho en un hueco de la barra para elegir el modo de ese hechizo.'),
                 }),
                 select('Placaje (experimental)', 'lockMode', LOCK_MODES, (v) => LOCK_MODE_NAMES[v]),
                 h('p.hint', {
@@ -439,7 +439,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     ];
     if (a.development)
         tabs.push([
-            'Desarrollo',
+            tr('Desarrollo'),
             [
                 h('h4', { text: 'Reloj del mundo' }),
                 select('Duración del día', 'dayLengthMinutes', DAY_LENGTH_MINUTES, (v) => `${v} min`),
@@ -453,9 +453,9 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                     DEV_PROGRESSION_PROFILES,
                     (v) =>
                         ({
-                            productivo: 'Productivo · 10 / 20 / 30',
-                            'anterior-5-5-5': 'Anterior · 5 / 5 / 5',
-                            'historico-5-20-30': 'Histórico · 5 / 20 / 30',
+                            productivo: tr('Productivo · 10 / 20 / 30'),
+                            'anterior-5-5-5': tr('Anterior · 5 / 5 / 5'),
+                            'historico-5-20-30': tr('Histórico · 5 / 20 / 30'),
                             personalizado: 'Personalizado',
                         })[v],
                 ),
@@ -705,7 +705,7 @@ export function presetsModal(
     // Buscador de texto.
     const searchInput = h('input.preset-search', {
         type: 'text',
-        placeholder: 'Buscar por nombre, clase, lugar…',
+        placeholder: tr('Buscar por nombre, clase, lugar…'),
     }) as HTMLInputElement;
 
     // Filtros por clase.

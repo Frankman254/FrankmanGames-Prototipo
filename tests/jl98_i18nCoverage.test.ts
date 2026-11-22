@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -89,5 +90,23 @@ describe('JL-98: cobertura i18n', () => {
         for (const k of expected) {
             expect(allTables[k], `Falta traducción para "${k}"`).toBeDefined();
         }
+    });
+
+    it('no quedan textos en español sin inglés (i18nUi.mjs)', () => {
+        // Ejecuta el script i18nUi.mjs que busca literales en src/ui/ sin traducción.
+        // JL-140: el script excluye fake/, editor/, dev/ y los patrones obvios.
+        // Si encuentra textos sin inglés, la salida empieza con "<n> textos sin inglés".
+        const output = execSync('node scripts/i18nUi.mjs', {
+            cwd: join(__dirname, '..'),
+            encoding: 'utf8',
+            timeout: 30000,
+        });
+        const firstLine = output.trim().split('\n')[0] ?? '';
+        const m = firstLine.match(/^(\d+)\s+textos?\s+sin\s+inglés/);
+        const count = m ? parseInt(m[1] ?? '-1', 10) : -1;
+        expect(
+            count,
+            `Quedan ${count} textos en español sin traducción en inglés.\n${output}`
+        ).toBe(0);
     });
 });

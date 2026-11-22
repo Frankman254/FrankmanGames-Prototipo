@@ -3,6 +3,7 @@
 // los modelos terminan de llegar. Se pinta antes del trabajo pesado (dos
 // fotogramas) para que se vea aunque el hilo quede congelado un momento.
 import './styles/carga.css';
+import { tr } from '../i18n';
 import { UI_LAYER_Z } from './menus/windows';
 
 export interface LoadingText {
@@ -24,7 +25,7 @@ export interface LoadingDeps {
 }
 
 // Consejos sobre lo que ya hace el juego (nada de promesas de contenido).
-const TIPS = [
+const TIPS_RAW = [
     'Las Piedras Pintadas recuerdan dónde despiertas al caer.',
     'Mantén pulsado el botón de andar y el personaje sigue al cursor.',
     'Los monstruos cerca de tu nivel dan más experiencia; los muy débiles, casi nada.',
@@ -52,7 +53,7 @@ export class LoadingScreen {
     private status!: HTMLElement;
     private tip!: HTMLElement;
     private active = false;
-    private tipIndex = Math.floor(Math.random() * TIPS.length);
+    private tipIndex = Math.floor(Math.random() * TIPS_RAW.length);
 
     constructor(private readonly deps: LoadingDeps) {}
 
@@ -76,7 +77,7 @@ export class LoadingScreen {
         this.deps.pause(true);
         try {
             this.show(text);
-            this.progress(0.12, 'Preparando el lugar…');
+            this.progress(0.12, tr('Preparando el lugar…'));
             await nextFrame();
             await nextFrame();
             try {
@@ -84,7 +85,7 @@ export class LoadingScreen {
             } catch (err) {
                 console.error('[carga]', err);
             }
-            this.progress(0.5, 'Cargando modelos…');
+            this.progress(0.5, tr('Cargando modelos…'));
             await nextFrame();
             let peak = 1;
             let calm = 0;
@@ -94,14 +95,14 @@ export class LoadingScreen {
                 peak = Math.max(peak, n);
                 this.progress(
                     0.5 + 0.38 * (1 - n / peak),
-                    n > 0 ? `Cargando modelos (${n})…` : 'Preparando la escena…',
+                    n > 0 ? `Cargando modelos (${n})…` : tr('Preparando la escena…'),
                 );
                 calm = n === 0 ? calm + 1 : 0;
                 if (calm >= 3) break;
                 await nextFrame();
             }
             if (this.deps.ready) await Promise.race([this.deps.ready().catch(() => undefined), wait(5000)]);
-            this.progress(1, 'Listo');
+            this.progress(1, tr('Listo'));
         } finally {
             this.deps.pause(false);
             await this.hide();
@@ -141,8 +142,8 @@ export class LoadingScreen {
     private show(text: LoadingText): void {
         this.root ??= this.build();
         this.label(text);
-        this.tipIndex = (this.tipIndex + 1) % TIPS.length;
-        this.tip.textContent = TIPS[this.tipIndex]!;
+        this.tipIndex = (this.tipIndex + 1) % TIPS_RAW.length;
+        this.tip.textContent = tr(TIPS_RAW[this.tipIndex]!);
         this.root.classList.remove('fuera');
         this.root.hidden = false;
     }
