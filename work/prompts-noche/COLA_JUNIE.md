@@ -1260,7 +1260,7 @@ No se aprueban dos:
 - [x] JL-114 Escenario `compendio`: búsqueda, ficha con las resistencias y visor 3D. — 1f85a35f — 10/10 en verde, tsc sin errores nuevos, push OK. Capturas en work/qa/. Evidencia en work/junie-jl114/.
 - [x] JL-115 Escenario `opciones`: idioma, volumen, modo de cámara y modo de lanzar se guardan y se recuperan al recargar. — commit «JL-115: escenario opciones — persistencia en localStorage» — 6/6 en verde, tsc sin errores nuevos, push OK. Captura en work/qa/jl115-opciones.jpg. Evidencia en work/junie-jl115/.
 - [x] JL-116 Escenario `criptaPiso100`: el portero lleva al piso 100 y el hilo devuelve a la superficie. — commit «JL-116: escenario criptaPiso100 — portero al piso 100 y hilo de retorno» — 9/9 en verde, capturas en work/junie-jl116/.
-- [ ] JL-117 Prueba de `rankLadder` con `maxRank` 6 y hechizos que se aprenden en el nivel 150 o después.
+- [x] JL-117 Prueba de `rankLadder` con `maxRank` 6 y hechizos que se aprenden en el nivel 150 o después. — commit «JL-117: pruebas rankLadder con maxRank 6 y hechizos tardíos» — 43 pruebas verdes (jl117_rankLadder.test.ts), suite 3557/3557, tsc limpio. Evidencia en tests/.
 - [ ] JL-118 Prueba: `content:check` falla con un tipo de efecto inexistente. Si hoy no falla, añade la validación al script, no al juego.
 - [ ] JL-119 Prueba: el Buhonero de pruebas no existe fuera de `npm run dev`.
 - [ ] JL-120 Prueba: un personaje de nivel 1 no puede equipar un objeto de nivel 200. **Si hoy sí puede, no lo cambies:** anótalo como pregunta para el creador en `work/junie-jl-120/PREGUNTA.md` y marca `[x]` con el hallazgo.

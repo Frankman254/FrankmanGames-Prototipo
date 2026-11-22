@@ -1,3 +1,15 @@
+## 2026-11-22 — JL-117: pruebas de rankLadder con maxRank 6 y hechizos tardíos (Junie)
+
+**Archivos:** `tests/jl117_rankLadder.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 43 pruebas nuevas para `rankLadder()` con `maxRank` 6 y hechizos aprendidos en nivel 150 o después. Cubren: escalera válida para los 16 unlockLevel tardíos de `data/rpg/spells.json`, `rankAtLevel` coincide con la escalera, casos límite (U=150 con 6 rangos completos, U=190 con margen 10, U=200 con 6 peldaños en nivel 200, U=195 con niveles duplicados), monotonía no-decreciente para todos los U 1–200, y ningún umbral supera `maxLevel`.
+
+**Hallazgo:** `rankLadder` permite niveles duplicados cuando el margen es muy pequeño (U=195+): rangos 2 y 3 pueden compartir el mismo nivel porque `ceil((M-U)*f)` da el mismo valor para factores cercanos. Esto es el comportamiento actual documentado en HZ-03-fix.
+
+**Validación:** `npx vitest run` 3557/3557, `npx tsc --noEmit` limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-22 — JL-114: escenario compendio — búsqueda, resistencias y visor 3D (Junie)
 ---
 
