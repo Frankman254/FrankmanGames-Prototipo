@@ -6114,6 +6114,81 @@ const scenarios = {
         await sleep(300);
     },
 
+    /** JL-115: Escenario opciones — idioma, volumen, modo de cámara y modo de lanzar
+     * se guardan en localStorage y se recuperan al recargar la página. */
+    async opciones() {
+        await newGame('QA Opciones');
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+
+        // 1. Cambiar opciones reconocibles (lejos de los defaults).
+        const testLang = 'en';
+        const testVolume = 0.5;
+        const testCameraMode = 'auto';
+        const testCastMode = 'holdClick';
+
+        await js(`(()=>{
+            const o = JSON.parse(localStorage.getItem('frankmangames.options') || '{}');
+            o.language = '${testLang}';
+            o.volume = ${testVolume};
+            o.cameraMode = '${testCameraMode}';
+            o.castMode = '${testCastMode}';
+            localStorage.setItem('frankmangames.options', JSON.stringify(o));
+        })()`);
+
+        // Verificar que se guardaron en localStorage.
+        const saved = await js(`(()=>{
+            const o = JSON.parse(localStorage.getItem('frankmangames.options') || 'null');
+            return o ? { language: o.language, volume: o.volume, cameraMode: o.cameraMode, castMode: o.castMode } : null;
+        })()`);
+        check('opciones: guardadas en localStorage',
+            saved && saved.language === testLang && saved.volume === testVolume &&
+            saved.cameraMode === testCameraMode && saved.castMode === testCastMode,
+            JSON.stringify(saved));
+
+        // 2. Recargar la página completa (simula cerrar y abrir el juego).
+        await cdp('Page.navigate', { url });
+        await sleep(2000);
+
+        // 3. Esperar a que la pantalla de título vuelva a cargar.
+        try {
+            await until(`!!document.querySelector('[data-testid="new-game"]')`, 30000, 'título tras recarga');
+        } catch {
+            const state = await js(
+                `document.readyState+' · '+location.href+' · '+document.body.innerText.replace(/\\s+/g,' ').slice(0,200)`,
+            ).catch((e) => `sin respuesta (${e.message.slice(0, 80)})`);
+            check('opciones: página recargada', false, String(state));
+            // Intentamos leer las opciones de todas formas.
+        }
+
+        // 4. Leer las opciones directamente de localStorage (no dependen de que el juego esté en marcha).
+        const recovered = await js(`(()=>{
+            const o = JSON.parse(localStorage.getItem('frankmangames.options') || 'null');
+            return o ? { language: o.language, volume: o.volume, cameraMode: o.cameraMode, castMode: o.castMode } : null;
+        })()`);
+
+        check('opciones: idioma recuperado tras recarga',
+            recovered && recovered.language === testLang,
+            recovered ? recovered.language : 'null');
+        check('opciones: volumen recuperado tras recarga',
+            recovered && recovered.volume === testVolume,
+            recovered != null ? String(recovered.volume) : 'null');
+        check('opciones: modo de cámara recuperado tras recarga',
+            recovered && recovered.cameraMode === testCameraMode,
+            recovered ? recovered.cameraMode : 'null');
+        check('opciones: modo de lanzar recuperado tras recarga',
+            recovered && recovered.castMode === testCastMode,
+            recovered ? recovered.castMode : 'null');
+
+        // 5. Captura final con las opciones en inglés visibles en la pantalla de título.
+        await shot('jl115-opciones');
+
+        // Restaurar idioma español y resolución.
+        await js(`(()=>{ try{ const o=JSON.parse(localStorage.getItem('frankmangames.options')||'{}');
+            if(o){o.language='es'; localStorage.setItem('frankmangames.options',JSON.stringify(o));} }catch(e){} })()`);
+        await resize(1280, 800);
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {

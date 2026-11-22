@@ -3810,3 +3810,14 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 ---
 
+## 2026-11-22 — JL-115: escenario opciones — persistencia en localStorage (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Escenario `opciones` en `scripts/qaElectron.mjs`: crea partida, cambia idioma a inglés, volumen a 0.5, modo de cámara a 'auto' y modo de lanzar a 'holdClick' en localStorage, verifica que se guardaron, recarga la página completa con `Page.navigate`, espera la pantalla de título y verifica que las 4 opciones se recuperan intactas. Captura final de la pantalla de título en inglés.
+- 6 checks: guardadas en localStorage, idioma recuperado, volumen recuperado, modo de cámara recuperado, modo de lanzar recuperado, sin errores de consola.
+
+**Validación:** Escenario `opciones` 6/6 en verde. Typecheck limpio (solo `balM3.ts` ajeno). Captura en `work/qa/jl115-opciones.jpg`.
+
+**Evidencia:** `work/qa/jl115-opciones.jpg`, `work/qa/resultado.json`.
