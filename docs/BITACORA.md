@@ -126,7 +126,19 @@
 
 ---
 
-## 2026-11-22 — OMP-POL-02: tres juegos de material por profundidad (OMP)
+## 2026-11-22 - OMP-POL-03: cuatro guardianes de la cripta, uno por tramo (OMP, PROTOTIPOS)
+
+**Archivos:** `scripts/blender/guardianes_cripta.py` (nuevo), `scripts/blender/revisar_guardianes_cripta.py` (nuevo). Los GLB **no** van al repo: son prototipos en `work/omp-pol03/` hasta el visto del creador, así que no hay fila nueva en `PROCEDENCIA.md` (se registrará al promover).
+
+**Qué se hizo:** verificado antes de modelar — hoy los once pisos con guardián (`data/dungeon.json` `tiers`) usan archetipos de zona heredados (`chame_grandcrab`, `boquete_foreman`, …) y en la cripta solo hay una silueta (`cripta_guardian`, k 0,85) más sus variantes de tinte. Cuatro guardianes nuevos, cada uno con silueta propia legible de lejos y más grande que el base: **raicero** (5-20: jorobado de capa de raíz, podón y farol de calavera; 600 tri), **anfibio** (30-50: pescuezo largo, aletas costales, redecilla de caña, garfio; 427 tri), **enmascarado** (60-80: estela de obsidiana y jade con máscara funeraria y andas en la espalda; 474 tri), **coloso de la huaca** (90-100: fuste-campana de oro, pechonal de máscara felina, corona de puntas, doble hacha; 461 tri). Mismo rig `FG_*` bípedo de `fg_rig.py` y los ocho clips de los enemigos exactos en los cuatro GLB; miran a -Y; clean-room desde primitivas.
+
+**Validación:** `guardianes_cripta.py` imprime por GLB triángulos y clips (427/461/474/600 ≤ presupuesto; clips: Atacar, Caminar, Correr, Golpeado, Lanzar, Morir, Reposo, Rodar). Lámina de tres vistas por guardián junto al base: `work/omp-pol03/guardianes_pol03.png`; lista para elegir: `work/omp-pol03/LISTA.md`. Sin captura en Electron: nada de `work/` se carga en el juego y los prototipos no están integrados (regla 2); la captura llega con la promoción.
+
+**Espera al creador:** qué cuatro valen / qué se corrige. Después, Junie o el coordinador promueven a `assets/models/`, plantillas en `data/assets.json` y `guardian` por tramo en `data/dungeon.json` (OMP no toca `data/` ni `src/`).
+
+---
+
+## 2026-11-22 - OMP-POL-02: tres juegos de material por profundidad (OMP)
 
 **Archivos:** `scripts/blender/mazmorra.py`, `scripts/blender/validar_tramos_cripta.py` (nuevo), seis PNG en `assets/textures/` (baldosa/muro × raices/humedo/oro), `PROCEDENCIA.md`.
 
