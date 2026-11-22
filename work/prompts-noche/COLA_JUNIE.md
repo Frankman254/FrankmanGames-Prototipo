@@ -1208,3 +1208,95 @@ Reglas comunes de toda la bolsa:
 - [x] JL-106 Regenerar `work/claude-map-nod-01/` con `npx vite-node scripts/audit/mundoNodos.ts` y anotar en el informe qué incoherencias cambiaron desde la última vez. — commit «JL-106: regenerar mundoNodos — 13 modelos actualizados, 0 incoherencias nuevas» — CAMBIOS.md en work/claude-map-nod-01/.
 - [x] JL-107 Recorrido completo de QA_SESION con todos los escenarios. — commit «JL-107: QA completo — 321 OK / 25 FALLA pre-existentes» — 14 tandas, 0 regresiones. RESUMEN.md actualizado. Evidencia en work/junie-jl107/.
 - [x] JL-108 Última de la bolsa. — commit «JL-108: 15 propuestas para la bolsa siguiente» — BOLSA_SIGUIENTE.md en work/junie-propuestas/ con JL-109 a JL-123 (escenarios QA, pruebas, arreglos typecheck). Sin código.
+
+
+## Tanda del 2026-11-21, madrugada (el creador: «asignale una tanda grande, si alguna no la termino toca reasignarsela nuevamente al final todo debe estar completado»). En este orden.
+
+Revisión de JL-73…108 por el coordinador:
+- Suite 3513/3513 en verde y tsc limpio, salvo `scripts/balance/balM3.ts`, que es ajeno: no lo toques.
+- El arnés usa su propio perfil (`work/qa-electron-profile*`), así que las partidas reales no corren peligro.
+- **«Sin display» no vale como motivo de bloqueo en este Mac.**
+  - El arnés dibuja con WebGL: `rendimiento` midió 61/86/119 fps y JL-95, 63 fps.
+  - Un arrastre con `setPointerCapture` funciona con eventos de verdad de CDP (`Input.dispatchMouseEvent` con `mousePressed`/`mouseMoved`/`mouseReleased`), no con `dispatchEvent` desde JS.
+  - Antes de marcar `[!]` por pantalla, prueba eso y deja la salida en el informe.
+- Tres commits fueron solo de documentación (`bba23066`, `bde9b19f`, `b66d51a1`), contra la regla «Sin commits de una línea». La casilla de una tarea sin código entra en el commit de la siguiente.
+- Regla de esta tanda: **todo debe quedar hecho.** Una tarea que se bloquea se reintenta en JL-160 con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces escribe la pregunta exacta.
+
+### Reasignadas: lo que no quedó hecho
+- [ ] JL-74b Escenario `barra` en verde (reasignación de JL-74).
+  - Haz el arrastre con `Input.dispatchMouseEvent` de CDP.
+  - «Se conserva al volver a entrar» falla porque `newGame()` del arnés borra las posiciones del HUD (JL-73). El escenario debe comprobar la conservación recargando la misma partida, sin llamar a `newGame()` entre medias.
+  - Si de verdad se solapan las secciones del personaje y de la mascota, corrige las posiciones por defecto en `hudProfiles.ts`.
+- [ ] JL-85b Escenario `crestalba` en verde (reasignación de JL-85). El diagnóstico «WebGL no arranca sin pantalla» no cuadra: otros escenarios dibujan modelos.
+  - Busca la causa real: el nombre del mesh (`mount:*`), el momento de la espera o la carga del GLB.
+  - Que CDP no se caiga al reiniciar.
+- [ ] JL-91b Escenario `modosLanzar` con apuntado real al suelo. Hoy solo comprueba la lógica de `castInput` porque supuso que no había WebGL.
+  - Lanza un hechizo de área con cada uno de los tres modos sobre un enemigo y comprueba que recibe daño.
+
+### Rojos del arnés de JL-107 (cada uno: causa, arreglo y escenario en verde tres veces seguidas)
+- [ ] JL-124 `audio`: JL-79 lo dio 5/5 y JL-107 se agotó esperando la portada. Es intermitente: hazlo robusto.
+- [ ] JL-125 `banco`: se agota esperando el panel del banco. Antes pasaba 5/5.
+- [ ] JL-126 Escenarios del editor que se agotan esperando `.name-input`: `editorMazmorra`, `editor_play`, `casco_capa`, `emotes` y `curas_dialogo`. Seguramente comparten causa (el flujo de partida nueva cambió). Un solo arreglo en el arnés.
+- [ ] JL-127 `editorCaliente` (escena lista) y `editorWorldBuilder` (guardado exterior): los tiempos agotados.
+- [ ] JL-128 `perfil` y `perfilCpu`: los tiempos agotados y la caída de CDP.
+- [ ] JL-129 `diablica`: tiempo agotado a los 120 s.
+- [ ] JL-130 `pantallaCompleta`: este Mac tiene pantalla. Espera a que termine la animación de pantalla completa de macOS antes de medir. Si algo solo puede pasar en Windows, el escenario lo dice con un motivo explícito, no con un fallo silencioso.
+- [ ] JL-131 `sondaSucio` sale con 0 comprobaciones: o se arregla para que compruebe algo, o el informe explica por qué está vacío.
+
+### Fallos del juego que encontró QA (cada uno: prueba que lo reproduzca, arreglo pequeño, escenario en verde)
+- [ ] JL-132 `bancoDetalle`: el amuleto que invoca mascota (2 comprobaciones rojas). Sin cambiar cifras.
+- [ ] JL-133 `modelos`: el pueblo muestra 17 casas y espera 18. Averigua cuál falta y por qué.
+- [ ] JL-134 `modelos`: el Centinela sale sin lanza. Comprueba el nodo de la mano y el arma del GLB.
+- [ ] JL-135 `santos`: el fallo del Seco del Regreso. Diagnóstico y arreglo.
+- [ ] JL-136 `aprendizaje`: la lancha no cruza. Escenario dedicado `lancha` (propuesta JL-110): Iguanera → Pedasol → Iguanera.
+- [ ] JL-137 El error de Babylon `postProcessManager` al cambiar de escena: reproduce, corrige la limpieza y consola limpia.
+- [ ] JL-138 `contraste`: los temas viento y claro no llegan al contraste mínimo (JL-30). Ajusta solo colores de tema, sin tocar el resto del estilo.
+- [ ] JL-139 `hudLibre`: el chat no tiene asa en modo edición (JL-53).
+- [ ] JL-140 `ingles`: quedan textos en español con el idioma en inglés. Pásalos a `data/i18n` y amplía la prueba de JL-98 para que lo detecte.
+
+### Propuestas de Junie que el coordinador aprueba (`work/junie-propuestas/BOLSA_SIGUIENTE.md`)
+No se aprueban dos:
+- JL-111 sobra, porque `assets.test.ts` ya está en verde.
+- JL-112 tampoco va: `balM3.ts` es ajeno.
+
+- [ ] JL-109 Escenario `muerte_y_revivir`, como en la propuesta.
+- [ ] JL-113 Escenario `editorMazmorra` con el ciclo completo: colocar objeto, ▶ Probar, ⏹ Stop y que persista. Hazlo después de JL-126.
+- [ ] JL-114 Escenario `compendio`: búsqueda, ficha con las resistencias y visor 3D.
+- [ ] JL-115 Escenario `opciones`: idioma, volumen, modo de cámara y modo de lanzar se guardan y se recuperan al recargar.
+- [ ] JL-116 Escenario `criptaPiso100`: el portero lleva al piso 100 y el hilo devuelve a la superficie.
+- [ ] JL-117 Prueba de `rankLadder` con `maxRank` 6 y hechizos que se aprenden en el nivel 150 o después.
+- [ ] JL-118 Prueba: `content:check` falla con un tipo de efecto inexistente. Si hoy no falla, añade la validación al script, no al juego.
+- [ ] JL-119 Prueba: el Buhonero de pruebas no existe fuera de `npm run dev`.
+- [ ] JL-120 Prueba: un personaje de nivel 1 no puede equipar un objeto de nivel 200. **Si hoy sí puede, no lo cambies:** anótalo como pregunta para el creador en `work/junie-jl-120/PREGUNTA.md` y marca `[x]` con el hallazgo.
+- [ ] JL-121 Escenario `guardadoCargar`: guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5.
+- [ ] JL-122 Prueba: las reacciones elementales no se activan con `devReactions: false`.
+- [ ] JL-123 Prueba: `hotbarFillOrder` con 30 casillas y 3 filas las cubre todas sin repetir.
+
+### Más cobertura y calidad
+- [ ] JL-141 Escenario `fantasma`: el fantasma de JL-90 aparece, se mueve y ataca con la animación de reserva, sin errores de consola.
+- [ ] JL-142 Escenario `fauna`: ver de cerca las águilas, el ñeque, el tapir, el jaguar, el búho y el zorro de JL-86…89. Una captura de cada uno al lado del jugador, para comprobar la escala.
+- [ ] JL-143 Escenario `utileriaCripta`: los tres tramos de la cripta (1–30, 31–70 y 71–100) muestran su utilería de JL-88 sin tapar pasillos.
+- [ ] JL-144 Prueba: ninguna pieza de utilería de la cripta cae sobre una baldosa de paso ni delante de una antorcha. Comprobación sobre los datos de todos los pisos a mano.
+- [ ] JL-145 Prueba: cada arquetipo de `data/assets.json` que apunta a un GLB tiene en ese GLB los clips que pide su plantilla, o una reserva declarada. Es la generalización de JL-90.
+- [ ] JL-146 El guion de JL-99 (`scripts/audit/nombreModelo.ts`) también sale en `npm run` con un nombre corto (`audit:modelos`), y queda documentado en `docs/ESTADO_ACTUAL.md` si esa sección existe.
+- [ ] JL-147 Escenario `monturasAndar`: andar, girar y frenar montado en cada montura. Capturas de la inercia de JL-70, sin errores de consola.
+- [ ] JL-148 Escenario `teclasModos`: Z cambia el modo de cámara y la tecla de JL-101, una vez asignada en Opciones, cambia el modo de lanzar. Cada cambio muestra su aviso.
+- [ ] JL-149 Escenario `restablecerHud`: mueve paneles, pulsa Restablecer, pide confirmación (JL-102) y los paneles vuelven a su sitio.
+- [ ] JL-150 Escenario `etiquetaCamara`: la opción de JL-103 enseña y oculta la etiqueta junto al minimapa.
+- [ ] JL-151 `npm run lint` sin avisos nuevos en los archivos que tocaron JL-59…108. Corrige solo esos archivos.
+- [ ] JL-152 Rendimiento de la cripta: el piso 100 va a 58 fps, cuando el pueblo va a 61 y la cripta normal a 119. Mide qué cuesta más (utilería de JL-88, luces o antorchas) y deja un informe con las cifras. Sin cambios si no hay una causa clara y pequeña.
+- [ ] JL-153 Actualizar `work/junie-qa01/RESUMEN.md`: la cabecera aún habla de 271/68. Que refleje la última cifra y enlace a `work/junie-jl107/`.
+- [ ] JL-154 Revisar que cada casilla `[x]` de JL-73…108 cite un commit o una evidencia que exista de verdad: ruta en `work/` y hash en `git log`. Corrige solo las citas rotas.
+
+### Cierre de la tanda
+- [ ] JL-155 Consola limpia otra vez (QA-02) tras esta tanda: 13 escenarios y cero errores nuevos.
+- [ ] JL-156 Recorrido completo de QA en dos pasadas con `QA_SESION`.
+  - El objetivo es 0 FALLA, salvo lo que espera una decisión del creador.
+  - Deja el resumen en `work/junie-jl-156/RESUMEN.md` y compáralo con JL-107.
+- [ ] JL-160 **Reintento obligatorio.** Por cada `[!]` de esta tanda (JL-74b…JL-156):
+  - vuelve a intentarlo con lo aprendido en el resto de la tanda;
+  - si sale, cambia su casilla a `[x]` con la evidencia;
+  - si de verdad necesita al creador, deja la pregunta exacta en `work/junie-jl-160/PREGUNTAS.md`.
+
+  La tanda solo se da por terminada cuando no queda ningún `[!]` sin pregunta escrita.
+- [ ] JL-161 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_2.md` con 20 tareas pequeñas que hayas visto, cada una con evidencia y criterio de hecho. Son propuestas: no las empieces.

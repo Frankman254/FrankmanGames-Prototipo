@@ -1,3 +1,24 @@
+## 2026-11-21 — Revisión de JL-73…108 y tanda de 50 para Junie
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`
+
+**Revisión:**
+- Junie cerró 34 de las 36 tareas. La suite está en 3513/3513 y tsc limpio, salvo `balM3.ts`, que es ajeno.
+- QA pasó de 271 OK y 68 FALLA a 321 OK y 25 FALLA (`work/junie-jl107/`).
+- JL-74 y JL-85 se bloquearon por «sin display». El coordinador no lo acepta: el arnés dibuja con WebGL en este Mac (61 a 119 fps) y CDP sabe hacer arrastres de verdad.
+- JL-91 solo comprobó la lógica de `castInput`.
+- Hubo tres commits solo de documentación, contra la regla.
+
+**Tanda nueva (50 tareas):**
+- reasignadas: JL-74b, JL-85b y JL-91b;
+- los 8 grupos de rojos del arnés;
+- 9 fallos del juego que encontró QA;
+- 12 propuestas de Junie aprobadas;
+- 14 de cobertura;
+- QA completo.
+
+JL-160 obliga a reintentar todo lo bloqueado antes de cerrar la tanda, como pidió el creador: «al final todo debe estar completado».
+
 ## 2026-11-21 — JL-107: Recorrido completo de QA_SESION (Junie)
 
 **Archivos:** `work/junie-qa01/RESUMEN.md`, `work/junie-jl107/RESUMEN.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
