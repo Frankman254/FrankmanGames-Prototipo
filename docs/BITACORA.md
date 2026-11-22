@@ -1,3 +1,13 @@
+## 2026-11-21 — JL-129: Escenario `diablica` ya resuelto (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl129/DIAGNOSTICO.md`.
+
+**Qué se hizo:** JL-129 reportaba que el escenario `diablica` se agotaba a los 120 s. Al ejecutarlo, pasa 7/7 sin timeout en 3 ejecuciones consecutivas. El problema ya fue resuelto por cambios anteriores del arnés: JL-50 (reset de idioma y data-testid), JL-51 (timeouts propios por escenario y relanzar Electron tras timeout) y JL-78 (vaciar ranuras de guardado entre escenarios). Sin cambio de código.
+
+**Validación:** Escenario `diablica` 7/7 en 3 ejecuciones consecutivas. Typecheck limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-21 — JL-128: `perfil` y `perfilCpu` — timeouts y caída de CDP (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl128/DIAGNOSTICO.md`.

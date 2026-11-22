@@ -1235,7 +1235,7 @@ Revisión de JL-73…108 por el coordinador:
 - [x] JL-126 Escenarios del editor que se agotan esperando `.name-input`: `editorMazmorra`, `editor_play`, `casco_capa`, `emotes` y `curas_dialogo`. Seguramente comparten causa (el flujo de partida nueva cambió). Un solo arreglo en el arnés. — 6ebd87e — 5/5 escenarios pasan sin timeout en `.name-input`. DIAGNOSTICO.md en work/junie-jl126/.
 - [x] JL-127 `editorCaliente` y `editorWorldBuilder`: ya resueltos — commit «JL-127: editorCaliente y editorWorldBuilder ya en verde» — editorCaliente 11/11, editorWorldBuilder 10/10. Sin código. DIAGNOSTICO.md en work/junie-jl127/.
 - [x] JL-128 `perfil` y `perfilCpu`: los tiempos agotados y la caída de CDP. — commit «JL-128: perfilCpu con timeout propio 300 s» — perfil estable (1/1), perfilCpu con timeout propio añadido; el único fallo es el error de consola pre-existente de Babylon (JL-137). DIAGNOSTICO.md en work/junie-jl128/.
-- [ ] JL-129 `diablica`: tiempo agotado a los 120 s.
+- [x] JL-129 `diablica`: tiempo agotado a los 120 s. — commit «JL-129: escenario diablica ya resuelto» — 7/7 en 3 ejecuciones consecutivas, sin timeout. Sin código que cambiar: ya robusto por JL-50, JL-51 y JL-78. DIAGNOSTICO.md en work/junie-jl129/.
 - [ ] JL-130 `pantallaCompleta`: este Mac tiene pantalla. Espera a que termine la animación de pantalla completa de macOS antes de medir. Si algo solo puede pasar en Windows, el escenario lo dice con un motivo explícito, no con un fallo silencioso.
 - [ ] JL-131 `sondaSucio` sale con 0 comprobaciones: o se arregla para que compruebe algo, o el informe explica por qué está vacío.
 
