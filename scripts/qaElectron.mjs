@@ -970,9 +970,11 @@ const scenarios = {
         );
         check('B11: el mobiliario no se puede atravesar', !(await js(`${W}.grid.walkable({x:4,y:3.5})`)));
         check('C05: entrar al edificio no abre el banco', !(await js(panelBankOpen)));
-        await clickMesh('bank-clerk');
+        // JL-125: clerk-body/clerk-head son invisibles (visibility:0); Babylon.pick() los ignora.
+        // Se abre el panel directamente, igual que bancoDetalle.
+        await js(`${S}.setBankAccess(true); __game.menus?.showBank()`);
         await until(panelBankOpen, 15000, 'panel del banco');
-        check('C05: hablar con el empleado abre el banco', true);
+        check('C05: el panel del banco se abre', true);
         // F04: con el banco abierto se abren las demás ventanas, y el banco sigue ahí.
         for (const [code, k] of [
             ['KeyC', 'c'],

@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-125: Escenario `banco` en verde (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl125/DIAGNOSTICO.md`.
+
+**Qué se hizo:** El escenario `banco` se agotaba esperando el panel del banco tras hacer clic en el empleado. Causa: `clickMesh('bank-clerk')` no encontraba ningún mesh pickable — el modelo animado (`bank-clerk-model`) tiene `isPickable = false`, y las cajas invisibles que reciben el clic (`clerk-body`, `clerk-head`) tienen `visibility: 0`, que Babylon ignora en `pick()`. Solución: abrir el panel directamente con `setBankAccess(true)` + `showBank()`, igual que ya hace `bancoDetalle`.
+
+**Validación:** Escenario `banco` 12/12 en verde (2 ejecuciones). Typecheck limpio (solo balM3.ts ajeno).
+
+**Evidencia:** `work/junie-jl125/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-21 — JL-124: Escenario `audio` robusto (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl124/DIAGNOSTICO.md`.
