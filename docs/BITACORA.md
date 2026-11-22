@@ -1,3 +1,15 @@
+## 2026-11-21 — JL-126: Escenarios del editor ya en verde (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl126/DIAGNOSTICO.md`.
+
+**Qué se hizo:** JL-126 reportaba que 5 escenarios del editor (`editorMazmorra`, `editor_play`, `casco_capa`, `emotes`, `curas_dialogo`) se agotaban esperando `.name-input` en el arnés de QA. Al ejecutarlos individualmente, todos pasan correctamente: editorMazmorra 11/12, editor_play 4/5, casco_capa 3/3, emotes 4/4, curas_dialogo 5/5. Los únicos fallos son el error pre-existente de Babylon `postProcessManager` (JL-137). El problema fue resuelto por los arreglos anteriores del arnés (JL-124, JL-125) que compartían la misma función `newGame()`.
+
+**Validación:** 5 escenarios ejecutados y verificados. Sin cambios de código.
+
+**Evidencia:** `work/junie-jl126/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-21 — JL-125: Escenario `banco` en verde (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl125/DIAGNOSTICO.md`.

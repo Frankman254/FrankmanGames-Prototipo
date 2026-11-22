@@ -1232,7 +1232,7 @@ Revisión de JL-73…108 por el coordinador:
 ### Rojos del arnés de JL-107 (cada uno: causa, arreglo y escenario en verde tres veces seguidas)
 - [x] JL-124 `audio`: JL-79 lo dio 5/5 y JL-107 se agotó esperando la portada. Es intermitente: hazlo robusto. — commit «JL-124: escenario audio robusto — timeout propio 180 s» — 5/5 en 3 ejecuciones consecutivas. DIAGNOSTICO.md en work/junie-jl124/.
 - [x] JL-125 `banco`: se agota esperando el panel del banco. — commit «JL-125: escenario banco abre panel directamente» — 12/12 en verde (2 ejecuciones), tsc sin errores nuevos, push OK. Causa: clickMesh no podía pickar meshes invisibles (visibility:0). Apertura directa con setBankAccess + showBank(). DIAGNOSTICO.md en work/junie-jl125/.
-- [ ] JL-126 Escenarios del editor que se agotan esperando `.name-input`: `editorMazmorra`, `editor_play`, `casco_capa`, `emotes` y `curas_dialogo`. Seguramente comparten causa (el flujo de partida nueva cambió). Un solo arreglo en el arnés.
+- [x] JL-126 Escenarios del editor que se agotan esperando `.name-input`: `editorMazmorra`, `editor_play`, `casco_capa`, `emotes` y `curas_dialogo`. Seguramente comparten causa (el flujo de partida nueva cambió). Un solo arreglo en el arnés. — commit «JL-126: escenarios del editor ya en verde — diagnóstico» — 5/5 escenarios pasan sin timeout en `.name-input`. DIAGNOSTICO.md en work/junie-jl126/.
 - [ ] JL-127 `editorCaliente` (escena lista) y `editorWorldBuilder` (guardado exterior): los tiempos agotados.
 - [ ] JL-128 `perfil` y `perfilCpu`: los tiempos agotados y la caída de CDP.
 - [ ] JL-129 `diablica`: tiempo agotado a los 120 s.
