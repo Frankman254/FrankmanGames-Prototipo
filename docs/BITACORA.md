@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-123: hotbarFillOrder con 30 casillas y 3 filas (Junie)
+
+**Archivos:** `work/junie-jl123/EVIDENCIA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** JL-123 pide una prueba de que `hotbarFillOrder(30, 3)` cubre las 30 casillas sin repetir. La prueba ya existe desde BAR-01 (`9e4b7a1`) en `tests/bar01_hotbarRows.test.ts`, línea 87-93. No se requiere código nuevo.
+
+**Cómo se verificó:** `npx vitest run tests/bar01_hotbarRows.test.ts` → 10/10 verdes. La prueba verifica que el array de 30 elementos contiene todos los índices 0-29.
+
+---
+
 ## 2026-11-22 — JL-122: prueba de reacciones desactivadas por defecto (Junie)
 
 **Archivos:** `tests/jl122_reactionsDisabled.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

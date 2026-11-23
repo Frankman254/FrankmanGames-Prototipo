@@ -1266,7 +1266,7 @@ No se aprueban dos:
 - [x] JL-120 Prueba: un personaje de nivel 1 no puede equipar un objeto de nivel 200. — commit «JL-120: prueba de nivel mínimo para equipar» — 4 pruebas verdes (jl120_levelEquip.test.ts), suite 3570/3570, tsc limpio, push OK. canEquip() ya rechaza con "Requiere nivel N" en character.ts:508. equip() también bloquea. Evidencia en tests/jl120_levelEquip.test.ts.
 - [x] JL-121 Escenario `guardadoCargar`: guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. — commit «JL-121: escenario guardadoCargar — piso 5 de la cripta» — 6/6 en verde, tsc sin errores nuevos. Capturas en work/qa/. Evidencia en work/junie-jl121/.
 - [x] JL-122 Prueba: las reacciones elementales no se activan con `devReactions: false`. — commit «JL-122: prueba de reacciones desactivadas por defecto» — 8 pruebas verdes (jl122_reactionsDisabled.test.ts), suite 3579/3579, tsc sin errores nuevos, build OK. Evidencia en tests/.
-- [ ] JL-123 Prueba: `hotbarFillOrder` con 30 casillas y 3 filas las cubre todas sin repetir.
+- [x] JL-123 Prueba: `hotbarFillOrder` con 30 casillas y 3 filas las cubre todas sin repetir. — Ya estaba hecho (BAR-01, `9e4b7a1`). Prueba en bar01_hotbarRows.test.ts:87-93, 10/10 verdes. Evidencia en work/junie-jl123/.
 
 ### Más cobertura y calidad
 - [ ] JL-141 Escenario `fantasma`: el fantasma de JL-90 aparece, se mueve y ataca con la animación de reserva, sin errores de consola.
