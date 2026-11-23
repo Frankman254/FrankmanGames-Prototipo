@@ -40,7 +40,7 @@ El creador pidió rehacer de una vez los iconos faltantes o pobres, incluidos em
 
 Además se regeneraron los 1.100 objetos con caja segura de 216 px y ornamentos estructurales para rutas, especializaciones, aprendizaje y conjuntos bi/trielementales: 642 siluetas alfa distintas y máximo de repetición 21, frente a 543 y 71. Validadores en verde; láminas a tamaño real en `work/codex-icon-refresh/review/auxiliares.png` y `work/codex-eq06/pages/`.
 
-Verificación: 26/26 pruebas focales y las pruebas de foco, i18n y chat en verde; Vite de producción compila. Electron: interfaz/portada/creación/oficios 18/18, chat y gestos 4/4, editor 9/9 operaciones funcionales. El editor conserva un error de consola preexistente de Babylon (`rgbdTextureTools`, `postProcessManager` nulo) al cerrar/reabrir; no procede de los iconos. `npm run typecheck` sigue bloqueado únicamente por el archivo ajeno sin commit `scripts/balance/balM3.ts`.
+Verificación: 98/98 pruebas focales/de foco/i18n/chat en verde; Vite de producción compila. Electron: interfaz/portada/creación/oficios 18/18, chat y gestos 4/4, editor 9/9 operaciones funcionales. El editor conserva un error de consola preexistente de Babylon (`rgbdTextureTools`, `postProcessManager` nulo) al cerrar/reabrir; no procede de los iconos. `npm run typecheck` sigue bloqueado únicamente por el archivo ajeno sin commit `scripts/balance/balM3.ts`. Integración publicada en `a5451ae9`.
 
 ---
 
