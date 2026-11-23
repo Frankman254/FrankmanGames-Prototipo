@@ -113,6 +113,10 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 
 ### Probar en el juego
 
+- **Creador de personaje (CLA-CR1)**: mueve altura y complexión. La altura ahora se nota en la vista previa y robusto/delgado cambian la masa del cuerpo, no solo el ancho. Si quieres más diferencia de altura, dime el rango: hoy es 0,94–1,06 (Q24).
+- **Jinetes (CLA-MON1)**: monta mula, caballo, tapir y las aves; el jinete debería ir sentado, sin flotar.
+- **Barra de hechizos (CLA-BAR1)**: si tu perfil guardado aún deja el hueco abajo, arrástrala abajo una vez y cierra el candado.
+
 - **Rendimiento (WIN-01)**: juega en pantalla completa en el pueblo, en el campo y en la cripta con muchos enemigos. Debería ir al doble que antes. Si algo sigue a tirones, anota dónde. Los árboles ya iban agrupados; las casas y demás piezas ahora también (mira que se vean y se muevan igual que antes).
 
 - **EQ-07, objetos**: fichas de nivel 40 y 200. Hay texto de muestra en `work/claude-items1118/fichas_electron.txt`.
@@ -146,6 +150,7 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 | Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
 | Q22 | ¿Vale poner Vida directa en el equipo en vez de Vitalidad? | Cerrar EQ-07 |
 | Q23 | ¿Te convence la reforja que recomendé? | EQ-08 |
+| Q24 | Altura del creador de personaje: ¿se queda el rango 0,94–1,06 o se amplía? | Nada (CLA-CR1 ya hecha) |
 
 ## Respuestas anteriores
 

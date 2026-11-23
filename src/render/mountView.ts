@@ -139,6 +139,11 @@ export class MountView {
         return look.rideHeight + (moving ? Math.abs(Math.sin(this.phase)) * 0.03 : 0);
     }
 
+    /** Mallas de la montura ya cargada (vacío si no hay o aún carga). CLA-MON1 mide el lomo con ellas. */
+    meshes(): AbstractMesh[] {
+        return this.built && !this.built.disposed ? this.built.root.getChildMeshes(false) : [];
+    }
+
     private setClip(b: Built, moving: boolean, flying: boolean): void {
         const c = b.clips;
         // Cambio suelo↔aire: una vez el despegue o el aterrizaje, si el modelo los trae.

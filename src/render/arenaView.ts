@@ -6,6 +6,7 @@ import {
     FxaaPostProcess,
     Matrix,
     MeshBuilder,
+    Ray,
     Scene,
     Vector3,
     TransformNode,
@@ -39,6 +40,7 @@ import { Atmosphere } from './atmosphere';
 import { loadWorldData } from '../data/worldData';
 import { createCharacter } from './characters/characterModel';
 import { MountView, mountBasePalette, type MountRenderLook } from './mountView';
+import { RiderSeat } from './riderSeat';
 import { customMountColors, isCustomMountLook } from '../rpg/mountColor';
 import { PaintStyle } from './paintStyle';
 import { SceneLook } from './sceneLook';
@@ -112,6 +114,9 @@ export class ArenaView {
     readonly atmosphere: Atmosphere;
     readonly assets: AssetCache;
     private readonly mountView: MountView;
+    private readonly riderSeat = new RiderSeat();
+    private readonly seatRay = new Ray(Vector3.Zero(), new Vector3(0, -1, 0), 3);
+    private readonly seatHips = new Vector3();
     readonly player: PlayerAvatar;
     private readonly chars: { assets: AssetManifest; animation: AnimationDataDef };
     /** Paleta y aspecto con los que está hecho el modelo del jugador (clave de `syncPlayerLook`). */
@@ -337,6 +342,30 @@ export class ArenaView {
         return hit?.hit ? EnemyView.enemyIdOf(hit.pickedMesh) : null;
     }
 
+    /**
+     * CLA-MON1: lomo de la montura bajo la cadera del jinete y parte de abajo del jinete en esa
+     * vertical (dos rayos). Null mientras alguno de los dos modelos no haya cargado.
+     */
+    private measureSeat(): { back: number; riderBottom: number } | null {
+        const mountMeshes = new Set(this.mountView.meshes());
+        const riderMeshes = new Set(this.player.model.root.getChildMeshes(false));
+        if (mountMeshes.size === 0 || riderMeshes.size === 0) return null;
+        this.player.model.root.computeWorldMatrix(true);
+        const hips = this.player.model.socket('hips', this.seatHips);
+        const r = this.seatRay;
+        r.origin.set(hips.x, hips.y + 0.6, hips.z);
+        r.direction.set(0, -1, 0);
+        r.length = 3;
+        const down = this.scene.pickWithRay(r, (m) => mountMeshes.has(m), false);
+        if (!down?.hit || !down.pickedPoint) return null;
+        const back = down.pickedPoint.y;
+        r.origin.set(hips.x, hips.y - 1.5, hips.z);
+        r.direction.set(0, 1, 0);
+        const up = this.scene.pickWithRay(r, (m) => riderMeshes.has(m), false);
+        if (!up?.hit || !up.pickedPoint) return null;
+        return { back, riderBottom: up.pickedPoint.y };
+    }
+
     private syncPathLine(world: World, x: number, z: number): void {
         const path = world.player.path;
         if (!this.showPath || path.length === 0) {
@@ -488,8 +517,9 @@ export class ArenaView {
               : variant !== baseLook.variant
                 ? { ...baseLook, variant }
                 : baseLook;
+        const rideKey = mount ? `${mount.itemId}#${variant ?? ''}#${colors ? Object.values(colors).join(',') : ''}` : null;
         const ride = this.mountView.sync(
-            mount ? `${mount.itemId}#${variant ?? ''}#${colors ? Object.values(colors).join(',') : ''}` : null,
+            rideKey,
             look,
             x,
             y,
@@ -503,7 +533,9 @@ export class ArenaView {
         // Sentado: la cadera baja hasta la silla. Cada montura define su fracción (seatDrop);
         // sin ella usa el valor por defecto (RIDE_SEAT_DROP = 0.42).
         const seat = look ? this.player.model.height * (look.seatDrop ?? RIDE_SEAT_DROP) : 0;
-        this.animEvents = this.player.sync(p, x, y + ride - seat, z, frameSeconds, simulationRunning, look !== null);
+        // CLA-MON1: corrección medida (lomo contra la parte de abajo del jinete), una vez por montura y modelo.
+        const seatFix = look && rideKey ? this.riderSeat.update(`${rideKey}|${this.player.model.height}`, () => this.measureSeat()) : 0;
+        this.animEvents = this.player.sync(p, x, y + ride - seat + seatFix, z, frameSeconds, simulationRunning, look !== null);
         this.spellFx.sync(world, frameSeconds);
         this.pets.sync(world, alpha, frameSeconds);
         this.statusFx.sync(world, frameSeconds);

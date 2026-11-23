@@ -1,3 +1,23 @@
+## 2026-11-23 — CLA-MON1: el jinete se sienta en la montura (Claude)
+
+**Archivos:** `src/render/riderSeat.ts`, `src/render/arenaView.ts`, `src/render/mountView.ts`, `tests/claMon1_riderSeat.test.ts`.
+
+**Qué:** El jinete flotaba de 23 a 42 cm sobre las aves y se hundía de 5 a 8 cm en mula, tapir y caballo. En vez de afinar cifras por montura, tras 12 fotogramas montado se lanzan dos rayos (lomo bajo la cadera; parte de abajo del jinete) y se corrige la altura una vez por montura y modelo, dejando 3 cm de hundimiento.
+
+**Cómo se verificó:** Electron QA manual con `work/claude-mon1/medir.js` (las siete monturas): de +0,23…+0,42 / −0,05…−0,08 m a −0,02…−0,035 m. `tests/claMon1_riderSeat.test.ts` 5/5. `npm test` 3749/3750: el fallo es `tests/junie/jl42_compPreview.test.ts` (import en frío > 5 s), que falla igual en HEAD sin estos cambios.
+
+---
+
+## 2026-11-23 — CLA-CR1: altura visible y complexión con masa (Claude)
+
+**Archivos:** `src/render/characters/bodyMass.ts`, `src/render/characters/gltfCharacter.ts`, `src/render/characterPreview.ts`, `tests/claCr1_bodyMass.test.ts`.
+
+**Qué:** La vista previa encuadraba con la altura ya escalada, así que alto y bajo se veían iguales; ahora usa la altura de referencia. La complexión hincha o adelgaza el cuerpo por la normal, pesada por hueso (tronco más que extremidades, nada en cabeza, manos y pies), con un objetivo de morph propio por copia; el ensanche uniforme baja al 45 %.
+
+**Cómo se verificó:** `tests/claCr1_bodyMass.test.ts` 6/6; capturas en `work/claude-cr1/` (masculino robusto, delgado, alto y bajo; femenino robusto).
+
+---
+
 ## 2026-11-23 — JL-170: huella de `model:` desde `data/ambient.json` (Junie)
 
 **Archivos:** `src/editor/doc.ts`, `tests/jl170_editorModelFootprint.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
