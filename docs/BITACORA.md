@@ -68,6 +68,18 @@
 - **GCD.** Cada hechizo pone 0,5–0,8 s de enfriamiento global y la cola solo guarda lo pulsado en los primeros 0,3 s; después se pierde. Sin cambios de cifras: queda la pregunta al creador (GCD-01). Junie mide (JL-184, JL-185).
 - **Junie.** Nueva tanda JL-181…203 en su cola.
 
+## 2026-11-23 — JL-185: medición de pulsaciones perdidas por GCD (Junie)
+
+**Archivos:** `tests/jl185_castPressure.test.ts`, `work/junie-jl185/INFORME.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Script de simulación pura que pulsa los 4 primeros slots de la barra cada 0,35 s durante 60 s simulados, con las 3 clases a nivel 1 y 50, contra un enemigo inmortal. Cuenta lanzamientos exitosos y bloques por motivo.
+
+**Resultado:** 66-98% de las pulsaciones se pierden. La cola de JUG-06 (0,3 s) no captura ninguna pulsación a este ritmo. GCD es el bloque dominante a nivel 50 para storm_weaver y mangrove_hunter; ember_vanguard tiene más cooldown individual. Informe detallado en `work/junie-jl185/INFORME.md`.
+
+**Validación:** 7 pruebas verdes, tsc limpio (solo balM3.ts ajeno).
+
+**Falta:** Decisión del creador (GCD-01) sobre si ampliar la cola, aceptar el ritmo del GCD o implementar auto-rotación.
+
 ## 2026-11-23 — JL-184: escenario colaHechizos y tabla de medición (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl184/TABLA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
