@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-175: escenario barraCandado — candado y persistencia (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `barraCandado` en `qaElectron.mjs` que verifica que la barra de hechizos, al fijarla con el candado, conserva la posición al recargar. Prueba 3 resoluciones (1280×720, 1920×1080, 2560×1080) × 2 escalas (1×1, 0.82×0.68) = 6 combinaciones. En cada una: (1) arrastra la barra al fondo por el grip, (2) fija el candado y verifica que las asas se ocultan, (3) comprueba `barPinned` en el perfil, (4) recarga la página y verifica que el borde inferior de la barra coincide con `innerHeight` (±2 px), (5) borra el perfil y verifica que la barra vuelve abajo centrada. JL-171 a JL-174 marcadas como bloqueadas (dependen de JL-169/CLA-CASA1).
+
+**Cómo se verificó:** `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). `npx vitest run` → 3763/3763 verdes. El escenario se ejecuta con `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs barraCandado`.
+
+---
+
 ## 2026-11-23 — CLA-MON1: el jinete se sienta en la montura (Claude)
 
 **Archivos:** `src/render/riderSeat.ts`, `src/render/arenaView.ts`, `src/render/mountView.ts`, `tests/claMon1_riderSeat.test.ts`.

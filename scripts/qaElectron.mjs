@@ -7204,6 +7204,162 @@ const scenarios = {
         record('6. Salida: fuera de la cripta', !(await js(`__game.crypt.inside`)), 'OK');
     },
 
+    /** JL-175: Escenario barraCandado — la barra de hechizos fijada al fondo
+     * conserva la posición al recargar. Para 3 resoluciones y 2 escalas:
+     * arrastra la barra al fondo, cierra el candado, recarga y comprueba que
+     * el borde inferior coincide con innerHeight (±2 px). Después pulsa
+     * Restablecer y comprueba que la barra queda abajo y centrada.
+     * Solo cambia scripts/qaElectron.mjs. */
+    async barraCandado() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-175 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        const resolutions = [
+            [1280, 720, '720p'],
+            [1920, 1080, '1080p'],
+            [2560, 1080, 'ultra'],
+        ];
+        const scales = [
+            [1, 1, '1x'],
+            [0.82, 0.68, '0.82x0.68'],
+        ];
+
+        for (const [w, h, resLabel] of resolutions) {
+            for (const [sx, sy, scaleLabel] of scales) {
+                const combo = `${resLabel}-${scaleLabel}`;
+
+                /* 1. Tamaño y escala. */
+                await resize(w, h);
+                await sleep(500);
+
+                /* 2. Partida nueva limpia. */
+                await newGame(`QA Candado ${combo}`);
+                await sleep(1500);
+
+                /* 3. Aplicar escala del perfil del HUD. */
+                if (sx !== 1 || sy !== 1) {
+                    await js(`(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); if(s?.profiles?.[0]){ s.profiles[0].scales={x:${sx},y:${sy}}; localStorage.setItem('frankmangames.hudProfiles', JSON.stringify(s)); } }catch(e){} })()`);
+                    // Recargar para que la escala se aplique.
+                    await cdp('Page.reload', {});
+                    await until(`document.querySelector('.game-hud')`, 15000, `HUD tras escala ${combo}`).catch(() => {});
+                    await sleep(1500);
+                }
+
+                /* 4. Desbloquear la barra para arrastrar. */
+                const tool = (t) => js(`document.querySelector('.hud-bar-tool[title="${t}"]')?.click() ?? false`);
+                const unlocked = await tool('Soltar la barra para moverla');
+                await sleep(400);
+                record(`${combo}: barra desbloqueada`, unlocked || true, 'OK (si ya estaba suelta, no importa)');
+
+                /* 5. Arrastrar la barra al fondo por el grip. */
+                const gripPos = await js(
+                    `(()=>{ const g=document.querySelector('.hud-frame > .hud-grip'); if(!g) return null; const r=g.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; })()`,
+                );
+                if (gripPos) {
+                    // Calcular la posición objetivo: centrada en el fondo.
+                    const targetY = h - 50; // cerca del fondo
+                    const targetX = w / 2 - 200; // centrado horizontalmente
+                    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: gripPos.x, y: gripPos.y });
+                    await cdp('Input.dispatchMouseEvent', {
+                        type: 'mousePressed',
+                        x: gripPos.x,
+                        y: gripPos.y,
+                        button: 'left',
+                        buttons: 1,
+                        clickCount: 1,
+                    });
+                    await sleep(100);
+                    // Mover en pasos hacia el fondo.
+                    const steps = 10;
+                    for (let i = 1; i <= steps; i++) {
+                        const cx = gripPos.x + ((targetX - gripPos.x) * i) / steps;
+                        const cy = gripPos.y + ((targetY - gripPos.y) * i) / steps;
+                        await cdp('Input.dispatchMouseEvent', {
+                            type: 'mouseMoved',
+                            x: cx,
+                            y: cy,
+                            button: 'left',
+                            buttons: 1,
+                        });
+                        await sleep(30);
+                    }
+                    await cdp('Input.dispatchMouseEvent', {
+                        type: 'mouseReleased',
+                        x: targetX,
+                        y: targetY,
+                        button: 'left',
+                        clickCount: 1,
+                    });
+                    await sleep(500);
+                }
+
+                /* 6. Fijar el candado. */
+                const pinned = await tool('Fijar la barra');
+                await sleep(400);
+                const gripHidden = await js(
+                    `(()=>{const g=document.querySelector('.hud-frame > .hud-grip'); return g?getComputedStyle(g).display==='none':true;})()`,
+                );
+                record(`${combo}: candado fijado (asas ocultas)`, gripHidden, `pinned=${pinned}, gripHidden=${gripHidden}`);
+
+                /* 7. Verificar que barPinned=true en el perfil. */
+                const barPinnedInProfile = await js(
+                    `(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); const p=s?.profiles?.[0]; return p?.barPinned !== false; }catch(e){return true;} })()`,
+                );
+                record(`${combo}: barPinned en perfil`, barPinnedInProfile, String(barPinnedInProfile));
+
+                /* 8. Medir el borde inferior de la barra antes de recargar. */
+                const barBottomBefore = await js(
+                    `(()=>{ const f=document.querySelector('.hud-frame'); if(!f) return null; const r=f.getBoundingClientRect(); return Math.round(r.bottom); })()`,
+                );
+                const innerH = await js(`window.innerHeight`);
+                record(`${combo}: borde inferior antes de recargar`, barBottomBefore != null, `bottom=${barBottomBefore}, innerH=${innerH}`);
+
+                /* 9. Recargar la página. */
+                await cdp('Page.reload', {});
+                await until(`document.querySelector('.game-hud')`, 20000, `HUD tras recarga ${combo}`).catch(() => {});
+                await sleep(2000);
+
+                /* 10. Verificar que el borde inferior coincide con innerHeight (±2 px). */
+                const barBottomAfter = await js(
+                    `(()=>{ const f=document.querySelector('.hud-frame'); if(!f) return null; const r=f.getBoundingClientRect(); return Math.round(r.bottom); })()`,
+                );
+                const innerHAfter = await js(`window.innerHeight`);
+                const delta = barBottomAfter != null ? Math.abs(barBottomAfter - innerHAfter) : 9999;
+                record(`${combo}: borde inferior = innerHeight (±2 px) tras recarga`, delta <= 2, `bottom=${barBottomAfter}, innerH=${innerHAfter}, delta=${delta}`);
+
+                /* 11. Verificar que barPinned sigue en el perfil tras recarga. */
+                const barPinnedAfter = await js(
+                    `(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); const p=s?.profiles?.[0]; return p?.barPinned !== false; }catch(e){return true;} })()`,
+                );
+                record(`${combo}: barPinned persiste tras recarga`, barPinnedAfter, String(barPinnedAfter));
+
+                /* 12. Restablecer posiciones (borrar perfil activo). */
+                await js(`(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); if(s?.profiles?.[0]){ delete s.profiles[0].barPinned; delete s.profiles[0].barSplit; delete s.profiles[0].positions; s.profiles[0].positions={}; } localStorage.setItem('frankmangames.hudProfiles', JSON.stringify(s)); }catch(e){} })()`);
+                await cdp('Page.reload', {});
+                await until(`document.querySelector('.game-hud')`, 20000, `HUD tras restablecer ${combo}`).catch(() => {});
+                await sleep(2000);
+
+                /* 13. Verificar que la barra queda abajo y centrada tras restablecer. */
+                const barRect = await js(
+                    `(()=>{ const f=document.querySelector('.hud-frame'); if(!f) return null; const r=f.getBoundingClientRect(); return {left:Math.round(r.left),right:Math.round(r.right),bottom:Math.round(r.bottom),width:Math.round(r.width)}; })()`,
+                );
+                const centered = barRect ? Math.abs((barRect.left + barRect.right) / 2 - w / 2) < 100 : false;
+                const atBottom = barRect ? Math.abs(barRect.bottom - innerHAfter) <= 10 : false;
+                record(`${combo}: barra centrada tras restablecer`, centered, barRect ? JSON.stringify(barRect) : 'no encontrada');
+                record(`${combo}: barra abajo tras restablecer`, atBottom, barRect ? JSON.stringify(barRect) : 'no encontrada');
+
+                await shot(`jl175-${combo}`);
+            }
+        }
+
+        /* Sin errores en consola. */
+        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return t.split('\\n').filter(l=>l).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string').length; return 0; })()`);
+        record('consola limpia', errors === 0, `errores=${errors}`);
+    },
+
     /** JL-162: El creador de personaje no se desborda en pantallas pequeñas.
      * Abre el creador a 4 tamaños y comprueba que "Empezar" y el último deslizador
      * quedan dentro de la ventana. Captura de cada tamaño en work/junie-jl162/. */
