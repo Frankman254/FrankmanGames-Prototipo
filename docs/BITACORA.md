@@ -1,3 +1,23 @@
+## 2026-11-22 — JL-141: escenario fantasma — verificación del fantasma de JL-90 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `fantasma` en el arnés de QA para verificar que el fantasma del jugador (JL-90) funciona correctamente: aparece al activar el modo espectral, se mueve sin errores de consola (los clips faltantes de fantasma.glb no lanzan error gracias al guard defensivo de JL-90), y desaparece al resucitar.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs fantasma` → 5/5 en verde: fantasma aparece (3 meshes ghost:*), se mueve (7.1 m), sin errores de consola del fantasma, desaparece al revivir. Capturas en `work/junie-jl141/` (jl141-fantasma.jpg, jl141-resucitado.jpg).
+
+---
+
+## 2026-11-22 — OMP-POL-07: propuesta del varón sobre la topología de la mujer (OMP Blender)
+
+**Archivos:** `scripts/blender/pol07_hombre_propuesta.py`, `scripts/blender/revisar_pol07_hombre.py`, `docs/TAREAS.md`, `docs/BITACORA.md`.
+
+**Qué:** El creador dijo que «el diseño del hombre está horrible». Los masculinos de hoy salen de la base YW (articulaciones de bola, hombros caídos). La propuesta construye el varón **desde el femenino** (`<clase>_f_anime.glb`): misma topología, mismo rig FG_* y los mismos clips (16; 17 en el cazador con `Disparar`), comprobado por import y recuento. Re-proporción por bandas de altura: hombros +10 %, cuello y brazos más gruesos, cintura +5 %, cadera −4 %, muslos rectos, pecho sin busto (la superficie frontal del tórax retrocede a la placa); mandíbula +10 % hacia el mentón y cara repintada con `fg_heroe.pintar_cara(sexo='m')` retirando el rubor común a ambos sexos (era lo que más feminizaba la cabeza ancha de B-chan); pelo corto asentado al cráneo y `Pelo_long`/`Pelo_bun` fuera; el sombrero del cazador, que apoyaba en el moño, sentado sobre el pelo. La textura de cara viaja como las de producción (neutra, teñida por la paleta en el juego; el PNG se recarga en sRGB).
+
+**Cómo se verificó:** Triángulos por GLB propuesto: centinela 20 068, oraculo 22 024, cazador 19 414 (≈8 000 menos que su base femenina, que sigue valiendo como tope). Mismos nombres de pieza y origen: `data/` y `src/` intactos. **Es solo propuesta: ningún GLB de `assets/models/` sustituido** — los tres `*_propuesto.glb`, la lámina HOY/PROPUESTA/MUJER × 3 clases (frente y tres cuartos, `cmp_*.png`) y los primeros planos de cara (`cara_*.png`, `cara2_*.png`) esperan el visto del creador en `work/omp-pol07/` (decisión y siguientes pasos en `REPORTE.md`).
+
+
+
 ## 2026-11-22 — JL-123: hotbarFillOrder con 30 casillas y 3 filas (Junie)
 
 **Archivos:** `work/junie-jl123/EVIDENCIA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

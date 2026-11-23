@@ -1146,6 +1146,49 @@ const scenarios = {
         await shot('jl109-revivido');
     },
 
+    async fantasma() {
+        // JL-141: el fantasma de JL-90 aparece, se mueve y no da errores de consola.
+        await newGame('QA Fantasma');
+        const ghost = () => js(`__game.view.scene.meshes.filter(m=>m.name.startsWith('ghost:')&&m.isEnabled()).length`);
+
+        // Bajar el Pulso a 0 y matar al jugador para activar el modo espectral.
+        await js(`${S}.energy.value=0`);
+        await js(`${W}.player.health=0`);
+        await until(deathShown, 10000, 'pantalla de muerte');
+        await button('Continuar como espectro');
+        await until(`${W}.character.spectral.active && ${W}.player.alive`, 10000, 'forma espectral');
+        await sleep(1000);
+
+        // Verificar que el fantasma se ve.
+        check('JL-141: el fantasma aparece (meshes ghost:*)', (await ghost()) > 0, await ghost());
+        await shot('jl141-fantasma');
+
+        // Mover al fantasma y verificar que cambia de posición.
+        const posBefore = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        await js(`(() => { const p=${W}.player; p.pos.x+=5; p.pos.y+=5; p.path=[]; })()`);
+        await sleep(500);
+        const posAfter = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        const dist = Math.hypot(posAfter.x - posBefore.x, posAfter.y - posBefore.y);
+        check('JL-141: el fantasma se mueve', dist > 4, `${dist.toFixed(1)} m`);
+
+        // Verificar que no hay errores de consola (JL-90: clips faltantes no deben lanzar error).
+        const errors = await js(`window.__consola?.errores(20) || []`);
+        const ghostErrors = errors.filter((e) => e.includes('fantasma') || e.includes('ghost'));
+        check('JL-141: sin errores de consola del fantasma (JL-90)', ghostErrors.length === 0, ghostErrors.join('; '));
+
+        // Resucitar directamente (el botón "Guiar al Alzador" puede no responder a tiempo).
+        const altar = await js(
+            `(() => { const p=${W}.player.pos; return [...${W}.content.spectral.resurrectors].sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0]; })()`,
+        );
+        await js(
+            `(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${altar.x},y:${altar.y}})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; ${W}.character.spectral.resurrectAt('${altar.id}',p.pos); ${W}.character.restore(); })()`,
+        );
+        await until(`!${W}.character.spectral.active`, 10000, 'volver a la forma viva');
+        await sleep(500);
+        check('JL-141: tras revivir, el fantasma desaparece', (await ghost()) === 0, await ghost());
+        await shot('jl141-resucitado');
+    },
+
     async bancoDetalle() {
         await newGame('QA Detalle');
         await js(
@@ -1723,19 +1766,19 @@ const scenarios = {
         check('B04: hay más árboles de nivel 1', l1 >= 12, l1);
     },
 
-    /** B05: emotes al campo de texto; ventana de emotes sin burbuja. */
+    /** B05: comandos de emote al campo; ventana de emotes sin burbuja. */
     async chat() {
         await newGame('QA Chat');
         await js(
             `(()=>{const i=document.querySelector('.chat-input');i.focus();i.value='hola ';i.setSelectionRange(5,5);})()`,
         );
         await sleep(200);
-        const emote = await js(`document.querySelector('.chat-emote').textContent`);
+        const emoteCommand = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).emotes[0].command;
         await js(`document.querySelector('.chat-emote').click()`);
         await sleep(200);
         check(
             'B05: el emote se escribe en el campo y no se envía',
-            (await js(`document.querySelector('.chat-input').value`)) === `hola ${emote}` &&
+            (await js(`document.querySelector('.chat-input').value`)) === `hola /${emoteCommand}` &&
                 !(await js(`[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('hola'))`)),
         );
         await button('Enviar');
@@ -1744,7 +1787,7 @@ const scenarios = {
             'B05: Enviar lo manda',
             await js(`[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('hola'))`),
         );
-        await button('☺');
+        await js(`document.querySelector('.chat-emotes-open').click()`);
         await sleep(200);
         await js(`document.querySelector('.emote-play').click()`);
         await sleep(300);
@@ -5131,7 +5174,7 @@ const scenarios = {
     },
 
     /** EV-02: emotes de verdad. Se escribe `/saludar` en el chat real (`:wave` es texto, no una orden)
-     * y se elige bailar en la ventana ☺; el clip `player:Emote_*` debe sonar y moverse lo corta. */
+     * y se elige bailar en la ventana de emotes; el clip `player:Emote_*` debe sonar y moverse lo corta. */
     async emotes() {
         await newGame('QA Emotes');
         await resize(1920, 1080);
@@ -5157,14 +5200,14 @@ const scenarios = {
         check('EV-02 emotes: moverse corta el emote', afterWalk.length === 0, JSON.stringify(afterWalk));
         await until(`!${W}.player.path?.length && Math.hypot(${W}.player.pos.x-${W}.player.prevPos.x,${W}.player.pos.y-${W}.player.prevPos.y)<1e-3`, 4000, 'quieto');
         await sleep(300);
-        // La fila del chat solo escribe el icono en el campo; la ventana ☺ es la que reproduce el emote.
-        await js(`[...document.querySelectorAll('.chat button')].find(b=>b.textContent.trim()==='☺')?.click()`);
+        // La fila del chat escribe el comando; la ventana ilustrada es la que reproduce el emote.
+        await js(`document.querySelector('.chat-emotes-open')?.click()`);
         await sleep(300);
         const danceIndex = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).emotes.findIndex((e) => e.id === 'dance');
         await js(`document.querySelectorAll('.emote-window .emote-play')[${danceIndex}]?.click()`);
         await sleep(250);
         const dance = await playing();
-        check('EV-02 emotes: bailar desde la ventana ☺ reproduce Emote_dance', dance.includes('player:Emote_dance'), JSON.stringify(dance));
+        check('EV-02 emotes: bailar desde la ventana reproduce Emote_dance', dance.includes('player:Emote_dance'), JSON.stringify(dance));
         await shot('ev02-emote-bailar');
         await walk();
     },

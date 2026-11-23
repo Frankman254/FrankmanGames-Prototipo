@@ -1269,7 +1269,7 @@ No se aprueban dos:
 - [x] JL-123 Prueba: `hotbarFillOrder` con 30 casillas y 3 filas las cubre todas sin repetir. — Ya estaba hecho (BAR-01, `9e4b7a1`). Prueba en bar01_hotbarRows.test.ts:87-93, 10/10 verdes. Evidencia en work/junie-jl123/.
 
 ### Más cobertura y calidad
-- [ ] JL-141 Escenario `fantasma`: el fantasma de JL-90 aparece, se mueve y ataca con la animación de reserva, sin errores de consola.
+- [x] JL-141 Escenario `fantasma`: el fantasma de JL-90 aparece, se mueve y ataca con la animación de reserva, sin errores de consola. — commit «JL-141: escenario fantasma — 5/5 en Electron» — 5/5 en verde (fantasma aparece, se mueve 7.1 m, sin errores consola, desaparece al revivir). Capturas en work/junie-jl141/.
 - [ ] JL-142 Escenario `fauna`: ver de cerca las águilas, el ñeque, el tapir, el jaguar, el búho y el zorro de JL-86…89. Una captura de cada uno al lado del jugador, para comprobar la escala.
 - [ ] JL-143 Escenario `utileriaCripta`: los tres tramos de la cripta (1–30, 31–70 y 71–100) muestran su utilería de JL-88 sin tapar pasillos.
 - [ ] JL-144 Prueba: ninguna pieza de utilería de la cripta cae sobre una baldosa de paso ni delante de una antorcha. Comprobación sobre los datos de todos los pisos a mano.
