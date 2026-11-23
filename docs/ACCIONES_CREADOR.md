@@ -116,6 +116,7 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 - **Creador de personaje (CLA-CR1)**: mueve altura y complexión. La altura ahora se nota en la vista previa y robusto/delgado cambian la masa del cuerpo, no solo el ancho. Si quieres más diferencia de altura, dime el rango: hoy es 0,94–1,06 (Q24).
 - **Jinetes (CLA-MON1)**: monta mula, caballo, tapir y las aves; el jinete debería ir sentado, sin flotar.
 - **Barra de hechizos (CLA-BAR1)**: si tu perfil guardado aún deja el hueco abajo, arrástrala abajo una vez y cierra el candado.
+- **Tu casa (CLA-CASA1)**: mira las láminas de `work/claude-casa1/v2/` (frente, tres cuartos, perfil, fondo y alero) y la captura en el juego `enjuego.jpg`. Dime qué no se parece. Las tres recámaras van a la izquierda y baño, cocina y lavandería a la derecha, según mi lectura del plano. Junie la pondrá cerca de Villa Raspadura (JL-174) solo cuando la apruebes.
 
 - **Rendimiento (WIN-01)**: juega en pantalla completa en el pueblo, en el campo y en la cripta con muchos enemigos. Debería ir al doble que antes. Si algo sigue a tirones, anota dónde. Los árboles ya iban agrupados; las casas y demás piezas ahora también (mira que se vean y se muevan igual que antes).
 

@@ -1,3 +1,13 @@
+## 2026-11-23 — CLA-CASA1: la casa del creador en Blender, como PROPUESTA (Claude)
+
+**Archivos:** `scripts/blender/casa_creador.py`, `scripts/blender/validar_casa_creador.py`, `arte/blender/casa_creador.blend`, `assets/models/casa_creador.glb`, `PROCEDENCIA.md`.
+
+**Qué:** Modelo reproducible de la casa de los planos del creador (6,30 × 12 m, techo a dos aguas, portal con columna, rejas negras con rojo, puerta articulada, losa de estacionamiento) con texturas propias pintadas por código. Sin datos personales: en el repo sólo se llama «casa del creador». Dos pasadas de comparación con la fachada: se corrigió un cimiento desplazado, una cortina tapada por el interior oscuro y el remate de la cumbrera.
+
+**Cómo se verificó:** `validar_casa_creador.py` en verde (3.708 tri, muros 6,30 × 12,02 m, puerta de 2,13 m). Láminas en `work/claude-casa1/v1/` y `v2/`. Cargada en Electron junto al jugador con el cargador de Babylon del juego (`work/claude-casa1/enjuego.js`, captura `enjuego.jpg`). `tests/assets.test.ts` y `tests/jl168_procedencia.test.ts` en verde.
+
+---
+
 ## 2026-11-23 — JL-175: escenario barraCandado — candado y persistencia (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
