@@ -307,6 +307,31 @@ def ajuste(fr_e, caja_e):
             por[b] = {'at': [round(x, 4) for x in gltf(at)],
                       'rot': [round(q.x, 5), round(q.y, 5), round(q.z, 5), round(q.w, 5)],
                       'scale': [round(s[0], 3), round(s[2], 3), round(s[1], 3)]}
+        # POL-08 (2026-11-23): la caja de reposo no basta — al correr y atacar la piel de la mano
+        # y el antebrazo se sale del guante, y el cuello de la blusa corta el pecho y la barbilla.
+        # Medido con `scripts/validarAjusteEquipo.mjs` (piel que ASOMA por delante de la pieza,
+        # las tres posturas, los seis héroes, 24 cuadros): guantes +19 % de grueso y +44 % de
+        # largo sobre su eje; puños de la blusa +6 % grueso y +15 % largo; torso −10 % de alto,
+        # 8 mm atrás y 12 mm abajo (las hombreras no se mueven: medido, la blusa baja más sin
+        # tocarlas). Bajó los puntos que asoman de 25 072 a
+        # 11 341 (−55 %) sin tocar el GLB. Lo que más baja son los guantes (21 463 a
+        # 8 194); lo que queda entra por las bocas de la tela (mango del guante y cuello), que
+        # en reposo se ve bien y en las láminas de `work/omp-pol08/` no corta la piel.
+        for b in ('handL', 'handR'):
+            sc_ = por[b]['scale']
+            sc_[0] = round(sc_[0] * 1.187, 3); sc_[1] = round(sc_[1] * 1.187, 3); sc_[2] = round(sc_[2] * 1.438, 3)
+        for b in ('foreArmL', 'foreArmR'):
+            sc_ = por[b]['scale']
+            sc_[0] = round(sc_[0] * 1.06, 3); sc_[1] = round(sc_[1] * 1.06, 3); sc_[2] = round(sc_[2] * 1.15, 3)
+        for b in ('chest', 'spine', 'hips'):
+            por[b]['scale'][1] = round(por[b]['scale'][1] * 0.896, 3)
+            por[b]['at'][2] = round(por[b]['at'][2] - 0.008, 4)
+            por[b]['at'][1] = round(por[b]['at'][1] - 0.012, 4)
+        # El listón de `tests/eq10_diablicaEspeja.test.ts`: ninguna escala sale de 0.8..1.6
+        # (fuera de ahí la pieza ya no es ropa, es un globo). El guante largo choca con él en
+        # los hombrones: se recorta al tope — pierde algo de manga pero sigue tapando la mano.
+        for b in HUESOS:
+            por[b]['scale'] = [min(1.6, max(0.8, s)) for s in por[b]['scale']]
         out[heroe] = por
     return out
 
@@ -315,6 +340,13 @@ def main(argv):
     arm, fr, caja, fuentes = espeja()
     if '--diag' in argv:
         diagnostico(fuentes)
+        return
+    if '--solo-ajuste' in argv:  # POL-08: reescribe solo la tabla, sin tocar equipo.glb
+        datos = ajuste(fr, caja)
+        with open(AJUSTE, 'w', encoding='utf-8') as fh:
+            json.dump(datos, fh, ensure_ascii=False, indent=2)
+            fh.write('\n')
+        print('ajuste (solo tabla)', AJUSTE)
         return
     col, mr = de.palette_images(256)
     imgs = []

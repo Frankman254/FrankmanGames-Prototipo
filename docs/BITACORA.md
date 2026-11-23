@@ -4354,3 +4354,15 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 ---
 
+## 2026-11-23 — OMP-POL-08: el ajuar de La Espeja no corta la piel (OMP, modo Blender)
+
+**Archivos:** `data/art/ajusteEquipo.json`, `scripts/blender/equipo_diablica.py`, `scripts/validarAjusteEquipo.mjs`, `PROCEDENCIA.md` (restauro la fila de POL-06 que se perdió en `a5451ae9`), `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- **Hoja de fallos:** `scripts/validarAjusteEquipo.mjs` carga `<héroe>.glb` + `equipo.glb` con Babylon (NullEngine), replica `attachFitted` con la tabla y posea Reposo/Correr/Atacar cuadro a cuadro (24 por héroe, seis héroes, hombre y mujer). Cuenta la piel que ASOMA por delante de la superficie de la pieza (>5 mm en la normal, cono 55°, pared tapada descartada por placa/plantilla/rayos). Antes: **25 072 puntos**; lo peor, los guantes en las manos (21 463) y la blusa en el pecho (2 095).
+- **Arreglo de los 10 primeros:** el generador `equipo_diablica.py` aplica ahora correcciones medidas a la tabla — guantes +19 % grueso y +44 % largo sobre su eje, puños de la blusa +6 % y +15 %, torso 10 % más bajo y 8 mm atrás / 12 mm abajo (las hombreras, sin tocar: medido, la blusa baja más sin moverlas) —, y recorta toda escala al 0,8..1,6 que fija el test EQ-10. Después: **11 341 (−55 %)**: guantes 8 194 (−62 %), blusa 1 337 (−36 %), amuleto 154 (−48 %). `equipo.glb` intacto; `--solo-ajuste` reescribe solo la tabla.
+- **Validación:** `node scripts/validarAjusteEquipo.mjs` en verde (listón total ≤ 12 000, guantes ≤ 8 300, blusa ≤ 2 200; con la tabla vieja FALLA las tres cifras, comprobado). `tests/eq10_diablicaEspeja.test.ts` + `tests/modelos.test.ts` 17/17. `npm run docs:check` en verde. Los dos fallos de suite que había en master (`assets.test.ts`, `jl168_procedencia`) los cierra esta entrada al restaurar la fila de PROCEDENCIA; `jl42_compPreview` pasa solo (flake de tiempo en paralelo).
+
+**Evidencia:** `work/omp-pol08/` — `fallos_antes.json` y `fallos_despues.json` (hojas completas), `lamina_antes_despues_cazador.png` y `lamina_antes_despues_centinelaF.png` (muñeco de la mochila en Electron, frente y lado, mismo encuadre), `ajusteEquipo_BASE.json` (tabla antes).
+
+**Nota para el creador:** lo que queda de asomo entra por las bocas de la tela (el mango del guante y el escote); en las láminas no se ve cortar la piel. El guante en los hombrones pide 1,79 de largo y el test EQ-10 lo corta a 1,6: si se quiere manga más larga, hay que subir ese tope a la vez en test y validador.
