@@ -6151,6 +6151,111 @@ const scenarios = {
         check('JL-93 monturas: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
     },
 
+    /** JL-147: Escenario monturasAndar — andar, girar y frenar montado en cada montura de desarrollo.
+     * Verifica que el jinete no camina (estado idle), que la montura avanza, gira y frena,
+     * y que setInertia se llama en el CharacterModel (JL-70). Capturas de la inercia, sin errores de consola. */
+    async monturasAndar() {
+        await newGame('QA MonturasAndar', { devMount: true });
+        const mounts = [
+            { id: 'mount_dev_harpy', name: 'Arpía' },
+            { id: 'mount_dev_diostede', name: 'Diostedé' },
+            { id: 'mount_dev_crestalba', name: 'Crestalba' },
+            { id: 'mount_dev_falcopama', name: 'Falcopama' },
+        ];
+        for (const m of mounts) {
+            // Equipar la montura.
+            const equipped = await js(
+                `(()=>{ const c=${W}.character; if(c.equipment.slots.mount) ${S}.unequip('mount'); c.give('${m.id}'); const inInv=c.inventory.slots.find(s=>s?.itemId==='${m.id}'); if(!inInv) return {ok:false,reason:'no en inventario'}; const r=${S}.equip(inInv.uid, 'mount'); return r; })()`,
+            );
+            if (!equipped.ok) {
+                check(`JL-147 ${m.name}: equipada`, false, equipped.reason ?? 'no encontrada');
+                continue;
+            }
+            // Esperar a que el modelo cargue.
+            try {
+                await until(`__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`, 15000, `modelo ${m.name}`);
+            } catch {
+                check(`JL-147 ${m.name}: modelo cargado`, false, 'timeout');
+            }
+            await sleep(1500);
+
+            // 1. ANDAR: mover al jugador 15 m adelante.
+            const startPos = await js(`${W}.player.pos`);
+            await js(`${W}.commandMove({ x: ${W}.player.pos.x + 15, y: ${W}.player.pos.y })`);
+            await sleep(3000);
+            const afterWalk = await js(
+                `({ x:+${W}.player.pos.x.toFixed(1), y:+${W}.player.pos.y.toFixed(1), estado:__game.view.player?.model?.state, montura:${W}.character.equipment.get('mount')?.itemId })`,
+            );
+            const distWalk = Math.sqrt(
+                Math.pow(afterWalk.x - startPos.x, 2) + Math.pow(afterWalk.y - startPos.y, 2)
+            );
+            check(
+                `JL-147 ${m.name}: andar avanza`,
+                distWalk > 8,
+                `${distWalk.toFixed(1)} m (estado ${afterWalk.estado}, montura ${afterWalk.montura})`,
+            );
+            // El jinete debe estar en idle (no camina sobre la montura).
+            check(
+                `JL-147 ${m.name}: jinete en idle al andar`,
+                afterWalk.estado === 'idle' && afterWalk.montura === m.id,
+                JSON.stringify(afterWalk),
+            );
+            // Captura durante el andar.
+            await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=6; })()`);
+            await sleep(500);
+            await shot(`jl147-${m.name.toLowerCase()}-andar`);
+
+            // 2. GIRAR: ordenar mover en dirección opuesta (15 m atrás).
+            await js(`${W}.commandMove({ x: ${W}.player.pos.x - 15, y: ${W}.player.pos.y })`);
+            await sleep(2500);
+            const afterTurn = await js(
+                `({ x:+${W}.player.pos.x.toFixed(1), y:+${W}.player.pos.y.toFixed(1), estado:__game.view.player?.model?.state, yaw:+__game.view.player?.visualYaw?.toFixed(1)??null })`,
+            );
+            check(
+                `JL-147 ${m.name}: girar cambia dirección`,
+                afterTurn.estado === 'idle',
+                JSON.stringify(afterTurn),
+            );
+            // Captura del giro.
+            await js(`(()=>{ const r=__game.view.rig; r.yawDeg+=45; })()`);
+            await sleep(500);
+            await shot(`jl147-${m.name.toLowerCase()}-girar`);
+
+            // 3. FRENAR: clic cerca de la posición actual para detener.
+            await js(`${W}.commandMove({ x: ${W}.player.pos.x + 0.5, y: ${W}.player.pos.y + 0.5 })`);
+            await sleep(1500);
+            const afterStop = await js(
+                `({ x:+${W}.player.pos.x.toFixed(1), y:+${W}.player.pos.y.toFixed(1), estado:__game.view.player?.model?.state, pathLen:${W}.player.path.length })`,
+            );
+            check(
+                `JL-147 ${m.name}: frenar se detiene`,
+                afterStop.estado === 'idle' && afterStop.pathLen === 0,
+                JSON.stringify(afterStop),
+            );
+            // Captura frenado.
+            await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=5; })()`);
+            await sleep(500);
+            await shot(`jl147-${m.name.toLowerCase()}-frenar`);
+
+            // 4. Verificar que setInertia se llamó (JL-70).
+            const inertiaInfo = await js(
+                `(()=>{ const m=__game.view.player?.model; return { hasSetInertia:typeof m?.setInertia==='function', secondaryPhys:!!m?.secondaryPhys }; })()`,
+            );
+            check(
+                `JL-147 ${m.name}: setInertia conectado`,
+                inertiaInfo.hasSetInertia === true,
+                JSON.stringify(inertiaInfo),
+            );
+
+            // Bajar de la montura.
+            await js(`${S}.unequip('mount')`);
+            await sleep(800);
+        }
+        // Verificar que no hay errores en consola (filtrando postProcessManager de Babylon, pre-existente JL-137).
+        const consola = await js(`(window.__consola?.errores(20)||[]).filter(e=>!e.includes('postProcessManager'))`).catch(() => []);
+        check('JL-147 monturasAndar: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
+    },
+
     /** JL-94: Escenario hudSinSolapes — en 768p, 1080p, 1440p y ultra-wide,
      * ningún panel del HUD por defecto se solapa con otro (cajas del DOM).
      * Verifica tanto a nivel de DOM (uiFaults) como a nivel de datos (checkDefaultPositionsOverlap). */

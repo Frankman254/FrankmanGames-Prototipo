@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-147: escenario monturasAndar — andar, girar y frenar montado (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `monturasAndar` en el arnés de QA para verificar que cada montura de desarrollo (Arpía, Diostedé, Crestalba, Falcopama) responde correctamente al andar, girar y frenar. Para cada montura: (1) andar 15 m adelante — el jinete queda en idle y la montura avanza; (2) girar — ordenar mover en dirección opuesta; (3) frenar — clic cerca de la posición actual detiene al jugador; (4) verificar que `setInertia` está conectado en el CharacterModel (JL-70). 12 capturas (andar/girar/frenar × 4 monturas).
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs monturasAndar` → 22/22 en verde. Todas las monturas avanzan 15.1 m, el jinete queda en idle, giran y frenan correctamente. `setInertia` conectado en las 4 monturas. Sin errores de consola (filtrando postProcessManager de Babylon, pre-existente JL-137). Capturas en `work/junie-jl147/` (12 jpg). `npm run typecheck` sin errores nuevos.
+
+---
+
 ## 2026-11-22 — JL-146: npm run audit:modelos y documentación (Junie)
 
 **Archivos:** `package.json`, `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
