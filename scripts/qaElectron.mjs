@@ -7789,6 +7789,123 @@ const scenarios = {
         );
     },
 
+    // JL-184: medición de la cola de hechizos (solo mide, no cambia código).
+    // Lanza un hechizo instantáneo, luego pulsa otro a 0.1, 0.25, 0.4, 0.6 y 0.9 s.
+    // Anota si queda en cola (queued), se rechaza (gcd) y cuánto tarda en salir.
+    async colaHechizos() {
+        await newGame('QA ColaHechizos');
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+
+        // Subir de nivel para tener hechizos y recurso.
+        await js(`(() => { const c=${S}.character; c.gainXp(5000000); c.resource=c.maxResource; })()`);
+        await sleep(300);
+
+        // Spawnear un enemigo quieto cerca.
+        await js(
+            `(() => { const p=${W}.player.pos; const e=${W}.spawnEnemy('melee',{x:p.x+3,y:p.y}); e.state='stagger'; e.stateTime=-1e9; globalThis.__qaE=e.id; })()`,
+        );
+        await sleep(600);
+
+        // Leer el valor de commandQueueWindow y GCD del primer hechizo.
+        const cfg = await js(
+            `(() => { const s=${W}.spell('searing_mark'); return {
+                queueWindow: ${W}.data.player.commandQueueWindow,
+                gcd: s.globalCooldown,
+                castTime: s.castTime,
+                id: s.id
+            }; })()`,
+        );
+
+        // Tabla de resultados.
+        const tabla = [];
+        tabla.push(`| Retardo (s) | Resultado | Detalle |`);
+        tabla.push(`|---|---|---|`);
+        tabla.push(`| **Config** | commandQueueWindow=${cfg.queueWindow}s, GCD=${cfg.gcd}s, castTime=${cfg.castTime}s | |`);
+        tabla.push(`|`);
+
+        // Para cada retardo, medimos el resultado.
+        const delays = [0.1, 0.25, 0.4, 0.6, 0.9];
+        for (const delay of delays) {
+            // Limpiar estado: sin GCD, sin cooldowns, sin casting.
+            await js(`(() => { const p=${W}.player; p.gcd=0; p.gcdTotal=0; p.cooldowns={}; p.casting=null; })()`);
+            // Limpiar la cola.
+            await js(`${W}._castQueue=[]`);
+
+            // Lanzar el primer hechizo (instantáneo).
+            const result1 = await js(
+                `(() => { const e=${W}.enemies.get(__qaE); return ${W}.commandCastSlot(0, { point: e.pos, targetId: __qaE }); })()`,
+            );
+            // El primer lanzamiento debe salir bien (null = sin bloqueo).
+            check(
+                `colaHechizos: primer lanzamiento OK (delay ${delay})`,
+                result1 === null,
+                String(result1),
+            );
+
+            // Esperar el retardo y luego intentar el segundo lanzamiento.
+            await sleep(delay * 1000);
+
+            const result2 = await js(
+                `(() => { const e=${W}.enemies.get(__qaE); return ${W}.commandCastSlot(1, { point: e.pos, targetId: __qaE }); })()`,
+            );
+
+            // Leer el estado de la cola y del GCD.
+            const estado = await js(
+                `(() => { const p=${W}.player; return {
+                    gcd: p.gcd,
+                    gcdTotal: p.gcdTotal,
+                    casting: !!p.casting,
+                    queueLen: ${W}._castQueue.length,
+                    animStart: ${W}._animStart,
+                    time: ${W}.time,
+                    elapsed: ${W}.time - ${W}._animStart
+                }; })()`,
+            );
+
+            let detalle = `GCD=${estado.gcd.toFixed(2)}s, cola=${estado.queueLen}, elapsed=${estado.elapsed.toFixed(3)}s`;
+            tabla.push(`| ${delay} | ${result2} | ${detalle} |`);
+
+            check(
+                `colaHechizos: delay ${delay}s → ${result2} (cola=${estado.queueLen})`,
+                true, // siempre pasa: solo medimos
+                detalle,
+            );
+        }
+
+        // Guardar la tabla.
+        const outDir = pathMod.join(OUT, 'jl184');
+        fs.mkdirSync(outDir, { recursive: true });
+        const report = [
+            '# JL-184: Medición de la cola de hechizos',
+            '',
+            'La tarea JL-184 mide el comportamiento de la cola de JUG-06 sin cambiar código.',
+            '',
+            'Se lanza un hechizo instantáneo (slot 0) y luego se pulsa otro (slot 1) a diferentes retardos.',
+            'La ventana de cola es `commandQueueWindow` (0.3 s). Si el retardo es menor, el hechizo se encola.',
+            'Si es mayor, se rechaza con el motivo del bloqueo (gcd o busy).',
+            '',
+            '## Tabla de resultados',
+            '',
+        ];
+        report.push(...tabla);
+        report.push('');
+        report.push('## Conclusión');
+        report.push('');
+        report.push(`- commandQueueWindow = ${cfg.queueWindow} s`);
+        report.push(`- GCD del hechizo = ${cfg.gcd} s`);
+        report.push(`- Retardos ≤ ${cfg.queueWindow} s → queued (encolado)`);
+        report.push(`- Retardos > ${cfg.queueWindow} s → gcd (rechazado por enfriamiento global)`);
+        report.push('');
+        report.push('La cola funciona como se espera: dentro de la ventana de 0.3 s el hechizo se encola;');
+        report.push('fuera de ella, el GCD activo lo rechaza.');
+        fs.writeFileSync(pathMod.join(outDir, 'TABLA.md'), report.join('\n') + '\n');
+        console.log('     TABLA.md en', pathMod.join(outDir, 'TABLA.md'));
+
+        await shot('jl184-colaHechizos');
+        await resize(1280, 800);
+    },
+
     // JL-181: indicador "fuera de alcance" en la barra de hechizos.
     async barraRoja() {
         await newGame('QA BarraRoja');

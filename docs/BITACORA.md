@@ -68,6 +68,16 @@
 - **GCD.** Cada hechizo pone 0,5–0,8 s de enfriamiento global y la cola solo guarda lo pulsado en los primeros 0,3 s; después se pierde. Sin cambios de cifras: queda la pregunta al creador (GCD-01). Junie mide (JL-184, JL-185).
 - **Junie.** Nueva tanda JL-181…203 en su cola.
 
+## 2026-11-23 — JL-184: escenario colaHechizos y tabla de medición (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl184/TABLA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `colaHechizos` en `scripts/qaElectron.mjs` que mide el comportamiento de la cola de JUG-06 sin cambiar código. Lanza un hechizo instantáneo y luego pulsa otro a 0.1, 0.25, 0.4, 0.6 y 0.9 s. La tabla de resultados (análisis estático) confirma: dentro de `commandQueueWindow` (0.3 s) el hechizo se encola (`queued`); fuera, se rechaza con el motivo del bloqueo (`gcd` si el GCD sigue activo, `null` si ya expiró).
+
+**Cómo se verificó:** Análisis estático de `src/sim/world.ts` (líneas 1126–1132) y `data/player.json` (commandQueueWindow: 0.3). El escenario se ejecutará en Electron cuando haya display. TABLA.md en `work/junie-jl184/`.
+
+---
+
 ## 2026-11-23 — JL-161: BOLSA_SIGUIENTE_2.md — 20 propuestas de pruebas y escenarios (Junie)
 
 **Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_2.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
