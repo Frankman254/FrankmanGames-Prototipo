@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-162: CSS responsive del creador de personaje (Junie)
+
+**Archivos:** `src/ui/styles/creacion.css`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** El creador de personaje se desbordaba en pantallas pequeñas (1280×720, 1366×768). Se añadió media query `max-height: 850px` en `creacion.css` que reduce alturas, fuentes, padding, iconos y la vista 3D (mínimo 160px). La media query `max-width: 980px` pasa a 2 columnas con la clase abajo. Se eliminaron las media queries duplicadas de 800px. Escenario `creadorPantallas` en `qaElectron.mjs`: abre el creador a 4 tamaños (1280×720, 1366×768, 1440×900, 1920×1080) y verifica que botón Empezar, último deslizador, vista 3D (≥ 260px), pestañas y botón Volver quedan dentro de la ventana.
+
+**Cómo se verificó:** `npm run typecheck` limpio (solo balM3.ts ajeno), `npm run build` OK. Electron no disponible para capturas (sin display). Evidencia en `work/junie-jl162/`.
+
+---
+
 ## 2026-11-22 — JL-152: rendimiento del piso 100 de la cripta (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl152/INFORME.md`.

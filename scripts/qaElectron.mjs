@@ -7206,6 +7206,103 @@ const scenarios = {
         await until(`__game.crypt.floor===null`, 10000, 'salida').catch(() => {});
         record('6. Salida: fuera de la cripta', !(await js(`__game.crypt.inside`)), 'OK');
     },
+
+    /** JL-162: El creador de personaje no se desborda en pantallas pequeñas.
+     * Abre el creador a 4 tamaños y comprueba que "Empezar" y el último deslizador
+     * quedan dentro de la ventana. Captura de cada tamaño en work/junie-jl162/. */
+    async creadorPantallas() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-162 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        const sizes = [
+            [1280, 720, '720p'],
+            [1366, 768, '768p'],
+            [1440, 900, '900p'],
+            [1920, 1080, '1080p'],
+        ];
+
+        for (const [w, h, label] of sizes) {
+            /* Cargar la portada limpia a cada tamaño. */
+            await resize(w, h);
+            await cdp('Page.navigate', { url });
+            await until(
+                `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`,
+                30000,
+                `portada ${label}`,
+            );
+            await sleep(500);
+
+            /* Abrir el creador. */
+            await button('Nueva partida');
+            await until(`document.querySelector('.name-input')`, 10000, `creador ${label}`);
+            await sleep(500);
+
+            /* Comprobar que "Empezar" está dentro de la ventana. */
+            const startBtn = await js(
+                `(()=>{ const b=document.querySelector('button.primary'); if(!b) return null; const r=b.getBoundingClientRect(); return {x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height),right:Math.round(r.right),bottom:Math.round(r.bottom)}; })()`,
+            );
+            const startVisible = startBtn && startBtn.bottom <= h + 1 && startBtn.right <= w + 1;
+            record(`${label}: botón Empezar dentro`, startVisible, startBtn ? JSON.stringify(startBtn) : 'no encontrado');
+
+            /* Comprobar que el último deslizador (Complexión) está dentro. */
+            const sliders = await js(
+                `(()=>{ const s=[...document.querySelectorAll('input.cr-slider')]; if(!s.length) return null; const last=s[s.length-1]; const r=last.getBoundingClientRect(); return {name:last.getAttribute('aria-label'),y:Math.round(r.y),bottom:Math.round(r.bottom)}; })()`,
+            );
+            const sliderVisible = sliders && sliders.bottom <= h + 1;
+            record(`${label}: último deslizador dentro`, sliderVisible, sliders ? JSON.stringify(sliders) : 'no encontrado');
+
+            /* Comprobar que la vista 3D (o silueta) tiene al menos 260 px de alto. */
+            const viewHeight = await js(
+                `(()=>{ const v=document.querySelector('.cr-view'); return v ? Math.round(v.getBoundingClientRect().height) : 0; })()`,
+            );
+            record(`${label}: vista 3D ≥ 260px`, viewHeight >= 260, `${viewHeight}px`);
+
+            /* Comprobar que las pestañas de aspecto están visibles. */
+            const tabs = await js(
+                `(()=>{ const t=[...document.querySelectorAll('.cr-tab')]; return t.map(b=>({id:b.dataset.tab,visible:!!b.offsetParent})); })()`,
+            );
+            const allTabs = tabs && tabs.every((t) => t.visible);
+            record(`${label}: pestañas visibles`, allTabs, tabs ? JSON.stringify(tabs) : 'no encontrado');
+
+            /* Comprobar que "Volver" está dentro. */
+            const backBtn = await js(
+                `(()=>{ const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Volver'); if(!b) return null; const r=b.getBoundingClientRect(); return {y:Math.round(r.y),bottom:Math.round(r.bottom)}; })()`,
+            );
+            const backVisible = backBtn && backBtn.bottom <= h + 1;
+            record(`${label}: botón Volver dentro`, backVisible, backBtn ? JSON.stringify(backBtn) : 'no encontrado');
+
+            await shot(`jl162-${label}`);
+
+            /* Cerrar el creador con Escape para volver a la portada. */
+            await key('Escape', 'Escape');
+            await until(
+                `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`,
+                10000,
+                `portada tras ${label}`,
+            );
+            await sleep(300);
+        }
+
+        /* Tabla de resultados. */
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = 'work/junie-jl162';
+        fs.mkdirSync(outDir, { recursive: true });
+        const tabla = ['| Tamaño | Paso | Resultado | Detalle |', '|--------|------|-----------|---------|'];
+        const results = await js(`window.__qaResults || []`);
+        if (results && results.length) {
+            for (const r of results) {
+                if (r.name?.startsWith('JL-162')) {
+                    const [size, paso] = r.name.replace('JL-162 ', '').split(': ');
+                    tabla.push(`| ${size || ''} | ${paso || ''} | ${r.ok ? '✓' : '✗'} | ${r.detail || ''} |`);
+                }
+            }
+        }
+        fs.writeFileSync(pathMod.join(outDir, 'TABLA.md'), '# JL-162 — creadorPantallas\n\n' + tabla.join('\n') + '\n');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

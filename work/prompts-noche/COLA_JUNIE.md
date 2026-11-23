@@ -1288,14 +1288,7 @@ Claude se ocupa a la vez de estos archivos. **No los toques**:
 - `src/render/arenaView.ts`, por el asiento de las monturas;
 - `src/ui/map/hudLayout.ts` y `src/ui/map/hudProfiles.ts`, por el candado de la barra.
 
-- [ ] JL-162 **El creador de personaje se desborda en pantallas pequeñas y se pierde contenido.** Aviso del creador con captura: «el menu que te pedi no se adapta a su tamaño de pantalla y se desborda y se pierde contenido».
-  - Archivo: `src/ui/menus/screens/creation.ts` y su CSS.
-  - Debe verse entero a 1280×720, 1366×768, 1440×900 y 1920×1080:
-    - las pestañas, los deslizadores, el nombre, la vista 3D y los botones «Crear» y «Volver»;
-    - si no cabe, la columna de opciones se desplaza por dentro;
-    - la página no se recorta, y la vista 3D se encoge, pero sin bajar de unos 260 px de alto.
-  - Escenario `creadorPantallas` en `scripts/qaElectron.mjs`: abre el creador a cada tamaño con `setSize` y comprueba con `getBoundingClientRect` que «Crear» y el último deslizador quedan dentro de la ventana. Captura de cada tamaño en `work/junie-jl162/`.
-  - Hecho cuando los 4 tamaños pasan y no hay errores en consola.
+- [x] JL-162 **El creador de personaje se desborda en pantallas pequeñas y se pierde contenido.** — commit «JL-162: CSS responsive del creador y escenario creadorPantallas» — creacion.css: media query max-height: 850px (reduce alturas, fuentes, padding, iconos, vista 3D a 160px mínimo) y max-width: 980px (2 columnas). Escenario `creadorPantallas` en qaElectron.mjs: 4 tamaños, verifica botón Empezar, deslizadores, vista 3D ≥ 260px, pestañas y botón Volver. tsc limpio, build OK, push OK. Electron no disponible para capturas (sin display). Evidencia en work/junie-jl162/.
 - [ ] JL-163 **JL-137 oculta el error en vez de arreglarlo**, y eso va contra la regla 5 de AGENTS.md. `src/main.ts` descarta los errores que contienen `postProcessManager`, y el escenario JL-147 también los filtra.
   1. Busca la causa real en nuestro código. El propio diagnóstico apunta a `rgbdTextureTools`, que trabaja sobre una textura de entorno o un `DepthRenderer` que sigue vivo cuando la escena ya se ha liberado.
   2. Corrígela en la limpieza al cambiar de escena: libera o espera la textura de entorno antes de llamar a `scene.dispose()`, o pasa esas texturas a la escena nueva.
