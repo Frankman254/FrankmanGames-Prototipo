@@ -216,6 +216,30 @@ estas pasadas, guardando captura o render en `work/<agente>-<tarea>/`:
    del juego y documentar límites reales. Un export correcto no sustituye la
    aprobación visual.
 
+### Telas, capas y piezas que se mueven (creador, 2026-11-23)
+
+Todo lo que cuelga (capas, faldas, pañuelos, cintas, pelo largo, colas, flecos) se
+anima con huesos propios, sin simulación de tela. La simulación completa atraviesa
+el cuerpo en cuanto el personaje se mueve y explota con cualquier temblor.
+
+1. **Concepto en dos vistas** (frente y perfil) fijado antes de modelar.
+2. **Modelado por piezas:** cuerpo, ropa, capa y accesorios separados. Cada pieza
+   que se mueve sola es su propia malla o su propio grupo de vértices.
+3. **Texturas pintadas a mano** en la estética del juego (anime pulido,
+   escalones suaves). Nada de PBR genérico que rompa el estilo.
+4. **Cadena de huesos independiente** para cada tela, de 3 a 6 huesos de la
+   raíz a la punta. La raíz va emparentada al hueso del cuerpo que la sostiene
+   (hombros, cadera, cabeza).
+5. **Medio tiempo de retraso:** cada hueso de la cadena repite el giro del
+   cuerpo con un desfase que crece hacia la punta (en idle y walk, alrededor de
+   medio paso en la punta). Ese desfase da peso e inercia. Se hornea en cada clip.
+6. **Sin atravesar el cuerpo:** se revisa cada clip de perfil y de espaldas. Si
+   la tela entra en el cuerpo, se corrige el giro del hueso o el peso del vértice,
+   nunca se añade física.
+7. **Pulido antes de entregar:** un personaje se entrega acabado y en la
+   estética del juego, con láminas de frente, perfil, espaldas y un bucle de
+   idle y walk en `work/<agente>-<tarea>/`.
+
 En piezas de relieve como monedas, el flujo preferido es un disco o polígono
 base con canto real, relieve high-poly (curvas/malla o displacement controlado),
 bake a normal/height para el modelo de juego y material metálico con rugosidad

@@ -7,6 +7,8 @@ import { solidMaterial } from '../render/materials';
 import { modelFile } from '../render/modelFiles';
 import { OcclusionPlugin } from '../render/occlusion';
 import { staticMesh, staticTexture } from '../render/staticModels';
+import { BarriadaView } from '../render/barriadaView';
+import { NavGrid } from '../sim/navGrid';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
 import {
@@ -18,11 +20,16 @@ import {
     casaRoomSolids,
     casaRoomStart,
 } from '../world/casaCreador';
+import { BARRIADA, barriadaInicio, barriadaPiedra, barriadaSolids } from '../world/barriada';
 import { surfaceHeight, type Platform } from '../world/steps';
 import type { SwitchableHeightField } from '../world/switchableGround';
 import type { BankHost } from './bankScene';
 
-export type HouseHost = Omit<BankHost, 'onBank' | 'ground'> & { ground?: SwitchableHeightField };
+export type HouseHost = Omit<BankHost, 'onBank' | 'ground' | 'switchInside'> & {
+    ground?: SwitchableHeightField;
+    /** `outdoor`: zona al aire libre (CLA-BARR1), con cielo y sol en vez de la luz de interior. */
+    switchInside(inside: boolean, outdoor?: boolean): void;
+};
 
 export interface HouseProp {
     x: number;
@@ -65,7 +72,7 @@ export function castleGate(p: HouseProp): HouseDoor {
 
 const REACH = 1.6;
 
-type RoomId = 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo';
+type RoomId = 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo' | 'barriada';
 
 /** Casa del creador en el mapa (landmark `casa_creador` o `casa_creador_espejo`). */
 export interface CreatorHouseProp extends HouseProp {
@@ -88,6 +95,9 @@ interface Room {
     /** Rejilla más fina que la del mundo, para puertas de 0,70 m. */
     cellSize?: number;
     navRadius?: number;
+    /** CLA-BARR1: esquina de la zona en el mundo, lejos del mapa; la rejilla va ahí. */
+    origin?: Vec2;
+    outdoor?: boolean;
 }
 
 function casaRoom(espejo: boolean): Room {
@@ -144,6 +154,19 @@ export const ROOMS: Record<RoomId, Room> = {
     },
     casa: casaRoom(false),
     casaEspejo: casaRoom(true),
+    // CLA-BARR1: la barriada de Praderas del Norte (src/world/barriada.ts), a la que se llega por su
+    // Piedra Pintada. La salida es la piedra de la plaza.
+    barriada: {
+        name: 'Praderas del Norte',
+        width: BARRIADA.ancho,
+        depth: BARRIADA.fondo,
+        zoom: 16,
+        solids: barriadaSolids().map((o) => ({ x: o.x, z: o.y, w: o.w, d: o.d })),
+        start: barriadaInicio(),
+        exit: { mesh: barriadaPiedra(), pos: { x: barriadaPiedra().x, y: barriadaPiedra().y - 2.6 } },
+        origin: { ...BARRIADA.origen },
+        outdoor: true,
+    },
 };
 
 type Target = { action: 'enter'; pos: Vec2; door: HouseDoor; room: RoomId } | { action: 'leave'; pos: Vec2 };
@@ -208,6 +231,7 @@ const ROOM_PIECES: Record<RoomId, ReadonlyArray<readonly [string, string]>> = {
     ],
     casa: [],
     casaEspejo: [],
+    barriada: [],
 };
 
 export class HouseScene {
@@ -219,6 +243,8 @@ export class HouseScene {
     private outdoorZoom = 0;
     private readonly targets = new Map<Mesh, Target>();
     private readonly materials = new Map<string, StandardMaterial>();
+    /** CLA-BARR1: se construye la primera vez que se entra (cientos de casas y calles). */
+    private barriada: BarriadaView | null = null;
 
     constructor(
         private readonly host: HouseHost,
@@ -298,6 +324,7 @@ export class HouseScene {
     }
 
     update(): void {
+        if (this.room === 'barriada') this.barriada?.update(1 / 60);
         const target = this.pending;
         if (!target) return;
         const w = this.host.world();
@@ -320,13 +347,16 @@ export class HouseScene {
         if (this.room || previous.character.spectral.active || !previous.player.alive) return false;
         const room = ROOMS[id];
         const d = this.host.data;
+        if (id === 'barriada') this.buildBarriada();
+        const ox = room.origin?.x ?? 0;
+        const oy = room.origin?.y ?? 0;
         const data: GameData = {
             ...d,
             zone: {
                 ...d.zone,
-                shared: undefined,
-                originX: 0,
-                originY: 0,
+                shared: room.origin ? this.originGrid(room, d.zone.cellSize) : undefined,
+                originX: ox,
+                originY: oy,
                 width: room.width,
                 depth: room.depth,
                 ...(room.cellSize ? { cellSize: room.cellSize } : {}),
@@ -341,11 +371,48 @@ export class HouseScene {
         this.outdoorZoom = this.host.view.rig.zoom;
         this.room = id;
         this.rooms.get(id)!.setEnabled(true);
-        this.host.switchInside(true);
+        this.host.switchInside(true, room.outdoor);
         this.setRelief(room.platforms);
         this.host.install(w);
         this.host.view.rig.jumpTo(room.zoom);
         return true;
+    }
+
+    /** CLA-BARR1: viaje de la Piedra Pintada de Praderas del Norte; al salir se vuelve a `back`. */
+    enterBarriada(back: Vec2): boolean {
+        return this.enter({ door: back, outside: { ...back }, rotDeg: 0 }, 'barriada');
+    }
+
+    /**
+     * Rejilla de una sala lejos del origen (la de `fromObstacles` empieza en 0, 0): densa, con el borde
+     * cerrado. Las casas se estampan con la holgura de la zona al montar el mundo (`buildZoneGrid`).
+     */
+    private originGrid(room: Room, cellSize: number): { grid: NavGrid; isActive: () => boolean } {
+        const cell = room.cellSize ?? cellSize;
+        const ox = room.origin!.x;
+        const oy = room.origin!.y;
+        const grid = new NavGrid(room.width, room.depth, cell, ox, oy);
+        const W = room.width;
+        const D = room.depth;
+        for (const o of [
+            { x: ox + W / 2, y: oy + 0.5, w: W, d: 1 },
+            { x: ox + W / 2, y: oy + D - 0.5, w: W, d: 1 },
+            { x: ox + 0.5, y: oy + D / 2, w: 1, d: D },
+            { x: ox + W - 0.5, y: oy + D / 2, w: 1, d: D },
+        ])
+            grid.stamp(o, 0);
+        return { grid, isActive: () => true };
+    }
+
+    private buildBarriada(): void {
+        if (this.barriada) return;
+        const view = this.host.view;
+        this.barriada = new BarriadaView(view.scene, view.atmosphere.shadows);
+        const root = this.rooms.get('barriada')!;
+        this.barriada.root.parent = root;
+        this.barriada.setVisible(true);
+        this.targets.set(this.barriada.stone, { action: 'leave', pos: { ...ROOMS.barriada.exit!.pos } });
+        goldOutline(this.barriada.stone);
     }
 
     leave(): void {
@@ -404,6 +471,11 @@ export class HouseScene {
         const room = ROOMS[id];
         if (room.model) this.loadRoomModel(root, room.model);
         const W = room.width;
+        // La barriada sale por su piedra (buildBarriada).
+        if (room.outdoor) {
+            root.setEnabled(false);
+            return;
+        }
         const exit = staticMesh(scene, 'salida', 'house-exit');
         exit.position.set(room.exit?.mesh.x ?? W / 2, 0, room.exit?.mesh.y ?? 0.2);
         exit.parent = root;

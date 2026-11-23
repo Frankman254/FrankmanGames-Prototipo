@@ -1,0 +1,46 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "CLA-BARR1 (creador, 2026-11-23): «modelar las calles y copiar y pegar las casas en sus calles aunque hay distintos modelos y variantes para que todas no sean iguales [...] esa zona es de panama, Praderas del norte». Zona aparte a escala 1:1, sólo para ver cómo queda el mundo real en el juego. Trazado aproximado del sector C de la hoja 01 de localizaciones: siete calles paralelas con dos filas de lotes de 10 × 21,5 m espalda con espalda, cortadas por una transversal. El plano va girado unos 25° para que las calles corran en x. Las distancias salen de contar lotes (10 m de frente) en la hoja; los extremos de cada calle son a ojo. Metros de la zona: (0, 0) es su esquina; `origen` la coloca en el mundo, lejos del mapa de Panamá. Cada tramo es [x0, x1] de la calle; los lotes llenan el tramo a los dos lados. Colores de las variantes: PROPUESTA.",
+  "origen": { "x": 6000, "y": 0 },
+  "ancho": 420,
+  "fondo": 420,
+  "calle": { "calzada": 6, "cordon": 0.15, "grama": 0.6, "acera": 1.2 },
+  "lote": { "ancho": 10, "fondo": 21.5, "retiro": 7 },
+  "calles": [
+    { "id": "calle_1", "y": 359.4, "tramos": [[15, 230], [240, 385]] },
+    { "id": "calle_2", "y": 306.5, "tramos": [[34, 230], [240, 395]] },
+    { "id": "calle_3", "y": 253.6, "tramos": [[56, 230], [240, 395]] },
+    { "id": "calle_4", "y": 200.7, "tramos": [[74, 230], [240, 390]] },
+    { "id": "calle_5", "y": 147.8, "tramos": [[87, 230], [240, 380]] },
+    { "id": "calle_6", "y": 94.9, "tramos": [[87, 230], [240, 355]] },
+    { "id": "calle_7", "y": 42, "tramos": [[82, 230], [240, 315]] }
+  ],
+  "transversales": [
+    { "id": "transversal", "x": 235, "y0": 15, "y1": 405 }
+  ],
+  "plaza": { "x": 235, "y": 398, "piedra": { "x": 241, "y": 400 }, "inicio": { "x": 235, "y": 394 } },
+  "variantes": {
+    "_nota": "Cada casa toma, de forma fija por su lote, un color de pared, de zócalo y de reja. El modelo alterna base y espejo como en las casas pareadas. Los colores multiplican la textura de repello del modelo (crema).",
+    "pared": [
+      [1, 1, 1],
+      [1.06, 1.02, 0.94],
+      [0.78, 1.08, 1.48],
+      [0.86, 1.18, 1.0],
+      [1.12, 0.92, 0.86],
+      [1.1, 1.12, 0.82],
+      [1.14, 1.2, 1.36]
+    ],
+    "zocalo": [
+      [1, 1, 1],
+      [0.62, 0.62, 0.7],
+      [0.8, 0.7, 0.62],
+      [0.6, 0.78, 0.8]
+    ],
+    "reja": [
+      [1, 1, 1],
+      [24, 24, 23],
+      [3.4, 6, 12],
+      [12, 3, 2.2]
+    ]
+  }
+}

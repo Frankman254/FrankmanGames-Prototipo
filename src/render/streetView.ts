@@ -20,16 +20,23 @@ const SKIRT = 0.35;
 export class StreetView {
     readonly root: TransformNode;
 
-    constructor(scene: Scene, ground: { sample(x: number, z: number): number }) {
-        this.root = new TransformNode('urbanizacion', scene);
+    /** `list` y `name`: CLA-BARR1 dibuja con lo mismo las calles de la barriada. */
+    constructor(
+        scene: Scene,
+        ground: { sample(x: number, z: number): number },
+        list: readonly Losa[] = losas(),
+        name = 'urbanizacion',
+    ) {
+        this.root = new TransformNode(name, scene);
+        const tag = name === 'urbanizacion' ? 'calle' : name;
         const by = new Map<Pieza, VertexData[]>();
-        for (const l of losas()) {
+        for (const l of list) {
             const list = by.get(l.pieza) ?? [];
             list.push(slab(l, ground));
             by.set(l.pieza, list);
         }
         for (const [pieza, parts] of by) {
-            const mesh = new Mesh(`calle:${pieza}`, scene);
+            const mesh = new Mesh(`${tag}:${pieza}`, scene);
             const all = new VertexData();
             all.positions = [];
             all.indices = [];
@@ -42,7 +49,7 @@ export class StreetView {
             }, all);
             VertexData.ComputeNormals(merged.positions!, merged.indices!, merged.normals!);
             merged.applyToMesh(mesh);
-            const m = new StandardMaterial(`calle-${pieza}`, scene);
+            const m = new StandardMaterial(`${tag}-${pieza}`, scene);
             m.diffuseColor = new Color3(...COLORS[pieza]);
             m.specularColor = new Color3(0.04, 0.04, 0.04);
             // Los faldones se ven por cualquier lado.

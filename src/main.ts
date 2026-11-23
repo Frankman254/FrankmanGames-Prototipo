@@ -216,6 +216,8 @@ if (!benchMode) {
 }
 const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
+/** CLA-BARR1: Piedra Pintada que lleva a la barriada de Praderas del Norte. */
+const BARRIADA_STONE = 'praderas_norte';
 // Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
 // `let`: el modo edición aplica `stones.json` en caliente (2026-11-11).
 let stonesDef = parseStones(stonesJson);
@@ -321,7 +323,11 @@ function openStones(): void {
                 saveStones();
             }
             audio?.cue('stone_travel');
-            veil({ kicker: tr('Viajando a'), title: z.name, sub: tr('Piedra Pintada') }, () => teleport(arriveAt(z)));
+            veil({ kicker: tr('Viajando a'), title: z.name, sub: tr('Piedra Pintada') }, () => {
+                teleport(arriveAt(z));
+                // CLA-BARR1: la piedra de Praderas del Norte lleva a la barriada 1:1, que está aparte.
+                if (z.id === BARRIADA_STONE) houses?.enterBarriada(arriveAt(z));
+            });
         },
         saveHome,
         all,
@@ -429,7 +435,8 @@ const crypt = benchMode
           nextSeed: () => data.loadTest.seed + ++runIndex,
           loading: veil,
       });
-function switchInterior(inside: boolean): void {
+/** `outdoor` (CLA-BARR1): zona al aire libre lejos del mapa; se oculta el mundo pero queda el cielo. */
+function switchInterior(inside: boolean, outdoor = false): void {
     view.ground.setEnabled(!inside);
     view.vegetation.setVisible(!inside);
     view.ambient.setVisible(!inside);
@@ -439,10 +446,12 @@ function switchInterior(inside: boolean): void {
     npcView.setVisible(!inside);
     view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
     ground.flatHeight = inside ? 0 : null;
-    view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
+    view.atmosphere.setInterior(
+        inside && !outdoor ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null,
+    );
     view.rig.blockers = inside ? [] : view.vegetation.solids;
-    view.rig.blockerMode = inside ? 'inside' : 'ray';
-    view.rig.distanceCap = inside ? 14 : null;
+    view.rig.blockerMode = inside && !outdoor ? 'inside' : 'ray';
+    view.rig.distanceCap = inside && !outdoor ? 14 : null;
     applyCameraMode();
     // Estar en el edificio no concede acceso: se habla con el empleado o cofre.
     session?.setBankAccess(false);
@@ -1620,7 +1629,9 @@ if (import.meta.env.DEV) {
             /** Pruebas: mismo destino seguro que el menú de una Piedra Pintada. */
             travelStone: (id: string) => {
                 const z = stonesDef.stones.find((s) => s.id === id);
-                if (z) teleport(arriveAt(z));
+                if (!z) return;
+                teleport(arriveAt(z));
+                if (z.id === BARRIADA_STONE) houses?.enterBarriada(arriveAt(z));
             },
             /** Pruebas: el modo edición y su aplicación en caliente, sin pasar por el POST de guardar. */
             editor,

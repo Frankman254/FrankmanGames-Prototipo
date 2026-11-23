@@ -1,3 +1,11 @@
+## 2026-11-23 — CLA-BARR1: barriada Praderas del Norte (Coord)
+
+- **Zona.** `data/barriada.json`: 7 calles y una transversal trazadas a ojo sobre el sector C del plano, en metros reales, lejos del mapa (origen 6000, 0). Lotes de 10 × 21,5 m a los dos lados de cada calle.
+- **Casas.** Unas 430, «copiadas y pegadas» con instancias finas: base y espejo alternos, y pared, zócalo y reja con colores fijos por lote. Una malla por pieza y modelo; 120 FPS en la QA.
+- **Viaje.** Nueva Piedra Pintada de Praderas del Norte; clic en la piedra de la plaza para volver. QA Electron y capturas en `work/claude-barriada/qa/`; 7 pruebas en `tests/cla_barr1_barriada.test.ts`.
+- **Pendiente.** La niebla del cielo tiñe de azul las casas lejanas y el asfalto.
+- **Blender.** `docs/GUIA_BLENDER_MCP.md` suma la sección de telas y capas con cadenas de huesos con retraso, sin simulación de tela (creador, 2026-11-23).
+
 ## 2026-11-23 — CLA-CASA2: casa del creador exacta, espejo, calle e interior (Coord)
 
 - **Planta exacta.** `data/casa_creador_planta.json` es la única fuente para Blender y para el juego: 3 recámaras, 2 baños con sus dos ventanas altas, cocina, sala-comedor y portal. La reja de la puerta copia la foto. Cuatro GLB: exterior e interior, cada uno en versión base y espejo. Validador verde.
