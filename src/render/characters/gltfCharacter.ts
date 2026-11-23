@@ -31,6 +31,7 @@ import {
     type BoneFit,
     type HeldSlot,
 } from './heldGear';
+import { applyBodyMass, massMeters, residualWidth } from './bodyMass';
 import {
     SecondaryPhysics,
     DEFAULT_CHAIN_CONFIG,
@@ -126,8 +127,9 @@ export class GltfCharacter implements CharacterModel {
         this.inner.rotation.y = (entry.yawDeg * Math.PI) / 180;
         this.inner.scaling.setAll(entry.scale);
         this.inner.scaling.y *= sy;
-        this.inner.scaling.x *= sxz;
-        this.inner.scaling.z *= sxz;
+        // CLA-CR1: la complexión ya no es solo ancho; una parte queda como escala y el resto es masa.
+        this.inner.scaling.x *= residualWidth(sxz);
+        this.inner.scaling.z *= residualWidth(sxz);
         if (look && entry.parts) {
             const k = BODY_WIDTH[look.bodyType];
             this.inner.scaling.x *= k;
@@ -162,6 +164,16 @@ export class GltfCharacter implements CharacterModel {
                         m.material.dispose();
                     }
                     m.dispose(false, false);
+                }
+                // CLA-CR1: masa de la complexión (tronco y miembros, no cabeza ni manos).
+                if (sxz !== 1) {
+                    this.root.computeWorldMatrix(true);
+                    const rootScale = Math.abs(this.root.absoluteScaling.y) || 1;
+                    applyBodyMass(this.meshes, massMeters(sxz), (mesh) => {
+                        mesh.computeWorldMatrix(true);
+                        const a = mesh.absoluteScaling;
+                        return (Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z)) / 3 / rootScale;
+                    });
                 }
                 // Físicas secundarias: buscar huesos `fis_*` y construir cadenas.
                 this.buildSecondaryPhysics();

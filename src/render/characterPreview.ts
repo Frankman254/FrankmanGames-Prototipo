@@ -134,8 +134,11 @@ export class CharacterPreview {
         m.play('idle');
         const frame = (): void => {
             if (this.model !== m) return;
-            // Encuadre según la altura del modelo: de los pies a algo por encima de la cabeza.
-            this.modelHeight = Math.max(1.2, m.height || 1.9);
+            // Encuadre según la altura de referencia (sin la altura elegida): así un personaje
+            // alto llena más el marco y uno bajo menos. Con la altura ya escalada el encuadre la
+            // anulaba y no se notaba (CLA-CR1).
+            const sy = spec.look?.bodyScale?.[0] ?? 1;
+            this.modelHeight = Math.max(1.2, (m.height || 1.9) / sy);
             const [y, r] = this.framing();
             this.camera.target.set(0, y, 0);
             this.camera.radius = r;
