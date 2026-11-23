@@ -67,6 +67,8 @@ export class BarriadaView {
 
         const streets = new StreetView(scene, FLAT, barriadaLosas(), 'barriada');
         streets.root.parent = this.root;
+        // Sin la niebla del mapa (ver `instance`): al fondo de la calle el asfalto se volvía azul.
+        for (const m of streets.root.getChildMeshes(false)) if (m.material) m.material.fogEnabled = false;
 
         // Piedra de vuelta en la plaza: las mismas piezas que las Piedras Pintadas.
         const p = barriadaPiedra();
@@ -145,9 +147,10 @@ export class BarriadaView {
             m.rotation.setAll(0);
             m.scaling.setAll(1);
             m.makeGeometryUnique();
+            // El GLB llega con una escala −1 (mano derecha → izquierda): al hornearla, Babylon ya da vuelta
+            // el orden de las caras. No volver a hacerlo: con flipFaces(true) las normales quedaban al revés
+            // y el sol no alumbraba las casas (sólo el azul del cielo: paredes lilas, techos magenta).
             m.bakeTransformIntoVertices(world);
-            // El GLB llega con una escala −1 (mano derecha → izquierda): al hornearla se dan vuelta las caras.
-            if (world.determinant() < 0) m.flipFaces(true);
             return m;
         });
         for (const node of entries.rootNodes) node.dispose(true, false);
@@ -183,6 +186,9 @@ export class BarriadaView {
             if (m.material && !plugged.has(m.material)) {
                 plugged.add(m.material);
                 new OcclusionPlugin(m.material);
+                // La niebla del mapa está pensada para kilómetros de terreno; en esta zona de 420 m teñía de
+                // azul y lila las casas a partir de unos 30 m, mientras calle y grama seguían limpias.
+                m.material.fogEnabled = false;
             }
             m.receiveShadows = true;
             this.shadows?.addShadowCaster(m, false);

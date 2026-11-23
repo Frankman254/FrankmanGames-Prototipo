@@ -3,7 +3,7 @@
 - **Zona.** `data/barriada.json`: 7 calles y una transversal trazadas a ojo sobre el sector C del plano, en metros reales, lejos del mapa (origen 6000, 0). Lotes de 10 × 21,5 m a los dos lados de cada calle.
 - **Casas.** Unas 430, «copiadas y pegadas» con instancias finas: base y espejo alternos, y pared, zócalo y reja con colores fijos por lote. Una malla por pieza y modelo; 120 FPS en la QA.
 - **Viaje.** Nueva Piedra Pintada de Praderas del Norte; clic en la piedra de la plaza para volver. QA Electron y capturas en `work/claude-barriada/qa/`; 7 pruebas en `tests/cla_barr1_barriada.test.ts`.
-- **Pendiente.** La niebla del cielo tiñe de azul las casas lejanas y el asfalto.
+- **Niebla.** Las casas salían lilas y los techos magenta a partir de unos 30 m: la niebla exponencial del mapa, pensada para kilómetros, sí se aplicaba a sus materiales PBR. Se desactiva en casas y losas de la barriada; además se quitó un `flipFaces` que repetía lo que ya hace `bakeTransformIntoVertices`. Capturas `barr2-*.jpg`.
 - **Blender.** `docs/GUIA_BLENDER_MCP.md` suma la sección de telas y capas con cadenas de huesos con retraso, sin simulación de tela (creador, 2026-11-23).
 
 ## 2026-11-23 — CLA-CASA2: casa del creador exacta, espejo, calle e interior (Coord)
