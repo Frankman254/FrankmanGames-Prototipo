@@ -1,3 +1,21 @@
+## 2026-11-23 — JL-183: barra y checkCast coherentes — 12 pruebas, 3 clases, 200 pasos (Junie)
+
+**Archivos:** `tests/jl183_hotbarCheckCast.test.ts`, `docs/BITACORA.md`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl183/INFORME.md`.
+
+**Qué:** Prueba que la barra de hechizos (`hotbarState()`) y la lógica de lanzamiento (`checkCast()`) siempre coinciden. Con secuencias aleatorias de lanzamientos (semilla fija), 200 pasos por clase, 3 clases, enemigo a 5 m y `tick` entre pulsaciones. Cuatro direcciones de verificación:
+1. Si un hueco está listo (cooldownRemaining≤0, affordable, inRange), `checkCast` no devuelve `cooldown`, `gcd` ni `resource`.
+2. Si `checkCast` devuelve `gcd`, el hueco muestra barrido (cooldownRemaining > 0).
+3. Si `checkCast` devuelve `cooldown`, el hueco muestra barrido.
+4. Si `checkCast` devuelve `resource`, el hueco no es affordable.
+
+**Resultado:** 12 pruebas verdes (4 direcciones × 3 clases). 0 desacuerdos en las 3 clases. INFORME.md en `work/junie-jl183/`.
+
+**Sin cambios de código:** Solo prueba nueva. Suite 3803/3804 (1 fallo pre-existente assets.test.ts de OMP). TypeScript sin errores nuevos.
+
+---
+
+---
+
 ## 2026-11-23 — JL-182: prueba de barrido de la barra — 3 clases, 30 hechizos, 0 falsos positivos (Junie)
 
 **Archivos:** `tests/jl182_noFalseRed.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl182/LISTA.md`.
