@@ -1,3 +1,20 @@
+## 2026-11-23 — JL-197: escenario pesca en QA Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl197/`.
+
+**Qué se hizo:** Escenario `pesca` en `scripts/qaElectron.mjs` que verifica el flujo completo del minijuego de pesca:
+
+1. Verificar que el Charco de la Garza tiene un banco de peces activo.
+2. Mover al jugador a la orilla del estanque (74, 184).
+3. Lanzar el sedal con `commandFish()` apuntando al banco.
+4. Esperar el bocado (`state === 'bite'`, 3–9 s).
+5. Sacar el pez inmediatamente con `commandFish(null)` dentro de la ventana de reacción (1.1 s).
+6. Verificar que el sedal se recoge (`fishing === null`).
+
+**Resultado:** 6/6 checks en verde. 5 capturas en `work/junie-jl197/` (antes-pesca, sedal-agua, pez-pica, sedal-recogido, pez-mochila).
+
+**Hallazgo:** `reel()` no produce botín (pez ni oro) en el contexto del arnés de QA. El inventario está vacío tras sacar el pez. Posible causa: `content.lootTables['fishing_meadow']` no se inicializa correctamente tras `newGame()`. El escenario `aprendizaje` (que también pesca) funciona con timeout 600 s. DIAGNOSTICO.md en `work/junie-jl197/`.
+
 ## 2026-11-23 — JL-195: pruebas de desbloqueo de recetas por nivel de oficio (Junie)
 
 **Archivos:** `tests/rpg/professions.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

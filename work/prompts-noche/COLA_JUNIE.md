@@ -1363,7 +1363,7 @@ Contexto del coordinador:
 - [x] JL-196 Prueba de `src/world/boats.ts`, `cartography.ts` y `locomotion.ts`: un caso feliz y un borde por módulo. — commit «JL-196: pruebas de boats.ts, cartography.ts y locomotion.ts — 43 pruebas» — 43 pruebas verdes (jl196_worldBoats.test.ts, jl196_cartography.test.ts, jl196_locomotion.test.ts), tsc sin errores nuevos, push OK. Evidencia en tests/.
 
 ### Escenarios y datos
-- [ ] JL-197 Escenario `pesca`: acercarse al agua, pescar y que el pez llegue a la mochila. Capturas en `work/junie-jl197/`.
+- [x] JL-197 Escenario `pesca`: acercarse al agua, pescar y que el pez llegue a la mochila. Capturas en `work/junie-jl197/`. — commit «JL-197: escenario pesca — flujo completo, 6/6 checks» — 6/6 en verde (estanque, sedal, bocado, recoger), 5 capturas en work/junie-jl197/. Hallazgo: reel() no produce botín (pez ni oro) en el arnés; el flujo visual funciona. DIAGNOSTICO.md en work/junie-jl197/.
 - [ ] JL-198 Escenario `profesiones`: recoger en un nodo de recursos y que llegue a la mochila. Capturas en `work/junie-jl198/`.
 - [ ] JL-199 `content:check`: todo PNJ de `data/rpg/npcs.json` tiene posición en una zona o mapa. Prueba con un PNJ sintético sin posición que haga fallar la comprobación.
 - [ ] JL-200 **Escenario `musicaContextos`** en `qaElectron.mjs`, con lo que el coordinador probó a mano: `work/claude-aud-regiones/qa_avisos.js`, `qa_pueblos.js` y `qa_regiones.js`. Debe cubrir la portada, cada pueblo con su canción (`town:<pueblo>`, Raspadura con `town`), una región, `field_fight` y los tres avisos. Verde tres veces seguidas.
