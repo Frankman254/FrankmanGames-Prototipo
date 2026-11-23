@@ -1374,5 +1374,5 @@ Contexto del coordinador:
 ### Cierre de la tanda
 - [x] JL-201 Consola limpia tras esta tanda: los escenarios nuevos y los de hechizos sin errores nuevos. INFORME en `work/junie-jl201/`.
   — commit «JL-201: consola limpia — 8 escenarios, 0 errores nuevos» — 80/81 checks (1 fallo pre-existente en previa). INFORME.md en work/junie-jl201/.
-- [ ] JL-202 Reintento obligatorio de lo que haya quedado `[!]` en JL-181…201, con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
-- [ ] JL-203 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_3.md` con 20 tareas pequeñas que hayas visto. Cada una con evidencia **comprobada**: si propones una prueba que falta, pon el `grep` que lo demuestra. Son propuestas: no las empieces.
+- [x] JL-202 Reintento obligatorio de lo que haya quedado `[!]` en JL-181…201, con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta. — Ya estaba hecho: 0 tareas bloqueadas en el rango. INFORME.md en work/junie-jl202/.
+- [x] JL-203 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_3.md` con 20 tareas pequeñas que hayas visto. Cada una con evidencia **comprobada**: si propones una prueba que falta, pon el `grep` que lo demuestra. Son propuestas: no las empieces. — BOLSA_SIGUIENTE_3.md con JL-204 a JL-229 (12 pruebas de módulos sin cobertura, 4 escenarios QA, 6 validaciones de datos, 3 calidad de código, 1 cierre).

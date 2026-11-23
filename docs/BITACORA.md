@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-202/203: cierre de la tanda (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl202/INFORME.md`, `work/junie-propuestas/BOLSA_SIGUIENTE_3.md`.
+
+**Qué se hizo:**
+- **JL-202:** Reintento obligatorio de JL-181…JL-201. Resultado: 0 tareas bloqueadas en el rango. Todas ya estaban `[x]`. INFORME.md en `work/junie-jl202/`.
+- **JL-203:** BOLSA_SIGUIENTE_3.md con 20 propuestas (JL-204…JL-229): 12 pruebas de módulos sin cobertura (crowd, fishing, weather, shoals, traps, fields, gathering, levelRange, telemetry, frameStats, bankSite, switchableGround), 4 escenarios QA faltantes (misiones, banco completo, profesiones completo, vuelo), 6 validaciones de datos (merchants, zones, stones, quests, dungeons, animation), 3 de calidad de código (catch, any, exports) y 1 de cierre.
+
+**Validación:** Sin código que cambiar. TAREAS.md actualizada a "Hecho".
+
+---
+
 ## 2026-11-23 — JL-201: consola limpia tras esta tanda (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl201/INFORME.md`.
