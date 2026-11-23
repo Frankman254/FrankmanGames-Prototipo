@@ -85,7 +85,8 @@
     { "kind": "lamp", "x": 157, "y": 125, "w": 0.4, "d": 0.4, "rotDeg": 0 },
     { "kind": "lamp", "x": 125, "y": 92,  "w": 0.4, "d": 0.4, "rotDeg": 0 },
     { "kind": "lamp", "x": 205, "y": 77,  "w": 0.4, "d": 0.4, "rotDeg": 0 },
-    { "kind": "house", "x": 250.41, "y": 234.29, "w": 6, "d": 6, "rotDeg": 0 }
+    { "kind": "house", "x": 250.41, "y": 234.29, "w": 6, "d": 6, "rotDeg": 0 },
+    { "kind": "landmark", "model": "casa_creador", "x": 170, "y": 175, "w": 6.3, "d": 12, "rotDeg": 0 }
   ],
   "exclusions": [{ "kind": "indio_desnudo", "x": 45.06, "y": 48.58 }],
   "placements": []

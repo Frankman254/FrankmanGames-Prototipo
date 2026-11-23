@@ -145,6 +145,7 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 
 | ID | Tema | Bloquea |
 |---|---|---|
+| JL-174 | La casa del creador se colocó en (170, 175), al sureste de Villa Raspadura. ¿Quieres que quede ahí o en otro sitio? ¿Debe ser la casa del jugador (interior accesible) o solo un edificio decorativo? | JL-174 (posición) |
 | JL-18 | `mist_veil` y `charcoal_cloud` tienen una zona con `effects: []` (vacía). Opción A: añadir daño del elemento. Opción B: eliminar la zona vacía. Diagnóstico en `work/junie-jl18/DIAGNOSTICO.md` | JL-18 (datos) |
 | Q16 | Arte de OMP sin revisar: fuego A, B o C, equipo lote 1, pila de leña, tres enemigos de cripta, gallote orgánico, tijereta blanca | Qué arte entra |
 | Q20 | Actualizar: ¿vale que el lanzador traiga los cambios con `git pull` y recompile en cada máquina? | DIST-01 |

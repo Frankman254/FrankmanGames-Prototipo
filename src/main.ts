@@ -2489,6 +2489,7 @@ const LANDMARK_MODEL_TO_KIND: Record<string, string> = {
     mazmorra: 'dungeon',
     muelle: 'dock',
     lancha: 'boat',
+    casa_creador: 'house',
 };
 
 /** Minimapa y mapa grande: jugador, cámara, marcadores, piedras de viaje y objetivo de la misión. */

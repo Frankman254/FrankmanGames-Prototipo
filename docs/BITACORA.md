@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-174: La casa del creador en el mundo (Junie)
+
+**Archivos:** `data/vegetation.json`, `src/main.ts`, `tests/jl174_casaCreador.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Colocar la casa del creador (CLA-CASA1, `assets/models/casa_creador.glb`, 6,30 × 12 m) como landmark en el mundo. Se eligió un solar libre en (170, 175), al sureste de Villa Raspadura: fuera del flatArea del pueblo (radio 24 + falloff 10 desde 128,128), a más de 3 m de cualquier prop existente y a más de 2 m del borde de cualquier camino. Se añadió la entrada `casa_creador: 'house'` en `LANDMARK_MODEL_TO_KIND` de `src/main.ts` para que aparezca en el mapa grande. Pregunta al creador en `docs/ACCIONES_CREADOR.md`: ¿quiere la casa ahí o en otro sitio? ¿Debe ser la casa del jugador (interior accesible) o solo un edificio decorativo?
+
+**Cómo se verificó:** `tests/jl174_casaCreador.test.ts` → 7/7 verdes (landmark existe, dimensiones 6,3 × 12, fuera del flatArea, sin colisión con props ni caminos, GLB existe, rotación múltiplo de 90). `npx tsc --noEmit` sin errores nuevos. `npm run build` OK. Escenario `pueblo` en Electron: 1/1 en verde, sin errores de consola. Captura en `work/junie-jl174/jl174-pueblo.jpg`.
+
+---
+
 ## 2026-11-23 — JL-173: Icono y etiqueta de Puertobelo — BLOQUEADA (Junie)
 
 **Archivos:** `work/junie-jl173/BLOQUEO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
