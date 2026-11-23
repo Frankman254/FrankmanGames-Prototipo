@@ -1280,6 +1280,37 @@ No se aprueban dos:
 - [x] JL-149 Escenario `restablecerHud`: mueve paneles, pulsa Restablecer, pide confirmación (JL-102) y los paneles vuelven a su sitio. — commit «JL-149: escenario restablecerHud — 8/8, drag, perfil y reset» — 8/8 en verde, hudLayout expuesto en MenusController. Captura en work/junie-jl149/.
 - [x] JL-150 Escenario `etiquetaCamara`: la opción de JL-103 enseña y oculta la etiqueta junto al minimapa. — commit «JL-150: escenario etiquetaCamara — 8/8, toggle y cambio de modo» — 8/8 en verde, etiqueta visible/oculta y texto "Cámara:" verificados. Captura en work/junie-jl150/.
 - [x] JL-151 `npm run lint` sin avisos nuevos en los archivos que tocaron JL-59…108. — commit «JL-151: 13 warnings no-unused-vars en archivos de JL-59…108» — 0 warnings en mis archivos, suite 3715/3715, tsc limpio (solo balM3.ts ajeno). Evidencia en work/junie-jl151/.
+### PRIORIDAD: pedidos del creador del 2026-11-22. Hazlas antes que JL-152
+
+Claude se ocupa a la vez de estos archivos. **No los toques**:
+- `src/render/characters/gltfCharacter.ts`, porque cambia la complexión y las físicas `fis_`;
+- `src/render/characterPreview.ts`;
+- `src/render/arenaView.ts`, por el asiento de las monturas;
+- `src/ui/map/hudLayout.ts` y `src/ui/map/hudProfiles.ts`, por el candado de la barra.
+
+- [ ] JL-162 **El creador de personaje se desborda en pantallas pequeñas y se pierde contenido.** Aviso del creador con captura: «el menu que te pedi no se adapta a su tamaño de pantalla y se desborda y se pierde contenido».
+  - Archivo: `src/ui/menus/screens/creation.ts` y su CSS.
+  - Debe verse entero a 1280×720, 1366×768, 1440×900 y 1920×1080:
+    - las pestañas, los deslizadores, el nombre, la vista 3D y los botones «Crear» y «Volver»;
+    - si no cabe, la columna de opciones se desplaza por dentro;
+    - la página no se recorta, y la vista 3D se encoge, pero sin bajar de unos 260 px de alto.
+  - Escenario `creadorPantallas` en `scripts/qaElectron.mjs`: abre el creador a cada tamaño con `setSize` y comprueba con `getBoundingClientRect` que «Crear» y el último deslizador quedan dentro de la ventana. Captura de cada tamaño en `work/junie-jl162/`.
+  - Hecho cuando los 4 tamaños pasan y no hay errores en consola.
+- [ ] JL-163 **JL-137 oculta el error en vez de arreglarlo**, y eso va contra la regla 5 de AGENTS.md. `src/main.ts` descarta los errores que contienen `postProcessManager`, y el escenario JL-147 también los filtra.
+  1. Busca la causa real en nuestro código. El propio diagnóstico apunta a `rgbdTextureTools`, que trabaja sobre una textura de entorno o un `DepthRenderer` que sigue vivo cuando la escena ya se ha liberado.
+  2. Corrígela en la limpieza al cambiar de escena: libera o espera la textura de entorno antes de llamar a `scene.dispose()`, o pasa esas texturas a la escena nueva.
+  3. Quita el filtro de `src/main.ts` y el de `qaElectron.mjs`.
+  - Hecho cuando el escenario `aprendizaje`, el cruce de lancha y el cambio de mundo, en 3 pasadas, terminan con la consola limpia **sin filtro**.
+  - Si de verdad es un fallo de Babylon sin arreglo posible desde nuestro código, márcala `[!]`. Deja la reproducción mínima en `work/junie-jl163/`. El filtro no vuelve.
+- [ ] JL-164 **La utilería de la cripta no se ve** (hallazgo de JL-143: `floor.props` vacío y `dProp: 0`).
+  - Encuentra por qué `DESIGNED_DUNGEON.floors[i].props` llega vacío en tiempo de ejecución, aunque el JSON los tiene, y por qué el `.catch(() => {})` de `dungeonView.ts` se lo traga.
+  - Corrígelo con un cambio pequeño y una prueba en Vitest.
+  - En `dungeonView.ts`, toca solo la carga de la utilería.
+  - Hecho cuando `utileriaCripta` pasa de 12/17 a 17/17, con capturas en `work/junie-jl164/`.
+- [ ] JL-165 **Rehacer JL-130 de verdad.** Este Mac tiene pantalla, como ya se dijo; el escenario de JL-130 se saltó la pantalla completa real.
+  - `pantallaCompleta` debe entrar en pantalla completa real con F11 o con la opción, esperar a que termine la animación de macOS (hasta 2 s), medir que `innerWidth` coincide con la pantalla y salir.
+  - Hecho cuando sale con 3/3 pasadas en verde, con una captura de dentro y otra de fuera en `work/junie-jl165/`.
+
 - [ ] JL-152 Rendimiento de la cripta: el piso 100 va a 58 fps, cuando el pueblo va a 61 y la cripta normal a 119. Mide qué cuesta más (utilería de JL-88, luces o antorchas) y deja un informe con las cifras. Sin cambios si no hay una causa clara y pequeña.
 - [ ] JL-153 Actualizar `work/junie-qa01/RESUMEN.md`: la cabecera aún habla de 271/68. Que refleje la última cifra y enlace a `work/junie-jl107/`.
 - [ ] JL-154 Revisar que cada casilla `[x]` de JL-73…108 cite un commit o una evidencia que exista de verdad: ruta en `work/` y hash en `git log`. Corrige solo las citas rotas.
