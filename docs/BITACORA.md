@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-167: prueba de integridad GLB citados (Junie)
+
+**Archivos:** `tests/jl167_globExists.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Prueba automática que verifica que todo GLB citado en `data/**/*.json` (campo `"file"` y comentarios `_nota`) y en `src/**/*.ts` (strings literales y `import.meta.glob` patterns) existe en `assets/models/`. Recorre los archivos, extrae las rutas con regex, filtra los placeholders (`<name>`, `<model>`) y comprueba la existencia en disco. Resultado: 45 GLB únicos citados en data/, 17 en src/, todos presentes — 0 faltantes.
+
+**Cómo se verificó:** `npx vitest run tests/jl167_globExists.test.ts` → 3/3 verdes. `npx tsc --noEmit` sin errores nuevos.
+
+---
+
 ## 2026-11-23 — JL-166: chaman.glb no carga en dev:web (Junie)
 
 **Archivos:** `vite.config.ts`, `tests/jl166_chamanGlb.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl166/DIAGNOSTICO.md`.
