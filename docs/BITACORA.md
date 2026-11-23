@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-166: chaman.glb no carga en dev:web (Junie)
+
+**Archivos:** `vite.config.ts`, `tests/jl166_chamanGlb.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl166/DIAGNOSTICO.md`.
+
+**Qué:** En `npm run dev:web` (Vite), la consola del navegador mostraba `[gltf] enemy10: no se pudo cargar /assets/models/chaman.glb`. Causa: Vite no reconoce `.glb` como tipo de asset por defecto. Sin `assetsInclude`, los archivos `.glb` no pasan por el pipeline de assets y se sirven sin el MIME type `model/gltf-binary` correcto, lo que hace que Babylon.js rechace la carga. En Electron funciona porque usa `file://`, no HTTP. Arreglo: añadido `assetsInclude: ['/**/*.glb', '/**/*.gltf']` en `vite.config.ts`.
+
+**Cómo se verificó:** `tests/jl166_chamanGlb.test.ts` → 6/6 verdes (archivo existe, GLB válido, sin referencias externas, animaciones correctas, referencia en data/assets.json). `npx tsc --noEmit` limpio (solo errores ajenos en balM3.ts y bodyMass.ts). `npx vite build` OK (6.43s). DIAGNOSTICO.md en `work/junie-jl166/`.
+
+---
+
 ## 2026-11-23 — JL-165: pantalla completa real en el escenario QA (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl165/`.

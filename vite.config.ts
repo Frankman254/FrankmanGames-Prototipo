@@ -6,6 +6,9 @@ import { EDITOR_FILES, WATCH_IGNORED_FILES } from './src/editor/files';
 export default defineConfig({
     // Rutas relativas: el build se carga con file:// dentro de Electron.
     base: './',
+    // GLB: Vite no los reconoce como assets por defecto; sin esto, dev:web
+    // los sirve sin MIME type y Babylon.js rechaza la carga (JL-166).
+    assetsInclude: ['/**/*.glb', '/**/*.gltf'],
     // Guardado del modo edición: sólo con `vite serve` (npm run dev), nunca en el build.
     // Música de pruebas desde una carpeta fuera del repositorio: sólo en desarrollo.
     plugins: [editorSavePlugin(), localMusicPlugin()],
