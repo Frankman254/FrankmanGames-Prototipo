@@ -1,3 +1,21 @@
+## 2026-11-23 — JL-161: BOLSA_SIGUIENTE_2.md — 20 propuestas de pruebas y escenarios (Junie)
+
+**Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_2.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Última tarea de la cola. Se escribió `work/junie-propuestas/BOLSA_SIGUIENTE_2.md` con 20 propuestas de tareas pequeñas derivadas de hallazgos durante la tanda JL-152…JL-180. Las propuestas son:
+
+- **17 pruebas de módulos sin cobertura:** `src/sim/` (navGrid, pathfinder, spatialHash, rng, vec2, shapes), `src/rpg/` (energy, hinder, items, spoils, stats, status, pets, professions), `src/world/` (boats, cartography, locomotion).
+- **2 escenarios QA:** `pesca` (minijuego de pesca) y `profesiones` (oficio de minería/recolección).
+- **1 validación content:check:** verificar que todos los PNJ tienen posición en el mundo.
+
+Cada propuesta incluye evidencia concreta (módulo sin pruebas, línea de código, hallazgo previo) y criterio de hecho verificable. Son propuestas, no tareas autorizadas.
+
+**Sin código:** Tarea de documentación. Sin cambios en el juego.
+
+---
+
+---
+
 ## 2026-11-23 — JL-160: cierre de bloqueos — Puertobelo espera OMP-PB-01 (Junie)
 
 **Archivos:** `work/junie-jl-160/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
