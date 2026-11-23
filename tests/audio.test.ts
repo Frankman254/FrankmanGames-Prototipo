@@ -7,7 +7,7 @@ import { loadAudioData, parseMusic, parseSfx } from '../src/audio/data';
 import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
-import { ContextMusicPlayer, DungeonPlaylist, musicContext, REGION_TRACK } from '../src/audio/contextMusic';
+import { ContextMusicPlayer, DungeonPlaylist, musicContext, REGION_TRACK, TOWN_TRACK } from '../src/audio/contextMusic';
 import { localMusicOverrides } from '../src/audio/director';
 import { DANGER_HEALTH, StingerPlayer, dangerCrossed } from '../src/audio/stingers';
 import {
@@ -468,6 +468,30 @@ describe('audio: música por zona', () => {
             expect(bytes.subarray(0, 4).toString('ascii'), id).toBe('OggS');
             expect(bytes.subarray(0, 64).includes(Buffer.from('OpusHead')), id).toBe(true);
             expect(readFileSync('PROCEDENCIA.md', 'utf8'), id).toContain(`assets/audio/music/${id}`);
+        }
+    });
+
+    // Creador (2026-11-23): «haz las canciones distintas para cada pueblo».
+    it('cada pueblo tiene su canción; Villa Raspadura conserva Fiesta en el atrio', () => {
+        const zones = (
+            JSON.parse(readFileSync('data/zones.json', 'utf8')) as { zones: { id: string; safe?: boolean }[] }
+        ).zones;
+        const towns = zones.filter((z) => z.safe).map((z) => z.id);
+        expect(towns).toContain('raspadura');
+        for (const id of towns) {
+            const expected = id === 'raspadura' ? 'town' : `town:${TOWN_TRACK[id]}`;
+            expect(TOWN_TRACK[id] !== undefined || id === 'raspadura', `${id} sin canción propia`).toBe(true);
+            expect(musicContext('game', null, false, true, false, id)).toBe(expected);
+            // Pelear en cualquier pueblo sigue con «Choque en la plaza».
+            expect(musicContext('game', null, false, true, true, id)).toBe('town_fight');
+        }
+        expect(new Set(Object.values(TOWN_TRACK)).size).toBe(Object.keys(TOWN_TRACK).length);
+        for (const name of Object.values(TOWN_TRACK)) {
+            const path = `assets/audio/music/pueblo/${name}.ogg`;
+            const bytes = readFileSync(path);
+            expect(bytes.subarray(0, 4).toString('ascii'), path).toBe('OggS');
+            expect(bytes.subarray(0, 64).includes(Buffer.from('OpusHead')), path).toBe(true);
+            expect(readFileSync('PROCEDENCIA.md', 'utf8'), path).toContain(path);
         }
     });
 

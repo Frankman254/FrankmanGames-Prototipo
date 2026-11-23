@@ -1331,3 +1331,44 @@ Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`
 - [x] JL-156 Recorrido completo de QA en dos pasadas con `QA_SESION`. — commit «JL-156: QA completo — 100 escenarios, 2 pasadas, sin regresiones» — 100 escenarios ejecutados en 2 pasadas, ~742 OK / ~18 FALLA (p1), ~445 OK / ~11 FALLA (p2). Fallos pre-existentes: utileriaCripta (floor.props), postProcessManager Babylon, barraCandado persistencia. CDP crash en batch solucionado ejecutando por separado. RESUMEN.md en work/junie-jl-156/.
 - [x] JL-160 **Reintento obligatorio.** — commit «JL-160: cierre de bloqueos — Puertobelo espera OMP-PB-01, JL-64 pendiente del creador» — JL-74 y JL-85 ya resueltas por JL-74b y JL-85b. JL-64 desbloqueada por JL-64b pero el rework de pisos es contenido (decisión del creador). JL-169, JL-171, JL-172, JL-173, JL-180: bloqueos legítimos por OMP-PB-01 (puertobelo_kit.glb no existe). PREGUNTAS.md en work/junie-jl-160/.
 - [x] JL-161 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_2.md` con 20 tareas pequeñas que hayas visto, cada una con evidencia y criterio de hecho. Son propuestas: no las empieces. — commit «JL-161: BOLSA_SIGUIENTE_2.md — 20 propuestas de pruebas y escenarios» — BOLSA_SIGUIENTE_2.md en work/junie-propuestas/ con 20 propuestas (17 pruebas de módulos sin cobertura, 2 escenarios QA, 1 validación content:check). Sin código que cambiar.
+
+## Tanda del 2026-11-23 (el creador: «revisa la cola de junie y asígnale artas tareas»; «aún veo bugs en los hechizos»). En este orden.
+
+Contexto del coordinador:
+- Suite completa en verde y tsc limpio, salvo `scripts/balance/balM3.ts`, que es ajeno: no lo toques.
+- El coordinador ya arregló un rojo falso de la barra (`aimedTarget` en `src/sim/world.ts`; mira `git log -- src/sim/world.ts`). Sin enemigo bajo el cursor, la barra medía el alcance contra el último enemigo atacado. Ese rojo se borraba al lanzar a otro blanco. Prueba en `tests/aimAssist.test.ts`.
+- **Enfriamiento global y cola:** cada hechizo pone 0,5–0,8 s de GCD (`data/rpg/spells.json`). La cola de JUG-06 solo guarda lo pulsado en los primeros 0,3 s (`commandQueueWindow`), medidos desde que empieza la animación. Lo pulsado después se pierde con «Enfriamiento global». **No cambies cifras ni la regla de la cola:** el creador decide (pregunta abierta GCD-01). Las tareas JL-184 y JL-185 solo miden.
+- Los hechizos son lo primero: el creador sigue viendo fallos. Todo hallazgo que no sea un arreglo pequeño y claro se anota como pregunta exacta, sin improvisar.
+- `scripts/qaElectron.mjs` es tuyo. No uses `work/qa-manual/` mientras otra sesión lo tenga abierto (puerto 9351): usa el arnés con su perfil propio.
+
+### Hechizos
+- [ ] JL-181 **Escenario `barraRoja`.** Partida nueva y enemigo quieto. Lanza un hechizo de un blanco sobre él y llévalo lejos, fuera de alcance, moviendo `pos`. Con el cursor en el suelo vacío, ningún hueco debe estar en `outOfRange`. Con el cursor sobre ese enemigo lejano, el hueco sí. Repite con un hechizo de suelo (`atTarget`). Captura de los dos estados en `work/junie-jl181/`. Aceptación: escenario en verde tres veces seguidas.
+- [ ] JL-182 **Ningún hueco en rojo sin motivo.** Prueba en `tests/` que recorra todos los hechizos de las 3 clases y los universales. Para cada uno: personaje en la barra, sin enemigos y con el cursor a 2 m. Después de esperar los enfriamientos, `hotbarState()` debe dar `inRange: true` y `cooldownRemaining: 0`. Repite con un enemigo a 2 m bajo el cursor. Si alguno sale en rojo, busca la causa. Si es pequeña, arréglala en `src/sim/` con su prueba; si no, anótala con la pregunta exacta. Lista de resultados en `work/junie-jl182/LISTA.md`.
+- [ ] JL-183 **La barra y `checkCast` dicen lo mismo.** Prueba con secuencias aleatorias de lanzamientos y semilla fija: 200 pasos con 3 clases y `tick` entre pulsaciones. En cada paso, si un hueco sale listo (`cooldownRemaining <= 0`, `affordable` y `inRange`), `checkCast` de ese hechizo no puede devolver `cooldown`, `gcd` ni `resource`. Al revés, si `checkCast` devuelve `gcd`, el hueco debe mostrar barrido. Cualquier desacuerdo es un fallo real: causa y arreglo pequeño con prueba, o pregunta.
+- [ ] JL-184 **Escenario `colaHechizos` (solo mide).** Lanza un hechizo instantáneo. Pulsa otro a 0,1, 0,25, 0,4, 0,6 y 0,9 s. Anota para cada momento si queda en cola (`queued`), si se rechaza (`gcd`) y cuánto tarda en salir de verdad. Tabla en `work/junie-jl184/TABLA.md`. No cambies `commandQueueWindow` ni el GCD.
+- [ ] JL-185 **Pulsaciones perdidas en una pelea (solo mide).** En `tests/` o `scripts/`, un bot que pulsa 1-2-3-4 cada 0,35 s durante 60 s simulados contra un muñeco, con cada clase a nivel 1 y 50. Cuenta los lanzamientos hechos y los `castBlocked` por motivo. Informe en `work/junie-jl185/INFORME.md` con la proporción perdida por GCD. Es la evidencia para la pregunta GCD-01 del creador.
+- [ ] JL-186 **Hechizos que se lanzan y no hacen nada.** Prueba que lanza cada hechizo de clase con un blanco válido, a nivel 1 y 50, y espera 3 s. Debe salir un `cast` y al menos un efecto: daño, curación, estado, zona, invocación, escudo o movimiento. Los que no hacen nada van a `work/junie-jl186/LISTA.md` con el motivo. Arregla solo lo pequeño y claro, con prueba (como en HZ-07); para el resto, pregunta.
+- [ ] JL-187 **Todo motivo de bloqueo tiene texto.** Prueba de que cada valor de `CastBlock` tiene texto en español en `CAST_BLOCK_TEXT` (`src/sim/combat.ts`), sin huecos ni `undefined`, incluidos `queued`, `dazed`, `trapSpacing`, `noLineOfSight`, `charges`, `spectral` y `disoriented`. Si falta alguno, añade un texto corto y neutro.
+- [ ] JL-188 **Escenario `hechizosClases`.** En Electron, con un muñeco delante, lanza los 4 primeros hechizos de la barra de cada clase. Cada uno debe dar daño o efecto visible, sin errores de consola. Capturas en `work/junie-jl188/`. Rehace el hueco de JL-178, que no capturó hechizos por falta de enemigos.
+
+### Pruebas que faltan (de tu BOLSA_SIGUIENTE_2, revisada por el coordinador)
+`navGrid`, `pathfinder`, `rng` y `vec2` ya tienen varias pruebas que los importan: esas propuestas se descartan. Quedan las de cobertura nula o mínima. Sin cambiar cifras: si una prueba destapa un fallo, se informa y no se relaja.
+- [ ] JL-189 Prueba de `src/rpg/hinder.ts` (hoy ninguna la importa): embotado, desorientación y los que tenga; cuánto duran y qué impiden.
+- [ ] JL-190 Prueba de `src/rpg/pets.ts` (hoy ninguna la importa): dar de comer, subir de nivel, bonos sin pasarse del tope actual y guardado.
+- [ ] JL-191 Prueba de `src/rpg/status.ts`: aplicar, acumular, renovar, expirar y quitar estados.
+- [ ] JL-192 Prueba de `src/sim/spatialHash.ts`: insertar, mover, consultar en radio y en los bordes de celda.
+- [ ] JL-193 Prueba de `src/sim/shapes.ts`: círculo, cono, línea, cruz, estrella y cuadrado, con puntos dentro, fuera y en el borde.
+- [ ] JL-194 Prueba de `src/rpg/energy.ts` y `src/rpg/spoils.ts`: gasto y recuperación; reparto del botín con semilla fija.
+- [ ] JL-195 Prueba de `src/rpg/professions.ts`: subir de nivel un oficio y las recetas que se desbloquean.
+- [ ] JL-196 Prueba de `src/world/boats.ts`, `cartography.ts` y `locomotion.ts`: un caso feliz y un borde por módulo.
+
+### Escenarios y datos
+- [ ] JL-197 Escenario `pesca`: acercarse al agua, pescar y que el pez llegue a la mochila. Capturas en `work/junie-jl197/`.
+- [ ] JL-198 Escenario `profesiones`: recoger en un nodo de recursos y que llegue a la mochila. Capturas en `work/junie-jl198/`.
+- [ ] JL-199 `content:check`: todo PNJ de `data/rpg/npcs.json` tiene posición en una zona o mapa. Prueba con un PNJ sintético sin posición que haga fallar la comprobación.
+- [ ] JL-200 **Escenario `musicaContextos`** en `qaElectron.mjs`, con lo que el coordinador probó a mano: `work/claude-aud-regiones/qa_avisos.js`, `qa_pueblos.js` y `qa_regiones.js`. Debe cubrir la portada, cada pueblo con su canción (`town:<pueblo>`, Raspadura con `town`), una región, `field_fight` y los tres avisos. Verde tres veces seguidas.
+
+### Cierre de la tanda
+- [ ] JL-201 Consola limpia tras esta tanda: los escenarios nuevos y los de hechizos sin errores nuevos. INFORME en `work/junie-jl201/`.
+- [ ] JL-202 Reintento obligatorio de lo que haya quedado `[!]` en JL-181…201, con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
+- [ ] JL-203 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_3.md` con 20 tareas pequeñas que hayas visto. Cada una con evidencia **comprobada**: si propones una prueba que falta, pon el `grep` que lo demuestra. Son propuestas: no las empieces.

@@ -2403,8 +2403,9 @@ export class World implements SessionWorld {
             }
             // UI-15: ¿el objetivo está al alcance y hay línea de visión? Sin objetivo todavía
             // (un hechizo de un blanco sin enemigo cerca del cursor) no se marca: no hay a quién
-            // estar lejos (creador 2026-11-20: «estan marcados en rojo cuando no deberia»).
-            const targetId = this.targetFor(s, aim);
+            // estar lejos (creador 2026-11-20: «estan marcados en rojo cuando no deberia»). El último
+            // atacado tampoco cuenta: marcaba en rojo hasta lanzar a otro blanco (creador 2026-11-23).
+            const targetId = this.aimedTarget(s, aim);
             const inRange =
                 (s.area.type === 'single' && !this.enemyById(targetId)) ||
                 (this.inRange(s, targetId, aim.point) && this.hasLineOfSight(s, targetId, aim.point));
@@ -2992,6 +2993,12 @@ export class World implements SessionWorld {
      * cercano al cursor a ≤ AIM_ASSIST_RADIUS de su borde; si tampoco, el último atacado.
      */
     targetFor(s: CompiledSpell, aim: Aim): number | null {
+        if (s.area.type !== 'single') return aim.targetId;
+        return this.aimedTarget(s, aim) ?? this.player.lastTarget;
+    }
+
+    /** Lo que apunta el cursor (bajo él o por el imán), sin el último atacado. */
+    private aimedTarget(s: CompiledSpell, aim: Aim): number | null {
         if (s.area.type !== 'single' || this.enemyById(aim.targetId)) return aim.targetId;
         let best: number | null = null;
         let bestD = AIM_ASSIST_RADIUS;
@@ -3003,7 +3010,7 @@ export class World implements SessionWorld {
                 best = e.id;
             }
         }
-        return best ?? this.player.lastTarget;
+        return best;
     }
 
     /** Anda hasta tener alcance y visión para el hechizo pendiente y lo lanza. */

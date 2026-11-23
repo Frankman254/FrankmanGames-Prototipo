@@ -66,6 +66,23 @@ describe('apuntado flexible', () => {
         expect(w.hotbarState()[i]!.inRange).toBe(false);
     });
 
+    // Creador (2026-11-23): «algunos salen en rojo y se resetean después de lanzar otro hechizo».
+    // El último atacado (fallback al lanzar) no cuenta como blanco apuntado para la barra.
+    it('la barra no marca en rojo por el último atacado si el cursor no apunta a nadie', () => {
+        const w = arena();
+        const i = w.character.spellbook.hotbar.indexOf('spark');
+        const old = still(w, 13, 10);
+        expect(w.commandCast('spark', aim(old.pos.x, old.pos.y, old.id))).toBeNull();
+        run(w, 1.5);
+        expect(w.player.lastTarget).toBe(old.id);
+        old.pos = { x: 10 + w.spell('spark').range + 8, y: 10 };
+        w.aimProvider = () => aim(10, 30);
+        expect(w.hotbarState()[i]!.inRange).toBe(true);
+        // El cursor sobre ese mismo enemigo lejano sí lo marca.
+        w.aimProvider = () => aim(old.pos.x, old.pos.y, old.id);
+        expect(w.hotbarState()[i]!.inRange).toBe(false);
+    });
+
     it('fuera de alcance, con approachToCast, se acerca andando y lanza', () => {
         const w = arena();
         w.approachToCast = true;

@@ -1,3 +1,10 @@
+## 2026-11-23 — AUD-CTX-07, HUD-ROJO-02 y tanda JL-181…203 (Coord)
+
+- **Pueblos con canción propia.** Cinco piezas nuevas en `assets/audio/music/pueblo/` (90–124 s en bucle, −16,5 a −18 LUFS), compuestas con `work/claude-aud-regiones/pueblos.py`. Cableadas con `TOWN_TRACK`. QA Electron 7/7: `work/claude-aud-regiones/qa_pueblos_resultado.txt`. Registradas en PROCEDENCIA y en `catalogar.py`.
+- **Barra en rojo.** Sin enemigo bajo el cursor, la barra medía el alcance contra el último atacado; el rojo duraba hasta lanzar a otro blanco. Arreglado con `aimedTarget` y una prueba en `tests/aimAssist.test.ts`.
+- **GCD.** Cada hechizo pone 0,5–0,8 s de enfriamiento global y la cola solo guarda lo pulsado en los primeros 0,3 s; después se pierde. Sin cambios de cifras: queda la pregunta al creador (GCD-01). Junie mide (JL-184, JL-185).
+- **Junie.** Nueva tanda JL-181…203 en su cola.
+
 ## 2026-11-23 — JL-161: BOLSA_SIGUIENTE_2.md — 20 propuestas de pruebas y escenarios (Junie)
 
 **Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_2.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

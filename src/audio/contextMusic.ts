@@ -20,9 +20,12 @@ export type RegionTrack =
     | 'darien'
     | 'islas'
     | 'ancon';
+/** Canción propia de cada pueblo (creador, 2026-11-23): work/claude-aud-regiones/pueblos.py. */
+export type TownTrack = 'chitri' | 'iguanera_muelle' | 'pedasol' | 'punta_venada' | 'cambutal';
 export type MusicContext =
     | 'title'
     | 'town'
+    | `town:${TownTrack}`
     | 'town_fight'
     | 'crypt'
     | 'guardian'
@@ -52,6 +55,15 @@ export const REGION_TRACK: Readonly<Record<string, RegionTrack>> = {
     ancon: 'ancon',
 };
 
+/** Pueblo (zona `safe`) → su canción. Villa Raspadura y los pueblos sin canción propia suenan «Fiesta en el atrio». */
+export const TOWN_TRACK: Readonly<Record<string, TownTrack>> = {
+    chitri: 'chitri',
+    iguanera_muelle: 'iguanera_muelle',
+    pedasol: 'pedasol',
+    punta_venada: 'punta_venada',
+    cambutal: 'cambutal',
+};
+
 /** Contextos del mundo abierto: la música local que el jugador asigne a la zona puede taparlos. */
 export function isOpenWorldContext(context: MusicContext | null): boolean {
     return context === null || context === 'field_fight' || context.startsWith('region:');
@@ -75,6 +87,12 @@ const TRACK_URL: Partial<Record<TrackId, string>> = {
     // Creador (2026-11-22): portada orquestal propia en vez de la mezcla sintética titulo_mix.wav.
     title: new URL('../../assets/audio/music/titulo/tierra_del_istmo.ogg?no-inline', import.meta.url).href,
     town: new URL('../../assets/audio/music/pueblo/fiesta_en_el_atrio.ogg?no-inline', import.meta.url).href,
+    'town:chitri': new URL('../../assets/audio/music/pueblo/chitri.ogg?no-inline', import.meta.url).href,
+    'town:iguanera_muelle': new URL('../../assets/audio/music/pueblo/iguanera_muelle.ogg?no-inline', import.meta.url)
+        .href,
+    'town:pedasol': new URL('../../assets/audio/music/pueblo/pedasol.ogg?no-inline', import.meta.url).href,
+    'town:punta_venada': new URL('../../assets/audio/music/pueblo/punta_venada.ogg?no-inline', import.meta.url).href,
+    'town:cambutal': new URL('../../assets/audio/music/pueblo/cambutal.ogg?no-inline', import.meta.url).href,
     town_fight: new URL('../../assets/audio/music/pueblo_pelea/choque_en_la_plaza.ogg?no-inline', import.meta.url)
         .href,
     crypt: new URL('../../assets/audio/music/cripta/mazmorra_hondo.ogg?no-inline', import.meta.url).href,
@@ -146,7 +164,12 @@ export function musicContext(
     // Creador (2026-11-19): la mazmorra suena a caverna y misterio. En un piso con guardián la
     // canción de jefe entra solo cuando hay pelea; el resto del piso sigue con la de la cripta.
     if (floor !== null) return guardian && fighting ? 'guardian' : 'crypt';
-    if (town) return fighting ? 'town_fight' : 'town';
+    if (town) {
+        if (fighting) return 'town_fight';
+        // Creador (2026-11-23): una canción distinta para cada pueblo.
+        const own = zone ? TOWN_TRACK[zone] : undefined;
+        return own ? `town:${own}` : 'town';
+    }
     // Creador (2026-11-22): cada región con su música propia, y pelea en el camino fuera de los pueblos.
     const region = zone ? REGION_TRACK[zone] : undefined;
     if (region) return fighting ? 'field_fight' : `region:${region}`;
