@@ -4656,3 +4656,15 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Evidencia:** `work/omp-pol08/` — `fallos_antes.json` y `fallos_despues.json` (hojas completas), `lamina_antes_despues_cazador.png` y `lamina_antes_despues_centinelaF.png` (muñeco de la mochila en Electron, frente y lado, mismo encuadre), `ajusteEquipo_BASE.json` (tabla antes).
 
 **Nota para el creador:** lo que queda de asomo entra por las bocas de la tela (el mango del guante y el escote); en las láminas no se ve cortar la piel. El guante en los hombrones pide 1,79 de largo y el test EQ-10 lo corta a 1,6: si se quiere manga más larga, hay que subir ese tope a la vez en test y validador.
+
+## 2026-11-23 — JL-196: pruebas de boats.ts, cartography.ts y locomotion.ts
+
+**Archivos:** `tests/jl196_worldBoats.test.ts`, `tests/jl196_cartography.test.ts`, `tests/jl196_locomotion.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** 43 pruebas puras para tres módulos de `src/world/` sin cobertura previa:
+- `boats.ts` (18 pruebas): `boatAt` (radio de clic, más cercana, borde, lista vacía), `boatOpen` (misión requerida, piedra conocida, sin requisito), `canBoard` (en muelle, dentro/fuera del radio, borde), `parseBoats` (parseo válido, vacío, id repetido, campos opcionales).
+- `cartography.ts` (13 pruebas): `worldCoordinate` (centro, negativo, positivo, label, altitud negativa, módulo doble para localX), `mapCell` (centro, negativo, positivo, borde de celda), `parseCartography` (válido, fuera de rango, no entero).
+- `locomotion.ts` (12 pruebas): `pickGait` con histéresis (caso feliz run/walk, transición run→walk y walk→run, banda conserva marcha, sin clip de caminar, naturalRun ≤ 0, umbrales exactos, velocidad cero).
+
+**Cómo se verificó:** `npx vitest run tests/jl196_` → 43/43 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
