@@ -9,6 +9,7 @@ import { formatLike } from './jsonFormat';
 import { brush, paintFromData, paintToData, type BrushMode, type PaintState } from './navBrush';
 
 import { FILE_IDS, type FileId } from './files';
+import ambientJson from '../../data/ambient.json';
 
 export { EDITOR_FILES, FILE_IDS, type FileId } from './files';
 
@@ -23,6 +24,43 @@ const PROP_DEFAULTS: Record<string, { w: number; d: number }> = {
 const PROP_HEIGHT: Record<string, number> = { house: 4.4, log: 0.9, boulder: 2, lamp: 3.1 };
 /** Modelos que ya salen por su kind (la farola es la lámpara); no se repiten en la paleta. */
 const KNOWN_PROPS = ['farola'];
+/** Modelos de landmark grande sin piezas en ambient.json — usan esta huella fija. */
+const LARGE_MODEL_FOOTPRINT: Record<string, { w: number; d: number }> = {
+    castillo: { w: 10, d: 10 },
+    iglesia: { w: 10, d: 10 },
+};
+
+/**
+ * Huella de un modelo GLB para colocarlo como landmark en el editor.
+ * Busca en `data/ambient.json` las piezas cuyo `model` coincide y devuelve
+ * la huella máxima (w, d). Si no hay piezas, usa 3 × 3 como respaldo.
+ * Los modelos grandes (castillo, iglesia) mantienen su huella fija.
+ */
+export function getModelFootprint(modelName: string): { w: number; d: number } {
+    // Modelos grandes con huella fija
+    if (LARGE_MODEL_FOOTPRINT[modelName]) {
+        return LARGE_MODEL_FOOTPRINT[modelName]!;
+    }
+    // Buscar en ambient.json las piezas de este modelo
+    const pieces = (ambientJson as any).pieces as Record<string, { model: string; w: number; d: number }> | undefined;
+    if (pieces) {
+        let maxW = 0;
+        let maxD = 0;
+        let found = false;
+        for (const p of Object.values(pieces)) {
+            if (p.model === modelName) {
+                if (p.w > maxW) maxW = p.w;
+                if (p.d > maxD) maxD = p.d;
+                found = true;
+            }
+        }
+        if (found) {
+            return { w: maxW, d: maxD };
+        }
+    }
+    // Respaldo
+    return { w: 3, d: 3 };
+}
 
 interface RawProp {
     kind: string;
@@ -917,8 +955,8 @@ export class EditorDoc {
             this.veg.props.push({ kind: kind!, x, y, ...PROP_DEFAULTS[kind!]!, rotDeg: 0 });
             key = `prop:${this.veg.props.length - 1}`;
         } else if (t === 'model') {
-            const w = kind === 'castillo' || kind === 'iglesia' ? 10 : 3;
-            this.veg.props.push({ kind: 'landmark', model: kind!, x, y, w, d: w, rotDeg: 0 });
+            const footprint = getModelFootprint(kind!);
+            this.veg.props.push({ kind: 'landmark', model: kind!, x, y, w: footprint.w, d: footprint.d, rotDeg: 0 });
             key = `prop:${this.veg.props.length - 1}`;
         } else if (t === 'pond') {
             (this.terrain.ponds ??= []).push({ x, y, radius: 5, depth: 1.6, shore: 2 });

@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-170: huella de `model:` desde `data/ambient.json` (Junie)
+
+**Archivos:** `src/editor/doc.ts`, `tests/jl170_editorModelFootprint.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** En `src/editor/doc.ts`, la función `add()` fijaba la huella de un `model:` en 10 para `castillo`/`iglesia` y 3 para el resto. Ahora usa `getModelFootprint()`, que busca en `data/ambient.json` las piezas cuyo `model` coincide con el nombre del GLB y devuelve la huella máxima (w, d). Los modelos grandes (castillo, iglesia) mantienen 10×10. Los modelos sin piezas registradas (personaje, equipo, etc.) usan 3×3 como respaldo. JL-169 se marca bloqueada: depende de OMP-PB-01 (`puertobelo_kit.glb` y `work/omp-pb-01/HUELLAS.md` no existen).
+
+**Cómo se verificó:** `npx vitest run tests/jl170_editorModelFootprint.test.ts` → 13/13 verdes. `npx tsc --noEmit` sin errores nuevos. Pruebas cubren: castillo/iglesia (10×10), utileria (1.9×1.33), naturaleza_modular (2.79×2.34), escenografia_regional (1.64×1.1), simbolos_istmo (2.345×1.514), detalle_suelo, caminos_rurales (4×...), costa_modular, naturaleza_suelo (2.42×1.79), modelo desconocido (3×3), personaje (3×3), equipo (3×3).
+
+---
+
 ## 2026-11-23 — JL-168: prueba de cobertura PROCEDENCIA.md (Junie)
 
 **Archivos:** `tests/jl168_procedencia.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl168/HUERFANOS.md`.
