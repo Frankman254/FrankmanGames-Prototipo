@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-191: pruebas de status.ts — 35 pruebas, apply, acumular, renovar, tick, expirar, remove, clear, absorb, shield, control, view, shareDamage (Junie)
+
+**Archivos:** `tests/jl191_status.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Pruebas completas de `src/rpg/status.ts` (StatusSet): aplicar estados nuevos, acumular stacks hasta maxStacks, renovar duración (al mayor), tick periódico con onTick por stack, expiración al llegar a 0, remove y clear, absorb con escudos (múltiples, en orden), shieldTotal, control (stun > root > silence), view, has/get, shareDamage (HZ-04b-defensa) y edge cases (dt=0, dt > remaining, shield al mayor, múltiples estados).
+
+**Validación:** `npx vitest run tests/jl191_status.test.ts` — 35/35 verdes. `npx tsc --noEmit` — limpio (solo balM3.ts ajeno). `npm run build` — OK.
+
+---
+
 ## 2026-11-23 — JL-190: pruebas de pets.ts — 52 pruebas, creación, comportamientos, aura, guardado (Junie)
 
 **Archivos:** `tests/jl190_pets.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
