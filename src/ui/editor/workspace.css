@@ -146,6 +146,21 @@
     font-size: 8px;
     transition: transform 0.1s;
 }
+.ed-tree-icon,
+.ed-vis-btn {
+    width: 18px;
+    height: 18px;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 18px;
+}
+.ed-tree-icon img,
+.ed-vis-btn img,
+.ed-asset-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 .ed-tree-category.collapsed .ed-tree-arrow {
     transform: rotate(-90deg);
 }
@@ -355,7 +370,9 @@
     background: #2a3a1a;
 }
 .ed-asset-card .ed-asset-icon {
-    font-size: 20px;
+    width: 42px;
+    height: 42px;
+    margin-inline: auto;
     margin-bottom: 2px;
 }
 .ed-asset-card .ed-asset-name {

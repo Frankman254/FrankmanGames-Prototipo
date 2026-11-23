@@ -27,6 +27,7 @@ import { tr, trf } from '../../../i18n';
 import { notice } from '../../devConsole';
 import type { Preview3d } from '../context';
 import { button, clear, h } from '../dom';
+import { artIcon } from '../artIcons';
 import { ELEMENT_LABEL, capitalize, formatStatValue, spellTooltip, statLabel } from '../format';
 import { ELEMENT_COLOR, namedIcon, spellIcon } from '../icons';
 import type { Tooltip } from '../tooltip';
@@ -161,7 +162,8 @@ function figureSvg(a: Appearance, sex: CharacterSex): string {
     const fem = sex === 'femenino';
     const sy = 1 + a.height * 0.06;
     const sx = 1 + a.build * 0.1;
-    const hairLong = a.hair === 'long' ? `<path d="M41 30c-3 8-3 18-1 26h20c2-8 2-18-1-26z" fill="#${a.hairColor}"/>` : '';
+    const hairLong =
+        a.hair === 'long' ? `<path d="M41 30c-3 8-3 18-1 26h20c2-8 2-18-1-26z" fill="#${a.hairColor}"/>` : '';
     const hairTop =
         a.hair === 'bald'
             ? ''
@@ -241,7 +243,13 @@ export function creationScreen(
         for (const s of CHARACTER_SEXES) {
             const b = h(
                 'button.cr-sex-btn',
-                { type: 'button', role: 'radio', 'aria-checked': String(s === sex), 'data-sex': s, title: SEX_LABEL[s] },
+                {
+                    type: 'button',
+                    role: 'radio',
+                    'aria-checked': String(s === sex),
+                    'data-sex': s,
+                    title: SEX_LABEL[s],
+                },
                 h('span.cr-sex-ic', { html: sexIcon(s) }),
                 h('span.cr-sex-name', { text: SEX_LABEL[s] }),
             );
@@ -320,11 +328,7 @@ export function creationScreen(
                 return b;
             }),
         );
-    const slider = (
-        label: string,
-        key: 'height' | 'build',
-        ends: [string, string],
-    ): HTMLElement => {
+    const slider = (label: string, key: 'height' | 'build', ends: [string, string]): HTMLElement => {
         const out = h('b.cr-slider-val');
         const showVal = (v: number): void => {
             out.textContent = v === 0 ? 'Media' : `${v > 0 ? '+' : ''}${Math.round(v * 100)}`;
@@ -387,7 +391,11 @@ export function creationScreen(
         clear(pane);
         if (tab === 'cuerpo') {
             pane.append(
-                section('Tono de piel', false, swatches(SKIN_TONES, look.skin, (c) => set({ skin: c }))),
+                section(
+                    'Tono de piel',
+                    false,
+                    swatches(SKIN_TONES, look.skin, (c) => set({ skin: c })),
+                ),
                 slider('Altura', 'height', ['Baja', 'Alta']),
                 slider('Complexión', 'build', ['Delgada', 'Robusta']),
             );
@@ -414,7 +422,11 @@ export function creationScreen(
                         (b) => browIcon(b, look.hairColor),
                     ),
                 ),
-                section('Color de ojos', !MODEL_SUPPORT.eyes, swatches(EYE_COLORS, look.eyes, (c) => set({ eyes: c }))),
+                section(
+                    'Color de ojos',
+                    !MODEL_SUPPORT.eyes,
+                    swatches(EYE_COLORS, look.eyes, (c) => set({ eyes: c })),
+                ),
             );
         } else if (tab === 'pelo') {
             pane.append(
@@ -429,12 +441,24 @@ export function creationScreen(
                         (c) => hairIcon(c, look.skin, look.hairColor),
                     ),
                 ),
-                section('Color de pelo', false, swatches(HAIR_COLORS, look.hairColor, (c) => set({ hairColor: c }))),
+                section(
+                    'Color de pelo',
+                    false,
+                    swatches(HAIR_COLORS, look.hairColor, (c) => set({ hairColor: c })),
+                ),
             );
         } else {
             pane.append(
-                section('Color principal', false, swatches(CLOTH_COLORS, look.cloth, (c) => set({ cloth: c }))),
-                section('Color secundario', false, swatches(CLOTH_COLORS, look.trim, (c) => set({ trim: c }))),
+                section(
+                    'Color principal',
+                    false,
+                    swatches(CLOTH_COLORS, look.cloth, (c) => set({ cloth: c })),
+                ),
+                section(
+                    'Color secundario',
+                    false,
+                    swatches(CLOTH_COLORS, look.trim, (c) => set({ trim: c })),
+                ),
                 h(
                     'div.cr-cloth-sample',
                     { style: `--a:#${look.cloth};--b:#${look.trim}` },
@@ -513,7 +537,9 @@ export function creationScreen(
             'div.cr-tags',
             null,
             h('span.cr-tag.role', { text: capitalize(c.role) }),
-            c.mainStat ? h('span.cr-tag', { text: trf('Escala con {stat}', { stat: tr(statLabel(c.mainStat)) }) }) : null,
+            c.mainStat
+                ? h('span.cr-tag', { text: trf('Escala con {stat}', { stat: tr(statLabel(c.mainStat)) }) })
+                : null,
             ...c.affinity.map((e) =>
                 h('span.cr-tag.el', {
                     style: `--el:${ELEMENT_COLOR[e]}`,
@@ -566,7 +592,7 @@ export function creationScreen(
             h(
                 'div.cr-info-head',
                 null,
-                h('div.cr-info-ic', { html: namedIcon(c.icon, res.color) }),
+                h('div.cr-info-ic', { html: artIcon('classes', c.id) ?? namedIcon(c.icon, res.color) }),
                 h('div', null, h('h3', { text: c.name }), tags),
             ),
             h('p.cr-desc', { text: c.description }),
@@ -597,7 +623,12 @@ export function creationScreen(
                     'div.cr-mech-row',
                     null,
                     h('span.cr-mech-k', { text: 'Repertorio' }),
-                    h('span.cr-mech-v', { text: trf('{n} hechizos propios, hasta el nivel {level}', { n: kit.total, level: kit.maxLevel }) }),
+                    h('span.cr-mech-v', {
+                        text: trf('{n} hechizos propios, hasta el nivel {level}', {
+                            n: kit.total,
+                            level: kit.maxLevel,
+                        }),
+                    }),
                 ),
                 elBar,
                 elLegend,
@@ -612,7 +643,9 @@ export function creationScreen(
             h('h4', { text: 'Hechizos de inicio' }),
             h('div.cr-spells', null, ...starting.map((sp) => spellRow(sp, res.name))),
             ...(later.length ? [h('h4', { text: 'Más adelante' }), laterGrid] : []),
-            ...(remaining > 0 ? [h('div.cr-more', { text: trf('y {n} más al subir de nivel', { n: remaining }) })] : []),
+            ...(remaining > 0
+                ? [h('div.cr-more', { text: trf('y {n} más al subir de nivel', { n: remaining }) })]
+                : []),
         );
         clear(stageClass);
         stageClass.append(
@@ -638,7 +671,7 @@ export function creationScreen(
         const card = h(
             'button.class-card.cr-card',
             { type: 'button', role: 'radio', 'data-id': c.id, style: `--c:${c.resource.color}` },
-            h('div.cc-icon', { html: namedIcon(c.icon, c.resource.color) }),
+            h('div.cc-icon', { html: artIcon('classes', c.id) ?? namedIcon(c.icon, c.resource.color) }),
             h('div.cc-name', { text: c.name }),
             h('div.cc-role', { text: `${capitalize(c.role)} · ${c.resource.name}` }),
         );

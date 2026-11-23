@@ -189,7 +189,7 @@ export interface MenusController {
     /** Aviso breve en pantalla. */
     toast(text: string, tone?: ToastTone): void;
     /** U01: línea del mundo (combate, zonas…) al chat, en trozos de color. */
-     chatFeed(channel: string, parts: ChatPart[], category?: ChatCategory): void;
+    chatFeed(channel: string, parts: ChatPart[], category?: ChatCategory): void;
     /** F27-INT: el jugador envió un emote; el render debe reproducir el clip. */
     onEmote(fn: (emoteId: string) => void): void;
     /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
@@ -305,10 +305,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         'nav.sys-menu',
         { 'aria-label': 'Menú del sistema' },
         sysButton('options', '⚙', 'Opciones', () => openOptions()),
-        sysButton(null, '💾', 'Guardar partida', () => openSlots('save')),
-        sysButton(null, '✎', 'Editar interfaz', () => hudLayout.toggle()),
+        sysButton('save_game', 'G', 'Guardar partida', () => openSlots('save')),
+        sysButton('edit_hud', 'E', 'Editar interfaz', () => hudLayout.toggle()),
         sysButton('pause', '☰', 'Menú', () => openPause()),
-        sysButton(null, '⏻', 'Salir al título', () =>
+        sysButton('quit_to_title', 'S', 'Salir al título', () =>
             ctx.confirm({
                 title: 'Salir al título',
                 text: 'La partida se guardará automáticamente antes de salir.',
@@ -676,7 +676,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         });
         journal = new JournalPanel(ctx, () => togglePanel('journal', false));
         compendium = opts.compendium
-            ? new CompendiumPanel(ctx, () => togglePanel('compendium', false), opts.compendium, opts.compendiumPreview3d)
+            ? new CompendiumPanel(
+                  ctx,
+                  () => togglePanel('compendium', false),
+                  opts.compendium,
+                  opts.compendiumPreview3d,
+              )
             : null;
         professions = opts.professions
             ? new ProfessionsPanel(ctx, () => togglePanel('professions', false), opts.professions)
@@ -878,7 +883,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             }
             case 'zoneEnter': {
                 // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
-                showBanner(e.name, e.safe ? 'zona segura' : trf('niv. {min}–{max}', { min: e.levelMin, max: e.levelMax }), e.zoneId, 60);
+                showBanner(
+                    e.name,
+                    e.safe ? 'zona segura' : trf('niv. {min}–{max}', { min: e.levelMin, max: e.levelMax }),
+                    e.zoneId,
+                    60,
+                );
                 if (!e.safe && e.levelMin >= s.player().level + zonesJson.dangerLevelGap)
                     dangerFlash(e.name, e.levelMin - s.player().level);
                 break;
@@ -1380,11 +1390,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (on !== options.fullscreen) setOptions({ ...options, fullscreen: on });
     });
     // En pantalla completa DOM, Esc no debe salir: el juego lo usa para abrir/cerrar el menú.
-    window.addEventListener('keydown', (e) => {
-        if (e.code === 'Escape' && document.fullscreenElement) {
-            e.preventDefault();
-        }
-    }, true);
+    window.addEventListener(
+        'keydown',
+        (e) => {
+            if (e.code === 'Escape' && document.fullscreenElement) {
+                e.preventDefault();
+            }
+        },
+        true,
+    );
     // Sin un gesto del jugador no se puede entrar en pantalla completa al arrancar:
     // se reintenta con el primer clic o tecla.
     const retryFullscreen = (): void => {
@@ -1504,7 +1518,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         setMap(f) {
             mapState.update(f, lastDt);
             // JL-103: actualizar la etiqueta del modo de cámara en el minimapa.
-            const label = options.showCameraModeLabel && f.cameraMode ? CAMERA_MODE_SHORT[f.cameraMode as keyof typeof CAMERA_MODE_SHORT] ?? null : null;
+            const label =
+                options.showCameraModeLabel && f.cameraMode
+                    ? (CAMERA_MODE_SHORT[f.cameraMode as keyof typeof CAMERA_MODE_SHORT] ?? null)
+                    : null;
             minimap?.setCameraModeLabel(label, options.showCameraModeLabel);
         },
         showDeath(where, onRespawn, energy, ctx) {
@@ -1522,7 +1539,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             const contextText = contextLines.length ? ` — ${contextLines.join(', ')}` : '';
             const deathTitle = (spectral ? tr('Has muerto') : tr('Has caído')) + contextText;
             const deathMessage = spectral
-                ? tr('Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.')
+                ? tr(
+                      'Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.',
+                  )
                 : tr('Vuelves a la última Piedra Pintada que tocaste. Si tu Pulso llega a 0, morirás definitivamente.');
             pushModal(
                 modal(
@@ -1537,7 +1556,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                               'div.energy-death',
                               null,
                               h('b', { text: pulseText(pulse?.name ?? 'Energía', energy.value, energy.max) }),
-                              h('p', { text: trf('Esta caída te costó {lost} puntos de Pulso.', { lost: Math.round(energy.lost) }) }),
+                              h('p', {
+                                  text: trf('Esta caída te costó {lost} puntos de Pulso.', {
+                                      lost: Math.round(energy.lost),
+                                  }),
+                              }),
                           )
                         : null,
                     h(

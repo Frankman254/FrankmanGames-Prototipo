@@ -11,7 +11,9 @@ import {
     type ChatPart,
     type EmoteDef,
 } from '../chatLog';
+import { tr } from '../../i18n';
 import { button, clear, h } from './dom';
+import { artIcon } from './artIcons';
 
 const CHAT_SIZE_KEY = 'frankmangames.chatSize';
 const CHAT_FILTERS_KEY = 'frankmangames.chatFilters';
@@ -122,7 +124,7 @@ export class ChatBox {
         this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
         for (const em of def.emotes) {
             // En la fila del chat el emote se escribe en el campo: se envía con Intro o Enviar.
-            const b = button(em.icon, () => this.insert(em.icon), 'small chat-emote');
+            const b = button(em.icon, () => this.insert(`/${em.command}`), 'small chat-emote');
             b.replaceChildren(emoteImage(em, 24));
             b.setAttribute('aria-label', em.command);
             b.title = em.command;
@@ -139,8 +141,11 @@ export class ChatBox {
         // arriba si cabe y si no abajo, siempre dentro de la pantalla.
         this.emoteWindow.classList.add('emote-pop');
         this.emoteWindow.addEventListener('pointerdown', (e) => e.stopPropagation());
-        const openEmotes = button('☺', () => this.toggleEmotes(openEmotes), 'small chat-emotes-open');
-        openEmotes.title = 'Emotes';
+        const openEmotes = button(tr('Gestos'), () => this.toggleEmotes(openEmotes), 'small chat-emotes-open');
+        const emotesArt = artIcon('ui', 'emotes');
+        if (emotesArt) openEmotes.innerHTML = emotesArt;
+        else openEmotes.textContent = 'E';
+        openEmotes.title = tr('Gestos');
         // Grip para el modo «Editar interfaz» (F02). Se crea aquí para que siempre exista,
         // incluso si hudLayout.attach() se llama antes o después de este constructor.
         const grip = h('div.hud-grip', { title: 'Mover: Chat' }, h('span', { text: 'Chat' }));
@@ -271,7 +276,7 @@ export class ChatBox {
             this.add({
                 channel: this.speakIn,
                 author: null,
-                text: `${this.author()} ${cmd.emote.action} ${cmd.emote.icon}`,
+                text: `${this.author()} ${cmd.emote.action}`,
             });
             this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds, cmd.emote);
             // F27-INT: notificar al render para que reproduzca el clip del emote.
@@ -305,7 +310,8 @@ export class ChatBox {
         if (this.tab === ALL || this.tab === line.channel) {
             // UI-12: respetar filtros
             const cat = line.category ?? 'system';
-            const visible = cat === 'combat' ? this.filters.combat : cat === 'loot' ? this.filters.loot : this.filters.system;
+            const visible =
+                cat === 'combat' ? this.filters.combat : cat === 'loot' ? this.filters.loot : this.filters.system;
             if (visible) this.appendLine(line);
         }
     }
@@ -351,13 +357,13 @@ export class ChatBox {
     private renderFilters(): void {
         clear(this.filtersBar);
         const items: Array<{ key: keyof ChatFilters; icon: string; label: string }> = [
-            { key: 'combat', icon: '⚔', label: 'Combate' },
-            { key: 'loot', icon: '✦', label: 'Botín' },
-            { key: 'system', icon: '⚙', label: 'Sistema' },
+            { key: 'combat', icon: 'chat_combat', label: 'Combate' },
+            { key: 'loot', icon: 'chat_loot', label: 'Botín' },
+            { key: 'system', icon: 'chat_system', label: 'Sistema' },
         ];
         for (const item of items) {
             const b = button(
-                `${item.icon} ${item.label}`,
+                item.label,
                 () => {
                     this.filters[item.key] = !this.filters[item.key];
                     saveFilters(this.filters);
@@ -366,6 +372,7 @@ export class ChatBox {
                 },
                 'small chip chat-filter',
             );
+            b.innerHTML = `${artIcon('ui', item.icon) ?? ''}<span>${item.label}</span>`;
             b.classList.toggle('on', this.filters[item.key]);
             b.classList.toggle('off', !this.filters[item.key]);
             this.filtersBar.appendChild(b);

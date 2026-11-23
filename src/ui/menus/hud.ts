@@ -268,7 +268,11 @@ export class GameHud {
     private showCastModeMenu(x: number, y: number, slotIndex: number): void {
         // Cierra cualquier menú anterior.
         this.closeCastModeMenu?.();
-        const menu = h('div.hot-slot-cast-mode-menu', { role: 'menu', 'aria-label': 'Modo de lanzamiento', tabindex: '-1' });
+        const menu = h('div.hot-slot-cast-mode-menu', {
+            role: 'menu',
+            'aria-label': 'Modo de lanzamiento',
+            tabindex: '-1',
+        });
         menu.style.cssText =
             'position:fixed;display:flex;flex-direction:column;gap:2px;padding:4px;min-width:180px;font-size:12px;background:var(--paper-1);color:var(--ink);border:1px solid #000;border-radius:6px;box-shadow:0 8px 24px #0009;pointer-events:auto;z-index:10000';
         // Posición: asegura que quepa en pantalla.
@@ -290,9 +294,11 @@ export class GameHud {
             item.addEventListener('mouseleave', () => (item.style.background = ''));
             item.addEventListener('click', () => {
                 // Emite evento custom para que main.ts lo capture.
-                window.dispatchEvent(new CustomEvent('frankmangames:slotCastMode', {
-                    detail: { slot: slotIndex, mode },
-                }));
+                window.dispatchEvent(
+                    new CustomEvent('frankmangames:slotCastMode', {
+                        detail: { slot: slotIndex, mode },
+                    }),
+                );
                 this.closeCastModeMenu?.();
             });
             menu.appendChild(item);
@@ -399,12 +405,18 @@ export class GameHud {
             (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.(
                 'critChance',
             ) ?? 0;
-        const tip = spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', {
-            level: p.level,
-            classId: p.classId,
-            known: !!known,
-            critChance,
-        });
+        const tip = spellTooltip(
+            sp,
+            known?.rank ?? 1,
+            s.content,
+            s.content.classes[p.classId]?.resource.name ?? 'recurso',
+            {
+                level: p.level,
+                classId: p.classId,
+                known: !!known,
+                critChance,
+            },
+        );
         // UI-15: si el objetivo está fuera de alcance, añadir aviso al tooltip.
         const st = s.hotbarState?.()?.find((st) => st.spellId === spellId);
         if (st?.inRange === false && tip) {
@@ -457,7 +469,7 @@ export class GameHud {
             this.classKey = p.classId;
             // U02-INT: retrato PNG con respaldo al SVG de la clase.
             const portrait = portraitImg('adventurer_default');
-            this.portrait.innerHTML = portrait ?? namedIcon(cls.icon, cls.resource.color);
+            this.portrait.innerHTML = portrait ?? artIcon('classes', cls.id) ?? namedIcon(cls.icon, cls.resource.color);
             this.el.style.setProperty('--res-color', cls.resource.color);
         }
         this.nameEl.textContent = p.spectral?.active ? trf('Espectro · ', {}) + p.name : p.name;
@@ -465,7 +477,11 @@ export class GameHud {
         this.hpFill.style.width = `${(100 * p.health) / Math.max(1, p.maxHealth)}%`;
         this.hpText.textContent = trf('{health} / {maxHealth}', { health: p.health, maxHealth: p.maxHealth });
         this.resFill.style.width = `${(100 * p.resource) / Math.max(1, p.maxResource)}%`;
-        this.resText.textContent = trf('{resource} {value} / {max}', { resource: cls?.resource.name ?? 'Recurso', value: p.resource, max: p.maxResource });
+        this.resText.textContent = trf('{resource} {value} / {max}', {
+            resource: cls?.resource.name ?? 'Recurso',
+            value: p.resource,
+            max: p.maxResource,
+        });
         const energy = p.energy;
         this.pulseMeter.hidden = !energy;
         if (energy) {
@@ -475,7 +491,11 @@ export class GameHud {
             this.pulseMeter.classList.toggle('exhausted', energy.exhausted);
         }
         this.xpFill.style.width = `${(100 * p.xp) / Math.max(1, p.xpToNext)}%`;
-        this.xpText.textContent = trf('Nivel {level} · {xp} / {xpToNext} XP', { level: p.level, xp: p.xp, xpToNext: p.xpToNext });
+        this.xpText.textContent = trf('Nivel {level} · {xp} / {xpToNext} XP', {
+            level: p.level,
+            xp: p.xp,
+            xpToNext: p.xpToNext,
+        });
         this.pointsDot.hidden = p.unspentStatPoints <= 0;
 
         // Barra de hechizos.
@@ -564,7 +584,10 @@ export class GameHud {
                         { kind: 'title', text: def.name, rarity: def.kind === 'buff' ? 'uncommon' : 'common' },
                         { kind: 'sub', text: def.kind === 'buff' ? 'Beneficio' : 'Perjuicio' },
                         { kind: 'text', text: def.description },
-                        { kind: 'hint', text: cur ? trf('Quedan {time} s', { time: cur.remaining.toFixed(1) }) : tr('Terminado') },
+                        {
+                            kind: 'hint',
+                            text: cur ? trf('Quedan {time} s', { time: cur.remaining.toFixed(1) }) : tr('Terminado'),
+                        },
                     ];
                 });
                 this.statusRow.appendChild(el);
@@ -591,7 +614,7 @@ export class GameHud {
             if (pet) {
                 const def = s.content.pets[pet.petId];
                 const face = h('div.pet-face');
-                face.innerHTML = namedIcon(def?.icon ?? 'pet_fox', '#d9b26a');
+                face.innerHTML = artIcon('pets', pet.petId) ?? namedIcon(def?.icon ?? 'pet_fox', '#d9b26a');
                 this.petBox.append(
                     face,
                     h(

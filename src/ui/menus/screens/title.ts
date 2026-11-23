@@ -1,5 +1,6 @@
 // Pantalla de título: sobre la escena 3D (el lienzo sigue pintando detrás).
 import { button, h } from '../dom';
+import { artIcon } from '../artIcons';
 import type { SlotSummary } from '../saveStore';
 
 export interface TitleActions {
@@ -25,9 +26,15 @@ export function titleScreen(
     className: (id: string) => string,
     a: TitleActions,
 ): HTMLElement {
-    const cont = button('Continuar', a.continueLatest, 'primary');
+    const menuButton = (label: string, icon: string, action: () => void, cls = ''): HTMLButtonElement => {
+        const b = button(label, action, cls);
+        const art = artIcon('ui', icon);
+        if (art) b.innerHTML = `<span class="title-btn-icon">${art}</span><span>${label}</span>`;
+        return b;
+    };
+    const cont = menuButton('Continuar', 'continue', a.continueLatest, 'primary');
     if (!latest) cont.disabled = true;
-    const load = button('Cargar partida', a.load);
+    const load = menuButton('Cargar partida', 'load_game', a.load);
     if (!latest) load.disabled = true;
 
     // PRE-01: "Continuar" muestra claramente qué partida es.
@@ -60,11 +67,15 @@ export function titleScreen(
                 null,
                 latest ? cont : null,
                 continueInfo,
-                (() => { const b = button('Nueva partida', a.newGame, latest ? '' : 'primary'); b.setAttribute('data-testid', 'new-game'); return b; })(),
+                (() => {
+                    const b = menuButton('Nueva partida', 'new_game', a.newGame, latest ? '' : 'primary');
+                    b.setAttribute('data-testid', 'new-game');
+                    return b;
+                })(),
                 latest ? load : null,
-                a.presets ? button('Partidas de prueba', a.presets) : null,
-                button('Opciones', a.options),
-                button('Salir', a.quit),
+                a.presets ? menuButton('Partidas de prueba', 'test_game', a.presets) : null,
+                menuButton('Opciones', 'options', a.options),
+                menuButton('Salir', 'quit', a.quit),
             ),
         ),
         h('div.title-foot', { text: 'Prototipo — clases, hechizos, objetos y números son PROPUESTA y se revisarán.' }),

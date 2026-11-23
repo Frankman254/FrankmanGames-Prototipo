@@ -5,6 +5,76 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 
 | Fecha | Archivo / paquete | Origen | Autor | Licencia | Notas |
 |---|---|---|---|---|---|
+| 2026-11-22 | Familias propias de iconos de clases, mascotas, oficios, estados, estadísticas, gestos, menú, chat y editor (inventario literal debajo) | Cinco láminas maestras clean-room creadas con OpenAI ImageGen para este proyecto y composición/derivación local determinista mediante `scripts/art/render_aux_icons.py`; sin material, texto, fuentes ni símbolos de terceros | FrankmanGames + Codex + OpenAI ImageGen | Propia del proyecto | 8 gestos, 3 clases, 4 mascotas, 6 oficios, 3 estadísticas antes ausentes, 19 estados antes ausentes, 13 acciones de menú/sistema/chat y 20 conceptos del editor. PNG RGBA 256×256 con transparencia y caja segura de 218 px. Validación en `scripts/art/validar_aux_icons.py`; lámina a 46 px en `work/codex-icon-refresh/review/auxiliares.png`. Los maestros editables quedan en `work/codex-icon-refresh/masters/` y no se distribuyen. |
+<!-- Inventario literal de los archivos nuevos del refresco visual 2026-11-22:
+assets/icons/classes/ember_vanguard.png
+assets/icons/classes/mangrove_hunter.png
+assets/icons/classes/storm_weaver.png
+assets/icons/editor/barrel.png
+assets/icons/editor/chest.png
+assets/icons/editor/decoration.png
+assets/icons/editor/door.png
+assets/icons/editor/entrance.png
+assets/icons/editor/exit.png
+assets/icons/editor/jar.png
+assets/icons/editor/npc.png
+assets/icons/editor/resource.png
+assets/icons/editor/spawn.png
+assets/icons/editor/start.png
+assets/icons/editor/station.png
+assets/icons/editor/stone.png
+assets/icons/editor/structural.png
+assets/icons/editor/torch.png
+assets/icons/editor/tree.png
+assets/icons/editor/trigger.png
+assets/icons/editor/visibility.png
+assets/icons/editor/water.png
+assets/icons/editor/zone.png
+assets/icons/pets/archivist_owl.png
+assets/icons/pets/ash_fox.png
+assets/icons/pets/moss_turtle.png
+assets/icons/pets/spirit_wolf.png
+assets/icons/professions/farmer.png
+assets/icons/professions/fisher.png
+assets/icons/professions/miner.png
+assets/icons/professions/smith.png
+assets/icons/professions/tailor.png
+assets/icons/professions/woodcutter.png
+assets/icons/stats/calm.png
+assets/icons/stats/flow.png
+assets/icons/stats/will.png
+assets/icons/statuses/frozen.png
+assets/icons/statuses/hawk_eye.png
+assets/icons/statuses/mark_earth.png
+assets/icons/statuses/mark_fire.png
+assets/icons/statuses/mark_frost.png
+assets/icons/statuses/mark_lightning.png
+assets/icons/statuses/mark_water.png
+assets/icons/statuses/numb.png
+assets/icons/statuses/reaction_fracture.png
+assets/icons/statuses/reaction_hardFrost.png
+assets/icons/statuses/reaction_mud.png
+assets/icons/statuses/reaction_vapor.png
+assets/icons/statuses/self_stack.png
+assets/icons/statuses/share_damage.png
+assets/icons/statuses/soaked.png
+assets/icons/statuses/thorn_ward.png
+assets/icons/statuses/ward_melee.png
+assets/icons/statuses/ward_ranged.png
+assets/icons/statuses/weapon_mastery.png
+assets/icons/ui/chat_combat.png
+assets/icons/ui/chat_loot.png
+assets/icons/ui/chat_system.png
+assets/icons/ui/continue.png
+assets/icons/ui/edit_hud.png
+assets/icons/ui/emotes.png
+assets/icons/ui/load_game.png
+assets/icons/ui/new_game.png
+assets/icons/ui/quit.png
+assets/icons/ui/quit_to_title.png
+assets/icons/ui/save_game.png
+assets/icons/ui/test_game.png
+-->
 | 2026-11-21 | `assets/models/mazmorra.glb` (regenerado), `scripts/blender/mazmorra.py`, `scripts/blender/validar_entrada_cripta.py` | Boceto original del frente de la cripta (OMP-POL-01) regenerado desde cero con primitivas propias en Blender 5.2: arco de piedra de 4,72 m con basa, capitel, dovelas y llave luminosa, montículo que abraza la boca, hueco cerrado a negrura, peldaños, mangos de antorcha y letrero. 3.944 tri (antes 3.472), mismos nombres de malla y origen | FrankmanGames + agente local OMP | Propia del proyecto | Procedural, sin imágenes ni modelos externos; comparativa en `work/omp-pol01/` |
 | 2026-11-22 | `assets/textures/baldosa_raices.png`, `assets/textures/muro_raices.png`, `assets/textures/baldosa_humedo.png`, `assets/textures/muro_humedo.png`, `assets/textures/baldosa_oro.png`, `assets/textures/muro_oro.png`, `scripts/blender/validar_tramos_cripta.py` | Seis texturas procedurales grises repetibles generadas desde cero por `scripts/blender/mazmorra.py` con numpy (OMP-POL-02): losas con raíces, regueros de agua y musgo, y veta metálica según el tramo de profundidad 1–30 / 31–70 / 71–100; viajan casi blancas — el tinte lo pone el tema del piso (contrato en `work/omp-pol02/CONTRATO.md`) | FrankmanGames + agente local OMP | Propia del proyecto | Sin imágenes externas; validador de costuras en verde, lámina tintada en `work/omp-pol02/lamina.png` |
 | 2026-11-21 | `assets/models/gotita.glb`, `assets/models/jiron.glb`, `assets/models/brasita.glb`, `assets/models/copito.glb`, `assets/models/alma.glb`, `assets/models/chitra.glb`, `arte/blender/fauna_espiritus.blend`, `scripts/blender/fauna_espiritus.py`, `scripts/blender/validar_fauna_espiritus.py`, `scripts/blender/revisar_fauna_espiritus.py` | Modelado, rig y clips originales generados desde cero con primitivas propias en Blender 5.2. Los cinco espiritus comparten literalmente el esqueleto FG_Espiritu (hips/chest/head/armL/armR/tail/tip, cola que barre el suelo); la chitra lleva su rig FG_Chitra (trompa y seis patas). Formas escritas a mano por especie: lagrima goteante, remolino de bruma, ascua con llama de pavesas, bola de nieve con puas de cristal, fantasma de capucha y manto roto, miniatura de zancudo. Lamina `revision_*.png` en `work/omp-fa-12/`, sin material de terceros de referencia | OMP (agente, generadores `scripts/blender/`) | Propiedad de FrankmanGames (original, clean-room) | Espiritus y minions de `boquete_drizzle`, `cerropunta_wisp`, `baru_ember`, `fortuna_flake`, `ancon_soul` y `chame_chitra` segun `work/junie-jl-63/NOMBRE_MODELO.md`; pendientes de decision del creador y de integracion (JL-45). Tonos de `look` en `data/enemies.json` | FrankmanGames | Licencia propia (sin publicar) |
@@ -34,7 +104,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-11-20 | `assets/models/cripta_rata_cueva.glb`, `assets/models/cripta_rata_huaca.glb`, `assets/models/cripta_guardian_cueva.glb`, `assets/models/cripta_guardian_huaca.glb`, `assets/models/cripta_bruto_cueva.glb`, `assets/models/cripta_bruto_huaca.glb`, `arte/blender/cripta_variantes.blend`, `scripts/blender/cripta_variantes.py`, `scripts/blender/validar_criptas_variantes.py`, `scripts/blender/revisar_criptas_variantes.py` | Variantes por tramo generadas desde las bases publicadas `cripta_{rata,guardian,bruto}.glb` (2026-11-13): mismo esqueleto `FG_*`, mismos clips, tinte de materiales y piezas nuevas ancladas al hueso con grupo de vértices; láminas `cripta_{rata,guardian,bruto}.png` (base y dos tramos × 5 vistas) en `work/omp-fa-03/` | FrankmanGames + agente local OMP | Propia del proyecto | OMP-FA-03: rata, guardián y bruto para la cueva húmeda (pisos 31–70: limo, musgo, setas, cuernos de hueso, coraza de caparazones, brillo verdoso) y la huaca de oro (71–100: oro batido metálico, máscaras y tocotes, gorgueras de cuentas, corona de puntas, brillo de brasa), adelantando OMP-POL-04. 741–936 triángulos (≤1.500), huesos y clips idénticos a la base (6 rata, 8 humanoides), apoyo z≈0. Tintes PROPUESTA en el generador. Clean-room: sin assets de terceros. No toca `data/` ni `src/`: la integración es JL-45 de Junie. |
 | 2026-11-20 | `assets/models/caiman.glb`, `assets/models/garza.glb`, `arte/blender/fauna_chame.blend`, `scripts/blender/fauna_chame.py`, `scripts/blender/validar_fauna_chame.py`, `scripts/blender/revisar_fauna_chame.py` | Modelado, rig y clips originales generados desde cero con primitivas propias en Blender 5.2 (blobs y tubos faceteado; hocico con dientes anclados al maxilar para el caimán, cuello en S y pico de daga para la garza); láminas `revision_caiman.png`/`revision_garza.png` y las 10 vistas sueltas por especie en `work/omp-fa-02/` | FrankmanGames + agente local OMP | Propia del proyecto | OMP-FA-02: caimán joven para `chame_caiman` (924 triángulos, 1,36 m de morro a cola, 0,29 m alto) y garza zancuda para `chame_heron` (800 triángulos, 1,10 m de alto, zancas largas). Rigs `FG_Caiman` y `FG_Garza` con clips Reposo/Caminar/Atacar/Golpeado/Morir sin salto; materiales teñibles skin/trim/hair/gear para las paletas de `data/`. No toca `data/` ni `src/`: la integración es JL-45 de Junie. |
 | 2026-11-20 | `assets/models/cangrejo.glb`, `arte/blender/cangrejo.blend`, `scripts/blender/cangrejo.py`, `scripts/blender/validar_cangrejo.py`, `scripts/blender/revisar_cangrejo.py` | Modelado, rig y clips originales generados desde cero con primitivas propias en Blender 5.2 (metaball + remesh para el caparazón, tubos y hojas para apéndices); lámina `revision.png` y las 10 vistas sueltas en `work/omp-fa-01/` | FrankmanGames + agente local OMP | Propia del proyecto | OMP-FA-01: cangrejo del manglar para `chame_crab` y `chame_grandcrab` (una malla, dos escalas por `data/`). 1.478 triángulos (≤1.500), caparazón 0,62 m, envergadura con pinzas 1,65 m (tenaza mayor y menor asimétricas, dedos mordiendo), patas puntiagundas apoyadas. Rig `FG_Cangrejo` con pedipalpos, pinzas y tres pares de patas; cinco clips (Reposo, Caminar, Atacar, Golpeado, Morir) con bucles sin salto, materiales teñibles skin/trim/hair/gear para las paletas de `data/`. Clean-room: sin assets de terceros. Aún no enlazado en `data/` (integración JL-45 de Junie) |
-| 2026-11-19 | Catálogo completo de `assets/icons/items/<itemId>.png` (1.100 archivos; inventario literal debajo) | Composición determinista clean-room con el repertorio original de `scripts/art/icon_primitives.py` y `scripts/art/render_item_icons.py`; sin imágenes, fuentes ni símbolos externos | FrankmanGames + Codex | Propia del proyecto | Sustituye el contenido visual anterior de los 209 PNG y crea los 891 faltantes. Capas reutilizables de efecto elemental, silueta, material y heráldica; RGBA 256×256, caja segura de 180 px, sin marco ni fondo. Los pergaminos incorporan el emblema propio de su hechizo. Evidencia a 46 px en `work/codex-eq06/pages/` |
+| 2026-11-19 | Catálogo completo de `assets/icons/items/<itemId>.png` (1.100 archivos; inventario literal debajo; rework 2026-11-22) | Composición determinista clean-room con el repertorio original de `scripts/art/icon_primitives.py` y `scripts/art/render_item_icons.py`; sin imágenes, fuentes ni símbolos externos | FrankmanGames + Codex | Propia del proyecto | Rework integral con caja segura de 216 px y ornamentos estructurales por familia `route_`, `spec_`, `learning_`, `bi_` y `tri_`; 642 siluetas alfa distintas y repetición máxima reducida de 71 a 21. Capas reutilizables de efecto elemental, silueta, material y heráldica; RGBA 256×256, sin marco ni fondo. Los pergaminos incorporan el emblema propio de su hechizo. Evidencia a 46 px en `work/codex-eq06/pages/` |
 
 <!-- Inventario literal de los 891 archivos añadidos por EQ-06; los 209 sustituidos ya tenían rutas registradas:
 assets/icons/items/acero_bracers.png

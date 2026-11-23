@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { loadGameData } from '../../src/data';
-import { ITEM_KINDS, RARITIES, type ItemDef } from '../../src/rpg/contracts';
+import { ITEM_KINDS, PRIMARY_STATS, RARITIES, type ItemDef } from '../../src/rpg/contracts';
 import { FAKE_CONTENT } from '../../src/ui/menus/fake/content';
 import { handsText, itemTooltip, KIND_LABEL } from '../../src/ui/menus/format';
 import { iconKind, drawnItemIcon, itemIcon, kindIcon } from '../../src/ui/menus/icons';
@@ -173,10 +173,36 @@ describe('iconos de arte (Codex)', () => {
         for (const id of ['double_monsoon', 'gale_star', 'firebreak', 'mist_veil', 'reed_call'])
             expect(sps.has(id), `icono ${id}`).toBe(true);
         const st = new Set(artIconIds('statuses'));
-        for (const s of Object.values(game.statuses))
-            if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
+        expect(st).toEqual(new Set(Object.keys(game.statuses)));
+        for (const s of Object.values(game.statuses)) expect(statusIcon(s), s.id).toContain('art-icon');
         const ui = new Set(artIconIds('ui'));
         for (const id of ['split_bar', 'split_bar_pressed', 'unlock_bar', 'unlock_bar_pressed'])
             expect(ui.has(id), id).toBe(true);
+    });
+
+    it('clases, mascotas, oficios, stats, emotes, editor y menú no dependen de emojis visibles', async () => {
+        const { artIconIds } = await import('../../src/ui/menus/artIcons');
+        expect(new Set(artIconIds('classes'))).toEqual(new Set(Object.keys(game.classes)));
+        expect(new Set(artIconIds('pets'))).toEqual(new Set(Object.keys(game.pets)));
+        const professions = JSON.parse(readFileSync('data/rpg/professions.json', 'utf8')) as {
+            professions: Record<string, unknown>;
+        };
+        expect(new Set(artIconIds('professions'))).toEqual(new Set(Object.keys(professions.professions)));
+        expect(new Set(artIconIds('stats'))).toEqual(new Set(PRIMARY_STATS));
+        for (const id of [
+            'continue',
+            'new_game',
+            'load_game',
+            'test_game',
+            'options',
+            'quit',
+            'save_game',
+            'edit_hud',
+            'quit_to_title',
+        ])
+            expect(artIconIds('ui'), id).toContain(id);
+        for (const id of ['wave', 'laugh', 'dance', 'cry', 'angry', 'love', 'sleep', 'doubt'])
+            expect(readFileSync(`assets/emotes/${id}.png`).length, id).toBeGreaterThan(100);
+        expect(artIconIds('editor')).toHaveLength(20);
     });
 });

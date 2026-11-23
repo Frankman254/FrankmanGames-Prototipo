@@ -1,4 +1,5 @@
 {
+  "Gestos": "Emotes",
  "_nota": "F07: textos fijos de la interfaz que faltaban en en.json (los encuentra `node scripts/i18nUi.mjs`). Clave = texto español del código.",
  "Arena limpia": "Arena cleared",
  "Vender basura": "Sell junk",

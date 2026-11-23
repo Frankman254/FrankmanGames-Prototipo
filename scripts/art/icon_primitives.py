@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import math
 import random
+import re
 from dataclasses import dataclass
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
@@ -187,7 +188,9 @@ class IconCanvas:
         alpha=self.image.getchannel("A"); bbox=alpha.point(lambda a:255 if a>=8 else 0).getbbox()
         if not bbox: return Image.new("RGBA",(256,256),(0,0,0,0))
         art=self.image.crop(bbox)
-        safe=round(180*S); ratio=min(1,safe/max(art.size))
+        # Más presencia a 46 px: la ilustración ocupa 84 % del master y la UI
+        # aporta el marco/aire exterior.
+        safe=round(216*S); ratio=min(1,safe/max(art.size))
         if ratio<1: art=art.resize((round(art.width*ratio),round(art.height*ratio)),Image.Resampling.LANCZOS)
         canvas=Image.new("RGBA",(SIZE,SIZE),(0,0,0,0)); canvas.alpha_composite(art,((SIZE-art.width)//2,(SIZE-art.height)//2))
         return canvas.resize((256,256),Image.Resampling.LANCZOS)
@@ -239,6 +242,50 @@ def _draw_weapon(c: IconCanvas, kind: str):
     elif kind=="spear":
         shaft=c.stroke([(62,221),(171,65)],12); c.material(shaft,"wood",texture=.2)
         blade=c.polygon([(160,73),(185,27),(202,75),(175,104)]); c.material(blade,metal,texture=.06); c.gem(171,91,7)
+
+
+def _draw_set_ornament(c: IconCanvas, kind: str) -> None:
+    """Rompe la silueta repetida de rutas/especializaciones por familia y grado."""
+    if not c.key.startswith(("route_", "spec_", "learning_", "bi_", "tri_")):
+        return
+    match = re.search(r"_(\d{2})_", c.key)
+    grade = int(match.group(1)) if match else 1 + c.seed % 10
+    variant = (grade - 1) % 10
+    accent = ELEMENTS.get(c.recipe.element or "", RARITY.get(c.recipe.rarity, RARITY["common"]))
+    slot = c.recipe.slot
+    masks = []
+    if slot == "head" or kind in {"hat", "hood", "helmet"}:
+        shapes = [
+            [(91,86),(66,36),(111,64)], [(165,86),(190,36),(145,64)],
+            [(112,63),(128,19),(144,63)], [(83,103),(42,73),(76,126)],
+            [(173,103),(214,73),(180,126)],
+        ]
+        masks = [c.polygon(shapes[variant % len(shapes)])]
+        if variant >= 5: masks.append(c.polygon(shapes[(variant + 2) % len(shapes)]))
+    elif slot == "chest" or kind in {"armor", "robe"}:
+        left = [(70,89),(28,70),(45,126),(86,123)] if variant % 2 == 0 else [(74,80),(39,42),(50,116),(91,126)]
+        right = [(186,89),(228,70),(211,126),(170,123)] if variant % 2 == 0 else [(182,80),(217,42),(206,116),(165,126)]
+        masks = [c.polygon(left), c.polygon(right)]
+        if variant in {2,5,8}: masks.append(c.polygon([(111,60),(128,23),(145,60),(128,91)]))
+    elif slot == "hands" or kind in {"gloves", "bracers"}:
+        masks = [c.polygon([(55,103),(25,79),(48,140),(72,151)]), c.polygon([(201,103),(231,79),(208,140),(184,151)])]
+    elif slot == "feet" or kind in {"boots", "sandals", "feet"}:
+        masks = [c.polygon([(53,173),(24,190),(60,208),(81,190)]), c.polygon([(203,173),(232,190),(196,208),(175,190)])]
+    elif slot == "back" or kind == "cape":
+        masks = [c.polygon([(78,73),(43,42),(58,124),(91,138)]), c.polygon([(178,73),(213,42),(198,124),(165,138)])]
+    elif slot == "waist" or kind == "belt":
+        masks = [c.polygon([(55,105),(20,128),(55,151),(87,128)]), c.polygon([(201,105),(236,128),(201,151),(169,128)])]
+    if masks:
+        merged = c.merge(*masks)
+        c.glow(merged, accent, .24, 8)
+        c.material(merged, "gold" if variant in {4,9} else c.recipe.material, accent, .08)
+    # Firma central distinta por grado: barra, chevrón, cruz, corona o espiral.
+    motifs = [
+        [(99,132),(157,132)], [(103,146),(128,116),(153,146)],
+        [(128,104),(128,158),(101,131),(155,131)], [(101,148),(113,116),(128,141),(143,116),(155,148)],
+        [(105,119),(151,143)], [(105,143),(151,119)],
+    ]
+    c.trim(motifs[variant % len(motifs)], 4 + variant % 3)
 
 
 def _draw_armor(c: IconCanvas, kind: str):
@@ -294,6 +341,7 @@ def _draw_armor(c: IconCanvas, kind: str):
     else:
         base=c.polygon([(59,165),(72,91),(103,58),(128,95),(157,57),(192,94),(199,165),(169,204),(88,204)])
         c.material(base,material,texture=.17); c.gem(128,131,9)
+    _draw_set_ornament(c, kind)
 
 
 def _draw_jewel(c: IconCanvas, kind: str):
@@ -308,11 +356,29 @@ def _draw_jewel(c: IconCanvas, kind: str):
         c.material(base,"gold",texture=.12); c.gem(128,128,8)
     elif kind=="amulet":
         chain=c.stroke([(64,58),(81,125),(128,174),(175,125),(192,58)],7); c.material(chain,"gold",texture=.06)
-        pendant=c.polygon([(128,96),(174,151),(128,217),(82,151)]); c.material(pendant,c.recipe.material,texture=.08); c.gem(128,154,15)
+        variant=c.seed%5
+        pendants=[
+            [(128,96),(174,151),(128,217),(82,151)],
+            [(128,94),(181,132),(160,207),(96,207),(75,132)],
+            [(128,91),(170,119),(178,176),(128,219),(78,176),(86,119)],
+            [(128,91),(151,132),(199,137),(164,168),(176,215),(128,187),(80,215),(92,168),(57,137),(105,132)],
+            [(128,91),(184,148),(128,218),(72,148)],
+        ]
+        pendant=c.polygon(pendants[variant]); c.material(pendant,c.recipe.material,texture=.08); c.gem(128,154,15)
+        if c.key.startswith(("route_","learning_")): c.trim([(98,171),(128,112),(158,171)],4+variant)
     else:
-        band=c.ellipse((56,57,200,201)); inner=c.ellipse((83,84,173,174)); band=ImageChops.subtract(band,inner)
+        variant=c.seed%4
+        outer=(50-variant*3,51-variant*2,206+variant*3,207+variant*2)
+        inner=(82+variant*2,83+variant*2,174-variant*2,175-variant*2)
+        band=c.ellipse(outer); band=ImageChops.subtract(band,c.ellipse(inner))
         c.material(band,c.recipe.material,texture=.08)
-        crown=c.polygon([(91,88),(128,39),(165,88),(147,114),(109,114)]); c.material(crown,"gold",texture=.05); c.gem(128,82,15)
+        crown_shapes=[
+            [(91,88),(128,39),(165,88),(147,114),(109,114)],
+            [(83,94),(105,48),(128,73),(151,48),(173,94),(148,118),(108,118)],
+            [(92,92),(106,46),(128,31),(150,46),(164,92),(146,119),(110,119)],
+            [(77,102),(98,55),(128,77),(158,55),(179,102),(146,121),(110,121)],
+        ]
+        crown=c.polygon(crown_shapes[variant]); c.material(crown,"gold",texture=.05); c.gem(128,82,15)
 
 
 def _draw_consumable(c: IconCanvas, kind: str):

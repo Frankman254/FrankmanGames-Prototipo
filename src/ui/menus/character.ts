@@ -30,7 +30,10 @@ const PRIMARY_HINT: Record<PrimaryStat, string> = {
 
 const GROUPS: { title: string; stats: string[] }[] = [
     { title: 'Supervivencia', stats: ['maxHealth', 'healthRegen', 'maxResource', 'resourceRegen', 'healingPower'] },
-    { title: 'Ataque', stats: ['power', 'elementalDamage', 'critChance', 'critBonus', 'cooldownReduction', 'castStability'] },
+    {
+        title: 'Ataque',
+        stats: ['power', 'elementalDamage', 'critChance', 'critBonus', 'cooldownReduction', 'castStability'],
+    },
     {
         title: 'Movimiento y Táctica',
         stats: ['moveSpeed', 'tackle', 'escape', 'slowResist', 'carryCapacity', 'discovery'],
@@ -61,16 +64,27 @@ export class CharacterPanel extends Panel {
         const face = h('div.char-face');
         // U02-INT: retrato PNG con respaldo al SVG de la clase.
         const portrait = portraitImg('adventurer_default');
-        face.innerHTML = portrait ?? namedIcon(cls?.icon ?? 'class_ember', cls?.resource.color ?? '#d9b26a');
+        face.innerHTML =
+            portrait ??
+            artIcon('classes', cls?.id) ??
+            namedIcon(cls?.icon ?? 'class_ember', cls?.resource.color ?? '#d9b26a');
         this.head.append(
             face,
             h(
                 'div',
                 null,
                 h('div.char-name', { text: p.name }),
-                h('div.char-class', { text: trf('{name} · nivel {level}', { name: cls?.name ?? p.classId, level: p.level }) }),
+                h('div.char-class', {
+                    text: trf('{name} · nivel {level}', { name: cls?.name ?? p.classId, level: p.level }),
+                }),
                 h('div.char-xp', null, h('div.fill', { style: `width:${(100 * p.xp) / Math.max(1, p.xpToNext)}%` })),
-                h('div.char-xptext', { text: trf('{xp} / {xpToNext} XP para el nivel {next}', { xp: p.xp, xpToNext: p.xpToNext, next: p.level + 1 }) }),
+                h('div.char-xptext', {
+                    text: trf('{xp} / {xpToNext} XP para el nivel {next}', {
+                        xp: p.xp,
+                        xpToNext: p.xpToNext,
+                        next: p.level + 1,
+                    }),
+                }),
             ),
         );
         if (p.energy) {
@@ -169,9 +183,7 @@ export class CharacterPanel extends Panel {
             const row = h(
                 'div.stat-row.primary',
                 null,
-                statIconHtml
-                    ? h('span.stat-icon', { innerHTML: statIconHtml })
-                    : h('span.stat-icon'),
+                statIconHtml ? h('span.stat-icon', { innerHTML: statIconHtml }) : h('span.stat-icon'),
                 h('span.n', { text: statLabel(stat) }),
                 h('span.cost', {
                     text: `${nextCost}/u`,
@@ -221,7 +233,14 @@ export class CharacterPanel extends Panel {
             this.ctx.tooltip.bind(row, () => [
                 { kind: 'title', text: 'Capacidad de carga', rarity: 'common' },
                 { kind: 'sep' },
-                { kind: 'hint', text: trf('Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)', { base, perLevel, bonus }) },
+                {
+                    kind: 'hint',
+                    text: trf('Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)', {
+                        base,
+                        perLevel,
+                        bonus,
+                    }),
+                },
             ]);
             box.appendChild(row);
             this.secondary.appendChild(box);
@@ -295,7 +314,9 @@ export class CharacterPanel extends Panel {
             const set = s.content.sets[setId];
             if (!set) continue;
             const total = Object.values(s.content.items).filter((d) => d.setId === setId).length;
-            box.appendChild(h('div.eq-set-name', { text: trf('{set} ({count}/{total})', { set: set.name, count, total }) }));
+            box.appendChild(
+                h('div.eq-set-name', { text: trf('{set} ({count}/{total})', { set: set.name, count, total }) }),
+            );
             for (const b of set.bonuses)
                 box.appendChild(
                     h(`div.eq-set-bonus${count >= b.pieces ? '.on' : ''}` as 'div', {

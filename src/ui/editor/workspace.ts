@@ -7,6 +7,7 @@ import type { EditorObject, Field, PaletteEntry } from '../../editor/doc';
 import type { BrushMode } from '../../editor/navBrush';
 import type { ManualObjectKind } from '../../data/dungeonFloorMap';
 import { prefabRegistry } from '../../editor/prefabRegistry';
+import { artIcon } from '../menus/artIcons';
 
 // ===== Tipos =================================================================
 
@@ -85,32 +86,34 @@ const LAYER_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
-    props: '📦',
-    trees: '🌲',
-    npcs: '👤',
-    water: '💧',
-    zones: '🔲',
-    start: '🏁',
-    stones: '🪨',
-    stations: '⚒️',
+    props: 'chest',
+    trees: 'tree',
+    npcs: 'npc',
+    water: 'water',
+    zones: 'zone',
+    start: 'start',
+    stones: 'stone',
+    stations: 'station',
 };
 
 const ASSET_ICONS: Record<ManualObjectKind, string> = {
-    chest: '📦',
-    barrel: '🛢️',
-    jar: '🏺',
-    door: '🚪',
-    torch: '🔥',
-    spawn: '💀',
-    npc: '👤',
-    resource: '⛏️',
-    decoration: '🎨',
-    structural: '🧱',
-    zone: '🔲',
-    trigger: '⚡',
-    entrance: '⬇️',
-    exit: '⬆️',
+    chest: 'chest',
+    barrel: 'barrel',
+    jar: 'jar',
+    door: 'door',
+    torch: 'torch',
+    spawn: 'spawn',
+    npc: 'npc',
+    resource: 'resource',
+    decoration: 'decoration',
+    structural: 'structural',
+    zone: 'zone',
+    trigger: 'trigger',
+    entrance: 'entrance',
+    exit: 'exit',
 };
+
+const editorIcon = (id: string): string => artIcon('editor', id) ?? '';
 
 // Las categorías se obtienen del PrefabRegistry en lugar de ser estáticas
 function getAssetCategories(): Record<string, ManualObjectKind[]> {
@@ -176,12 +179,12 @@ class Toolbar {
         // Herramientas
         const toolGroup = el('div', 'ed-toolbar-group');
         const tools: Array<[WorkspaceTool, string, string]> = [
-            ['select', '☝ Seleccionar', 'Elegir objetos (1)'],
-            ['move', '✥ Mover', 'Mover objetos con gizmo (2)'],
+            ['select', 'Seleccionar', 'Elegir objetos (1)'],
+            ['move', 'Mover', 'Mover objetos con gizmo (2)'],
             ['rotate', '↻ Girar', 'Girar objetos con gizmo (3)'],
             ['scale', '⤢ Escalar', 'Escalar objetos con gizmo (4)'],
-            ['add', '➕ Añadir', 'Colocar desde assets (5)'],
-            ['paint', '🖌 Navegación', 'Pintar celdas (6)'],
+            ['add', 'Añadir', 'Colocar desde assets (5)'],
+            ['paint', 'Navegación', 'Pintar celdas (6)'],
         ];
         for (const [t, label, tip] of tools) {
             const btn = button(label, () => this.act.tool(t), 'ed-toolbar-btn', tip);
@@ -203,7 +206,7 @@ class Toolbar {
 
         // Cerrar
         this.el.append(el('div', 'ed-toolbar-sep'));
-        this.el.append(button('✕ Cerrar', () => this.act.close(), 'ed-toolbar-btn', 'Salir (F12)'));
+        this.el.append(button('Cerrar', () => this.act.close(), 'ed-toolbar-btn', 'Salir (F12)'));
 
         // Estado
         const status = el('div', 'ed-toolbar-status');
@@ -292,8 +295,8 @@ class HierarchyPanel {
         for (const [cat, items] of groups) {
             const isCollapsed = this.collapsed.has(cat);
             const catEl = el('div', `ed-tree-category${isCollapsed ? ' collapsed' : ''}`);
-            const icon = CATEGORY_ICONS[cat] ?? '📁';
-            catEl.innerHTML = `<span class="ed-tree-arrow">▼</span> ${icon} ${LAYER_LABELS[cat] ?? cat} (${items.length})`;
+            const icon = CATEGORY_ICONS[cat] ?? 'chest';
+            catEl.innerHTML = `<span class="ed-tree-arrow">▼</span><span class="ed-tree-icon">${editorIcon(icon)}</span>${LAYER_LABELS[cat] ?? cat} (${items.length})`;
             catEl.addEventListener('click', () => {
                 if (this.collapsed.has(cat)) this.collapsed.delete(cat);
                 else this.collapsed.add(cat);
@@ -311,7 +314,8 @@ class HierarchyPanel {
                         this.act.pickFromList(o.key);
                     });
                     if (s.isDungeon) {
-                        const visBtn = el('span', 'ed-vis-btn', '👁');
+                        const visBtn = el('span', 'ed-vis-btn');
+                        visBtn.innerHTML = editorIcon('visibility');
                         visBtn.dataset.vis = '1';
                         visBtn.title = 'Ocultar (se puede deshacer con Ctrl+Z)';
                         visBtn.addEventListener('click', (e) => {
@@ -507,8 +511,8 @@ class AssetBrowser {
         for (const entry of entries) {
             const kind = entry.kind;
             const card = el('div', 'ed-asset-card');
-            const icon = entry.icon ?? ASSET_ICONS[kind as keyof typeof ASSET_ICONS] ?? '📦';
-            card.innerHTML = `<div class="ed-asset-icon">${icon}</div><div class="ed-asset-name">${entry.name}</div><div class="ed-asset-desc">${entry.description}</div>`;
+            const icon = entry.icon ?? ASSET_ICONS[kind as keyof typeof ASSET_ICONS] ?? 'chest';
+            card.innerHTML = `<div class="ed-asset-icon">${editorIcon(icon)}</div><div class="ed-asset-name">${entry.name}</div><div class="ed-asset-desc">${entry.description}</div>`;
             card.title = `${entry.description} (Clic para colocar)`;
             card.addEventListener('click', () => {
                 this.selectedKind = kind;

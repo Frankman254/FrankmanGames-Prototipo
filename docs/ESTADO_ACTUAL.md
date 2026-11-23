@@ -1,6 +1,6 @@
 # Estado actual
 
-Revisión: 2026-11-20, sobre HEAD. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
+Revisión: 2026-11-22, sobre HEAD. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
 
 «Existe en el código», «compila», «pasa los tests», «se vio en Electron» y «el creador lo aprobó» son evidencias distintas. Ninguna fila de este documento equivale a aprobación del creador.
 
@@ -28,6 +28,7 @@ Revisión: 2026-11-20, sobre HEAD. Aquí solo hay hechos comprobados con código
 
 | Tema | Hecho | Dónde |
 |---|---|---|
+| Sistema visual de iconos | Cobertura propia integrada para los 1.100 objetos y para gestos, clases, mascotas, oficios, las 8 estadísticas, los 39 estados, menú principal/sistema/chat y editor. La UI resuelve las rutas por ID con `artIcon()`; no quedan pictogramas Unicode en `src/ui/` ni `src/editor/`. Los objetos usan repertorio modular y ornamentos por familia; los auxiliares comparten acabado pintado y transparencia | `assets/icons/`, `assets/emotes/`, `scripts/art/{icon_primitives,render_aux_icons,validar_aux_icons,revisar_aux_icons}.py`, `tests/ui/icons.test.ts`, `work/codex-icon-refresh/review/auxiliares.png` |
 | Rangos de hechizo | El rango automático por nivel se aplica al subir de nivel, al cargar y al aprender por pergamino (D-01a y D-01a-fix). Existe el evento `rankUp`, con cartel y aviso. **Límites:** varias subidas a la vez muestran un cartel por hechizo, cada uno tapando al anterior, en vez de uno con la lista; y los universales que suben al subir de nivel no emiten aviso | `src/rpg/character.ts` (`recalculateSpellRanks`, `learnSpell`, `unlockClassSpellsForLevel`), `src/ui/menus/index.ts` (`rankUp`), `tests/d01a_fix.test.ts`, `tests/d01d_rankUp.test.ts` |
 | Vida al equipar | Lo que una pieza o mascota cambia de la Vida máxima se suma o resta también a la actual (2026-11-18); quitarla no baja de 1 | `src/rpg/character.ts` (`carryHealth`), `tests/rpg/equipHealth.test.ts` |
 | Filtro de elemento | Mochila, banco y tienda cuentan primarias y tiradas; una pieza bielemental sale en sus dos elementos (2026-11-18) | `src/ui/menus/itemFilters.ts` (`getElementsOf`) |

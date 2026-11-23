@@ -22,7 +22,7 @@ El marco pertenece a la interfaz, no al PNG. Esto evita generar decenas de
 anillos distintos y mantiene alineados objetos, hechizos, estados y accesos.
 
 - lienzo maestro: PNG RGBA de 256×256, siempre transparente;
-- caja segura del dibujo: aproximadamente 176×176 centrada (69 % del lienzo);
+- caja segura base: aproximadamente 176×176 centrada (69 % del lienzo); los catálogos revisados de objetos y familias auxiliares usan 216–218 px porque se muestran a 46 px y necesitan más masa visual, siempre conservando esquinas transparentes;
 - el PNG no incluye círculo, marco, placa, fondo opaco, rareza, tecla, cantidad,
   coste, enfriamiento ni estado de selección;
 - `artIcon()` añade una clase por familia (`art-icon-items`,
@@ -117,6 +117,12 @@ El lenguaje modular tiene cuatro capas, siempre en este orden:
 2. silueta semántica (arma, ranura de equipo, joya, montura, consumible o material);
 3. material (metal, bronce, madera, cuero, tela, oro, piedra, vidrio, papel u orgánico);
 4. heráldica, gema y detalle determinista por ID.
+
+Desde el rework del 2026-11-22 la caja segura de objetos es de 216 px y hay una quinta capa de ornamento estructural para las familias `route_`, `spec_`, `learning_`, `bi_` y `tri_`. No es un recolor: cambia apéndices, coronas, anillos, costuras y motivos según familia, nivel y ranura. El catálogo medido tiene 642 siluetas alfa distintas y ningún patrón aparece más de 21 veces.
+
+## Familias auxiliares — lote 01
+
+`artIcon()` resuelve también `classes`, `pets`, `professions` y `editor`. Los PNG viven en sus carpetas homónimas bajo `assets/icons/`; los gestos viven en `assets/emotes/`. Menú principal, menú de sistema y filtros del chat usan la familia `ui`. Todos son RGBA 256×256, transparentes y se verifican a 46 px con `scripts/art/validar_aux_icons.py` y `scripts/art/revisar_aux_icons.py`. Los pictogramas Unicode quedan únicamente como fallback de datos si una imagen falla al cargar, no como presentación normal.
 
 Estas primitivas son el repertorio común del proyecto. Los iconos ilustrados de
 hechizos y reacciones conservan su arte propio, pero respetan la misma caja

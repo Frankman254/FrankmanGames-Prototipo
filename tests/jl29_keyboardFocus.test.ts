@@ -62,11 +62,12 @@ describe('JL-29: Foco visible con teclado', () => {
     describe('Portada: botones en orden visual', () => {
         it('titleScreen usa button() para cada opción del menú', () => {
             // Los botones HTML son focusables por defecto (tabIndex=0).
-            // title.ts debe usar button() para Continuar, Nueva partida, Opciones, Salir.
-            expect(titleTs).toContain("button('Continuar'");
-            expect(titleTs).toContain("button('Nueva partida'");
-            expect(titleTs).toContain("button('Opciones'");
-            expect(titleTs).toContain("button('Salir'");
+            // El helper ilustrado debe seguir delegando en button() para cada opción.
+            expect(titleTs).toContain('const b = button(label');
+            expect(titleTs).toContain("menuButton('Continuar'");
+            expect(titleTs).toContain("menuButton('Nueva partida'");
+            expect(titleTs).toContain("menuButton('Opciones'");
+            expect(titleTs).toContain("menuButton('Salir'");
         });
 
         it('los botones están dentro de nav.title-menu (orden visual = orden DOM)', () => {

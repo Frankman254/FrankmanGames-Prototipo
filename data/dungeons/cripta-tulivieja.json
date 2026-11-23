@@ -101,7 +101,7 @@
           "piece": "crip_velas",
           "tile": [
             6,
-            3
+            2
           ],
           "rotDeg": 0
         }
@@ -336,7 +336,7 @@
           "piece": "crip_sarcofago",
           "tile": [
             5,
-            4
+            6
           ],
           "rotDeg": 0
         },
@@ -344,7 +344,7 @@
           "piece": "crip_telarana_rincon",
           "tile": [
             1,
-            11
+            10
           ],
           "rotDeg": 0
         }
@@ -589,7 +589,7 @@
           "piece": "crip_sarcofago_oro",
           "tile": [
             7,
-            9
+            10
           ],
           "rotDeg": 0
         },

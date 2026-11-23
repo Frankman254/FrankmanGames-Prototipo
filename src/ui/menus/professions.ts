@@ -7,6 +7,7 @@ import type { ItemDef } from '../../rpg/contracts';
 import { needleAt, strikeScore, type ProfessionsDef, type RecipeDef } from '../../rpg/professions';
 import type { UiContext } from './context';
 import { button, h } from './dom';
+import { artIcon } from './artIcons';
 import { RARITY_COLOR } from './icons';
 import { Panel } from './panel';
 
@@ -62,7 +63,7 @@ export class ProfessionsPanel extends Panel {
             const row = h(
                 'button.job-row',
                 { type: 'button' },
-                h('span.job-name', { text: `${p.icon} ${p.name}` }),
+                h('span.job-name', null, h('span.job-icon', { html: artIcon('professions', p.id) ?? '' }), p.name),
                 h('span.job-level', { text: `nv. ${p.level}` }),
                 h(
                     'div.job-xp',

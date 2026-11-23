@@ -1,3 +1,15 @@
+## 2026-11-22 — JL-144: prueba de utilería sin colisión con antorchas (Junie)
+
+**Archivos:** `tests/jl144_cryptProps.test.ts`, `data/dungeons/cripta-tulivieja.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Prueba que ninguna pieza de utilería de la cripta cae sobre baldosa de paso, escalera, cofre, puerta ni antorcha generada. 8 tests: props en baldosas caminables, no sobre escaleras/cofres/puertas, no en la misma baldosa que antorcha generada, distancia mínima de 1 baldosa de antorcha, y conteo total de 12 props.
+
+**Hallazgo:** 4 props colisionaban con antorchas generadas automáticamente: `crip_velas` en atrio (6,3), `crip_sarcofago` y `crip_telarana_rincon` en cámara del candil (5,4 y 1,11), `crip_sarcofago_oro` en santuario (7,9). Se reubicaron una baldosa arriba o abajo para evitar la colisión.
+
+**Cómo se verificó:** `npx vitest run tests/jl144_cryptProps.test.ts` → 8/8 verdes. Suite completa 3590/3590, tsc limpio salvo balM3.ts ajeno, Vite build OK. Pruebas de torces existentes (j16_torches, tor01_*, jl64b_*) 46/46 sin regresión.
+
+---
+
 ## 2026-11-22 — JL-143: escenario utilería cripta — hallazgo floor.props vacío (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl143/DIAGNOSTICO.md`.
