@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-193: pruebas de shapes.ts — 71 pruebas, 6 formas (Junie)
+
+**Archivos:** `tests/jl193_shapes.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Pruebas completas de `shapeHitsCircle` en `src/sim/shapes.ts` para los 6 tipos de forma: circle (9 pruebas), line (12 pruebas), square (8 pruebas), cross (11 pruebas), star (8 pruebas), cone (14 pruebas) y edge cases (6 pruebas). Cubren puntos dentro, fuera, en el borde, con radio del actor, rotaciones, coordenadas negativas, origin desplazado y formas pequeñas.
+
+**Validación:** `npx vitest run tests/jl193_shapes.test.ts` → 71/71 verdes. `npx tsc --noEmit` limpio (solo balM3.ts ajeno). Suite completa: 4025/4026 (1 fallo pre-existente assets.test.ts por GLB CC0 ajenos).
+
+---
+
 ## 2026-11-23 — JL-192: pruebas de spatialHash.ts — 19 pruebas, constructor, rebuild, query, bordes (Junie)
 
 **Archivos:** `tests/jl192_spatialHash.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
