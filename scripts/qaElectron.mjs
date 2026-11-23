@@ -8219,6 +8219,99 @@ const scenarios = {
 
         await js('clearInterval(window.__qaVida)');
     },
+
+    /** JL-198: Escenario profesiones — acercarse a un nodo de cedro, recogerlo y verificar que la madera llega a la mochila. */
+    async jl198_profesiones() {
+        await newGame('QA Profesiones');
+        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+        await sleep(1500);
+
+        // 1) Esperar que el campo de recursos esté disponible.
+        await until(`${W}.gatherField !== null`, 30000, 'campo de recursos');
+        const fieldInfo = await js(
+            `(() => { const f=${W}.gatherField; if(!f) return null; const nodes=f.nodes.filter(n=>n.respawn<=0); return {total:f.nodes.length, available:nodes.length, first:nodes[0]?{id:nodes[0].id,kind:nodes[0].kind,x:nodes[0].x,y:nodes[0].y}:null}; })()`,
+        );
+        check(
+            'profesiones: campo de recursos con nodos disponibles',
+            fieldInfo !== null && fieldInfo.available > 0,
+            JSON.stringify(fieldInfo),
+        );
+
+        // 2) Elegir un nodo de cedro (nivel 1, no requiere profesión).
+        const cedarNode = await js(
+            `(() => { const f=${W}.gatherField; if(!f) return null; const n=f.nodes.find(n=>n.kind==='cedar'&&n.respawn<=0); return n?{id:n.id,x:n.x,y:n.y}:null; })()`,
+        );
+        check(
+            'profesiones: nodo de cedro disponible',
+            cedarNode !== null,
+            JSON.stringify(cedarNode),
+        );
+
+        // 3) Mover al jugador cerca del nodo de cedro.
+        await js(
+            `(() => { const p=${W}.player; p.pos={x:${cedarNode.x - 3},y:${cedarNode.y}}; p.path=[]; p.moveTarget=null; })()`,
+        );
+        await sleep(500);
+        const pos = await js(`${W}.player.pos`);
+        check(
+            'profesiones: jugador cerca del nodo de cedro',
+            Math.hypot(pos.x - (cedarNode.x - 3), pos.y - cedarNode.y) < 2,
+            JSON.stringify(pos),
+        );
+        await shot('jl198-jugador-cerca-cedro');
+
+        // 4) Contar la madera antes de recoger.
+        const beforeWood = await js(`${W}.character.inventory.count ? ${W}.character.inventory.count('wood_cedar') : 0`);
+
+        // 5) Ordenar recoger el nodo.
+        await js(`${W}.commandGather(${cedarNode.id})`);
+        await sleep(1000);
+
+        // 6) Esperar que empiece la recolección (gathering no null).
+        await until(`${W}.gathering !== null`, 15000, 'recolección iniciada');
+        const gatherState = await js(
+            `(() => { const g=${W}.gathering; return g ? {nodeId:g.nodeId,elapsed:g.elapsed,duration:g.duration} : null; })()`,
+        );
+        check(
+            'profesiones: recolección en curso',
+            gatherState !== null && gatherState.nodeId === cedarNode.id,
+            JSON.stringify(gatherState),
+        );
+        await shot('jl198-recoleccion-en-curso');
+
+        // 7) Esperar a que termine (gathering vuelve a null tras gatherSeconds ≈ 2.5 s).
+        await until(`${W}.gathering === null`, 15000, 'recolección terminada');
+        await sleep(500);
+
+        // 8) Verificar que la madera llegó a la mochila.
+        const afterWood = await js(`${W}.character.inventory.count ? ${W}.character.inventory.count('wood_cedar') : 0`);
+        check(
+            'profesiones: madera de cedro en la mochila',
+            afterWood > beforeWood,
+            `antes ${beforeWood}, después ${afterWood}`,
+        );
+        await shot('jl198-madera-en-mochila');
+
+        // 9) Verificar que el oficio de leñador ganó experiencia.
+        const woodcutterXp = await js(
+            `(() => { const prof=${W}.character.professions; return prof.woodcutter ? {level:prof.woodcutter.level,xp:prof.woodcutter.xp} : null; })()`,
+        );
+        if (woodcutterXp && woodcutterXp.xp > 0) {
+            check('profesiones: oficio de leñador con experiencia', true, JSON.stringify(woodcutterXp));
+        }
+
+        // 10) Verificar que el nodo está agotado (respawn > 0).
+        const nodeStatus = await js(
+            `(() => { const f=${W}.gatherField; if(!f) return null; const n=f.nodes.find(n=>n.id===${cedarNode.id}); return n?{respawn:n.respawn,kind:n.kind}:null; })()`,
+        );
+        check(
+            'profesiones: nodo de cedro agotado (en respawn)',
+            nodeStatus !== null && nodeStatus.respawn > 0,
+            JSON.stringify(nodeStatus),
+        );
+
+        await js('clearInterval(window.__qaVida)');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

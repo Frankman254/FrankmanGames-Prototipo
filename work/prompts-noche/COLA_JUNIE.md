@@ -1364,7 +1364,8 @@ Contexto del coordinador:
 
 ### Escenarios y datos
 - [x] JL-197 Escenario `pesca`: acercarse al agua, pescar y que el pez llegue a la mochila. Capturas en `work/junie-jl197/`. — commit «JL-197: escenario pesca — flujo completo, 6/6 checks» — 6/6 en verde (estanque, sedal, bocado, recoger), 5 capturas en work/junie-jl197/. Hallazgo: reel() no produce botín (pez ni oro) en el arnés; el flujo visual funciona. DIAGNOSTICO.md en work/junie-jl197/.
-- [ ] JL-198 Escenario `profesiones`: recoger en un nodo de recursos y que llegue a la mochila. Capturas en `work/junie-jl198/`.
+- [x] JL-198 Escenario `profesiones`: recoger en un nodo de recursos y que llegue a la mochila. Capturas en `work/junie-jl198/`.
+  — commit «JL-198: escenario profesiones — recoger cedro, madera en mochila» — 7/7 en verde (campo de recursos, nodo cedro, jugador cerca, recolección en curso, madera en mochila, nodo agotado, sin errores). 4 capturas en work/junie-jl198/.
 - [ ] JL-199 `content:check`: todo PNJ de `data/rpg/npcs.json` tiene posición en una zona o mapa. Prueba con un PNJ sintético sin posición que haga fallar la comprobación.
 - [ ] JL-200 **Escenario `musicaContextos`** en `qaElectron.mjs`, con lo que el coordinador probó a mano: `work/claude-aud-regiones/qa_avisos.js`, `qa_pueblos.js` y `qa_regiones.js`. Debe cubrir la portada, cada pueblo con su canción (`town:<pueblo>`, Raspadura con `town`), una región, `field_fight` y los tres avisos. Verde tres veces seguidas.
 

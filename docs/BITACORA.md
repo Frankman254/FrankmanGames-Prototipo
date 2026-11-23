@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-198: escenario profesiones en QA Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl198/`.
+
+**Qué se hizo:** Escenario `jl198_profesiones` en el arnés QA de Electron. Verifica el flujo completo de recolección de recursos: campo de recursos disponible, nodo de cedro encontrado, jugador cerca, recolección iniciada, madera de cedro en la mochila (antes 0, después 2), nodo agotado en respawn y sin errores de consola. 7/7 checks en verde, 4 capturas.
+
+**Validación:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs jl198_profesiones` → 7/7. Typecheck limpio (solo balM3.ts ajeno). Capturas en `work/junie-jl198/`.
+
+---
+
 ## 2026-11-23 — JL-197: escenario pesca en QA Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl197/`.
