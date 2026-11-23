@@ -1,3 +1,13 @@
+## 2026-11-22 — ICO-04 + EQ-06 rework: repertorio integral de iconos (Codex)
+
+**Archivos:** `assets/emotes/`, `assets/icons/{classes,editor,items,pets,professions,stats,statuses,ui}/`, `scripts/art/`, consumidores de `src/ui/` y `src/editor/`.
+
+El creador pidió rehacer de una vez los iconos faltantes o pobres, incluidos emojis y menú principal. Se crearon cinco láminas maestras clean-room con ImageGen y un compositor local determinista para gestos, clases, mascotas, oficios, menú y derivados semánticos; no se usó ningún modelo local. Cobertura auxiliar: 101 PNG validados (8 gestos, 3 clases, 4 mascotas, 6 oficios, 8 estadísticas, 39 estados, 13 acciones de menú/chat y 20 conceptos del editor). La UI los carga por ID en portada, creación/ficha/HUD, mascota, oficios, chat, menú del sistema y editor; el barrido Unicode no encuentra pictogramas en `src/ui/` ni `src/editor/`.
+
+Además se regeneraron los 1.100 objetos con caja segura de 216 px y ornamentos estructurales para rutas, especializaciones, aprendizaje y conjuntos bi/trielementales: 642 siluetas alfa distintas y máximo de repetición 21, frente a 543 y 71. Validadores en verde; láminas a tamaño real en `work/codex-icon-refresh/review/auxiliares.png` y `work/codex-eq06/pages/`.
+
+---
+
 ## 2026-11-22 — JL-141: escenario fantasma — verificación del fantasma de JL-90 (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
