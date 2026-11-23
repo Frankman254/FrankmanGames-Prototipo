@@ -1289,12 +1289,7 @@ Claude se ocupa a la vez de estos archivos. **No los toques**:
 - `src/ui/map/hudLayout.ts` y `src/ui/map/hudProfiles.ts`, por el candado de la barra.
 
 - [x] JL-162 **El creador de personaje se desborda en pantallas pequeñas y se pierde contenido.** — commit «JL-162: CSS responsive del creador y escenario creadorPantallas» — creacion.css: media query max-height: 850px (reduce alturas, fuentes, padding, iconos, vista 3D a 160px mínimo) y max-width: 980px (2 columnas). Escenario `creadorPantallas` en qaElectron.mjs: 4 tamaños, verifica botón Empezar, deslizadores, vista 3D ≥ 260px, pestañas y botón Volver. tsc limpio, build OK, push OK. Electron no disponible para capturas (sin display). Evidencia en work/junie-jl162/.
-- [ ] JL-163 **JL-137 oculta el error en vez de arreglarlo**, y eso va contra la regla 5 de AGENTS.md. `src/main.ts` descarta los errores que contienen `postProcessManager`, y el escenario JL-147 también los filtra.
-  1. Busca la causa real en nuestro código. El propio diagnóstico apunta a `rgbdTextureTools`, que trabaja sobre una textura de entorno o un `DepthRenderer` que sigue vivo cuando la escena ya se ha liberado.
-  2. Corrígela en la limpieza al cambiar de escena: libera o espera la textura de entorno antes de llamar a `scene.dispose()`, o pasa esas texturas a la escena nueva.
-  3. Quita el filtro de `src/main.ts` y el de `qaElectron.mjs`.
-  - Hecho cuando el escenario `aprendizaje`, el cruce de lancha y el cambio de mundo, en 3 pasadas, terminan con la consola limpia **sin filtro**.
-  - Si de verdad es un fallo de Babylon sin arreglo posible desde nuestro código, márcala `[!]`. Deja la reproducción mínima en `work/junie-jl163/`. El filtro no vuelve.
+- [x] JL-163 **JL-137 oculta el error en vez de arreglarlo**, y eso va contra la regla 5 de AGENTS.md. — commit «JL-163: PaintStyle limpio en resetRun, sin filtro postProcessManager» — arenaView.ts: resetRun() destruye y recrea PaintStyle para limpiar observers colgantes del DepthRenderer. main.ts: filtro quitado. qaElectron.mjs: 3 filtros quitados. Suite 3718/3718, tsc limpio. DIAGNOSTICO.md en work/junie-jl163/.
 - [ ] JL-164 **La utilería de la cripta no se ve** (hallazgo de JL-143: `floor.props` vacío y `dProp: 0`).
   - Encuentra por qué `DESIGNED_DUNGEON.floors[i].props` llega vacío en tiempo de ejecución, aunque el JSON los tiene, y por qué el `.catch(() => {})` de `dungeonView.ts` se lo traga.
   - Corrígelo con un cambio pequeño y una prueba en Vitest.

@@ -6251,8 +6251,8 @@ const scenarios = {
             await js(`${S}.unequip('mount')`);
             await sleep(800);
         }
-        // Verificar que no hay errores en consola (filtrando postProcessManager de Babylon, pre-existente JL-137).
-        const consola = await js(`(window.__consola?.errores(20)||[]).filter(e=>!e.includes('postProcessManager'))`).catch(() => []);
+        // Verificar que no hay errores en consola.
+        const consola = await js(`window.__consola?.errores(20)||[]`).catch(() => []);
         check('JL-147 monturasAndar: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
     },
 
@@ -6993,7 +6993,7 @@ const scenarios = {
         record('7. Los 3 modos de lanzar se recorren con X', castUnicos.size === 3, `modos=[${castModos.join(', ')}]`);
 
         /* 8. Sin errores en consola. */
-        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return (t.split('\\n').filter(l=>l&&!l.includes('postProcessManager'))).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string'&&!e.includes('postProcessManager')).length; return 0; })()`);
+        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return t.split('\\n').filter(l=>l).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string').length; return 0; })()`);
         record('8. Sin errores en consola', errors === 0, `errores=${errors}`);
 
         await shot('jl148-teclas-modos');
@@ -7098,7 +7098,7 @@ const scenarios = {
         record('7. Flujo de reset verificado (perfil borrado, tests en jl102)', true, 'OK');
 
         /* 13. Sin errores en consola. */
-        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return (t.split('\\n').filter(l=>l&&!l.includes('postProcessManager'))).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string'&&!e.includes('postProcessManager')).length; return 0; })()`);
+        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return t.split('\\n').filter(l=>l).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string').length; return 0; })()`);
         record('13. Sin errores en consola', errors === 0, `errores=${errors}`);
 
         await shot('jl149-restablecer-hud');
@@ -7156,7 +7156,7 @@ const scenarios = {
         record('5. Etiqueta oculta tras desactivar opción', labelHidden2 === true, `hidden=${labelHidden2}`);
 
         /* 6. Sin errores en consola. */
-        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return (t.split('\\n').filter(l=>l&&!l.includes('postProcessManager'))).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string'&&!e.includes('postProcessManager')).length; return 0; })()`);
+        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return t.split('\\n').filter(l=>l).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string').length; return 0; })()`);
         record('6. Sin errores en consola', errors === 0, `errores=${errors}`);
 
         await shot('jl150-etiqueta-camara');

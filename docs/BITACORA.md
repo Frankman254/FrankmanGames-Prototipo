@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-163: error postProcessManager de Babylon — destrucción limpia del PaintStyle (Junie)
+
+**Archivos:** `src/render/arenaView.ts`, `src/main.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl163/DIAGNOSTICO.md`.
+
+**Qué:** JL-137 ocultó un error de Babylon (`postProcessManager`) con un filtro en `src/main.ts` y en 4 lugares de `scripts/qaElectron.mjs`, violando la regla 5 de AGENTS.md. La causa real: `PaintStyle` crea un `DepthRenderer` en la escena de Babylon, cuyo Effect registra un observer `addOnce` asíncrono en `rgbdTextureTools.js`. Al cambiar de mundo (`resetRun`), el observer se dispara después de que la escena cambió y encuentra `scene === null`. Solución: en `resetRun()`, destruir y recrear el PaintStyle para eliminar los observers colgantes antes de que se disparen. Se quitaron los 4 filtros de `postProcessManager` (1 en `main.ts`, 3 en `qaElectron.mjs`).
+
+**Cómo se verificó:** `npx tsc --noEmit` limpio (solo balM3.ts ajeno), `npx vitest run` → 3718/3718 verdes. DIAGNOSTICO.md en `work/junie-jl163/`.
+
+---
+
 ## 2026-11-23 — JL-162: CSS responsive del creador de personaje (Junie)
 
 **Archivos:** `src/ui/styles/creacion.css`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

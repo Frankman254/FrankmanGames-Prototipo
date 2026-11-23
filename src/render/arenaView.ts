@@ -418,6 +418,19 @@ export class ArenaView {
         this.arrows.reset();
         this.player.reset();
         this.hitPause.reset();
+        // JL-163: El DepthRenderer de PaintStyle deja observers asíncronos de Babylon
+        // (rgbdTextureTools) que disparan después de que la escena cambió. Destruir y
+        // recrear el pase elimina los observers colgantes y evita el error
+        // "Cannot read properties of null (reading 'postProcessManager')".
+        const hadPaint = this.paint !== null;
+        if (this.paint) {
+            this.paint.dispose();
+            this.paint = null;
+        }
+        if (hadPaint) {
+            this.paint = new PaintStyle(this.scene, this.rig.camera);
+            this.sceneLook.setPaintGrading(true);
+        }
     }
 
     /**
