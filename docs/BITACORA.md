@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-152: rendimiento del piso 100 de la cripta (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl152/INFORME.md`.
+
+**Qué:** Medición del rendimiento del piso 100 de la cripta, que el creador reportaba a 58 fps en Windows. En Mac M5 el piso 100 rinde a 120 fps con 117 enemigos: msRender 3.5 ms, msSim 0.1 ms, msAnim 0.9 ms, msSombras 0.4 ms, 109 draw calls. No hay cuello de botella en Mac. El problema de 58 fps es en Windows (cubierto por WIN-01). Sin cambios de código.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs rendimientoHondo` → 2/2 en verde. INFORME.md con tabla completa (pueblo, Iguanera, pisos 1/20/60/100) en `work/junie-jl152/`.
+
+---
+
 ## 2026-11-22 — JL-151: lint limpio en archivos de JL-59…108 (Junie)
 
 **Archivos:** `scripts/audit/nombreModelo.ts`, `src/render/arenaView.ts`, `src/render/dungeonView.ts`, `src/ui/map/hudLayout.ts`, `src/ui/menus/screens/modals.ts`, `src/world/dungeon.ts`, `tests/jl103_cameraModeLabel.test.ts`, `tests/jl60_aspectDefaults.test.ts`, `tests/jl67_secondaryPhysics.test.ts`, `tests/jl70_secondaryIntegration.test.ts`, `tests/jl88_cryptProps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
