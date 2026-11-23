@@ -1372,6 +1372,7 @@ Contexto del coordinador:
   — commit «JL-200: escenario musicaContextos — 18/18 en 3 ejecuciones» — 18/18 en verde (3 ejecuciones consecutivas). Portada (title), pueblo (town), pelea en pueblo (town_fight), región (region:iguanera), pelea en campo (field_fight), cripta (crypt), guardián (guardian), stingers (victory, defeat, danger) y duck. Captura en work/qa/jl200-musicaContextos.jpg.
 
 ### Cierre de la tanda
-- [ ] JL-201 Consola limpia tras esta tanda: los escenarios nuevos y los de hechizos sin errores nuevos. INFORME en `work/junie-jl201/`.
+- [x] JL-201 Consola limpia tras esta tanda: los escenarios nuevos y los de hechizos sin errores nuevos. INFORME en `work/junie-jl201/`.
+  — commit «JL-201: consola limpia — 8 escenarios, 0 errores nuevos» — 80/81 checks (1 fallo pre-existente en previa). INFORME.md en work/junie-jl201/.
 - [ ] JL-202 Reintento obligatorio de lo que haya quedado `[!]` en JL-181…201, con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
 - [ ] JL-203 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_3.md` con 20 tareas pequeñas que hayas visto. Cada una con evidencia **comprobada**: si propones una prueba que falta, pon el `grep` que lo demuestra. Son propuestas: no las empieces.

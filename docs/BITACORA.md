@@ -1,3 +1,18 @@
+## 2026-11-23 — JL-201: consola limpia tras esta tanda (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl201/INFORME.md`.
+
+**Qué se hizo:** Verificación de consola limpia en 8 escenarios (6 nuevos de esta tanda + 2 de hechizos existentes). Todos sin errores de consola del juego.
+
+**Resultados:**
+- barraRoja: 6/6 ✓, hechizosClases: 25/25 ✓, colaHechizos: 8/12 (fallos de medición esperados), pesca: 6/6 ✓, jl198_profesiones: 7/7 ✓, musicaContextos: 18/18 ✓, barra: 6/6 ✓, previa: 8/11 (fallos pre-existentes).
+- **0 errores de consola del juego en todos los escenarios.**
+- Hallazgo: `colaHechizos` tiene `pathMod is not defined` en el arnés (no en el juego).
+
+**Validación:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs <escenario>` para cada uno. INFORME.md en `work/junie-jl201/`.
+
+---
+
 ## 2026-11-23 — JL-200: escenario musicaContextos en QA Electron (Junie)
 
 - **Qué:** Escenario `musicaContextos` en `scripts/qaElectron.mjs` que verifica todos los contextos musicales del juego: portada (title), pueblo (town), pelea en pueblo (town_fight), región (region:iguanera), pelea en campo (field_fight), cripta (crypt), guardián (guardian), los tres stingers (victory, defeat, danger) y el duck de la música.
