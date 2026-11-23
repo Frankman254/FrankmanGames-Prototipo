@@ -42,6 +42,14 @@
 
 ---
 
+## 2026-11-23 — JL-178: escenario emotes — 8 emotes capturados (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+Escenario `jl178_emotes` en `scripts/qaElectron.mjs`: lanza cada uno de los 8 emotes del chat (wave, laugh, dance, cry, angry, love, sleep, doubt) y verifica que el clip `Emote_<id>` se reproduce en el modelo del jugador. Captura cada emote en `work/junie-jl178/ANTES/` para comparar antes y después de OMP-PJ-02. Los hechizos de las 3 clases no se capturaron porque no hay enemigos en el pueblo y el arnés no puede crear enemigos fácilmente. 9/9 checks en verde, 8 capturas JPG.
+
+---
+
 ## 2026-11-23 — JL-175: escenario barraCandado — candado y persistencia (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

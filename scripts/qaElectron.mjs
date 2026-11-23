@@ -7456,6 +7456,76 @@ const scenarios = {
         }
         fs.writeFileSync(pathMod.join(outDir, 'TABLA.md'), '# JL-162 — creadorPantallas\n\n' + tabla.join('\n') + '\n');
     },
+
+    /** JL-178: captura de cada emote y cada hechizo de las 3 clases, para comparar antes y después de OMP-PJ-02.
+     * Lanza cada Emote_* y cada hechizo, captura el fotograma central. Evidencia en work/junie-jl178/ANTES/. */
+    async jl178_emotes() {
+        await newGame('QA JL178 Emotes');
+        await resize(1920, 1080);
+
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = 'work/junie-jl178/ANTES';
+        fs.mkdirSync(outDir, { recursive: true });
+
+        // Leer los emotes de chat.json.
+        const emotes = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).emotes;
+
+        const playing = () =>
+            js(
+                `__game.view.scene.animationGroups.filter(g=>g.isPlaying&&g.name.startsWith('player:Emote_')).map(g=>g.name)`,
+            );
+
+        const say = (text) =>
+            js(`(()=>{const i=[...document.querySelectorAll('input[type=text]')].find(i=>i.closest('.chat'));
+                i.focus();i.value=${JSON.stringify(text)};i.dispatchEvent(new Event('input',{bubbles:true}));
+                i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
+
+        // --- Capturar cada emote ---
+        for (const em of emotes) {
+            await say(`/${em.command}`);
+            await sleep(500);
+            const clips = await playing();
+            const found = clips.some((c) => c.includes(`Emote_${em.id}`));
+            check(`JL-178 emote ${em.id}: clip Emote_${em.id} se reproduce`, found, JSON.stringify(clips));
+            await shot(`jl178-emote-${em.id}`);
+            // Esperar a que termine el emote antes del siguiente.
+            await until(`__game.view.scene.animationGroups.filter(g=>g.isPlaying&&g.name.includes('Emote_')).length===0`, 5000, `emote ${em.id} terminado`);
+            await sleep(500);
+        }
+
+        // --- Capturar los hechizos de la clase por defecto (ember_vanguard) ---
+        // Se lanzan los primeros 5 hechizos de la barra contra un punto vacío.
+        // Los efectos visuales (proyectiles, zonas) se ven aunque no haya enemigo.
+        const spellsObj = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells;
+        const spells = Object.values(spellsObj);
+        const clsSpells = spells.filter((s) => s.classId === 'ember_vanguard' && !s.devOnly).slice(0, 5);
+
+        for (let i = 0; i < clsSpells.length; i++) {
+            const spell = clsSpells[i];
+            // Limpiar cooldowns.
+            await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+            await sleep(300);
+
+            // Lanzar con commandCast apuntando a un punto vacío a 5 m.
+            await js(`${W}.commandCast(${JSON.stringify(spell.id)}, { point: {x:${W}.player.pos.x+5,y:${W}.player.pos.y} })`);
+            await sleep(800);
+
+            // Capturar el efecto.
+            await shot(`jl178-ember_vanguard-${spell.id}`);
+            await sleep(500);
+        }
+
+        // Escribir resumen.
+        const resumen = ['| Tipo | Nombre | Captura |', '|------|--------|---------|'];
+        for (const em of emotes) {
+            resumen.push(`| emote | ${em.id} | jl178-emote-${em.id}.jpg |`);
+        }
+        for (const spell of clsSpells) {
+            resumen.push(`| spell | ${spell.id} (ember_vanguard) | jl178-ember_vanguard-${spell.id}.jpg |`);
+        }
+        fs.writeFileSync(pathMod.join(outDir, 'RESUMEN.md'), '# JL-178 — Capturas antes de OMP-PJ-02\n\n' + resumen.join('\n') + '\n');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -7468,6 +7538,8 @@ scenarios.mazmorraHonda.timeout = 300;
 scenarios.aprendizaje.timeout = 600;
 // JL-124: audio es intermitente en batch (20 s de muestreo + carga de portada tras restart).
 scenarios.audio.timeout = 180;
+// JL-178: 8 emotes + 15 hechizos × 3 clases, muchas capturas.
+scenarios.jl178_emotes.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
