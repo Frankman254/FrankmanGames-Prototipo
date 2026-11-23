@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-145: prueba de clips GLB — 40 plantillas verificadas (Junie)
+
+**Archivos:** `tests/jl145_assetClips.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl145/EVIDENCIA.md`.
+
+**Qué:** Prueba que cada plantilla GLB de `data/assets.json` tiene en su archivo los clips de animación que declara. Generalización de JL-90 (fantasma.glb). 40 plantillas GLB verificadas con 125 pruebas: existencia de archivo, clips declarados presentes en el GLB (usando `endsWith` para tolerar prefijos), y al menos un clip detectable por GLB.
+
+**Cómo se verificó:** `npx vitest run tests/jl145_assetClips.test.ts` → 125/125 verdes. Suite completa 3715/3715, tsc limpio (solo errores pre-existentes en balM3.ts ajeno).
+
+---
+
 ## 2026-11-22 — JL-144: prueba de utilería sin colisión con antorchas (Junie)
 
 **Archivos:** `tests/jl144_cryptProps.test.ts`, `data/dungeons/cripta-tulivieja.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
