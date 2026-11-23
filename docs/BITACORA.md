@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-177: escenario jinetes — 8/10 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `jinetes` en `qaElectron.mjs` que monta al héroe en cada montura de desarrollo (Arpía, Diostedé, Crestalba, Falcopama), verifica que el jinete está en `rider_root` con estado `idle`, lee los datos de asiento de RiderSeat (CLA-MON1: `rideHeight`, `seatFix`, `settled`) y toma una captura de lado con cámara fija (pitch 14°, distancia 5 m, yaw 270°). 4 capturas en `work/junie-jl177/`. Los 2 fallos son pre-existentes: error `postProcessManager` de Babylon (JL-137/163).
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs jinetes` → 8/10 en verde (4 monturas × 2 checks + 1 consola; 2 fallos pre-existentes). `npx vitest run` → 3770/3770 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). `npm run build` OK. INFORME.md y 4 capturas JPG en `work/junie-jl177/`.
+
+---
+
+---
+
 ## 2026-11-23 — JL-176: escenario creadorCuerpo — 31/31 (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

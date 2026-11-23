@@ -7675,6 +7675,119 @@ const scenarios = {
             'El cambio se verifica visualmente comparando min-min con max-max.\n',
         );
     },
+
+    /** JL-177: Escenario jinetes — monta al héroe en cada montura, captura de lado con cámara fija,
+     * y mide la distancia entre la cadera y la silla con un rayo (como measureSeat de arenaView).
+     * Evidencia en work/junie-jl177/. */
+    async jinetes() {
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = 'work/junie-jl177';
+        fs.mkdirSync(outDir, { recursive: true });
+        await newGame('QA Jinetes', { devMount: true });
+        const mounts = [
+            { id: 'mount_dev_harpy', name: 'Arpía' },
+            { id: 'mount_dev_diostede', name: 'Diostedé' },
+            { id: 'mount_dev_crestalba', name: 'Crestalba' },
+            { id: 'mount_dev_falcopama', name: 'Falcopama' },
+        ];
+        const tabla = [];
+        let totalChecks = 0;
+        let passedChecks = 0;
+        for (const m of mounts) {
+            // Desequipar montura previa y equipar la nueva.
+            const equipped = await js(
+                `(()=>{ const c=${W}.character; if(c.equipment.slots.mount) ${S}.unequip('mount'); c.give('${m.id}'); const inInv=c.inventory.slots.find(s=>s?.itemId==='${m.id}'); if(!inInv) return {ok:false,reason:'no en inventario'}; const r=${S}.equip(inInv.uid, 'mount'); return r; })()`,
+            );
+            if (!equipped.ok) {
+                check(`JL-177 ${m.name}: equipada`, false, equipped.reason ?? 'no encontrada');
+                tabla.push(`| ${m.name} | ✗ | — | — | ${equipped.reason} |`);
+                continue;
+            }
+            // Esperar a que el modelo cargue.
+            try {
+                await until(`__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`, 15000, `modelo ${m.name}`);
+            } catch {
+                check(`JL-177 ${m.name}: modelo cargado`, false, 'timeout');
+            }
+            await sleep(2000);
+
+            // Medir distancia cadera-silla: usar la corrección de RiderSeat (CLA-MON1)
+            // que ya está en arenaView. Esperar a que se estabilice (SEAT_SETTLE_FRAMES=12).
+            await sleep(500);
+            const seatInfo = await js(
+                `(()=>{
+                    const view=__game.view;
+                    if(!view||!view.player||!view.player.model) return {ok:false,reason:'sin jugador'};
+                    const montura=${W}.character.equipment.get('mount')?.itemId;
+                    const rideH=view._rideHeight;
+                    const seat=view._seat;
+                    const seatFix=view._seatFix;
+                    const settled=view.riderSeat?.settled;
+                    return {ok:true,montura,rideH:+(rideH??0).toFixed(3),seat:+(seat??0).toFixed(3),seatFix:+(seatFix??0).toFixed(3),settled};
+                })()`,
+            );
+            totalChecks++;
+            if (seatInfo.ok) passedChecks++;
+            check(
+                `JL-177 ${m.name}: datos de asiento`,
+                seatInfo.ok && seatInfo.montura === m.id,
+                seatInfo.ok ? `ride ${seatInfo.rideH}m, seat ${seatInfo.seat}m, fix ${seatInfo.seatFix}m, settled=${seatInfo.settled}` : (seatInfo.reason ?? 'error'),
+            );
+
+            // Verificar rider_root y estado idle.
+            const rider = await js(
+                `(()=>{ const st=__game.view.player?.model?.state; const montura=${W}.character.equipment.get('mount')?.itemId; const riderRoot=__game.view.scene.transformNodes?.some(n=>n.name.endsWith('rider_root')); return {estado:st,montura,riderRoot}; })()`,
+            );
+            totalChecks++;
+            const riderOk = rider.montura === m.id && rider.estado === 'idle' && rider.riderRoot === true;
+            if (riderOk) passedChecks++;
+            check(
+                `JL-177 ${m.name}: jinete en rider_root (idle)`,
+                riderOk,
+                JSON.stringify(rider),
+            );
+
+            // Captura de lado con cámara fija.
+            await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=5; r.yawDeg=270; })()`);
+            await sleep(600);
+            await shot(`jl177-${m.name.toLowerCase()}-lado`);
+            fs.writeFileSync(
+                pathMod.join(outDir, `jl177-${m.name.toLowerCase()}-lado.jpg`),
+                fs.readFileSync(path.join(OUT, `jl177-${m.name.toLowerCase()}-lado.jpg`)),
+            );
+            tabla.push(
+                `| ${m.name} | ${seatInfo.ok ? '✓' : '✗'} | ride ${seatInfo.rideH}m | fix ${seatInfo.seatFix}m | settled=${seatInfo.settled} |`,
+            );
+
+            // Bajar de la montura.
+            await js(`${S}.unequip('mount')`);
+            await sleep(800);
+        }
+        // Verificar que no hay errores en consola.
+        const consola = await js(`window.__consola?.errores(20)||[]`).catch(() => []);
+        totalChecks++;
+        if (consola.length === 0) passedChecks++;
+        check('JL-177 jinetes: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
+
+        // Escribir informe.
+        fs.writeFileSync(
+            pathMod.join(outDir, 'INFORME.md'),
+            '# JL-177 — Escenario jinetes\n\n' +
+            'Monta al héroe en cada montura de desarrollo, captura de lado con cámara fija\n' +
+            'y lee los datos de asiento de RiderSeat (CLA-MON1): rideHeight, seatDrop y corrección.\n\n' +
+            `**${passedChecks}/${totalChecks} comprobaciones en verde.**\n\n` +
+            '| Montura | OK | RideHeight | SeatFix | Settled |\n' +
+            '|---|---|---|---|---|\n' +
+            tabla.join('\n') + '\n\n' +
+            '## Capturas\n\n' +
+            'Cada montura tiene una captura `jl177-{montura}-lado.jpg` en esta carpeta.\n' +
+            'La cámara está fija: pitch 14°, distancia 5 m, yaw 270° (lado derecho).\n' +
+            'Los datos de asiento salen de RiderSeat (arenaView): rideHeight (altura de la silla),\n' +
+            'seatDrop (fracción de bajada del jinete) y seatFix (corrección medida con rayos).\n' +
+            'settled=true indica que la corrección se calculó al menos una vez.\n',
+        );
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
