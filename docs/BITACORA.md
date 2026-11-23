@@ -1,3 +1,18 @@
+## 2026-11-23 — JL-189: pruebas de hinder.ts — 28 pruebas, 4 funciones (Junie)
+
+**Archivos:** `tests/jl189_hinder.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Pruebas completas de `src/rpg/hinder.ts`, un módulo sin cobertura que gestiona los controles en tiempo real del combate táctico (agotamiento, embotamiento, desorientación). Cubre las 4 funciones exportadas:
+
+- `hinderDuration`: 13 pruebas — primera aplicación (factor 1), rendimientos decrecientes (0.5, 0.25, 0), reinicio fuera de ventana, contadores independientes por familia, slowResist con cap y negativo, combinación de resistencia con rendimientos decrecientes, ventana medida desde último intento, log actualizado aunque duración sea 0.
+- `cooldownSlow`: 6 pruebas — sin estados, suma × stacks, tope en cap, ignora estados sin hinder o sin cooldownSlow, combinación de varios estados.
+- `dazeOf`: 5 pruebas — sin estados, encuentra daze, ignora otras familias, ignora sin hinder, devuelve el primero si hay varios.
+- `isDisoriented`: 4 pruebas — sin estados, detecta disorient, ignora otras familias, funciona con otros estados presentes.
+
+**Verificación:** 28 pruebas verdes (jl189_hinder.test.ts), `npx tsc --noEmit` sin errores nuevos (solo `balM3.ts` ajeno), `npm run build` OK.
+
+---
+
 ## 2026-11-23 — JL-188: escenario hechizosClases — 25/25, 3 clases, 12 hechizos (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
