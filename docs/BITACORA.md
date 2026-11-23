@@ -1,3 +1,13 @@
+## 2026-11-23 — CLA-BAR1: la barra de hechizos ya no sube al cerrar el candado (Claude)
+
+**Archivos:** `src/ui/map/hudLayout.ts`, `src/ui/map/hudProfiles.ts`, `tests/claBar1_hudPlacement.test.ts`, `docs/TAREAS.md`.
+
+**Qué:** dos causas. (1) `HudLayout.applyScale` escalaba con `transform: scale()`, pero `WindowLayout.place` fija `transform: none !important`; la barra se medía unas veces escalada y otras no, y la posición guardada arrastraba el hueco. Ahora se usa la propiedad CSS `scale`, que `place` no toca. (2) `getDefaultPositions` devolvía fracciones sin `fx`/`fy` y `WindowLayout` las leía como píxeles: tras Restablecer o en un perfil nuevo la barra, las coordenadas y la barra de combate quedaban arriba a la izquierda. Ahora llevan `fx`/`fy`.
+
+**Cómo se verificó:** `npm test` 3724/3724; typecheck limpio salvo `tests/jl164_checkProps.test.ts` (Junie, en curso) y `scripts/balance/balM3.ts` (ajeno). En el navegador (Vite, 1024×768): barra a escala 0,82×0,68 arrastrada abajo, candado y recarga → borde inferior 768 = alto de ventana; perfil vacío → barra abajo centrada y coordenadas arriba centradas. El perfil del creador guardado con hueco (`fy` 0,879) se corrige arrastrando la barra abajo una vez.
+
+---
+
 ## 2026-11-23 — JL-163: error postProcessManager de Babylon — destrucción limpia del PaintStyle (Junie)
 
 **Archivos:** `src/render/arenaView.ts`, `src/main.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl163/DIAGNOSTICO.md`.

@@ -283,14 +283,22 @@ export class HudLayout {
         });
     }
 
-    /** Pone el tamaño guardado del elemento por eje (transform: scale(x, y)). */
+    /**
+     * Pone el tamaño guardado del elemento por eje con la propiedad CSS `scale`.
+     * CLA-BAR1 (2026-11-22): antes iba en `transform`, pero WindowLayout.place pone
+     * `transform: none !important` al colocar; la escala aparecía y desaparecía, y la
+     * posición se guardaba midiendo un alto y se recolocaba con otro: la barra bajada
+     * del todo volvía más arriba con hueco debajo. `scale` no la toca `place`, y
+     * getBoundingClientRect la incluye siempre, así que medir y colocar coinciden.
+     */
     private applyScale(el: HTMLElement, key: string): void {
         const s: HudScale = this.profiles.active.scales?.[key] ?? { x: 1, y: 1 };
+        el.style.removeProperty('transform');
         if (Math.abs(s.x - 1) < 0.01 && Math.abs(s.y - 1) < 0.01) {
-            el.style.removeProperty('transform');
+            el.style.removeProperty('scale');
             el.style.removeProperty('transform-origin');
         } else {
-            el.style.setProperty('transform', `scale(${s.x}, ${s.y})`);
+            el.style.setProperty('scale', `${s.x} ${s.y}`);
             el.style.setProperty('transform-origin', 'bottom left');
         }
     }
@@ -395,6 +403,8 @@ export class HudLayout {
                     'margin',
                     'position',
                     'transform',
+                    'transform-origin',
+                    'scale',
                     'translate',
                     'zoom',
                     'inset',

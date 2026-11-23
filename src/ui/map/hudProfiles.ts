@@ -494,10 +494,12 @@ function posToWindowPos(
         y = pos.y;
     }
 
-    return {
-        x: f(x, elW, vw),
-        y: f(y, elH, vh),
-    };
+    // CLA-BAR1 (2026-11-22): WindowLayout lee la proporción de `fx`/`fy`; sin ellas toma `x`/`y`
+    // como píxeles, y las fracciones (0–1) dejaban la barra, las coordenadas y la barra de combate
+    // pegadas a la esquina de arriba a la izquierda al no haber posición guardada o tras Restablecer.
+    const fx = f(x, elW, vw);
+    const fy = f(y, elH, vh);
+    return { x: fx, y: fy, fx, fy };
 }
 
 /**
