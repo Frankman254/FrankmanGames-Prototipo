@@ -1,3 +1,23 @@
+## 2026-11-23 — JL-160: cierre de bloqueos — Puertobelo espera OMP-PB-01 (Junie)
+
+**Archivos:** `work/junie-jl-160/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reintento obligatorio de las tareas `[!]` de la tanda JL-73…JL-156:
+- **JL-74** (escenario `barra`): ya resuelta por JL-74b (6/6 en verde).
+- **JL-85** (escenario `crestalba`): ya resuelta por JL-85b (5/5 en verde).
+- **JL-64** (rework de pisos manuales): desbloqueada por JL-64b, pero el rework es contenido (decisión del creador).
+- **JL-169, JL-171, JL-172, JL-173, JL-180** (Puertobelo): bloqueos legítimos — `puertobelo_kit.glb` no existe (pendiente de OMP-PB-01). Las 5 tareas forman una cadena de dependencias que arranca en OMP.
+
+**Preguntas para el creador:** `work/junie-jl-160/PREGUNTAS.md` con dos preguntas:
+1. ¿Esperar OMP-PB-01, reemplazar las tareas de Puertobelo, o avanzar parcialmente?
+2. ¿Avanzar con el rework de los pisos manuales de la cripta (JL-64)?
+
+**Sin código:** Tarea de diagnóstico y cierre. Suite 3770/3770 en verde, tsc limpio (solo balM3.ts ajeno).
+
+---
+
+---
+
 ## 2026-11-23 — JL-156: QA completo — 100 escenarios, 2 pasadas, sin regresiones (Junie)
 
 **Archivos:** `work/junie-jl-156/RESUMEN.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

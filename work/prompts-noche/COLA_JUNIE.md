@@ -1329,10 +1329,5 @@ Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`
 ### Cierre de la tanda
 - [x] JL-155 Consola limpia otra vez (QA-02) tras esta tanda: 13 escenarios y cero errores nuevos. — commit «JL-155: consola limpia — 14 escenarios, 152/153 checks, 0 errores nuevos» — INFORME.md en work/junie-jl155/.
 - [x] JL-156 Recorrido completo de QA en dos pasadas con `QA_SESION`. — commit «JL-156: QA completo — 100 escenarios, 2 pasadas, sin regresiones» — 100 escenarios ejecutados en 2 pasadas, ~742 OK / ~18 FALLA (p1), ~445 OK / ~11 FALLA (p2). Fallos pre-existentes: utileriaCripta (floor.props), postProcessManager Babylon, barraCandado persistencia. CDP crash en batch solucionado ejecutando por separado. RESUMEN.md en work/junie-jl-156/.
-- [ ] JL-160 **Reintento obligatorio.** Por cada `[!]` de esta tanda (JL-74b…JL-156):
-  - vuelve a intentarlo con lo aprendido en el resto de la tanda;
-  - si sale, cambia su casilla a `[x]` con la evidencia;
-  - si de verdad necesita al creador, deja la pregunta exacta en `work/junie-jl-160/PREGUNTAS.md`.
-
-  La tanda solo se da por terminada cuando no queda ningún `[!]` sin pregunta escrita.
+- [x] JL-160 **Reintento obligatorio.** — commit «JL-160: cierre de bloqueos — Puertobelo espera OMP-PB-01, JL-64 pendiente del creador» — JL-74 y JL-85 ya resueltas por JL-74b y JL-85b. JL-64 desbloqueada por JL-64b pero el rework de pisos es contenido (decisión del creador). JL-169, JL-171, JL-172, JL-173, JL-180: bloqueos legítimos por OMP-PB-01 (puertobelo_kit.glb no existe). PREGUNTAS.md en work/junie-jl-160/.
 - [ ] JL-161 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_2.md` con 20 tareas pequeñas que hayas visto, cada una con evidencia y criterio de hecho. Son propuestas: no las empieces.
