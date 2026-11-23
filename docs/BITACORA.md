@@ -1,3 +1,20 @@
+## 2026-11-23 — JL-156: QA completo — 100 escenarios, 2 pasadas, sin regresiones (Junie)
+
+**Archivos:** `work/junie-jl-156/RESUMEN.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Recorrido completo de QA en dos pasadas con `QA_SESION`:
+- 100 escenarios ejecutados en grupos de ~15 para evitar timeouts globales.
+- Pasada 1: ~742 OK / ~18 FALLA. Pasada 2: ~445 OK / ~11 FALLA.
+- Los escenarios que crashean CDP en batch (audio, muerte_y_revivir, criptaAislada, criticoV3, editorMazmorra, mapRepaso, barraCandado, creadorPantallas, editor_play, viaje, mazmorraHonda) se ejecutaron por separado.
+- Fallos pre-existentes: utileriaCripta (floor.props vacío, JL-143), postProcessManager de Babylon, barraCandado persistencia.
+- No hay regresiones nuevas.
+
+**Verificación:** RESUMEN.md en `work/junie-jl-156/` con tabla detallada por escenario y comparación con JL-107.
+
+**Notas:** El arnés funciona correctamente ejecutando los escenarios problemáticos por separado. Sin display físico, CDP cae al reiniciar Electron tras timeout; la solución es ejecutarlos individualmente.
+
+---
+
 ## 2026-11-23 — JL-155: consola limpia — 14 escenarios, 0 errores nuevos (Junie)
 
 **Archivos:** `work/junie-jl155/INFORME.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

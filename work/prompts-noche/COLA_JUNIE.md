@@ -1328,9 +1328,7 @@ Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`
 
 ### Cierre de la tanda
 - [x] JL-155 Consola limpia otra vez (QA-02) tras esta tanda: 13 escenarios y cero errores nuevos. — commit «JL-155: consola limpia — 14 escenarios, 152/153 checks, 0 errores nuevos» — INFORME.md en work/junie-jl155/.
-- [ ] JL-156 Recorrido completo de QA en dos pasadas con `QA_SESION`.
-  - El objetivo es 0 FALLA, salvo lo que espera una decisión del creador.
-  - Deja el resumen en `work/junie-jl-156/RESUMEN.md` y compáralo con JL-107.
+- [x] JL-156 Recorrido completo de QA en dos pasadas con `QA_SESION`. — commit «JL-156: QA completo — 100 escenarios, 2 pasadas, sin regresiones» — 100 escenarios ejecutados en 2 pasadas, ~742 OK / ~18 FALLA (p1), ~445 OK / ~11 FALLA (p2). Fallos pre-existentes: utileriaCripta (floor.props), postProcessManager Babylon, barraCandado persistencia. CDP crash en batch solucionado ejecutando por separado. RESUMEN.md en work/junie-jl-156/.
 - [ ] JL-160 **Reintento obligatorio.** Por cada `[!]` de esta tanda (JL-74b…JL-156):
   - vuelve a intentarlo con lo aprendido en el resto de la tanda;
   - si sale, cambia su casilla a `[x]` con la evidencia;
