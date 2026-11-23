@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-168: prueba de cobertura PROCEDENCIA.md (Junie)
+
+**Archivos:** `tests/jl168_procedencia.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl168/HUERFANOS.md`.
+
+**Qué:** Prueba automática que verifica que todo GLB en `assets/models/` tiene al menos una mención en `PROCEDENCIA.md` y viceversa. Extrae los nombres de GLB del registro con regex y los compara con el contenido de la carpeta. Resultado: 131 GLB en disco, 131 mencionados en PROCEDENCIA.md, 0 huérfanos, 0 mencionados pero ausentes en disco. La prueba también verifica que no hay nombres duplicados en la carpeta.
+
+**Cómo se verificó:** `npx vitest run tests/jl168_procedencia.test.ts` → 3/3 verdes. `npx tsc --noEmit` sin errores nuevos. HUERFANOS.md en `work/junie-jl168/`.
+
+---
+
 ## 2026-11-23 — JL-167: prueba de integridad GLB citados (Junie)
 
 **Archivos:** `tests/jl167_globExists.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
