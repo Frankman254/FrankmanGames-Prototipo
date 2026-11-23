@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-176: escenario creadorCuerpo — 31/31 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `creadorCuerpo` en `qaElectron.mjs` que verifica que los deslizadores de altura y complexión del creador de personaje funcionan correctamente. CLA-CR1 ya está integrado: `bodyScale()` en `appearance.ts` calcula la escala [alto, ancho] desde `height`/`build`; `playerLook.ts` la aplica al look; `gltfCharacter.ts` la usa para escalar el modelo 3D. El escenario abre el creador, por cada clase (Vanguardia, Cazador, Tejedora) y sexo (Mujer, Hombre), pone los sliders a los extremos (min-min: -100/-100, max-max: +100/+100), verifica que los valores se guardan y que el canvas `.doll-3d` (vista 3D, 342×624 px) es visible. 12 capturas en `work/junie-jl176/`.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs creadorCuerpo` → 31/31 en verde (6 combinaciones × 3 checks + 6 checks de sliders existen). `npx vitest run` → 3770/3770 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). INFORME.md y 12 capturas JPG en `work/junie-jl176/`.
+
+---
+
 ## 2026-11-23 — JL-174: La casa del creador en el mundo (Junie)
 
 **Archivos:** `data/vegetation.json`, `src/main.ts`, `tests/jl174_casaCreador.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

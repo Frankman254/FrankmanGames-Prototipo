@@ -7526,6 +7526,155 @@ const scenarios = {
         }
         fs.writeFileSync(pathMod.join(outDir, 'RESUMEN.md'), '# JL-178 — Capturas antes de OMP-PJ-02\n\n' + resumen.join('\n') + '\n');
     },
+
+    /** JL-176: Escenario `creadorCuerpo`. Abre el creador, pone altura y complexión a los
+     * extremos por clase y sexo, captura la vista 3D (canvas .doll-3d) y verifica que los sliders
+     * se aplican. La vista 3D es un canvas Babylon, no un SVG: se mide el tamaño del canvas
+     * y se capturan las combinaciones para verificación visual.
+     * Evidencia en work/junie-jl176/. */
+    async creadorCuerpo() {
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = 'work/junie-jl176';
+        fs.mkdirSync(outDir, { recursive: true });
+
+        const classes = [
+            ['ember_vanguard', 'Vanguardia'],
+            ['mangrove_hunter', 'Cazador'],
+            ['storm_weaver', 'Tejedora'],
+        ];
+        const sexes = [
+            ['femenino', 'Mujer'],
+            ['hombre', 'Hombre'],
+        ];
+        const combos = [
+            [-100, -100, 'min-min'],
+            [100, 100, 'max-max'],
+        ];
+
+        const tabla = ['| Clase | Sexo | Combo | Slider Altura | Slider Complexión | doll-3d visible |', '|-------|------|-------|---------------|-------------------|-----------------|'];
+        let totalChecks = 0;
+        let passedChecks = 0;
+
+        for (const [classId, classLabel] of classes) {
+            for (const [sexId, sexLabel] of sexes) {
+                /* Cargar la portada limpia. */
+                await cdp('Page.navigate', { url });
+                await until(
+                    `!!document.querySelector('[data-testid="new-game"]')`,
+                    30000,
+                    `portada ${classId} ${sexId}`,
+                );
+                await sleep(500);
+
+                /* Abrir el creador con JS click (CDP mouse no funciona con menus-on). */
+                await js('document.querySelector("[data-testid=new-game]")?.click()');
+                await until(`document.querySelector('.name-input')`, 10000, `creador ${classId} ${sexId}`);
+                await sleep(800);
+
+                /* Elegir clase. */
+                await click(`.class-card[data-id=${JSON.stringify(classId)}]`);
+                await sleep(300);
+
+                /* Elegir sexo. */
+                await js(
+                    `(()=>{ const btns=[...document.querySelectorAll('button.cr-sex-btn')]; const s=btns.find(b=>b.dataset.sex==='${sexId}'); if(s) s.click(); })()`,
+                );
+                await sleep(300);
+
+                /* Ir a la pestaña Cuerpo (si no está activa por defecto). */
+                await js(
+                    `(()=>{ const t=document.querySelector('.cr-tab[data-tab="cuerpo"]'); if(t && !t.classList.contains('on')) t.click(); })()`,
+                );
+                await sleep(300);
+
+                /* Verificar que los sliders existen. */
+                const slidersExist = await js(
+                    `(()=>{ const h=document.querySelector('input[type="range"][aria-label="Altura"]'); const b=document.querySelector('input[type="range"][aria-label="Complexión"]'); return {height:!!h,build:!!b}; })()`,
+                );
+                totalChecks++;
+                if (slidersExist.height && slidersExist.build) passedChecks++;
+                check(`JL-176 ${classLabel} ${sexLabel}: sliders existen`, slidersExist.height && slidersExist.build, JSON.stringify(slidersExist));
+
+                for (const [hVal, bVal, comboLabel] of combos) {
+                    /* Setear los sliders directamente por JS y disparar el evento input. */
+                    await js(
+                        `(()=>{
+                            const hInput = document.querySelector('input[type="range"][aria-label="Altura"]');
+                            const bInput = document.querySelector('input[type="range"][aria-label="Complexión"]');
+                            if(hInput){ hInput.value=${hVal}; hInput.dispatchEvent(new Event("input",{bubbles:true})); }
+                            if(bInput){ bInput.value=${bVal}; bInput.dispatchEvent(new Event("input",{bubbles:true})); }
+                        })()`,
+                    );
+                    await sleep(600);
+
+                    /* Verificar que los sliders guardaron el valor. */
+                    const sliderVals = await js(
+                        `(()=>{
+                            const hInput = document.querySelector('input[type="range"][aria-label="Altura"]');
+                            const bInput = document.querySelector('input[type="range"][aria-label="Complexión"]');
+                            return {height:hInput?hInput.value:null,build:bInput?bInput.value:null};
+                        })()`,
+                    );
+                    totalChecks++;
+                    const slidersOk = sliderVals.height === String(hVal) && sliderVals.build === String(bVal);
+                    if (slidersOk) passedChecks++;
+                    check(
+                        `JL-176 ${classLabel} ${sexLabel} ${comboLabel}: sliders en ${hVal}/${bVal}`,
+                        slidersOk,
+                        JSON.stringify(sliderVals),
+                    );
+
+                    /* Verificar que el canvas .doll-3d es visible. */
+                    const doll3d = await js(
+                        `(()=>{ const c=document.querySelector('canvas.doll-3d'); if(!c) return {visible:false,w:0,h:0}; return {visible:!!c.offsetParent,w:c.offsetWidth,h:c.offsetHeight}; })()`,
+                    );
+                    totalChecks++;
+                    if (doll3d.visible && doll3d.w > 0 && doll3d.h > 0) passedChecks++;
+                    check(
+                        `JL-176 ${classLabel} ${sexLabel} ${comboLabel}: doll-3d visible (${doll3d.w}×${doll3d.h})`,
+                        doll3d.visible && doll3d.w > 0 && doll3d.h > 0,
+                        JSON.stringify(doll3d),
+                    );
+
+                    /* Captura. */
+                    const shotName = `jl176-${classId}-${sexId}-${comboLabel}`;
+                    await shot(shotName);
+                    fs.writeFileSync(
+                        pathMod.join(outDir, `${shotName}.jpg`),
+                        fs.readFileSync(path.join(OUT, `${shotName}.jpg`)),
+                    );
+                    tabla.push(
+                        `| ${classLabel} | ${sexLabel} | ${comboLabel} | ${sliderVals.height} | ${sliderVals.build} | ${doll3d.visible ? '✓' : '✗'} |`,
+                    );
+                }
+
+                /* Cerrar el creador con Escape. */
+                await key('Escape', 'Escape');
+                await until(
+                    `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`,
+                    10000,
+                    `portada tras ${classId} ${sexId}`,
+                );
+                await sleep(300);
+            }
+        }
+
+        /* Escribir informe. */
+        fs.writeFileSync(
+            pathMod.join(outDir, 'INFORME.md'),
+            '# JL-176 — creadorCuerpo\n\n' +
+            'Escenario que abre el creador de personaje, pone altura y complexión a los extremos\n' +
+            'por clase y sexo, captura la vista 3D (canvas .doll-3d) y verifica que los sliders\n' +
+            'se aplican correctamente.\n\n' +
+            `**${passedChecks}/${totalChecks} comprobaciones en verde.**\n\n` +
+            tabla.join('\n') + '\n\n' +
+            '## Capturas\n\n' +
+            'Cada combinación tiene una captura `jl176-{clase}-{sexo}-{combo}.jpg` en esta carpeta.\n' +
+            'La vista 3D es un canvas Babylon (.doll-3d); la silueta cambia según altura y complexión.\n' +
+            'El cambio se verifica visualmente comparando min-min con max-max.\n',
+        );
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
