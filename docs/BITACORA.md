@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-151: lint limpio en archivos de JL-59…108 (Junie)
+
+**Archivos:** `scripts/audit/nombreModelo.ts`, `src/render/arenaView.ts`, `src/render/dungeonView.ts`, `src/ui/map/hudLayout.ts`, `src/ui/menus/screens/modals.ts`, `src/world/dungeon.ts`, `tests/jl103_cameraModeLabel.test.ts`, `tests/jl60_aspectDefaults.test.ts`, `tests/jl67_secondaryPhysics.test.ts`, `tests/jl70_secondaryIntegration.test.ts`, `tests/jl88_cryptProps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** 13 warnings `no-unused-vars` en los archivos que tocaron JL-59…108. Cada uno se corrigió con el mínimo cambio: importar sin usar → quitar del import; variable sin usar → prefijo `_`; función sin usar → quitar del import. Los archivos de OMP (`scripts/blender/**`) y los archivos ajenos (`scripts/balance/**`, `scripts/audit/mapGeo.ts`) no se tocaron.
+
+**Cómo se verificó:** `npm run lint` sobre los 47 archivos de JL-59…108 → 0 warnings en mis archivos (los 165 warnings restantes son de archivos ajenos: mapGeo, auditBuilds, auditCombat, caps, balM3, falcopamasHuacas). Suite 3715/3715, tsc limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-22 — JL-150: escenario etiquetaCamara — toggle de la etiqueta del modo de cámara (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

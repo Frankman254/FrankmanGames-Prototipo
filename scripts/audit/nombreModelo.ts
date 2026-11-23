@@ -99,7 +99,7 @@ function expectedTypeForTemplate(template: string): string {
 // Evalúa si hay discordancia entre nombre y template
 function evaluateMismatch(id: string, name: string, template: string, glb: string): Mismatch {
     const classification = classifyByName(name);
-    const templateType = expectedTypeForTemplate(template);
+    const _templateType = expectedTypeForTemplate(template);
 
     // Si el template no es genérico, es específico → OK
     if (!GENERIC_TEMPLATES.has(template)) {

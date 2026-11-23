@@ -90,7 +90,6 @@ describe('JL-88: utilería de la cripta', () => {
     it('generateFloor produce props en los pisos a mano', () => {
         for (let i = 0; i < 5; i++) {
             const floor = generateFloor(def, i);
-            const designed = def.floors[i];
             // Los 5 primeros pisos son hand
             const handFloor = designedDungeonJson.floors[i];
             if (handFloor?.mode === 'hand') {

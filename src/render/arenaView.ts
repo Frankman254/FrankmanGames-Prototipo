@@ -10,7 +10,6 @@ import {
     Vector3,
     TransformNode,
     type LinesMesh,
-    type StandardMaterial,
     type Mesh,
 } from '@babylonjs/core';
 import type { GameData } from '../data';
@@ -169,7 +168,7 @@ export class ArenaView {
 
         this.rig = new CameraRig(this.scene, data.camera);
 
-        const z = data.zone;
+        const _z = data.zone;
         this.heights = overworld.heights;
         useLinearFog(this.scene);
         const biomes = overworld.vegetation.biomes;

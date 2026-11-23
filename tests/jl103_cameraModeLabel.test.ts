@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DEFAULT_OPTIONS, normalizeOptions, type GameOptions } from '../src/ui/menus/saveStore';
 import { CAMERA_MODE_SHORT } from '../src/ui/menus/screens/modals';
-import { CAMERA_MODES, type CameraMode } from '../src/camera';
+import { CAMERA_MODES } from '../src/camera';
 
 describe('JL-103: opción showCameraModeLabel', () => {
     it('DEFAULT_OPTIONS tiene showCameraModeLabel false', () => {

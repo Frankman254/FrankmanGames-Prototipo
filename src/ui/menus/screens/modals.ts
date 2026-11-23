@@ -168,7 +168,7 @@ const BAR_NAMES: Record<EnemyBarMode, string> = {
     nunca: 'Nunca',
 };
 
-const CAST_MODE_HINTS: Record<CastMode, string> = {
+const _CAST_MODE_HINTS: Record<CastMode, string> = {
     pressClick: tr('Pulsa la tecla para apuntar, luego pulsa de nuevo o haz clic para lanzar. Esc o clic derecho cancelan.'),
     indicator: tr('Mantén la tecla pulsada para ver el área de efecto, suéltala para lanzar. Esc o clic derecho cancelan.'),
     press: tr('Pulsa la tecla y el hechizo sale al instante hacia donde apunta el cursor. Sin vista previa.'),

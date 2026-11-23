@@ -21,7 +21,6 @@ import {
     validateDesignedFloor,
     type DesignedDungeonDef,
     type DesignedFloorDef,
-    type DesignedProp,
 } from './designedDungeon';
 
 /** Sala en baldosas: [x0, x0 + w) × [y0, y0 + h). */
@@ -450,7 +449,7 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
     const links: Array<[number, number]> = rooms.slice(1).map((_, i) => [i, i + 1]);
     const ts = DESIGNED_DUNGEON.tileSize || def.tileSize;
     const at = (tile: readonly [number, number]): Vec2 => tileToWorld(tile, ts);
-    const beside = ([c, r]: readonly [number, number]): Vec2 => {
+    const _beside = ([c, r]: readonly [number, number]): Vec2 => {
         for (const [dc, dr] of [
             [1, 0],
             [-1, 0],

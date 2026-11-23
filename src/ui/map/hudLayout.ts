@@ -10,7 +10,7 @@ import { artIconUrl } from '../menus/artIcons';
 export type HudLayoutHost = Pick<UiContext, 'toast' | 'confirm'>;
 import { button, h } from '../menus/dom';
 import { toFraction, type WindowLayout } from '../menus/windows';
-import { clampHudScale, clampHudScaleAxis, getDefaultPositions, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook, type HudScale } from './hudProfiles';
+import { clampHudScale, getDefaultPositions, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook, type HudScale } from './hudProfiles';
 import type { Minimap } from './minimap';
 
 export class HudLayout {

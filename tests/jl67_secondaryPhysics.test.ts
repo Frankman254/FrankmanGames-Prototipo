@@ -70,8 +70,8 @@ describe('JL-67: Motor de físicas secundarias', () => {
                 chain.update(dt, { x: 50, y: 0, z: 0 });
                 const positions = chain.update(0, { x: 0, y: 0, z: 0 });
                 // El ángulo entre el vector reposo (0,-0.3,0) y el vector actual debe ser ≤ 30°.
-                const dx = positions[0]!.x - 0;
-                const dy = positions[0]!.y - (-0.3);
+                const _dx = positions[0]!.x - 0;
+                const _dy = positions[0]!.y - (-0.3);
                 // El reposo apunta hacia abajo: (0, -0.3, 0).
                 // El desplazamiento desde el padre (0,0,0) es (pos.x, pos.y, pos.z).
                 const px = positions[0]!.x;

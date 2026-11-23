@@ -7,7 +7,6 @@ import {
     SecondaryPhysics,
     bodyInertiaLean,
     DEFAULT_CHAIN_CONFIG,
-    type Vec3,
 } from '../src/render/characters/secondaryPhysics';
 
 describe('JL-70: Integración de físicas secundarias', () => {

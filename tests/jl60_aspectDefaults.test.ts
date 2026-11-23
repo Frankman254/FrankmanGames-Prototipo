@@ -6,7 +6,6 @@ import {
     getDefaultPositions,
     checkDefaultPositionsOverlap,
     checkDefaultPositionsFit,
-    type AspectClass,
 } from '../src/ui/map/hudProfiles';
 
 describe('JL-60: clases de proporción', () => {
@@ -140,7 +139,7 @@ describe('JL-60: getDefaultPositions — estructura', () => {
         // 3440×1440 es 21:9. Zona segura: left=320, right=3120 (ancho 2800).
         // El minimap debe estar dentro de esa zona.
         const scaleX = 3440 / 2560;
-        const scaleY = 1440 / 1080;
+        const _scaleY = 1440 / 1080;
         const estW = Math.round(220 * scaleX);
         const fromF = (frac: number, size: number, view: number) => Math.round(frac * (view - size));
         const minimapX = fromF(pos['minimap']!.x, estW, 3440);

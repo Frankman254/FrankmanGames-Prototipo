@@ -348,7 +348,7 @@ export class DungeonFloorView {
         // Contrato O9: ancla en el plano de pared exacto, yaw = atan2(ny, nx),
         // offset frontal 0 (la malla lo lleva). La luz sigue con offset 0.5 m.
         const torchY = wh * 0.62;
-        const TORCH_BRACKET_OFFSET = 0; // O9: el modelo ya no necesita asomarse
+        const _TORCH_BRACKET_OFFSET = 0; // O9: el modelo ya no necesita asomarse
         const TORCH_FLAME_OFFSET = 0; // O9: el modelo ya no necesita asomarse
         const TORCH_LAMP_OFFSET = 0.5; // luz más delante para iluminar la sala
         const bracket = own(staticMesh(scene, 'd_antorcha', 'dTorch'));
