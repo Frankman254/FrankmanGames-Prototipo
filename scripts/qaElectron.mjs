@@ -187,7 +187,9 @@ async function until(expr, ms = 15000, label = expr) {
     }
     // Qué dijo el juego mientras se esperaba (consola oculta, F8): errores y avisos al jugador.
     const said = await js(`window.__consola ? window.__consola.text(6) : ''`).catch(() => '');
-    throw new Error(`Tiempo agotado esperando: ${label}${said ? `\n  Consola del juego:\n  ${said.split('\n').join('\n  ')}` : ''}`);
+    throw new Error(
+        `Tiempo agotado esperando: ${label}${said ? `\n  Consola del juego:\n  ${said.split('\n').join('\n  ')}` : ''}`,
+    );
 }
 
 /**
@@ -304,8 +306,8 @@ async function key(code, keyName = code.replace(/^Key|^Digit/, '').toLowerCase()
                     : code === 'F8'
                       ? 119
                       : code === 'Space'
-                      ? 32
-                      : 0;
+                        ? 32
+                        : 0;
     const base = { code, key: code === 'Escape' ? 'Escape' : keyName, windowsVirtualKeyCode: vk };
     await cdp('Input.dispatchKeyEvent', { ...base, type: 'rawKeyDown' });
     await cdp('Input.dispatchKeyEvent', { ...base, type: 'keyUp' });
@@ -429,12 +431,18 @@ async function newGame(name, { island = false, crossed = false, devMount = false
     if (name !== asked) console.log(`     (nombre «${asked}» → «${name}»: el juego admite 2–16 letras)`);
     // JL-50: resetear idioma a español antes de cada partida, para que el escenario `ingles`
     // no deje los siguientes buscando "Nueva partida" en inglés.
-    await js(`(()=>{ try{ const o=JSON.parse(localStorage.getItem('frankmangames.options')||'null'); if(o){o.language='es'; localStorage.setItem('frankmangames.options',JSON.stringify(o)); } }catch(e){} })()`);
+    await js(
+        `(()=>{ try{ const o=JSON.parse(localStorage.getItem('frankmangames.options')||'null'); if(o){o.language='es'; localStorage.setItem('frankmangames.options',JSON.stringify(o)); } }catch(e){} })()`,
+    );
     // JL-73: borrar las posiciones del HUD guardadas para que cada escenario use las por defecto.
-    await js(`(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); if(s){ for(const p of (s.profiles||[])) p.positions={}; localStorage.setItem('frankmangames.hudProfiles',JSON.stringify(s)); } }catch(e){} })()`);
+    await js(
+        `(()=>{ try{ const s=JSON.parse(localStorage.getItem('frankmangames.hudProfiles')||'null'); if(s){ for(const p of (s.profiles||[])) p.positions={}; localStorage.setItem('frankmangames.hudProfiles',JSON.stringify(s)); } }catch(e){} })()`,
+    );
     // JL-78: vaciar las 12 ranuras de guardado y sus backups para que balance45, criticoV3
     // y cualquier otro escenario no fallen por falta de ranura libre.
-    await js(`(()=>{ for(let i=0;i<12;i++){ localStorage.removeItem('frankmangames.save.'+i); localStorage.removeItem('frankmangames.backup.v1.'+i); localStorage.removeItem('frankmangames.backup.v2.'+i); localStorage.removeItem('frankmangames.backup.slot.'+i); } })()`);
+    await js(
+        `(()=>{ for(let i=0;i<12;i++){ localStorage.removeItem('frankmangames.save.'+i); localStorage.removeItem('frankmangames.backup.v1.'+i); localStorage.removeItem('frankmangames.backup.v2.'+i); localStorage.removeItem('frankmangames.backup.slot.'+i); } })()`,
+    );
     // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
     // JL-73: recargar para que las nuevas posiciones por defecto se apliquen.
     if (!firstGame) await cdp('Page.navigate', { url });
@@ -470,7 +478,9 @@ async function newGame(name, { island = false, crossed = false, devMount = false
         );
     }
     // JL-50: clic por data-testid, no por texto (el idioma puede ser inglés).
-    const newGameBtn = await js(`(()=>{ const b=document.querySelector('[data-testid="new-game"]'); if(!b) return null; const r=b.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+    const newGameBtn = await js(
+        `(()=>{ const b=document.querySelector('[data-testid="new-game"]'); if(!b) return null; const r=b.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`,
+    );
     if (!newGameBtn) throw new Error('No está visible: button[data-testid="new-game"]');
     await mouse(newGameBtn.x, newGameBtn.y);
     await sleep(120);
@@ -1130,10 +1140,7 @@ const scenarios = {
 
         // Verificar que la música vuelve a la del pueblo.
         await until(`__audio?.contextMusic?.active==='town'`, 15000, 'música vuelve al pueblo');
-        check(
-            'JL-109: la música vuelve al pueblo tras revivir',
-            await js(`__audio.contextMusic.active==='town'`),
-        );
+        check('JL-109: la música vuelve al pueblo tras revivir', await js(`__audio.contextMusic.active==='town'`));
 
         // Verificar que el HUD no tiene solapes.
         const faults = await uiFaults();
@@ -1524,7 +1531,10 @@ const scenarios = {
         await newGame('QA Audio Maz');
         await until(`window.__audio?.engine`, 10000, 'motor de audio');
         await until(`__audio.contextMusic?.active==='town'`, 15000, 'música de pueblo');
-        check('Audio pueblo: la partida empieza en un pueblo con su canción', await js(`__audio.contextMusic.activeTrack==='town'`));
+        check(
+            'Audio pueblo: la partida empieza en un pueblo con su canción',
+            await js(`__audio.contextMusic.activeTrack==='town'`),
+        );
         // Pelea: la misma ventana de tensión que dejan los enemigos en combate (threatHoldSeconds).
         await js(`__audio.threatHold=4`);
         await until(`__audio.contextMusic?.active==='town_fight'`, 15000, 'música de pelea en pueblo');
@@ -1654,7 +1664,11 @@ const scenarios = {
         check('B01: frankmanDesktop IPC existe', ipcExists);
 
         const ipcReply = await js('window.frankmanDesktop?.isFullScreen?.() ?? "no_reply"');
-        check('B01: isFullScreen responde (valor sin display: false)', ipcReply === false || ipcReply === 'no_reply', String(ipcReply));
+        check(
+            'B01: isFullScreen responde (valor sin display: false)',
+            ipcReply === false || ipcReply === 'no_reply',
+            String(ipcReply),
+        );
 
         // B01-2: applyFullscreen está conectado — verificamos que la opción existe en el juego.
         // Las opciones se guardan en localStorage con prefijo frankmangames.save.
@@ -1665,7 +1679,11 @@ const scenarios = {
           }
           return 'not_found';
         })()`);
-        check('B01: opción fullscreen existe en opciones guardadas', fsOption === false || fsOption === true || fsOption === 'not_found', String(fsOption));
+        check(
+            'B01: opción fullscreen existe en opciones guardadas',
+            fsOption === false || fsOption === true || fsOption === 'not_found',
+            String(fsOption),
+        );
 
         // B01-3: El juego expone la acción 'fullscreen' en handleAction (verificado por código).
         // Sin display, verificamos que applyFullscreen no lanza errores.
@@ -1689,7 +1707,11 @@ const scenarios = {
             return 'not_accessible';
           } catch(e) { return 'error'; }
         })()`);
-        check('B01: opciones del juego accesibles', gameFs === false || gameFs === true || gameFs === 'not_accessible', String(gameFs));
+        check(
+            'B01: opciones del juego accesibles',
+            gameFs === false || gameFs === true || gameFs === 'not_accessible',
+            String(gameFs),
+        );
 
         // B01-4: El evento fullscreenchange está escuchado (verificar que el listener existe en el DOM).
         const listenerExists = await js('document.fullscreenElement === null');
@@ -1917,15 +1939,13 @@ const scenarios = {
         await sleep(300);
         check(
             'Barra: fijada, las asas se ocultan',
-            await js(`(()=>{const g=document.querySelector('.hud-frame > .hud-grip'); return g?getComputedStyle(g).display==='none':true;})()`),
+            await js(
+                `(()=>{const g=document.querySelector('.hud-frame > .hud-grip'); return g?getComputedStyle(g).display==='none':true;})()`,
+            ),
         );
         // JL-74b: conservación verificada por el perfil guardado en localStorage.
         // La posición se restaura al cargar la partida porque el perfil la tiene.
-        check(
-            'Barra: se conserva al volver a entrar',
-            saved,
-            `hud-sec-character en perfil: ${saved}`,
-        );
+        check('Barra: se conserva al volver a entrar', saved, `hud-sec-character en perfil: ${saved}`);
         await tool('Unir la barra');
         await sleep(300);
         check(
@@ -2069,7 +2089,9 @@ const scenarios = {
         const door = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).filter(n=>n.name.endsWith('FG_Casa_Puerta')).map(n=>Math.round(Math.abs(n.rotationQuaternion?.y ?? 0)*100))`;
         await place(110, 141.8);
         // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
-        await js(`__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`);
+        await js(
+            `__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`,
+        );
         await js('void __game.view.rig.jumpTo(8)');
         await sleep(1600);
         check('Modelos: puerta abierta al acercarse', await js(`${door}.some(v=>v>30)`), await js(`${door}.join()`));
@@ -2116,7 +2138,11 @@ const scenarios = {
         const caretaBase = await js(
             `__game.view.scene.animationGroups.filter(g=>!/Mascara(On|Off)$/.test(g.name) && g.targetedAnimations.some(t=>{const n=t.target&&t.target.name;return n==='careta'||(n&&n.endsWith(':careta'))})).map(g=>g.name)`,
         );
-        check('Espeja: Reposo/Danzas no animan la careta (sin pop)', caretaBase.length === 0, JSON.stringify(caretaBase));
+        check(
+            'Espeja: Reposo/Danzas no animan la careta (sin pop)',
+            caretaBase.length === 0,
+            JSON.stringify(caretaBase),
+        );
         const caretaGesto = await js(
             `__game.view.scene.animationGroups.filter(g=>/Mascara(On|Off)$/.test(g.name) && g.targetedAnimations.some(t=>{const n=t.target&&t.target.name;return n==='careta'||(n&&n.endsWith(':careta'))})).map(g=>g.name).length`,
         );
@@ -2130,7 +2156,9 @@ const scenarios = {
         await js('void __game.view.rig.setFraming("default")');
         await sleep(1500);
         // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
-        await js(`__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`);
+        await js(
+            `__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`,
+        );
         await js('void __game.view.rig.jumpTo(8)');
         await sleep(2200);
         await shot('espeja-pueblo');
@@ -2141,24 +2169,43 @@ const scenarios = {
         const name = await newGame('QA Nombre Larguísimo 123');
         check('Consola: un nombre largo con números se adapta y la partida empieza', name === 'QA Nombre Larguí', name);
         // Un hechizo bloqueado: el juego avisa al jugador y el aviso queda en la consola.
-        await js(`console.warn('QA: advertencia de prueba'); setTimeout(()=>{ throw new Error('QA: error de prueba'); }, 0)`);
+        await js(
+            `console.warn('QA: advertencia de prueba'); setTimeout(()=>{ throw new Error('QA: error de prueba'); }, 0)`,
+        );
         await sleep(300);
         const txt = await js(`window.__consola.text(20)`);
-        check('Consola: recoge advertencias y errores sin capturar', /WARN QA: advertencia de prueba/.test(txt) && /ERROR .*QA: error de prueba/.test(txt), txt);
+        check(
+            'Consola: recoge advertencias y errores sin capturar',
+            /WARN QA: advertencia de prueba/.test(txt) && /ERROR .*QA: error de prueba/.test(txt),
+            txt,
+        );
         consoleErrors.length = 0; // el error de arriba es provocado
         await key('F8', 'F8');
         await sleep(300);
-        const open = await js(`(() => { const e=document.querySelector('.dev-console'); return e && !e.hidden ? e.textContent : null; })()`);
-        check('Consola: F8 la abre con los mensajes', !!open && open.includes('QA: advertencia de prueba'), String(open).slice(0, 120));
+        const open = await js(
+            `(() => { const e=document.querySelector('.dev-console'); return e && !e.hidden ? e.textContent : null; })()`,
+        );
+        check(
+            'Consola: F8 la abre con los mensajes',
+            !!open && open.includes('QA: advertencia de prueba'),
+            String(open).slice(0, 120),
+        );
         await shot('consola-f8');
         await key('F8', 'F8');
-        check('Consola: F8 la cierra (y no deja franja en pantalla)', await js(`(()=>{const e=document.querySelector('.dev-console'); return e.hidden && e.offsetParent===null && e.getBoundingClientRect().height===0;})()`));
+        check(
+            'Consola: F8 la cierra (y no deja franja en pantalla)',
+            await js(
+                `(()=>{const e=document.querySelector('.dev-console'); return e.hidden && e.offsetParent===null && e.getBoundingClientRect().height===0;})()`,
+            ),
+        );
     },
 
     /** 2026-11-17: Estrella de vendaval (área star) congelaba el render; el dibujo debe seguir. */
     async estrella() {
         await newGame('QA Estrella', { classId: 'mangrove_hunter' });
-        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+        await js(
+            `window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`,
+        );
         await js(`(() => { const w=${W}; const c=w.character; c.level=Math.max(c.level,10); c.spellbook.level=c.level; c.spellbook.rank('gale_star') || c.spellbook.learn('gale_star');
       const e=w.spawnEnemy('melee',{x:w.player.pos.x+5,y:w.player.pos.y}); e.state='stagger'; e.stateTime=-1e9; e.health=1e6; window.__qaDummy=e.id; })()`);
         await sleep(300);
@@ -2439,10 +2486,12 @@ const scenarios = {
             await js('void __game.view.rig.setFraming("default")');
             await sleep(800);
             await js('void __game.view.rig.setFraming("default")');
-        await sleep(1500);
-        // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
-        await js(`__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`);
-        await js('void __game.view.rig.jumpTo(8)');
+            await sleep(1500);
+            // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
+            await js(
+                `__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`,
+            );
+            await js('void __game.view.rig.jumpTo(8)');
             await sleep(900);
             await shot(`enemigo-${name}`);
         }
@@ -3515,11 +3564,7 @@ const scenarios = {
         await js(
             `(()=>{ const c=${W}.character; let it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba'); if(!it){c.give('mount_dev_crestalba'); it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba');} return ${S}.equip(it.uid, 'mount'); })()`,
         );
-        await until(
-            `__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`,
-            15000,
-            'modelo Crestalba',
-        );
+        await until(`__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`, 15000, 'modelo Crestalba');
         await sleep(1800);
         const loaded = await js(
             `(()=>{ const s=__game.view.scene; return { meshes:s.meshes.filter(m=>m.name.startsWith('mount:')).length, clips:s.animationGroups.filter(g=>g.name.startsWith('mount:')).map(g=>g.name.split(':').at(-1)), rider:s.transformNodes.some(n=>n.name.endsWith('rider_root')), fps:+s.getEngine().getFps().toFixed(1) }; })()`,
@@ -3718,7 +3763,11 @@ const scenarios = {
             full.pipsOnIcon > 0 && full.outsideInfo === 0,
             JSON.stringify({ pipsOnIcon: full.pipsOnIcon }),
         );
-        check('HZ-UI-01: la escalera cabe en una línea en todas las cartas', full.ladderOneLine === true, JSON.stringify({ ladderOneLine: full.ladderOneLine }));
+        check(
+            'HZ-UI-01: la escalera cabe en una línea en todas las cartas',
+            full.ladderOneLine === true,
+            JSON.stringify({ ladderOneLine: full.ladderOneLine }),
+        );
         check('HZ-UI-01: el icono mide ≈ 56 px', Math.abs(full.iconW - 56) < 2, `${full.iconW}`);
         // Acotado al libro: que la ventana quepa y ninguna carta desborde su
         // columna (no se mide el solape chat↔barra, que es del HUD/BAR-01).
@@ -4064,32 +4113,50 @@ const scenarios = {
         await fullscreen();
         await sleep(5000);
         const fps = (ms) =>
-            js(`new Promise(r=>{ let n=0; const t0=performance.now(); const f=()=>{ n++; if(performance.now()-t0<${ms}) requestAnimationFrame(f); else r(+(n*1000/(performance.now()-t0)).toFixed(1)); }; requestAnimationFrame(f); })`);
+            js(
+                `new Promise(r=>{ let n=0; const t0=performance.now(); const f=()=>{ n++; if(performance.now()-t0<${ms}) requestAnimationFrame(f); else r(+(n*1000/(performance.now()-t0)).toFixed(1)); }; requestAnimationFrame(f); })`,
+            );
         const out = { cerrada: await fps(4000) };
         await key('KeyB', 'b');
         await until(`!!document.querySelector('.panel-inventory .doll-3d')?.offsetParent`, 5000, 'vista 3D');
         await sleep(3500);
-        await js(`(async()=>{ window.__qaPrev=(await import('/src/render/characterPreview.ts')).CharacterPreview; })()`);
+        await js(
+            `(async()=>{ window.__qaPrev=(await import('/src/render/characterPreview.ts')).CharacterPreview; })()`,
+        );
         const f0 = await js(`__qaPrev.active?.frames ?? -1`);
         out.abierta = await fps(4000);
         out.previa = +(((await js(`__qaPrev.active?.frames ?? -1`)) - f0) / 4).toFixed(1);
         out.mallas = await js(`__qaPrev.active ? __qaPrev.active.scene?.meshes?.length ?? 'privado' : -1`);
         await shot('inv3d-frente');
-        const r = await js(`(()=>{ const b=document.querySelector('.doll-3d').getBoundingClientRect(); return {x:b.x+b.width/2,y:b.y+b.height/2}; })()`);
+        const r = await js(
+            `(()=>{ const b=document.querySelector('.doll-3d').getBoundingClientRect(); return {x:b.x+b.width/2,y:b.y+b.height/2}; })()`,
+        );
         // Vídeo: 3 s quieto (respira), giro arrastrando y otro rato hasta el gesto.
         let n = 0;
         const frame = async () => shot(`inv3d-video-${String(n++).padStart(3, '0')}`);
-        for (let i = 0; i < 12; i++) { await frame(); await sleep(150); }
+        for (let i = 0; i < 12; i++) {
+            await frame();
+            await sleep(150);
+        }
         await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: r.x, y: r.y, button: 'left', clickCount: 1 });
         for (let i = 1; i <= 24; i++) {
             await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r.x + i * 5, y: r.y, button: 'left' });
             await sleep(60);
             if (i % 2 === 0) await frame();
         }
-        await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: r.x + 120, y: r.y, button: 'left', clickCount: 1 });
+        await cdp('Input.dispatchMouseEvent', {
+            type: 'mouseReleased',
+            x: r.x + 120,
+            y: r.y,
+            button: 'left',
+            clickCount: 1,
+        });
         await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 500 });
         await shot('inv3d-girado');
-        for (let i = 0; i < 60; i++) { await frame(); await sleep(150); }
+        for (let i = 0; i < 60; i++) {
+            await frame();
+            await sleep(150);
+        }
         await shot('inv3d-gesto');
         console.log('     inventario3d', JSON.stringify(out));
         check('UI-06: la vista 3D dibuja con la mochila abierta', out.previa > 10, JSON.stringify(out));
@@ -4103,7 +4170,9 @@ const scenarios = {
 
     /** EQ-10: el ajuar de La Espeja (8 piezas a medida) puesto en cada héroe, de frente y de espaldas. */
     async diablica() {
-        const ids = ['head', 'chest', 'amulet', 'waist', 'hands', 'feet', 'back', 'staff'].map((s) => `diablica_espeja_${s}`);
+        const ids = ['head', 'chest', 'amulet', 'waist', 'hands', 'feet', 'back', 'staff'].map(
+            (s) => `diablica_espeja_${s}`,
+        );
         for (const classId of ['ember_vanguard', 'storm_weaver', 'mangrove_hunter']) {
             await newGame('QA Diablica', { classId });
             await resize(1600, 1000);
@@ -4113,8 +4182,14 @@ const scenarios = {
             for (const sex of ['masculino', 'femenino']) {
                 if (sex === 'femenino') await js(`${S}.character.sex='femenino'`);
                 await sleep(2500);
-                const puestas = await js(`(()=>{ const n=new Set(); for (const m of __game.view.scene.meshes){ if(!m.isEnabled()) continue; const r=/obj_(diablica_espeja_[a-z]+)/.exec(m.name); if(r) n.add(r[1]); } return [...n].sort(); })()`);
-                check(`EQ-10: las 8 piezas se ven puestas (${classId}, ${sex})`, puestas.length === 8, JSON.stringify(puestas));
+                const puestas = await js(
+                    `(()=>{ const n=new Set(); for (const m of __game.view.scene.meshes){ if(!m.isEnabled()) continue; const r=/obj_(diablica_espeja_[a-z]+)/.exec(m.name); if(r) n.add(r[1]); } return [...n].sort(); })()`,
+                );
+                check(
+                    `EQ-10: las 8 piezas se ven puestas (${classId}, ${sex})`,
+                    puestas.length === 8,
+                    JSON.stringify(puestas),
+                );
                 await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=8; r.distance=3.2; })()`);
                 await sleep(700);
                 await shot(`eq10-${classId}-${sex}-frente`);
@@ -4137,10 +4212,19 @@ const scenarios = {
         await key('KeyB', 'b');
         await until(`!!document.querySelector('.panel-inventory .doll-3d')?.offsetParent`, 5000, 'vista 3D');
         const medir = () =>
-            js(`(()=>{ const q=(s)=>document.querySelector('.panel-inventory '+s).getBoundingClientRect(); const e=q('.equip-col'), b=q('.bag-col'), c=q('.doll-3d'), p=q('.doll .eq-head'), d=document.querySelector('.panel-inventory').getBoundingClientRect(); return {ventana:[Math.round(d.width),Math.round(d.height)], equipo:Math.round(e.width), mochila:Math.round(b.width), personaje:[Math.round(c.width),Math.round(c.height)], hueco:Math.round(p.width), casillas:document.querySelectorAll('.panel-inventory .inv-grid .cell').length, columnas:getComputedStyle(document.querySelector('.panel-inventory .inv-grid')).gridTemplateColumns.split(' ').length, casilla:Math.round(q('.inv-grid .cell').width)}; })()`);
+            js(
+                `(()=>{ const q=(s)=>document.querySelector('.panel-inventory '+s).getBoundingClientRect(); const e=q('.equip-col'), b=q('.bag-col'), c=q('.doll-3d'), p=q('.doll .eq-head'), d=document.querySelector('.panel-inventory').getBoundingClientRect(); return {ventana:[Math.round(d.width),Math.round(d.height)], equipo:Math.round(e.width), mochila:Math.round(b.width), personaje:[Math.round(c.width),Math.round(c.height)], hueco:Math.round(p.width), casillas:document.querySelectorAll('.panel-inventory .inv-grid .cell').length, columnas:getComputedStyle(document.querySelector('.panel-inventory .inv-grid')).gridTemplateColumns.split(' ').length, casilla:Math.round(q('.inv-grid .cell').width)}; })()`,
+            );
         const out = {};
-        for (const [name, w, h] of [['partida', 0, 0], ['grande', 1700, 1000], ['chica', 640, 420]]) {
-            if (w) await js(`(()=>{ const el=document.querySelector('.panel-inventory'); el.style.width='${w}px'; el.style.height='${h}px'; })()`);
+        for (const [name, w, h] of [
+            ['partida', 0, 0],
+            ['grande', 1700, 1000],
+            ['chica', 640, 420],
+        ]) {
+            if (w)
+                await js(
+                    `(()=>{ const el=document.querySelector('.panel-inventory'); el.style.width='${w}px'; el.style.height='${h}px'; })()`,
+                );
             await sleep(2500);
             out[name] = await medir();
             await shot(`mochila-${name}`);
@@ -4148,19 +4232,50 @@ const scenarios = {
         console.log('     mochila', JSON.stringify(out));
         for (const k of ['partida', 'grande']) {
             const o = out[k];
-            check(`UI-06b: mitad y mitad (${k})`, Math.abs(o.equipo - o.mochila) < 0.12 * o.ventana[0], JSON.stringify(o));
+            check(
+                `UI-06b: mitad y mitad (${k})`,
+                Math.abs(o.equipo - o.mochila) < 0.12 * o.ventana[0],
+                JSON.stringify(o),
+            );
         }
-        check('UI-06b: al agrandar crece el personaje', out.grande.personaje[1] > out.partida.personaje[1] * 1.4, JSON.stringify(out));
+        check(
+            'UI-06b: al agrandar crece el personaje',
+            out.grande.personaje[1] > out.partida.personaje[1] * 1.4,
+            JSON.stringify(out),
+        );
         check('UI-06b: al agrandar crecen los huecos', out.grande.hueco > out.partida.hueco, JSON.stringify(out));
-        check('UI-06b: no se achica de más (10 columnas en la chica)', out.chica.columnas === 10 && out.chica.ventana[0] > 640, JSON.stringify(out.chica));
-        check('UI-06b: grande = 10 columnas más grandes', out.grande.columnas === 10 && out.grande.casilla > out.partida.casilla * 1.5, JSON.stringify(out));
+        check(
+            'UI-06b: no se achica de más (10 columnas en la chica)',
+            out.chica.columnas === 10 && out.chica.ventana[0] > 640,
+            JSON.stringify(out.chica),
+        );
+        check(
+            'UI-06b: grande = 10 columnas más grandes',
+            out.grande.columnas === 10 && out.grande.casilla > out.partida.casilla * 1.5,
+            JSON.stringify(out),
+        );
         // Doble clic en algo equipado lo desequipa.
         const llenos = () => js(`document.querySelectorAll('.panel-inventory .doll .cell.filled').length`);
-        const centro = (sel) => js(`(()=>{ const b=document.querySelector('${sel}')?.getBoundingClientRect(); return b?{x:b.x+b.width/2,y:b.y+b.height/2}:null; })()`);
+        const centro = (sel) =>
+            js(
+                `(()=>{ const b=document.querySelector('${sel}')?.getBoundingClientRect(); return b?{x:b.x+b.width/2,y:b.y+b.height/2}:null; })()`,
+            );
         const doble = async (c) => {
             for (const n of [1, 2]) {
-                await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: n });
-                await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: n });
+                await cdp('Input.dispatchMouseEvent', {
+                    type: 'mousePressed',
+                    x: c.x,
+                    y: c.y,
+                    button: 'left',
+                    clickCount: n,
+                });
+                await cdp('Input.dispatchMouseEvent', {
+                    type: 'mouseReleased',
+                    x: c.x,
+                    y: c.y,
+                    button: 'left',
+                    clickCount: n,
+                });
             }
             await sleep(800);
         };
@@ -4173,31 +4288,56 @@ const scenarios = {
         if (c) await doble(c);
         const despues = await llenos();
         await shot('mochila-desequipada');
-        check('UI-06b: doble clic desequipa', !!c && antes > 0 && despues === antes - 1, JSON.stringify({ antes, despues }));
+        check(
+            'UI-06b: doble clic desequipa',
+            !!c && antes > 0 && despues === antes - 1,
+            JSON.stringify({ antes, despues }),
+        );
     },
 
     async luzModos() {
         await newGame('QA Luz');
         await fullscreen();
-        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+        await js(
+            `window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`,
+        );
         // El módulo que usa la escena (con su sello de recarga, si lo hay), no una copia nueva.
-        await js(`(async()=>{ const s=await (await fetch('/src/render/atmosphere.ts')).text(); window.__qaDv=await import(s.match(/from "(\\/src\\/render\\/devVisual\\.ts[^"]*)"/)[1]); })()`);
+        await js(
+            `(async()=>{ const s=await (await fetch('/src/render/atmosphere.ts')).text(); window.__qaDv=await import(s.match(/from "(\\/src\\/render\\/devVisual\\.ts[^"]*)"/)[1]); })()`,
+        );
         await sleep(3000);
         const out = {};
-        for (const [hora, t] of [['dia', 0.45], ['noche', 0.85]]) {
-            await js(`(()=>{ const w=${W}; w.timeScale=0; w.timeOfDay=${t}; const p=w.player, g=w.grid, a=g.center(g.nearestWalkable({x:126,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        for (const [hora, t] of [
+            ['dia', 0.45],
+            ['noche', 0.85],
+        ]) {
+            await js(
+                `(()=>{ const w=${W}; w.timeScale=0; w.timeOfDay=${t}; const p=w.player, g=w.grid, a=g.center(g.nearestWalkable({x:126,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+            );
             await sleep(2500);
-            for (const [modo, heroe] of [['original', false], ['vivo', true], ['claro', true], ['calido', true], ['vivo', false]]) {
+            for (const [modo, heroe] of [
+                ['original', false],
+                ['vivo', true],
+                ['claro', true],
+                ['calido', true],
+                ['vivo', false],
+            ]) {
                 await js(`__qaDv.setDevVisual({lightMode:'${modo}',heroLight:${heroe}})`);
                 await sleep(1500);
                 const name = `luz-${hora}-${modo}${heroe ? '' : '-sinheroe'}`;
-                out[name] = await js(`(()=>{ const a=__game.view.atmosphere; return {ambiente:+a.ambient.intensity.toFixed(3), sol:+a.sun.intensity.toFixed(3), heroe:a.playerLight.isEnabled()?+a.playerLight.intensity.toFixed(2):0}; })()`);
+                out[name] = await js(
+                    `(()=>{ const a=__game.view.atmosphere; return {ambiente:+a.ambient.intensity.toFixed(3), sol:+a.sun.intensity.toFixed(3), heroe:a.playerLight.isEnabled()?+a.playerLight.intensity.toFixed(2):0}; })()`,
+                );
                 await shot(name);
             }
         }
         await js(`__qaDv.setDevVisual({lightMode:'vivo',heroLight:true}); clearInterval(window.__qaVida)`);
         console.log('     luz', JSON.stringify(out));
-        check('LUZ-02: el modo cambia la luz ambiente', out['luz-dia-vivo'].ambiente > out['luz-dia-original-sinheroe'].ambiente, JSON.stringify(out));
+        check(
+            'LUZ-02: el modo cambia la luz ambiente',
+            out['luz-dia-vivo'].ambiente > out['luz-dia-original-sinheroe'].ambiente,
+            JSON.stringify(out),
+        );
     },
 
     async sondaSucio() {
@@ -4207,29 +4347,52 @@ const scenarios = {
         const probe = `(()=>{ const sc=__game.view.scene; let P=Object.getPrototypeOf(sc.materials[0]); while(P && !Object.prototype.hasOwnProperty.call(P,'_markAllSubMeshesAsDirty')) P=Object.getPrototypeOf(P);
           const m=window.__qaDirty=new Map(); const f=P._markAllSubMeshesAsDirty; P._markAllSubMeshesAsDirty=function(cb){ const st=new Error().stack.split(String.fromCharCode(10)).slice(2,9).map(l=>{ const w=l.trim().split(' '); const u=(w[w.length-1]||'').split('/').pop().split('?')[0].replace(')',''); const q=(w[w.length-1]||'').split(':'); return (w.length>2?w[1]:'')+'@'+u.split(':')[0]+':'+q[q.length-2]; }).join(' < '); m.set(st,(m.get(st)??0)+1); return f.call(this,cb); }; })()`;
         await shot(`sonda-pueblo-${process.env.QA_ETIQUETA ?? 'ultima'}`);
-        const tipos = await js(`(()=>{ const r={}; for (const x of __game.view.scene.meshes) { const k=x.name.split(':')[0]; if(!/guayacan|indio|corotu|palma|arbol_panama|casa/.test(k)) continue; const t=k+(x.isAnInstance?' inst':x.skeleton?' huesos':x.morphTargetManager?' morph':' clon'); r[t]=(r[t]??0)+1; } return r; })()`);
+        const tipos = await js(
+            `(()=>{ const r={}; for (const x of __game.view.scene.meshes) { const k=x.name.split(':')[0]; if(!/guayacan|indio|corotu|palma|arbol_panama|casa/.test(k)) continue; const t=k+(x.isAnInstance?' inst':x.skeleton?' huesos':x.morphTargetManager?' morph':' clon'); r[t]=(r[t]??0)+1; } return r; })()`,
+        );
         console.log('TIPOS', JSON.stringify(tipos));
-        const mallas = await js(`(()=>{ const sc=__game.view.scene, m=sc.meshes; const pre={}; for (const x of m) { if(!x.isEnabled()||!x.isVisible) continue; const k=x.name.replace(/[0-9.]+$/,'').slice(0,18); pre[k]=(pre[k]??0)+1; } return {total:m.length, activas:m.filter(x=>x.isEnabled()&&x.isVisible).length, congeladas:m.filter(x=>x.isWorldMatrixFrozen).length, conHuesos:m.filter(x=>x.skeleton).length, instancias:m.filter(x=>x.isAnInstance).length, top:Object.entries(pre).sort((a,b)=>b[1]-a[1]).slice(0,15)}; })()`);
+        const mallas = await js(
+            `(()=>{ const sc=__game.view.scene, m=sc.meshes; const pre={}; for (const x of m) { if(!x.isEnabled()||!x.isVisible) continue; const k=x.name.replace(/[0-9.]+$/,'').slice(0,18); pre[k]=(pre[k]??0)+1; } return {total:m.length, activas:m.filter(x=>x.isEnabled()&&x.isVisible).length, congeladas:m.filter(x=>x.isWorldMatrixFrozen).length, conHuesos:m.filter(x=>x.skeleton).length, instancias:m.filter(x=>x.isAnInstance).length, top:Object.entries(pre).sort((a,b)=>b[1]-a[1]).slice(0,15)}; })()`,
+        );
         console.log('MALLAS', JSON.stringify(mallas));
         check('Sonda: hay mallas activas en el pueblo', mallas.activas > 0, JSON.stringify(mallas));
         await js(probe);
         await sleep(3000);
-        const puebloDirty = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
+        const puebloDirty = await js(
+            `[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`,
+        );
         const puebloCount = await js(`window.__qaDirty.size`);
         console.log('PUEBLO', puebloDirty.join(' | '));
         // 0 llamadas = materiales bien congelados (freeze). Cualquier cifra es valida.
-        check('Sonda: la sonda se instalo y reporto en el pueblo', typeof puebloCount === 'number', `dirtyCalls=${puebloCount} (0 = freeze activo)`);
+        check(
+            'Sonda: la sonda se instalo y reporto en el pueblo',
+            typeof puebloCount === 'number',
+            `dirtyCalls=${puebloCount} (0 = freeze activo)`,
+        );
         await js(`window.__qaDirty.clear(); ${S}.energy.value=20; __game.crypt.enter(19,'above')`);
         await until(`__game.crypt.floor===19`, 15000, 'piso');
         await sleep(6000);
         await js(`window.__qaDirty.clear()`);
         await sleep(3000);
-        const piso20Dirty = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
+        const piso20Dirty = await js(
+            `[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`,
+        );
         const piso20Count = await js(`window.__qaDirty.size`);
         console.log('PISO20', piso20Dirty.join(' | '));
-        check('Sonda: la sonda se instalo y reporto en el piso 20', typeof piso20Count === 'number', `dirtyCalls=${piso20Count} (0 = freeze activo)`);
+        check(
+            'Sonda: la sonda se instalo y reporto en el piso 20',
+            typeof piso20Count === 'number',
+            `dirtyCalls=${piso20Count} (0 = freeze activo)`,
+        );
         // Guardar informe JSON para referencia (igual que rendimientoHondo).
-        const out = { tipos, mallas, pueblo: puebloDirty, piso20: piso20Dirty, puebloDirtyCount: puebloCount, piso20DirtyCount: piso20Count };
+        const out = {
+            tipos,
+            mallas,
+            pueblo: puebloDirty,
+            piso20: piso20Dirty,
+            puebloDirtyCount: puebloCount,
+            piso20DirtyCount: piso20Count,
+        };
         fs.writeFileSync(
             path.join(OUT, `sonda-sucio-${process.env.QA_ETIQUETA ?? 'ultima'}.json`),
             JSON.stringify(out, null, 1),
@@ -4986,9 +5149,7 @@ const scenarios = {
 
         // JL-113: ciclo ▶ Probar / ⏹ Stop en el editor de mazmorra.
         // Guarda la posición de la copia antes de Play Mode.
-        const copyPosBefore = await js(
-            `__game.editor.objects().find(o=>o.key===${JSON.stringify(copy0?.key)})`,
-        );
+        const copyPosBefore = await js(`__game.editor.objects().find(o=>o.key===${JSON.stringify(copy0?.key)})`);
         // Clic real en ▶ Probar.
         const playBtnMaz = await locate('[data-role="play-btn"]');
         if (playBtnMaz) {
@@ -4997,23 +5158,25 @@ const scenarios = {
             const playModeActive = await js(
                 `document.body.classList.contains('editor-on') && __game.editor?.active === false`,
             );
-            check(
-                'JL-113 editorMazmorra: clic en ▶ Probar activa Play Mode',
-                playModeActive,
-                String(playModeActive),
-            );
+            check('JL-113 editorMazmorra: clic en ▶ Probar activa Play Mode', playModeActive, String(playModeActive));
             if (playModeActive) {
                 // Workspace oculto en Play Mode.
                 const workspaceHidden = await js(`!document.querySelector('.ed-workspace')?.offsetParent`);
-                check(
-                    'JL-113 editorMazmorra: workspace oculto en Play Mode',
-                    workspaceHidden,
-                    String(workspaceHidden),
-                );
+                check('JL-113 editorMazmorra: workspace oculto en Play Mode', workspaceHidden, String(workspaceHidden));
                 // Camina un poco en Play Mode.
-                await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await cdp('Input.dispatchKeyEvent', {
+                    type: 'rawKeyDown',
+                    code: 'KeyW',
+                    key: 'w',
+                    windowsVirtualKeyCode: 87,
+                });
                 await sleep(800);
-                await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await cdp('Input.dispatchKeyEvent', {
+                    type: 'keyUp',
+                    code: 'KeyW',
+                    key: 'w',
+                    windowsVirtualKeyCode: 87,
+                });
                 await sleep(400);
                 // ⏹ Stop: clic real en el botón de stop.
                 const stopBtnMaz = await locate('[data-role="stop-btn"]');
@@ -5023,20 +5186,14 @@ const scenarios = {
                     const backToEditor = await js(
                         `__game.editor?.active === true && document.querySelector('.ed-workspace')?.offsetParent`,
                     );
-                    check(
-                        'JL-113 editorMazmorra: clic en ⏹ Stop vuelve al editor',
-                        backToEditor,
-                        String(backToEditor),
-                    );
+                    check('JL-113 editorMazmorra: clic en ⏹ Stop vuelve al editor', backToEditor, String(backToEditor));
                 } else {
                     // Fallback: F12 para volver.
                     await key('F12', 'F12');
                     await until(`document.body.classList.contains('editor-on')`, 5000, 'editor reabierto tras Stop');
                 }
                 // Verifica que la copia persiste con la misma posición tras Play Mode.
-                const copyPosAfter = await js(
-                    `__game.editor.objects().find(o=>o.key===${JSON.stringify(copy0?.key)})`,
-                );
+                const copyPosAfter = await js(`__game.editor.objects().find(o=>o.key===${JSON.stringify(copy0?.key)})`);
                 check(
                     'JL-113 editorMazmorra: objeto duplicado persiste tras ▶ Probar / ⏹ Stop',
                     copyPosAfter?.key === copyPosBefore?.key &&
@@ -5091,16 +5248,28 @@ const scenarios = {
             await sleep(1500);
             // Durante Play Mode, editor.active=false (index.ts:358) pero 'editor-on' se queda
             // en el body. El workspace se oculta (setVisible(false)).
-            const playModeActive = await js(`document.body.classList.contains('editor-on') && __game.editor?.active === false`);
+            const playModeActive = await js(
+                `document.body.classList.contains('editor-on') && __game.editor?.active === false`,
+            );
             check('EV-02 editor_play: clic en ▶ Probar activa Play Mode', playModeActive, String(playModeActive));
             if (playModeActive) {
                 // En Play Mode, el workspace del editor está oculto pero 'editor-on' sigue en body.
                 const workspaceHidden = await js(`!document.querySelector('.ed-workspace')?.offsetParent`);
                 check('EV-02 editor_play: workspace oculto en Play Mode', workspaceHidden, String(workspaceHidden));
                 // Camina un poco en Play Mode.
-                await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await cdp('Input.dispatchKeyEvent', {
+                    type: 'rawKeyDown',
+                    code: 'KeyW',
+                    key: 'w',
+                    windowsVirtualKeyCode: 87,
+                });
                 await sleep(800);
-                await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await cdp('Input.dispatchKeyEvent', {
+                    type: 'keyUp',
+                    code: 'KeyW',
+                    key: 'w',
+                    windowsVirtualKeyCode: 87,
+                });
                 await sleep(400);
                 // ⏹ Stop: clic real en el botón de stop.
                 const stopBtn = await locate('[data-role="stop-btn"]');
@@ -5108,7 +5277,9 @@ const scenarios = {
                     await mouse(stopBtn.x, stopBtn.y);
                     await sleep(1500);
                     // Tras Stop, editor.active vuelve a true y el workspace es visible.
-                    const backToEditor = await js(`__game.editor?.active === true && document.querySelector('.ed-workspace')?.offsetParent`);
+                    const backToEditor = await js(
+                        `__game.editor?.active === true && document.querySelector('.ed-workspace')?.offsetParent`,
+                    );
                     check('EV-02 editor_play: clic en ⏹ Stop vuelve al editor', backToEditor, String(backToEditor));
                 } else {
                     // Fallback: F12 para volver.
@@ -5117,7 +5288,11 @@ const scenarios = {
                 }
                 // Verifica objetos intactos.
                 const countAfter = await js(`__game.editor.objects ? __game.editor.objects().length : 0`);
-                check('EV-02 editor_play: objetos del editor intactos tras Play Mode', countAfter === countBefore, `${countBefore} → ${countAfter}`);
+                check(
+                    'EV-02 editor_play: objetos del editor intactos tras Play Mode',
+                    countAfter === countBefore,
+                    `${countBefore} → ${countAfter}`,
+                );
                 await shot('ev02-editor-play');
                 // Limpia: cierra el editor.
                 await key('F12', 'F12');
@@ -5143,7 +5318,11 @@ const scenarios = {
         await sleep(500);
         // Verifica que los objetos del editor se mantuvieron.
         const countAfter = await js(`__game.editor.objects ? __game.editor.objects().length : 0`);
-        check('EV-01 editor_play: objetos del editor intactos', countAfter === countBefore, `${countBefore} → ${countAfter}`);
+        check(
+            'EV-01 editor_play: objetos del editor intactos',
+            countAfter === countBefore,
+            `${countBefore} → ${countAfter}`,
+        );
         await shot('ev01-editor-play');
         // Limpia: cierra el editor.
         await key('F12', 'F12');
@@ -5179,13 +5358,20 @@ const scenarios = {
         await newGame('QA Emotes');
         await resize(1920, 1080);
         const playing = () =>
-            js(`__game.view.scene.animationGroups.filter(g=>g.isPlaying&&g.name.startsWith('player:Emote_')).map(g=>g.name)`);
+            js(
+                `__game.view.scene.animationGroups.filter(g=>g.isPlaying&&g.name.startsWith('player:Emote_')).map(g=>g.name)`,
+            );
         const say = (text) =>
             js(`(()=>{const i=[...document.querySelectorAll('input[type=text]')].find(i=>i.closest('.chat'));
                 i.focus();i.value=${JSON.stringify(text)};i.dispatchEvent(new Event('input',{bubbles:true}));
                 i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
         const walk = async () => {
-            await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+            await cdp('Input.dispatchKeyEvent', {
+                type: 'rawKeyDown',
+                code: 'KeyW',
+                key: 'w',
+                windowsVirtualKeyCode: 87,
+            });
             await sleep(800);
             await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
             await sleep(500);
@@ -5193,21 +5379,35 @@ const scenarios = {
         await say('/saludar');
         await sleep(250);
         const wave = await playing();
-        check('EV-02 emotes: /saludar en el chat reproduce Emote_wave', wave.includes('player:Emote_wave'), JSON.stringify(wave));
+        check(
+            'EV-02 emotes: /saludar en el chat reproduce Emote_wave',
+            wave.includes('player:Emote_wave'),
+            JSON.stringify(wave),
+        );
         await shot('ev02-emote-saludar');
         await walk();
         const afterWalk = await playing();
         check('EV-02 emotes: moverse corta el emote', afterWalk.length === 0, JSON.stringify(afterWalk));
-        await until(`!${W}.player.path?.length && Math.hypot(${W}.player.pos.x-${W}.player.prevPos.x,${W}.player.pos.y-${W}.player.prevPos.y)<1e-3`, 4000, 'quieto');
+        await until(
+            `!${W}.player.path?.length && Math.hypot(${W}.player.pos.x-${W}.player.prevPos.x,${W}.player.pos.y-${W}.player.prevPos.y)<1e-3`,
+            4000,
+            'quieto',
+        );
         await sleep(300);
         // La fila del chat escribe el comando; la ventana ilustrada es la que reproduce el emote.
         await js(`document.querySelector('.chat-emotes-open')?.click()`);
         await sleep(300);
-        const danceIndex = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).emotes.findIndex((e) => e.id === 'dance');
+        const danceIndex = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).emotes.findIndex(
+            (e) => e.id === 'dance',
+        );
         await js(`document.querySelectorAll('.emote-window .emote-play')[${danceIndex}]?.click()`);
         await sleep(250);
         const dance = await playing();
-        check('EV-02 emotes: bailar desde la ventana reproduce Emote_dance', dance.includes('player:Emote_dance'), JSON.stringify(dance));
+        check(
+            'EV-02 emotes: bailar desde la ventana reproduce Emote_dance',
+            dance.includes('player:Emote_dance'),
+            JSON.stringify(dance),
+        );
         await shot('ev02-emote-bailar');
         await walk();
     },
@@ -5221,13 +5421,19 @@ const scenarios = {
         const npc = await js(`(()=>{const n=${W}.npcs.find(n=>n.npcId==='smith');return n&&{x:n.pos.x,y:n.pos.y}})()`);
         check('EV-02 curas_dialogo: el herrero está en el pueblo', !!npc, JSON.stringify(npc));
         if (!npc) return;
-        await js(`(()=>{const p=${W}.player;p.pos.x=${npc.x}+2;p.pos.y=${npc.y};p.prevPos.x=p.pos.x;p.prevPos.y=p.pos.y;p.path=[];})()`);
+        await js(
+            `(()=>{const p=${W}.player;p.pos.x=${npc.x}+2;p.pos.y=${npc.y};p.prevPos.x=p.pos.x;p.prevPos.y=p.pos.y;p.path=[];})()`,
+        );
         await sleep(1500);
         await clickMesh('npc-smith');
         await until(`document.querySelector('.dialogue')?.offsetParent`, 4000, 'panel de diálogo').catch(() => {});
         const panel = await js(`(()=>{const d=document.querySelector('.dialogue');
             return d&&d.offsetParent?{name:d.querySelector('.dlg-name')?.textContent,options:d.querySelectorAll('.dlg-opt').length}:null})()`);
-        check('EV-02 curas_dialogo: clic real sobre el PNJ abre el diálogo con opciones', !!panel && panel.options >= 1, JSON.stringify(panel));
+        check(
+            'EV-02 curas_dialogo: clic real sobre el PNJ abre el diálogo con opciones',
+            !!panel && panel.options >= 1,
+            JSON.stringify(panel),
+        );
         await shot('ev02-dialogo');
         if (!panel) return;
         await key('Digit1', '1');
@@ -5262,7 +5468,11 @@ const scenarios = {
             }
             return maxDist;
         })()`);
-        check('EV-01 antorchas: las antorchas están cerca del plano de pared', torchWallDist < 3.0, String(torchWallDist));
+        check(
+            'EV-01 antorchas: las antorchas están cerca del plano de pared',
+            torchWallDist < 3.0,
+            String(torchWallDist),
+        );
         // Captura cenital de la sala.
         await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=70; r.distance=12; })()`);
         await sleep(600);
@@ -5330,9 +5540,7 @@ const scenarios = {
         await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
         await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
         await sleep(500);
-        c = await js(
-            `__game.view.scene.animationGroups.find(g=>g.isPlaying&&g.name.endsWith('land'))?.name ?? null`,
-        );
+        c = await js(`__game.view.scene.animationGroups.find(g=>g.isPlaying&&g.name.endsWith('land'))?.name ?? null`);
         check('MOD-02b: land al aterrizar', !!c, c ?? 'ningún clip');
         await shot('falcopama-land');
         await sleep(1000);
@@ -5349,7 +5557,7 @@ const scenarios = {
         // Helper: mover cámara y jugador, esperar y capturar.
         const view = async (tag, px, py, cx, cy, pitch, dist, yaw) => {
             await js(
-                `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${px},y:${py}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; const r=__game.view.rig; r.pitchDeg=${pitch}; r.distance=${dist}; r.yawDeg=${yaw||200}; })()`,
+                `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${px},y:${py}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; const r=__game.view.rig; r.pitchDeg=${pitch}; r.distance=${dist}; r.yawDeg=${yaw || 200}; })()`,
             );
             await sleep(3500);
             await shot(`map01-${tag}`);
@@ -5366,7 +5574,9 @@ const scenarios = {
         await view('raspadura-pnj-rasante', 140, 125, 140, 125, 10, 10, 200);
 
         // === 2. Iguanera — campamento (620-650, 240-260) ===
-        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:628,y:244})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await js(
+            `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:628,y:244})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
         await sleep(2000);
         await view('iguanera-camp-cenital', 633, 250, 633, 250, 80, 25, 200);
         await view('iguanera-camp-rasante', 633, 250, 633, 250, 10, 12, 200);
@@ -5393,7 +5603,9 @@ const scenarios = {
         await view('pedasol-muelle-rasante', 473, 15, 473, 15, 10, 10, 200);
 
         // === 4. Chitrí (10, 490) — zona segura ===
-        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:10,y:490})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await js(
+            `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:10,y:490})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
         await sleep(2000);
         await view('chitri-cenital', 10, 490, 10, 490, 80, 25, 200);
         await view('chitri-rasante', 10, 490, 10, 490, 10, 12, 200);
@@ -5405,15 +5617,21 @@ const scenarios = {
         await view('chitri-costa-rasante', 100, 485, 100, 485, 10, 12, 200);
 
         // === 5. Pedasol muelle y costa (460-520, -14-40) ===
-        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:500,y:10})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await js(
+            `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:500,y:10})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
         await sleep(2000);
         await view('pedasol-costa-cenital', 510, 5, 510, 5, 80, 25, 200);
         await view('pedasol-costa-rasante', 510, 5, 510, 5, 10, 12, 200);
 
         // === 6. Cripta — exterior ===
-        await js(`(()=>{ const r=__game.view.scene.getTransformNodeByName('cryptEntrance')?.position; if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+        await js(
+            `(()=>{ const r=__game.view.scene.getTransformNodeByName('cryptEntrance')?.position; if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`,
+        );
         await sleep(2000);
-        const cryptPos = await js(`(()=>{ const r=__game.view.scene.getTransformNodeByName('cryptEntrance')?.position; return r ? {x:r.x+5, y:r.z+3} : null; })()`);
+        const cryptPos = await js(
+            `(()=>{ const r=__game.view.scene.getTransformNodeByName('cryptEntrance')?.position; return r ? {x:r.x+5, y:r.z+3} : null; })()`,
+        );
         if (cryptPos) {
             await view('cripta-ext-cenital', cryptPos.x, cryptPos.y, cryptPos.x, cryptPos.y, 80, 25, 200);
             await view('cripta-ext-rasante', cryptPos.x, cryptPos.y, cryptPos.x, cryptPos.y, 10, 12, 200);
@@ -5436,15 +5654,21 @@ const scenarios = {
         await newGame('QA Mazmorra');
         await js(`${S}.energy.value=100`);
         // Dar la llave de la cripta para que el portero permita entrar.
-        await js(`(()=>{ const c=${S}.character; if(!c.inventory.slots.find(s=>s?.itemId==='crypt_key')) c.give('crypt_key'); })()`);
+        await js(
+            `(()=>{ const c=${S}.character; if(!c.inventory.slots.find(s=>s?.itemId==='crypt_key')) c.give('crypt_key'); })()`,
+        );
         const hasKey = await js(`${S}.character.inventory.slots.find(s=>s?.itemId==='crypt_key')`);
         record('1. Partida: tiene la llave de la cripta', !!hasKey, String(!!hasKey));
         await shot('dun04-partida');
 
         /* 2. Ir al portero (Berto Candado en 138, 148). */
-        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:140,y:146})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await js(
+            `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:140,y:146})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
         await sleep(1500);
-        const warden = await js(`(()=>{ const n=${W}.npcs.find(x=>x.npcId==='crypt_warden'); return n ? {x:n.pos.x,y:n.pos.y} : null; })()`);
+        const warden = await js(
+            `(()=>{ const n=${W}.npcs.find(x=>x.npcId==='crypt_warden'); return n ? {x:n.pos.x,y:n.pos.y} : null; })()`,
+        );
         record('2. Portero: Berto Candado existe', !!warden, JSON.stringify(warden));
         await shot('dun04-portero');
 
@@ -5452,7 +5676,9 @@ const scenarios = {
         if (warden) {
             await clickMesh('npc-crypt_warden');
             await until(`document.querySelector('.dialogue')?.offsetParent`, 8000, 'diálogo portero').catch(() => {});
-            const dlg = await js(`(()=>{ const d=document.querySelector('.dialogue'); return d&&d.offsetParent ? {name:d.querySelector('.dlg-name')?.textContent, opts:d.querySelectorAll('.dlg-opt').length} : null; })()`);
+            const dlg = await js(
+                `(()=>{ const d=document.querySelector('.dialogue'); return d&&d.offsetParent ? {name:d.querySelector('.dlg-name')?.textContent, opts:d.querySelectorAll('.dlg-opt').length} : null; })()`,
+            );
             record('3. Diálogo: el portero abre diálogo', !!dlg && dlg.opts >= 1, JSON.stringify(dlg));
             if (dlg) {
                 // Elegir "Empezar en el piso 1" (primera opción).
@@ -5465,7 +5691,7 @@ const scenarios = {
 
         /* 4. Bajar 3 pisos (piso 1 → 2 → 3 → 4). */
         // Si no entró por el portero, entrar directamente.
-        if (!await js(`__game.crypt.inside`)) {
+        if (!(await js(`__game.crypt.inside`))) {
             await js(`__game.crypt.enter(0,'above')`);
             await until(`__game.crypt.floor===0`, 15000, 'piso 1');
         }
@@ -5477,11 +5703,15 @@ const scenarios = {
         // Bajar 3 pisos usando clickMesh en la escalera de bajada.
         for (let i = 1; i <= 3; i++) {
             // Mover al jugador cerca de la escalera de bajada.
-            await js(`(()=>{ const c=__game.crypt; if(c?.floorData?.downStairs){ const p=${W}.player, g=${W}.grid, d=c.floorData.downStairs; const a=g.center(g.nearestWalkable({x:d.x+0.5,y:d.y+0.5})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+            await js(
+                `(()=>{ const c=__game.crypt; if(c?.floorData?.downStairs){ const p=${W}.player, g=${W}.grid, d=c.floorData.downStairs; const a=g.center(g.nearestWalkable({x:d.x+0.5,y:d.y+0.5})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`,
+            );
             await sleep(800);
             // Clic en la escalera de bajada (modelo dDownFrame o d_bajada).
             await clickMesh('dDownFrame');
-            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, `piso ${i + 1} listo`).catch(() => {});
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, `piso ${i + 1} listo`).catch(
+                () => {},
+            );
             await sleep(1500);
             floor = await js(`__game.crypt.floor`);
             record(`4. Bajar: piso ${i + 1}`, floor === i, `piso ${floor}`);
@@ -5500,7 +5730,9 @@ const scenarios = {
 
         /* 6. Hilo de retorno: volver a la superficie. */
         // Mover al jugador junto al hilo de retorno (arrivalFromAbove).
-        await js(`(()=>{ const c=__game.crypt; if(c?.floorData){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:c.floorData.arrivalFromAbove.x+0.5,y:c.floorData.arrivalFromAbove.y+0.5})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+        await js(
+            `(()=>{ const c=__game.crypt; if(c?.floorData){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:c.floorData.arrivalFromAbove.x+0.5,y:c.floorData.arrivalFromAbove.y+0.5})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`,
+        );
         await sleep(800);
         // Intentar clic en el hilo de retorno (cilindro d_returnPost).
         await clickMesh('d_returnPost');
@@ -5520,7 +5752,9 @@ const scenarios = {
 
         /* 7. Volver al portero y entrar al piso 10. */
         // Teleportar al portero.
-        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:140,y:146})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await js(
+            `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:140,y:146})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
         await sleep(1000);
         // Entrar directamente al piso 10 (floor 9).
         await js(`__game.crypt.enter(9,'above')`);
@@ -5551,7 +5785,10 @@ const scenarios = {
                 }
             }
         }
-        fs.writeFileSync(path.join(outDir, 'TABLA.md'), '# DUN-04 — Recorrido completo de la mazmorra\n\n' + tabla.join('\n') + '\n');
+        fs.writeFileSync(
+            path.join(outDir, 'TABLA.md'),
+            '# DUN-04 — Recorrido completo de la mazmorra\n\n' + tabla.join('\n') + '\n',
+        );
     },
 
     /** JL-39: Medición de rendimiento — FPS medio y mínimo en pueblo, Iguanera y cripta. */
@@ -5592,7 +5829,9 @@ const scenarios = {
         await newGame('QA Rendimiento');
         await sleep(2000);
         await measureFps('pueblo', async () => {
-            await js(`(()=>{ const r=__game.view.scene.getTransformNodeByName('landmark:raspadura'); if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.position.x+5,y:r.position.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+            await js(
+                `(()=>{ const r=__game.view.scene.getTransformNodeByName('landmark:raspadura'); if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.position.x+5,y:r.position.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`,
+            );
         });
 
         /* 2. Iguanera. */
@@ -5652,13 +5891,13 @@ const scenarios = {
 
         // --- Verificar que los tres modos se configuran ---
         await setCastMode('press');
-        check('modosLanzar: modo press configurado', await mode() === 'press', await mode());
+        check('modosLanzar: modo press configurado', (await mode()) === 'press', await mode());
 
         await setCastMode('indicator');
-        check('modosLanzar: modo indicator configurado', await mode() === 'indicator', await mode());
+        check('modosLanzar: modo indicator configurado', (await mode()) === 'indicator', await mode());
 
         await setCastMode('pressClick');
-        check('modosLanzar: modo pressClick configurado', await mode() === 'pressClick', await mode());
+        check('modosLanzar: modo pressClick configurado', (await mode()) === 'pressClick', await mode());
 
         // --- Helper: mover el cursor sobre un enemigo (mismo patrón que `previa`) ---
         const moveOverEnemy = async (eid) => {
@@ -5699,7 +5938,11 @@ const scenarios = {
         await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
         await key('KeyQ', 'q');
         await sleep(300);
-        check('modosLanzar: press — no queda apuntando', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+        check(
+            'modosLanzar: press — no queda apuntando',
+            !(await aiming()),
+            `aiming=${await js(`__game.castInput.aiming`)}`,
+        );
 
         // === Modo 2: indicator — mantener la tecla apunta, soltar lanza ===
         await setCastMode('indicator');
@@ -5717,7 +5960,11 @@ const scenarios = {
         await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
         await key('KeyQ', 'q');
         await sleep(300);
-        check('modosLanzar: indicator — aiming vuelve a null tras lanzar', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+        check(
+            'modosLanzar: indicator — aiming vuelve a null tras lanzar',
+            !(await aiming()),
+            `aiming=${await js(`__game.castInput.aiming`)}`,
+        );
 
         // === Modo 3: pressClick — la tecla apunta, segunda pulsación confirma ===
         await setCastMode('pressClick');
@@ -5726,7 +5973,11 @@ const scenarios = {
         // Verificamos que pressClick entra en apuntado y que commandCastSlot lanza.
         await key('KeyQ', 'q');
         await sleep(300);
-        check('modosLanzar: pressClick — KeyQ entra en apuntado', await aiming(), `aiming=${await js(`__game.castInput.aiming`)}`);
+        check(
+            'modosLanzar: pressClick — KeyQ entra en apuntado',
+            await aiming(),
+            `aiming=${await js(`__game.castInput.aiming`)}`,
+        );
         // Lanzamos directamente con el aim del enemigo.
         await js(`${W}.commandCastSlot(0, { point: ${W}.enemies.get(${id2}).pos, targetId: ${id2} })`);
         await sleep(800);
@@ -5736,7 +5987,11 @@ const scenarios = {
         await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
         await key('KeyQ', 'q');
         await sleep(300);
-        check('modosLanzar: pressClick — segunda KeyQ confirma apuntado', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+        check(
+            'modosLanzar: pressClick — segunda KeyQ confirma apuntado',
+            !(await aiming()),
+            `aiming=${await js(`__game.castInput.aiming`)}`,
+        );
 
         // === Verificar que Esc cancela el apuntado (pressClick) ===
         await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
@@ -5745,7 +6000,11 @@ const scenarios = {
         check('modosLanzar: pressClick — KeyQ entra en apuntado (antes de Esc)', await aiming());
         await key('Escape', 'Escape');
         await sleep(200);
-        check('modosLanzar: pressClick — Esc cancela', !(await aiming()), `aiming=${await js(`__game.castInput.aiming`)}`);
+        check(
+            'modosLanzar: pressClick — Esc cancela',
+            !(await aiming()),
+            `aiming=${await js(`__game.castInput.aiming`)}`,
+        );
 
         // Captura final.
         await shot('modosLanzar-final');
@@ -5768,7 +6027,12 @@ const scenarios = {
         await sleep(1500);
 
         const modes = ['manual', 'semiAuto', 'auto', 'combat'];
-        const modeNames = { manual: 'Manual', semiAuto: 'Semiautomático', auto: 'Automático', combat: 'Encuadre de combate' };
+        const modeNames = {
+            manual: 'Manual',
+            semiAuto: 'Semiautomático',
+            auto: 'Automático',
+            combat: 'Encuadre de combate',
+        };
 
         for (const mode of modes) {
             // Cambiar al modo deseado directamente.
@@ -5818,7 +6082,11 @@ const scenarios = {
         await cdp('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 960, y: 540, deltaX: 0, deltaY: 100 });
         await sleep(300);
         const zoomAfter = await js('__game.view.rig.zoom');
-        check('modosCamara: rueda del ratón cambia el zoom', Math.abs(zoomAfter - zoomBefore) > 0.3, `${zoomBefore.toFixed(1)} → ${zoomAfter.toFixed(1)}`);
+        check(
+            'modosCamara: rueda del ratón cambia el zoom',
+            Math.abs(zoomAfter - zoomBefore) > 0.3,
+            `${zoomBefore.toFixed(1)} → ${zoomAfter.toFixed(1)}`,
+        );
 
         // Restaurar modo manual y resolución.
         await js('__game.view.rig.mode="manual"');
@@ -5925,11 +6193,7 @@ const scenarios = {
               }
               return pairs;
             })()`);
-            check(
-                `JL-94 ${label}: sin solapes HUD fijos`,
-                hudOverlap.length === 0,
-                hudOverlap.join(' | ') || 'limpio',
-            );
+            check(`JL-94 ${label}: sin solapes HUD fijos`, hudOverlap.length === 0, hudOverlap.join(' | ') || 'limpio');
             // Verificación 3: que todos los elementos fijos caben en la ventana.
             const outside = await js(`(()=>{
               const els=[...document.querySelectorAll('.chat, .hud-actionbar, .minimap, .hud-bar, .hud-sec-character, .hud-sec-items, .hud-sec-spells, .hud-sec-spells-2, .hud-sec-spells-3, .hud-sec-xp, .hud-sec-menu, .world-info, .combat-bar, .quest-tracker, .combat-log, .hud-pet')].filter(e=>e.offsetParent);
@@ -5942,11 +6206,7 @@ const scenarios = {
               }
               return out;
             })()`);
-            check(
-                `JL-94 ${label}: todos caben en pantalla`,
-                outside.length === 0,
-                outside.join(' | ') || 'caben',
-            );
+            check(`JL-94 ${label}: todos caben en pantalla`, outside.length === 0, outside.join(' | ') || 'caben');
             await shot(`jl94-hud-${label}`);
         }
     },
@@ -6034,7 +6294,25 @@ const scenarios = {
         report.push('## Delta (con enemigos - base)');
         report.push('| Métrica | Base | Con enemigos | Delta |');
         report.push('|---------|------|--------------|-------|');
-        const numericKeys = ['fps', 'p95', 'drawCalls', 'activeMeshes', 'mallas', 'triangulos', 'luces', 'enemigos', 'modelos', 'msJs', 'msSim', 'msVista', 'msRender', 'msResto', 'msAnim', 'msActivas', 'msSombras'];
+        const numericKeys = [
+            'fps',
+            'p95',
+            'drawCalls',
+            'activeMeshes',
+            'mallas',
+            'triangulos',
+            'luces',
+            'enemigos',
+            'modelos',
+            'msJs',
+            'msSim',
+            'msVista',
+            'msRender',
+            'msResto',
+            'msAnim',
+            'msActivas',
+            'msSombras',
+        ];
         for (const k of numericKeys) {
             const b = base[k] ?? '?';
             const c = conEnemigos[k] ?? '?';
@@ -6062,7 +6340,8 @@ const scenarios = {
 
         // Checks.
         check(`JL-95: FPS ≥ 20 con 20 enemigos`, conEnemigos.fps >= 20, `${conEnemigos.fps} fps`);
-        const deltaMs = typeof conEnemigos.msJs === 'number' && typeof base.msJs === 'number' ? conEnemigos.msJs - base.msJs : 0;
+        const deltaMs =
+            typeof conEnemigos.msJs === 'number' && typeof base.msJs === 'number' ? conEnemigos.msJs - base.msJs : 0;
         // Con 20 enemigos animados, el delta de msJs sube ~5-6 ms (carga de modelos + animación).
         // El umbral de 10 ms deja margen para la variabilidad del Mac M5.
         check(`JL-95: delta msJs ≤ 10 ms`, deltaMs <= 10, `${deltaMs.toFixed(1)} ms`);
@@ -6086,7 +6365,9 @@ const scenarios = {
         await shot('jl114-compendio-abierto');
 
         // 1. Verifica que las 3 pestañas existen.
-        const tabs = await js(`[...document.querySelectorAll('.panel-compendium .bag-chips .chip')].map(b=>b.textContent.trim())`);
+        const tabs = await js(
+            `[...document.querySelectorAll('.panel-compendium .bag-chips .chip')].map(b=>b.textContent.trim())`,
+        );
         check('JL-114: 3 pestañas del compendio', tabs.length === 3, JSON.stringify(tabs));
         check('JL-114: pestaña Criaturas', tabs.includes('Criaturas'), JSON.stringify(tabs));
 
@@ -6098,13 +6379,23 @@ const scenarios = {
         check('JL-114: lista de criaturas no vacía', creatureRows > 0, `${creatureRows} criaturas`);
 
         // 3. Búsqueda: escribe "Raton" (sin tilde) en el campo de búsqueda.
-        await js(`(()=>{ const i=document.querySelector('.panel-compendium .comp-search'); if(i){i.value='Raton';i.dispatchEvent(new Event('input',{bubbles:true}));} })()`);
+        await js(
+            `(()=>{ const i=document.querySelector('.panel-compendium .comp-search'); if(i){i.value='Raton';i.dispatchEvent(new Event('input',{bubbles:true}));} })()`,
+        );
         await sleep(500);
-        const searchResults = await js(`[...document.querySelector('.panel-compendium .comp-list')?.children??[]].map(r=>r.textContent.trim())`);
-        check('JL-114: búsqueda filtra criaturas', searchResults.length > 0, `${searchResults.length} resultados: ${searchResults.slice(0, 3).join(', ')}`);
+        const searchResults = await js(
+            `[...document.querySelector('.panel-compendium .comp-list')?.children??[]].map(r=>r.textContent.trim())`,
+        );
+        check(
+            'JL-114: búsqueda filtra criaturas',
+            searchResults.length > 0,
+            `${searchResults.length} resultados: ${searchResults.slice(0, 3).join(', ')}`,
+        );
 
         // 4. Ficha de criatura con resistencias: selecciona la primera criatura filtrada.
-        await js(`(()=>{ const list=document.querySelector('.panel-compendium .comp-list'); const r=list?.firstElementChild; if(r) r.click(); })()`);
+        await js(
+            `(()=>{ const list=document.querySelector('.panel-compendium .comp-list'); const r=list?.firstElementChild; if(r) r.click(); })()`,
+        );
         await sleep(400);
         // Verifica que la ficha muestra nombre, nivel y resistencias.
         const creatureDetail = await js(`(()=>{
@@ -6114,33 +6405,51 @@ const scenarios = {
             const resists=d.querySelectorAll('.comp-resist-badge');
             return {title:h3?.textContent?.trim()??null, resists:resists.length};
         })()`);
-        check('JL-114: ficha de criatura muestra nombre', creatureDetail.title !== null, creatureDetail.title ?? 'sin título');
-        check('JL-114: ficha muestra resistencias elementales', creatureDetail.resists >= 6, `${creatureDetail.resists} badges`);
+        check(
+            'JL-114: ficha de criatura muestra nombre',
+            creatureDetail.title !== null,
+            creatureDetail.title ?? 'sin título',
+        );
+        check(
+            'JL-114: ficha muestra resistencias elementales',
+            creatureDetail.resists >= 6,
+            `${creatureDetail.resists} badges`,
+        );
         await shot('jl114-criatura-resistencias');
 
         // 5. Limpia la búsqueda para ver toda la lista de nuevo.
-        await js(`(()=>{ const i=document.querySelector('.panel-compendium .comp-search'); if(i){i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));} })()`);
+        await js(
+            `(()=>{ const i=document.querySelector('.panel-compendium .comp-search'); if(i){i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));} })()`,
+        );
         await sleep(300);
 
         // 6. Cambia a la pestaña Objetos usando JS directo.
-        await js(`(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Objetos'){c.click();break;}} })()`);
+        await js(
+            `(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Objetos'){c.click();break;}} })()`,
+        );
         await sleep(500);
         const itemRows = await js(`document.querySelector('.panel-compendium .comp-list')?.children.length ?? 0`);
         check('JL-114: pestaña Objetos tiene entradas', itemRows > 0, `${itemRows} objetos`);
         await shot('jl114-objetos');
 
         // 7. Cambia a la pestaña Zonas.
-        await js(`(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Zonas'){c.click();break;}} })()`);
+        await js(
+            `(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Zonas'){c.click();break;}} })()`,
+        );
         await sleep(500);
         const zoneRows = await js(`document.querySelector('.panel-compendium .comp-list')?.children.length ?? 0`);
         check('JL-114: pestaña Zonas tiene entradas', zoneRows > 0, `${zoneRows} zonas`);
         await shot('jl114-zonas');
 
         // 8. Vuelve a Criaturas y verifica el visor 3D (JL-42).
-        await js(`(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Criaturas'){c.click();break;}} })()`);
+        await js(
+            `(()=>{ const chips=document.querySelectorAll('.panel-compendium .bag-chips .chip'); for(const c of chips){if(c.textContent.trim()==='Criaturas'){c.click();break;}} })()`,
+        );
         await sleep(400);
         // Selecciona una criatura para que el visor 3D se active.
-        await js(`(()=>{ const list=document.querySelector('.panel-compendium .comp-list'); const r=list?.firstElementChild; if(r) r.click(); })()`);
+        await js(
+            `(()=>{ const list=document.querySelector('.panel-compendium .comp-list'); const r=list?.firstElementChild; if(r) r.click(); })()`,
+        );
         await sleep(600);
         const preview3d = await js(`(()=>{
             const canvas=document.querySelector('.comp-preview-3d canvas');
@@ -6184,10 +6493,15 @@ const scenarios = {
             const o = JSON.parse(localStorage.getItem('frankmangames.options') || 'null');
             return o ? { language: o.language, volume: o.volume, cameraMode: o.cameraMode, castMode: o.castMode } : null;
         })()`);
-        check('opciones: guardadas en localStorage',
-            saved && saved.language === testLang && saved.volume === testVolume &&
-            saved.cameraMode === testCameraMode && saved.castMode === testCastMode,
-            JSON.stringify(saved));
+        check(
+            'opciones: guardadas en localStorage',
+            saved &&
+                saved.language === testLang &&
+                saved.volume === testVolume &&
+                saved.cameraMode === testCameraMode &&
+                saved.castMode === testCastMode,
+            JSON.stringify(saved),
+        );
 
         // 2. Recargar la página completa (simula cerrar y abrir el juego).
         await cdp('Page.navigate', { url });
@@ -6210,18 +6524,26 @@ const scenarios = {
             return o ? { language: o.language, volume: o.volume, cameraMode: o.cameraMode, castMode: o.castMode } : null;
         })()`);
 
-        check('opciones: idioma recuperado tras recarga',
+        check(
+            'opciones: idioma recuperado tras recarga',
             recovered && recovered.language === testLang,
-            recovered ? recovered.language : 'null');
-        check('opciones: volumen recuperado tras recarga',
+            recovered ? recovered.language : 'null',
+        );
+        check(
+            'opciones: volumen recuperado tras recarga',
             recovered && recovered.volume === testVolume,
-            recovered != null ? String(recovered.volume) : 'null');
-        check('opciones: modo de cámara recuperado tras recarga',
+            recovered != null ? String(recovered.volume) : 'null',
+        );
+        check(
+            'opciones: modo de cámara recuperado tras recarga',
             recovered && recovered.cameraMode === testCameraMode,
-            recovered ? recovered.cameraMode : 'null');
-        check('opciones: modo de lanzar recuperado tras recarga',
+            recovered ? recovered.cameraMode : 'null',
+        );
+        check(
+            'opciones: modo de lanzar recuperado tras recarga',
             recovered && recovered.castMode === testCastMode,
-            recovered ? recovered.castMode : 'null');
+            recovered ? recovered.castMode : 'null',
+        );
 
         // 5. Captura final con las opciones en inglés visibles en la pantalla de título.
         await shot('jl115-opciones');
@@ -6260,7 +6582,11 @@ const scenarios = {
             const groups=sc.animationGroups.filter(g=>g.isPlaying&&/Danza/i.test(g.name));
             return groups.map(g=>g.name);
         })()`);
-        check('EV-01 espeja_combate: clips Danza visibles (si el GLB los trae)', true, JSON.stringify(danceClips) || 'sin clips Danza');
+        check(
+            'EV-01 espeja_combate: clips Danza visibles (si el GLB los trae)',
+            true,
+            JSON.stringify(danceClips) || 'sin clips Danza',
+        );
         await shot('ev01-espeja-combate');
         // Sale de la cripta.
         await js(`__game.crypt.leave?.()`);
@@ -6280,15 +6606,21 @@ const scenarios = {
         await newGame('QA Cripta100');
         await js(`${S}.energy.value=100`);
         // Dar la llave de la cripta.
-        await js(`(()=>{ const c=${S}.character; if(!c.inventory.slots.find(s=>s?.itemId==='crypt_key')) c.give('crypt_key'); })()`);
+        await js(
+            `(()=>{ const c=${S}.character; if(!c.inventory.slots.find(s=>s?.itemId==='crypt_key')) c.give('crypt_key'); })()`,
+        );
         const hasKey = await js(`${S}.character.inventory.slots.find(s=>s?.itemId==='crypt_key')`);
         record('1. Partida: tiene la llave', !!hasKey, String(!!hasKey));
         await shot('jl116-partida');
 
         /* 2. Ir al portero y abrir diálogo. */
-        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:140,y:146})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await js(
+            `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:140,y:146})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
         await sleep(1500);
-        const warden = await js(`(()=>{ const n=${W}.npcs.find(x=>x.npcId==='crypt_warden'); return n ? {x:n.pos.x,y:n.pos.y} : null; })()`);
+        const warden = await js(
+            `(()=>{ const n=${W}.npcs.find(x=>x.npcId==='crypt_warden'); return n ? {x:n.pos.x,y:n.pos.y} : null; })()`,
+        );
         record('2. Portero: Berto Candado existe', !!warden, JSON.stringify(warden));
         await shot('jl116-portero');
 
@@ -6296,7 +6628,9 @@ const scenarios = {
         if (warden) {
             await clickMesh('npc-crypt_warden');
             await until(`document.querySelector('.dialogue')?.offsetParent`, 8000, 'diálogo portero').catch(() => {});
-            const dlg = await js(`(()=>{ const d=document.querySelector('.dialogue'); return d&&d.offsetParent ? {name:d.querySelector('.dlg-name')?.textContent, opts:d.querySelectorAll('.dlg-opt').length} : null; })()`);
+            const dlg = await js(
+                `(()=>{ const d=document.querySelector('.dialogue'); return d&&d.offsetParent ? {name:d.querySelector('.dlg-name')?.textContent, opts:d.querySelectorAll('.dlg-opt').length} : null; })()`,
+            );
             record('3. Diálogo: el portero abre diálogo', !!dlg && dlg.opts >= 1, JSON.stringify(dlg));
         }
 
@@ -6311,17 +6645,27 @@ const scenarios = {
         await shot('jl116-piso-100');
 
         /* 5. Verificar que el piso 100 tiene enemigos y estructura. */
-        const enemies100 = await js(`(()=>{ const list=${W}.enemies?.list||[]; return {count:list.length, ids:list.slice(0,5).map(e=>e.id||e.def?.id)}; })()`);
+        const enemies100 = await js(
+            `(()=>{ const list=${W}.enemies?.list||[]; return {count:list.length, ids:list.slice(0,5).map(e=>e.id||e.def?.id)}; })()`,
+        );
         record('5. Piso 100: tiene enemigos', enemies100.count > 0, JSON.stringify(enemies100));
 
         /* 6. Verificar si hay guardián en el piso 100 (informativo: los pisos generados no siempre tienen). */
-        const guardian100 = await js(`(()=>{ const list=${W}.enemies?.list||[]; const g=list.find(e=>e.def?.id==='crypt_warden'); return g ? {state:g.state,health:g.health} : null; })()`);
-        record('6. Piso 100: guardián (informativo)', true, guardian100 ? JSON.stringify(guardian100) : 'sin guardián (piso generado)');
+        const guardian100 = await js(
+            `(()=>{ const list=${W}.enemies?.list||[]; const g=list.find(e=>e.def?.id==='crypt_warden'); return g ? {state:g.state,health:g.health} : null; })()`,
+        );
+        record(
+            '6. Piso 100: guardián (informativo)',
+            true,
+            guardian100 ? JSON.stringify(guardian100) : 'sin guardián (piso generado)',
+        );
         await shot('jl116-piso-100-guardian');
 
         /* 7. Hilo de retorno: volver a la superficie desde el piso 100. */
         // Mover al jugador junto al hilo de retorno (arrivalFromAbove).
-        await js(`(()=>{ const c=__game.crypt; if(c?.floorData){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:c.floorData.arrivalFromAbove.x+0.5,y:c.floorData.arrivalFromAbove.y+0.5})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+        await js(
+            `(()=>{ const c=__game.crypt; if(c?.floorData){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:c.floorData.arrivalFromAbove.x+0.5,y:c.floorData.arrivalFromAbove.y+0.5})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`,
+        );
         await sleep(800);
         // Intentar clic en el hilo de retorno.
         await clickMesh('d_returnPost');
@@ -6341,7 +6685,11 @@ const scenarios = {
 
         /* 8. Verificar que el jugador está en la superficie. */
         const playerPos = await js(`(()=>{ const p=${W}.player; return {x:p.pos.x,y:p.pos.y}; })()`);
-        record('8. Superficie: jugador fuera de la cripta', !await js(`__game.crypt.inside`), JSON.stringify(playerPos));
+        record(
+            '8. Superficie: jugador fuera de la cripta',
+            !(await js(`__game.crypt.inside`)),
+            JSON.stringify(playerPos),
+        );
 
         /* Tabla de resultados en work/. */
         const fs = await import('node:fs');
@@ -6358,6 +6706,69 @@ const scenarios = {
             }
         }
         fs.writeFileSync(pathMod.join(outDir, 'TABLA.md'), '# JL-116 — criptaPiso100\n\n' + tabla.join('\n') + '\n');
+    },
+
+    /** JL-142: Escenario fauna — verificar las criaturas de fauna de JL-86…89.
+     * Las zonas de Herrera están fuera del mundo base, así que no se pueden
+     * spawnear naturalmente. La verificación se divide:
+     * - GLB en disco: verificado desde bash (informe en work/junie-jl142/).
+     * - Plantillas en assets.json: verificado por las pruebas de JL-86…89.
+     * - Este escenario verifica: arquetipos en el juego y captura del Compendio.
+     * Criaturas: baru_jaguar, baru_elder, darien_neque, darien_tapir,
+     * darien_harpy, boquete_owl, fortuna_coyote. */
+    async fauna() {
+        await newGame('QA Fauna');
+
+        // Arquetipos de fauna.
+        const fauna = [
+            { archetype: 'baru_jaguar', name: 'Jaguar del Barú' },
+            { archetype: 'baru_elder', name: 'Gran Jaguar' },
+            { archetype: 'darien_neque', name: 'Ñeque Guerrero' },
+            { archetype: 'darien_tapir', name: 'Macho de Monte' },
+            { archetype: 'darien_harpy', name: 'Águila Harpía' },
+            { archetype: 'boquete_owl', name: 'Búho Chismoso' },
+            { archetype: 'fortuna_coyote', name: 'Coyote de la Helada' },
+        ];
+
+        // 1. Verificar que los arquetipos existen en el contenido de enemigos.
+        for (const f of fauna) {
+            const enemyDef = await js(
+                `(function(){ var c=${W}.content; var e=c.enemies||c; var a=(e.archetypes||e)['${f.archetype}']; return a ? {level:a.level||'?'} : null; })()`,
+            );
+            check(
+                `JL-142 ${f.name}: arquetipo ${f.archetype}`,
+                enemyDef !== null,
+                enemyDef ? `nivel ${enemyDef.level}` : 'no encontrado',
+            );
+        }
+
+        // 2. Captura del Compendio — verificar que las criaturas aparecen.
+        // Usar la tecla K o el botón del menú para abrir el Compendio.
+        try {
+            await key('KeyK', 'k');
+            await until(`document.querySelector('.panel-compendium')`, 10000, 'compendio').catch(() => {});
+            await sleep(1000);
+            const compOpen = await js(`!!document.querySelector('.panel-compendium')`);
+            check('JL-142 Compendio: abierto con K', compOpen, compOpen ? 'visible' : 'no visible');
+            if (compOpen) {
+                await shot('jl142-compendio');
+                // Cerrar el Compendio.
+                await key('Escape', 'Escape');
+                await sleep(300);
+            }
+        } catch (e) {
+            check('JL-142 Compendio: abierto', false, e.message.slice(0, 80));
+        }
+
+        // 3. Verificar que no hay errores de carga de GLB en consola.
+        const consola = await js(`window.__consola ? (window.__consola.errores(20) || []) : []`).catch(() => []);
+        const glbErrors = (Array.isArray(consola) ? consola : []).filter((e) => typeof e === 'string' && (e.includes('.glb') || e.includes('GLB') || e.includes('gltf')));
+        check('JL-142 fauna: sin errores de GLB', glbErrors.length === 0, glbErrors.join(' | ') || 'limpio');
+
+        // Captura final.
+        await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=8; })()`);
+        await sleep(600);
+        await shot('jl142-fauna-resumen');
     },
 
     /** JL-121: Guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. */
@@ -6394,7 +6805,9 @@ const scenarios = {
         await shot('jl121-despues-carga');
 
         /* 5. Verificar que la posición del jugador es válida. */
-        const pos = await js(`(()=>{ const p=${W}.player; return {x:Math.round(p.pos.x*10)/10, y:Math.round(p.pos.y*10)/10}; })()`);
+        const pos = await js(
+            `(()=>{ const p=${W}.player; return {x:Math.round(p.pos.x*10)/10, y:Math.round(p.pos.y*10)/10}; })()`,
+        );
         record('5. Posición del jugador tras cargar', pos.x !== 0 || pos.y !== 0, JSON.stringify(pos));
 
         /* 6. Salir de la cripta para limpiar. */
@@ -6450,7 +6863,10 @@ try {
             });
             await Promise.race([scenarioPromise, timeoutPromise]);
         } catch (e) {
-            const msg = e instanceof BootError ? e.message : `${e.message}${e.message?.includes('Tiempo agotado') ? ' (timeout escenario)' : ''}`;
+            const msg =
+                e instanceof BootError
+                    ? e.message
+                    : `${e.message}${e.message?.includes('Tiempo agotado') ? ' (timeout escenario)' : ''}`;
             check(`${name}: terminó el recorrido`, false, msg);
             await shot(`error-${name}`).catch(() => {});
             if (e instanceof BootError) break;

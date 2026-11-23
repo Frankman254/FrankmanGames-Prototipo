@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-142: escenario fauna — verificación de criaturas de fauna (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `fauna` en el arnés de QA para verificar las criaturas de fauna integradas en JL-86…89 (jaguar, jaguar anciano, ñeque, tapir, águila arpía, búho, zorro). Las zonas de Herrera están fuera del mundo base y no spawnean enemigos naturalmente, por lo que la verificación se divide: arquetipos en `world.content.enemies`, GLB en disco (bash), y Compendio abierto con K.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs fauna` → 10/10 en verde: 7 arquetipos encontrados con sus niveles, Compendio abierto con K, sin errores de GLB en consola. Los 7 GLB existen en disco (jaguar.glb, jaguar_anciano.glb, neque.glb, tapir.glb, aguila_arpia.glb, buho.glb, zorro.glb). Las plantillas en assets.json ya están verificadas por las pruebas de JL-86, JL-87, JL-89 y JL-72. Capturas en `work/junie-jl142/` (jl142-compendio.jpg, jl142-fauna-resumen.jpg).
+
+---
+
 ## 2026-11-22 — ICO-04 + EQ-06 rework: repertorio integral de iconos (Codex)
 
 **Archivos:** `assets/emotes/`, `assets/icons/{classes,editor,items,pets,professions,stats,statuses,ui}/`, `scripts/art/`, consumidores de `src/ui/` y `src/editor/`.

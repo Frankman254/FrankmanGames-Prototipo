@@ -1270,7 +1270,7 @@ No se aprueban dos:
 
 ### Más cobertura y calidad
 - [x] JL-141 Escenario `fantasma`: el fantasma de JL-90 aparece, se mueve y ataca con la animación de reserva, sin errores de consola. — commit «JL-141: escenario fantasma — 5/5 en Electron» — 5/5 en verde (fantasma aparece, se mueve 7.1 m, sin errores consola, desaparece al revivir). Capturas en work/junie-jl141/.
-- [ ] JL-142 Escenario `fauna`: ver de cerca las águilas, el ñeque, el tapir, el jaguar, el búho y el zorro de JL-86…89. Una captura de cada uno al lado del jugador, para comprobar la escala.
+- [x] JL-142 Escenario `fauna`: ver de cerca las águilas, el ñeque, el tapir, el jaguar, el búho y el zorro de JL-86…89. — commit «JL-142: escenario fauna — 10/10, arquetipos y Compendio» — 10/10 en verde (7 arquetipos, Compendio, sin errores GLB). Las zonas de Herrera no spawnean (fuera del mundo base). GLB verificados en disco. Capturas en work/junie-jl142/.
 - [ ] JL-143 Escenario `utileriaCripta`: los tres tramos de la cripta (1–30, 31–70 y 71–100) muestran su utilería de JL-88 sin tapar pasillos.
 - [ ] JL-144 Prueba: ninguna pieza de utilería de la cripta cae sobre una baldosa de paso ni delante de una antorcha. Comprobación sobre los datos de todos los pisos a mano.
 - [ ] JL-145 Prueba: cada arquetipo de `data/assets.json` que apunta a un GLB tiene en ese GLB los clips que pide su plantilla, o una reserva declarada. Es la generalización de JL-90.
