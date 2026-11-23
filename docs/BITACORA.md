@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-165: pantalla completa real en el escenario QA (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl165/`.
+
+**Qué:** El escenario `pantallaCompleta` de JL-130 solo verificaba la lógica IPC sin entrar en pantalla completa real, asumiendo que no había display. Este Mac sí tiene pantalla. El escenario ahora: (1) entra en pantalla completa real con `requestFullscreen` (userGesture vía CDP), (2) espera 2 s a que termine la animación de macOS, (3) mide que `innerWidth` coincide con `screen.width` (Δ=0 px), (4) verifica que la opción `fullscreen` del juego se sincroniza con el evento `fullscreenchange`, (5) toma una captura dentro, (6) sale con `exitFullscreen`, (7) verifica que la opción volvió a false, (8) toma una captura fuera. 13 checks, 10/10 en verde.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs pantallaCompleta` → 10/10 en 3 ejecuciones consecutivas. Capturas `jl165-dentro.jpg` y `jl165-fuera.jpg` en `work/junie-jl165/`.
+
+---
+
 ## 2026-11-23 — CLA-BAR1: la barra de hechizos ya no sube al cerrar el candado (Claude)
 
 **Archivos:** `src/ui/map/hudLayout.ts`, `src/ui/map/hudProfiles.ts`, `tests/claBar1_hudPlacement.test.ts`, `docs/TAREAS.md`.

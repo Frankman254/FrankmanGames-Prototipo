@@ -1651,82 +1651,79 @@ const scenarios = {
         }
     },
 
-    /** B01: Pantalla completa — lógica del juego y IPC (sin display, la verificación visual la hace el creador). */
+    /** B01/JL-165: Pantalla completa real — entra, mide, captura y sale. */
     async pantallaCompleta() {
         await cdp('Emulation.clearDeviceMetricsOverride');
         await newGame('QA Completa');
 
-        // JL-130: win.setFullScreen() requiere display físico en macOS.
-        // Verificamos la lógica del juego sin depender de la pantalla completa real.
+        // JL-165: Este Mac tiene pantalla. Entrar en pantalla completa real, esperar la animación,
+        // medir que innerWidth coincide con la pantalla, capturar y salir.
 
         // B01-1: frankmanDesktop IPC existe y responde.
         const ipcExists = await js('typeof window.frankmanDesktop?.setFullScreen === "function"');
         check('B01: frankmanDesktop IPC existe', ipcExists);
 
-        const ipcReply = await js('window.frankmanDesktop?.isFullScreen?.() ?? "no_reply"');
-        check(
-            'B01: isFullScreen responde (valor sin display: false)',
-            ipcReply === false || ipcReply === 'no_reply',
-            String(ipcReply),
-        );
+        // B01-2: Antes de entrar, no hay pantalla completa activa.
+        const fsBefore = await js('Boolean(document.fullscreenElement)');
+        check('B01: sin pantalla completa antes de entrar', fsBefore === false, String(fsBefore));
 
-        // B01-2: applyFullscreen está conectado — verificamos que la opción existe en el juego.
-        // Las opciones se guardan en localStorage con prefijo frankmangames.save.
-        const fsOption = await js(`(() => {
-          const keys = Object.keys(localStorage).filter(k => k.includes('options') || k.includes('option'));
-          for (const k of keys) {
-            try { const v = JSON.parse(localStorage.getItem(k)); if (typeof v.fullscreen === 'boolean') return v.fullscreen; } catch(e) {}
-          }
-          return 'not_found';
+        // B01-3: Ancho de pantalla de referencia.
+        const screenW = await js('screen.width');
+        check('B01: screen.width > 0', screenW > 0, String(screenW));
+
+        // B01-4: Entrar en pantalla completa real (requestFullscreen con userGesture).
+        await fullscreen();
+
+        // Esperar a que termine la animación de macOS (hasta 2 s).
+        await sleep(2000);
+
+        // B01-5: Verificar que estamos en pantalla completa.
+        const fsAfter = await js('Boolean(document.fullscreenElement)');
+        check('B01: pantalla completa activa tras entrar', fsAfter === true, String(fsAfter));
+
+        // B01-6: innerWidth coincide con el ancho de la pantalla (±1 px por redondeo).
+        const innerW = await js('innerWidth');
+        const delta = Math.abs(innerW - screenW);
+        check('B01: innerWidth coincide con screen.width (±1 px)', delta <= 1, `${innerW} vs ${screenW} (Δ=${delta})`);
+
+        // B01-7: Captura dentro de pantalla completa.
+        await shot('jl165-dentro');
+
+        // B01-8: La opción del juego se sincronizó con el evento fullscreenchange.
+        const gameFsOn = await js(`(() => {
+          try { const opts = __game?.menus?.options; if (opts && typeof opts.fullscreen === 'boolean') return opts.fullscreen; return 'na'; } catch(e) { return 'err'; }
         })()`);
-        check(
-            'B01: opción fullscreen existe en opciones guardadas',
-            fsOption === false || fsOption === true || fsOption === 'not_found',
-            String(fsOption),
-        );
+        check('B01: opción fullscreen=true tras entrar', gameFsOn === true, String(gameFsOn));
 
-        // B01-3: El juego expone la acción 'fullscreen' en handleAction (verificado por código).
-        // Sin display, verificamos que applyFullscreen no lanza errores.
-        const noError = await js(`(() => {
-          try {
-            // applyFullscreen es interno; verificamos que requestFullscreen no lance.
-            if (document.documentElement.requestFullscreen) {
-              // no la llamamos (requiere gesto del usuario), pero existe.
-              return true;
-            }
-            return true;
-          } catch(e) { return false; }
+        // B01-9: Salir de pantalla completa.
+        await cdp('Runtime.evaluate', {
+            expression: 'document.exitFullscreen().catch(()=>{})',
+            userGesture: true,
+            awaitPromise: true,
+        });
+        await until('!document.fullscreenElement', 5000, 'salir de pantalla completa');
+        await sleep(500);
+
+        // B01-10: Verificar que ya no estamos en pantalla completa.
+        const fsOut = await js('Boolean(document.fullscreenElement)');
+        check('B01: sin pantalla completa tras salir', fsOut === false, String(fsOut));
+
+        // B01-11: Captura fuera de pantalla completa.
+        await shot('jl165-fuera');
+
+        // B01-12: La opción del juego volvió a false.
+        const gameFsOff = await js(`(() => {
+          try { const opts = __game?.menus?.options; if (opts && typeof opts.fullscreen === 'boolean') return opts.fullscreen; return 'na'; } catch(e) { return 'err'; }
         })()`);
-        check('B01: applyFullscreen no lanza errores', noError);
+        check('B01: opción fullscreen=false tras salir', gameFsOff === false, String(gameFsOff));
 
-        // B01-4: La opción fullscreen se puede leer del objeto de opciones del juego.
-        const gameFs = await js(`(() => {
-          try {
-            const opts = __game?.menus?.options;
-            if (opts && typeof opts.fullscreen === 'boolean') return opts.fullscreen;
-            return 'not_accessible';
-          } catch(e) { return 'error'; }
-        })()`);
-        check(
-            'B01: opciones del juego accesibles',
-            gameFs === false || gameFs === true || gameFs === 'not_accessible',
-            String(gameFs),
-        );
-
-        // B01-4: El evento fullscreenchange está escuchado (verificar que el listener existe en el DOM).
-        const listenerExists = await js('document.fullscreenElement === null');
-        check('B01: no hay pantalla completa DOM activa (esperado sin display)', listenerExists);
-
-        // B01-5: Sin errores en consola relacionados con pantalla completa.
+        // B01-13: Sin errores de pantalla completa en consola.
         const errors = await js(`(() => {
           const err = window.__consola?.errores?.(20);
           if (!err || !Array.isArray(err)) return 0;
           return err.filter(e => typeof e === 'string' && (e.includes('fullscreen') || e.includes('FullScreen'))).length;
         })()`);
         check('B01: sin errores de pantalla completa en consola', errors === 0, String(errors));
-
-        // Nota: la verificación visual de pantalla completa real (F11, Esc con menú)
-        // requiere display físico — el creador la prueba en Windows.
     },
 
     /** B02 y B03: casilla entera a la vista y cambio de modo con Z (cameraNextMode). */
