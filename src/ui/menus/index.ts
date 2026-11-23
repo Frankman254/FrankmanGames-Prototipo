@@ -160,6 +160,8 @@ export interface MenusController {
     readonly pointerCaptured: boolean;
     readonly options: GameOptions;
     readonly keys: KeyMap;
+    /** JL-149: acceso de QA al HudLayout para cerrar edición y resetear posiciones. */
+    readonly hudLayout: HudLayout;
     /** Llamar una vez por fotograma con el tiempo real transcurrido. */
     frame(dt: number): void;
     /** Acciones que la interfaz no resuelve (evasión, depuración, prueba de carga…) y las de la barra. */
@@ -1453,6 +1455,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             return options;
         },
         keys,
+        /** JL-149: acceso de QA al HudLayout para cerrar edición y resetear posiciones. */
+        get hudLayout() {
+            return hudLayout;
+        },
         frame(dt: number) {
             if (!session || screen !== 'game') return;
             sinceAutosave += dt;

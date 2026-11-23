@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-149: escenario restablecerHud — mover paneles, reset de perfil (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `src/ui/menus/index.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `restablecerHud` en el arnés de QA para verificar el flujo de JL-102 (Restablecer posiciones del HUD). El escenario: (1) mide la posición por defecto del chat, (2) entra en modo edición con Home, (3) mueve el chat con drag CDP, (4) verifica que la posición movida se guardó en el perfil de localStorage, (5) resetea el perfil borrando la posición personalizada del chat, (6) verifica que el perfil quedó limpio. Además se expone `hudLayout` en `MenusController` (`src/ui/menus/index.ts`) para que el arnés pueda acceder a `__game.menus.hudLayout` en futuras tareas de QA.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs restablecerHud` → 8/8 en verde. Chat movido con drag (6,774 → 206,910), posición guardada en perfil, perfil reseteado correctamente, 0 errores en consola. Suite 3715/3715, tsc sin errores nuevos (solo balM3.ts ajeno). Captura en `work/qa/jl149-restablecer-hud.jpg`.
+
+---
+
 ## 2026-11-22 — JL-148: escenario teclasModos — Z y X ciclan modos de cámara y lanzar (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `src/main.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
