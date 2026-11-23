@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-146: npm run audit:modelos y documentación (Junie)
+
+**Archivos:** `package.json`, `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** El guion de auditoría nombre↔modelo de JL-99 (`scripts/audit/nombreModelo.ts`) se expone como comando npm corto `audit:modelos` y se documenta en `docs/ESTADO_ACTUAL.md`. Ahora se ejecuta con `npm run audit:modelos` en lugar de `npx vite-node scripts/audit/nombreModelo.ts`.
+
+**Cómo se verificó:** `npm run audit:modelos` → 78 arquetipos auditados (6 alta, 7 media, 6 baja, 59 OK). `npm run typecheck` sin errores nuevos.
+
+---
+
 ## 2026-11-22 — JL-145: prueba de clips GLB — 40 plantillas verificadas (Junie)
 
 **Archivos:** `tests/jl145_assetClips.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl145/EVIDENCIA.md`.

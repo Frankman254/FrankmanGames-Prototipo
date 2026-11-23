@@ -1,0 +1,7 @@
+
+> frankmangames-prototipo@0.1.0 audit:modelos
+> vite-node scripts/audit/nombreModelo.ts
+
+JL-99: 78 arquetipos auditados
+  Alta: 6, Media: 7, Baja: 6, OK: 59
+Evidencia en /Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/work/junie-jl-99/

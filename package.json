@@ -32,6 +32,7 @@
         "audit:density": "vite-node scripts/audit/worldDensity.ts",
         "audit:structures": "vite-node scripts/audit/structureGrounding.ts",
         "audit:equipment": "node scripts/audit/equipmentBudget.mjs",
+        "audit:modelos": "vite-node scripts/audit/nombreModelo.ts",
         "balance:equipment": "node scripts/balance/rebalanceEquipment.mjs",
         "balance:routes": "node scripts/balance/generateEquipmentRoutes.mjs",
         "balance:eq07": "node scripts/balance/eq07Equipment.mjs",

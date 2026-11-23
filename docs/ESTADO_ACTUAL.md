@@ -94,7 +94,7 @@ Estado de cada sistema con su límite conocido. Las filas con fecha son de la re
 | Mundo de Panamá | Atlas de 13 regiones, islas principales y los dos países vecinos visibles sin poder entrar (F10); 256 m jugables dentro de Los Santos; detalle por distancia; bruma azul; Panamá lejana; flora por zona; iglesia, trapiche y fortín | `data/panama.json`, `src/world/atlas.ts`, `scripts/audit/worldDensity.ts`, escenario `mapa` | Auditoría reproducible (`npm run audit:density`): mediana 93,1 % de tierra caminable, cero invasiones de camino, cero cuellos según el umbral PROPUESTA y las 16 anclas con un claro de combate de 6 m a ≤2 m. Vigilar p3_7 (Macanas, 42,6 % admite disco de 6 m), el cuasi-cuello (512,14) y las franjas p2_8/p3_8; no se cambió vegetación sin revisión visual. El resto de Panamá se ve y no se entra; LOD distante y mapa grande siguen pendientes |
 | Online | Prueba local separada | `server/`, `tests/server/poc.test.ts` | No hay MMO, economía persistente ni intercambio entre jugadores en el RPG |
 
-Límites conocidos: el pueblo ronda las 580 llamadas de dibujo (PNJ y vegetación sin agrupar); queda un tirón corto al entrar al piso 20 (ahora tapado por la pantalla de carga); `audit:density` sólo revisa la parcela antigua.
+Límites conocidos: el pueblo ronda las 580 llamadas de dibujo (PNJ y vegetación sin agrupar); queda un tirón corto al entrar al piso 20 (ahora tapado por la pantalla de carga); `audit:density` sólo revisa la parcela antigua; `audit:modelos` (`npm run audit:modelos`) audita la coherencia nombre↔modelo de los 78 arquetipos de criaturas y escribe la tabla en `work/junie-jl-99/`.
 
 ## Hechos de contexto que siguen vigentes
 
