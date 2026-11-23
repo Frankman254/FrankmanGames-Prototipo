@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-150: escenario etiquetaCamara — toggle de la etiqueta del modo de cámara (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `etiquetaCamara` en el arnés de QA para verificar la opción de JL-103 (`showCameraModeLabel`). El escenario: (1) confirma que la etiqueta `.mm-camera-mode` está oculta por defecto, (2) activa `showCameraModeLabel` y verifica que la etiqueta aparece con texto "Cámara: Manual", (3) pulsa Z para cambiar el modo de cámara y verifica que la etiqueta se actualiza ("Cámara: Semiauto"), (4) desactiva la opción y verifica que la etiqueta se oculta de nuevo.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs etiquetaCamara` → 8/8 en verde. Etiqueta oculta por defecto, visible al activar, texto cambia con Z, oculta al desactivar. 0 errores en consola. Captura en `work/junie-jl150/jl150-etiqueta-camara.jpg`. Suite 3715/3715, tsc sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-22 — JL-149: escenario restablecerHud — mover paneles, reset de perfil (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `src/ui/menus/index.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

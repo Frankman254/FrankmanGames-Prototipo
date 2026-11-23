@@ -7104,6 +7104,64 @@ const scenarios = {
         await shot('jl149-restablecer-hud');
     },
 
+    /** JL-150: Escenario etiquetaCamara — la opción de JL-103 enseña y oculta la etiqueta junto al minimapa. */
+    async etiquetaCamara() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-150 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        /* 1. Partida nueva. */
+        await newGame('QA EtiquetaCam');
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+        await sleep(1000);
+
+        /* 2. Por defecto, la etiqueta está oculta. */
+        const labelHidden0 = await js(`document.querySelector('.mm-camera-mode')?.hidden ?? true`);
+        record('2. Etiqueta oculta por defecto', labelHidden0 === true, `hidden=${labelHidden0}`);
+
+        /* 3. Activar showCameraModeLabel. setMap se llama cada frame desde main.ts,
+         * por lo que la etiqueta se actualiza sola en el siguiente ciclo. */
+        await js(`__game.menus.options.showCameraModeLabel = true`);
+        // Esperar a que el frame actualice la etiqueta (setMap → minimap.setCameraModeLabel).
+        await until("document.querySelector('.mm-camera-mode')?.hidden === false", 5000, 'etiqueta visible');
+        await sleep(300);
+
+        const labelText1 = await js(`document.querySelector('.mm-camera-mode')?.textContent ?? ''`);
+        record('3. Etiqueta visible tras activar opción', labelText1.length > 0, labelText1.slice(0, 40));
+        record('3b. Etiqueta contiene "Cámara:"', labelText1.includes('Cámara:'), labelText1.slice(0, 40));
+
+        /* 4. Pulsar Z para cambiar el modo de cámara y verificar que la etiqueta se actualiza. */
+        const labelBefore = labelText1;
+        await key('KeyZ', 'z');
+        await sleep(800);
+        // Esperar a que la etiqueta cambie.
+        await until(
+            `document.querySelector('.mm-camera-mode')?.textContent !== '${labelBefore.replace(/'/g, "\\'")}'`,
+            5000,
+            'etiqueta cambia',
+        ).catch(() => {});
+
+        const labelText2 = await js(`document.querySelector('.mm-camera-mode')?.textContent ?? ''`);
+        record('4. Etiqueta refleja el nuevo modo', labelText2 !== labelBefore, `${labelBefore} → ${labelText2}`);
+        record('4b. Etiqueta sigue conteniendo "Cámara:"', labelText2.includes('Cámara:'), labelText2.slice(0, 40));
+
+        /* 5. Desactivar la opción y verificar que se oculta. */
+        await js(`__game.menus.options.showCameraModeLabel = false`);
+        await until("document.querySelector('.mm-camera-mode')?.hidden === true", 5000, 'etiqueta oculta');
+        await sleep(300);
+
+        const labelHidden2 = await js(`document.querySelector('.mm-camera-mode')?.hidden ?? true`);
+        record('5. Etiqueta oculta tras desactivar opción', labelHidden2 === true, `hidden=${labelHidden2}`);
+
+        /* 6. Sin errores en consola. */
+        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return (t.split('\\n').filter(l=>l&&!l.includes('postProcessManager'))).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string'&&!e.includes('postProcessManager')).length; return 0; })()`);
+        record('6. Sin errores en consola', errors === 0, `errores=${errors}`);
+
+        await shot('jl150-etiqueta-camara');
+    },
+
     /** JL-121: Guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. */
     async guardadoCargar() {
         const failures = [];
