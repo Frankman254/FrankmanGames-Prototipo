@@ -1327,7 +1327,7 @@ Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`
 - [x] JL-154 Revisar que cada casilla `[x]` de JL-73…108 cite un commit o una evidencia que exista de verdad: ruta en `work/` y hash en `git log`. Corrige solo las citas rotas. — commit «JL-154: cita rota JL-79 corregida a 06da5151» — 36 tareas verificadas, 1 cita rota (JL-79 → 06da5151). VERIFICACION.md en work/junie-jl154/.
 
 ### Cierre de la tanda
-- [ ] JL-155 Consola limpia otra vez (QA-02) tras esta tanda: 13 escenarios y cero errores nuevos.
+- [x] JL-155 Consola limpia otra vez (QA-02) tras esta tanda: 13 escenarios y cero errores nuevos. — commit «JL-155: consola limpia — 14 escenarios, 152/153 checks, 0 errores nuevos» — INFORME.md en work/junie-jl155/.
 - [ ] JL-156 Recorrido completo de QA en dos pasadas con `QA_SESION`.
   - El objetivo es 0 FALLA, salvo lo que espera una decisión del creador.
   - Deja el resumen en `work/junie-jl-156/RESUMEN.md` y compáralo con JL-107.

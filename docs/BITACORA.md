@@ -1,3 +1,14 @@
+## 2026-11-23 — JL-155: consola limpia — 14 escenarios, 0 errores nuevos (Junie)
+
+**Archivos:** `work/junie-jl155/INFORME.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Re-verificación de QA-02 tras la tanda JL-73…JL-180. Se ejecutaron 14 escenarios de Electron (pueblo, Iguanera, cripta, combate, audio, mazmorraCompleta, viaje, banco, interfaz, previa, muerte_y_revivir, botin, santos, casa) con 152/153 checks en verde y **0 errores nuevos** de consola. El único fallo es el bug pre-existente de Babylon.js (`postProcessManager` en `botin` al cambiar de escena muerte → revivir), que no es nuevo ni del código del juego.
+
+**Cómo se verificó:** Cada escenario ejecutado con `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs <escenario>`. Todos pasaron sin errores nuevos de consola. INFORME.md en `work/junie-jl155/` con tabla de resultados.
+
+---
+
+
 ## 2026-11-23 — JL-154: cita rota JL-79 corregida (Junie)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/BITACORA.md`, `work/junie-jl154/VERIFICACION.md`.
