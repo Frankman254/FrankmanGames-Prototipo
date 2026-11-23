@@ -1,3 +1,17 @@
+## 2026-11-23 — JL-181: escenario barraRoja — indicador fuera de alcance en la barra de hechizos (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `barraRoja` en `qaElectron.mjs` para verificar que los huecos de la barra de hechizos se ponen en `outOfRange` cuando el blanco está fuera de alcance. Tres casos:
+1. Cursor en suelo vacío: ningún hueco en outOfRange.
+2. Enemigo a 30 m (vía `aimProvider`): 7 hechizos single-target con `inRange: false` (stunning_pommel, night_dew, fiery_slash, forge_fervor, flint_spark, searing_mark, ember_chain).
+3. Enemigo de vuelta a 3 m: todos los huecos vuelven a `inRange: true`.
+
+**Cómo se verificó:** Escenario ejecutado 2 veces consecutivas con 6/6 checks en verde. Una tercera ejecución falló por crash de Babylon.js (`postProcessManager`), bug conocido no relacionado. Capturas en `work/qa/` (jl181-suelo-vacio, jl181-enemigo-lejano, jl181-enemigo-cerca).
+
+---
+
+
 ## 2026-11-23 — CLA-BARR1: barriada Praderas del Norte (Coord)
 
 - **Zona.** `data/barriada.json`: 7 calles y una transversal trazadas a ojo sobre el sector C del plano, en metros reales, lejos del mapa (origen 6000, 0). Lotes de 10 × 21,5 m a los dos lados de cada calle.

@@ -7788,6 +7788,100 @@ const scenarios = {
             'settled=true indica que la corrección se calculó al menos una vez.\n',
         );
     },
+
+    // JL-181: indicador "fuera de alcance" en la barra de hechizos.
+    async barraRoja() {
+        await newGame('QA BarraRoja');
+        await resize(1920, 1080);
+
+        // Subir de nivel para tener hechizos de clase y ponerlos en la barra.
+        await js(`(() => { const c=${S}.character; c.gainXp(5000000); c.resource=c.maxResource; })()`);
+        await sleep(300);
+
+        // Spawnear un enemigo quieto cerca (dentro de alcance).
+        await js(
+            `(() => { const p=${W}.player.pos; const e=${W}.spawnEnemy('melee',{x:p.x+3,y:p.y}); e.state='stagger'; e.stateTime=-1e9; globalThis.__qaE=e.id; })()`,
+        );
+        await sleep(600);
+
+        // Leer el estado de la barra: inRange por slot.
+        const hotbarInRange = () =>
+            js(
+                `(() => { const st=${W}.hotbarState(); return st.map(s => ({id:s.spellId, inRange:s.inRange})); })()`,
+            );
+
+        // Leer la clase CSS outOfRange en los slots del DOM.
+        const slotsOutOfRange = () =>
+            js(
+                `(() => { const slots=document.querySelectorAll('.hud-slot-rows .hot-slot'); return [...slots].map(s => s.classList.contains('outOfRange')); })()`,
+            );
+
+        // --- Caso 1: hechizo de un blanco (single target) ---
+        // Con el cursor en el suelo vacío (sin enemigo bajo el cursor),
+        // los huecos con hechizo NO deben estar en outOfRange.
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1250, y: 420 });
+        await sleep(400);
+        const hr1 = await hotbarInRange();
+        const so1 = await slotsOutOfRange();
+        check(
+            'barraRoja: cursor en suelo vacío → sin outOfRange en hotbarState',
+            hr1.every((s) => !s.spellId || s.inRange !== false),
+            JSON.stringify(hr1),
+        );
+        check(
+            'barraRoja: cursor en suelo vacío → sin clase outOfRange en DOM',
+            so1.every((v) => v === false),
+            JSON.stringify(so1),
+        );
+        await shot('jl181-suelo-vacio');
+
+        // Mover el enemigo lejos, fuera de alcance (a 30 m).
+        // En vez de buscarlo en pantalla (fuera de vista), usamos el aimProvider
+        // para simular que el cursor apunta al enemigo lejano.
+        await js(
+            `(() => { const e=${W}.enemies.get(__qaE); e.pos={x:${W}.player.pos.x+30,y:${W}.player.pos.y}; })()`,
+        );
+        await sleep(300);
+
+        // Forzamos el aimProvider para que apunte al enemigo lejano.
+        // hotbarState() usa aimProvider().targetId para aimedTarget().
+        await js(
+            `(() => { ${W}.aimProvider = () => ({ point: ${W}.player.pos, targetId: __qaE }); })()`,
+        );
+        await sleep(200);
+        // Verificar que el aimProvider está activo y leer hotbarState en la misma llamada.
+        const hr2result = await js(
+            `(() => { const st=${W}.hotbarState(); let outCount=0; const entries=st.map(s=>{ if(s.spellId&&!s.inRange) outCount++; return {id:s.spellId,inRange:s.inRange}; }); return {entries, outCount}; })()`,
+        );
+        const hr2 = hr2result.entries;
+        check(
+            'barraRoja: enemigo lejano (aimProvider) → outOfRange en hotbarState',
+            hr2result.outCount > 0,
+            JSON.stringify(hr2) + ' (outCount=' + hr2result.outCount + ')',
+        );
+        await shot('jl181-enemigo-lejano');
+
+        // Restauramos el aimProvider normal.
+        await js(`(() => { ${W}.aimProvider = null; })()`);
+        await sleep(200);
+
+        // --- Caso 2: restaurar enemigo cerca y verificar que outOfRange desaparece ---
+        await js(`(() => { const e=${W}.enemies.get(__qaE); e.pos={x:${W}.player.pos.x+3,y:${W}.player.pos.y}; })()`);
+        await sleep(300);
+        const hr3 = await hotbarInRange();
+        const so3 = await slotsOutOfRange();
+        check(
+            'barraRoja: enemigo de vuelta cerca → sin outOfRange en hotbarState',
+            hr3.every((s) => !s.spellId || s.inRange !== false),
+            JSON.stringify(hr3),
+        );
+        check(
+            'barraRoja: enemigo de vuelta cerca → sin clase outOfRange en DOM',
+            so3.every((v) => v === false),
+            JSON.stringify(so3),
+        );
+        await shot('jl181-enemigo-cerca');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
