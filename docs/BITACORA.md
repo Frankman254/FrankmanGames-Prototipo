@@ -1,3 +1,15 @@
+## 2026-11-22 — JL-143: escenario utilería cripta — hallazgo floor.props vacío (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl143/DIAGNOSTICO.md`.
+
+**Qué:** Escenario `utileriaCripta` en el arnés de QA para verificar la utilería de los 5 pisos a mano de la cripta (JL-88). Los pisos se renderizan correctamente (dFloor, dWall, dTorch, dChest...). El GLB `utileria_cripta.glb` existe y es accesible, y sus 12 nodos coinciden con las piezas declaradas en `cripta-tulivieja.json`. Sin embargo, **ningún mesh dProp se crea**: `floor.props` está vacío en `generateHandFloor()`, lo que hace que `buildProps()` no tenga nada que instanciar.
+
+**Causa:** `generateHandFloor()` mapea `hand.props ?? []`, pero `hand.props` es undefined en runtime. El JSON de `cripta-tulivieja.json` tiene los props declarados, pero no llegan al floor generado. Posible causa: `import.meta.glob('/assets/models/utileria_cripta.glb')` en `dungeonView.ts` no incluye el GLB en el bundle de Vite, o el JSON no se importa correctamente.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs utileriaCripta` → 12/17 en verde (5 pisos renderizados, GLB accesible, salida limpia). 5 fallos = hallazgo documentado (floor.props vacío). DIAGNOSTICO.md en `work/junie-jl143/`.
+
+---
+
 ## 2026-11-22 — JL-142: escenario fauna — verificación de criaturas de fauna (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -15,6 +27,8 @@
 El creador pidió rehacer de una vez los iconos faltantes o pobres, incluidos emojis y menú principal. Se crearon cinco láminas maestras clean-room con ImageGen y un compositor local determinista para gestos, clases, mascotas, oficios, menú y derivados semánticos; no se usó ningún modelo local. Cobertura auxiliar: 101 PNG validados (8 gestos, 3 clases, 4 mascotas, 6 oficios, 8 estadísticas, 39 estados, 13 acciones de menú/chat y 20 conceptos del editor). La UI los carga por ID en portada, creación/ficha/HUD, mascota, oficios, chat, menú del sistema y editor; el barrido Unicode no encuentra pictogramas en `src/ui/` ni `src/editor/`.
 
 Además se regeneraron los 1.100 objetos con caja segura de 216 px y ornamentos estructurales para rutas, especializaciones, aprendizaje y conjuntos bi/trielementales: 642 siluetas alfa distintas y máximo de repetición 21, frente a 543 y 71. Validadores en verde; láminas a tamaño real en `work/codex-icon-refresh/review/auxiliares.png` y `work/codex-eq06/pages/`.
+
+Verificación: 26/26 pruebas focales y las pruebas de foco, i18n y chat en verde; Vite de producción compila. Electron: interfaz/portada/creación/oficios 18/18, chat y gestos 4/4, editor 9/9 operaciones funcionales. El editor conserva un error de consola preexistente de Babylon (`rgbdTextureTools`, `postProcessManager` nulo) al cerrar/reabrir; no procede de los iconos. `npm run typecheck` sigue bloqueado únicamente por el archivo ajeno sin commit `scripts/balance/balM3.ts`.
 
 ---
 

@@ -4851,7 +4851,7 @@ const scenarios = {
             !!before?.key,
             JSON.stringify(before),
         );
-        await click('button', '✥ Mover');
+        await click('button', 'Mover');
         await until(`__game.editor.gizmoPosition() !== null`, 3000, 'gizmo adjunto');
         await shot('editor-world-builder-gizmo');
 
@@ -4860,7 +4860,7 @@ const scenarios = {
             await js(`(() => { const g=__game.editor.gizmoPosition(), sc=__game.view.scene, cam=__game.view.rig.camera, eng=sc.getEngine();
       const V=cam.position.constructor,M=cam.getViewMatrix().constructor,vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight()),p=V.Project(new V(g.x,g.y+2,g.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp),c=eng.getRenderingCanvas(),r=c.getBoundingClientRect();
       return {x:r.x+p.x*r.width/eng.getRenderWidth(),y:r.y+p.y*r.height/eng.getRenderHeight()}; })()`);
-        await click('button', '☝ Seleccionar');
+        await click('button', 'Seleccionar');
         await mouse(viewportPoint.x, viewportPoint.y);
         const viewportSelected = await js(`__game.editor.selected()`);
         check(
@@ -4868,7 +4868,7 @@ const scenarios = {
             viewportSelected?.key === before.key,
             JSON.stringify(viewportSelected),
         );
-        await click('button', '✥ Mover');
+        await click('button', 'Mover');
 
         const axis =
             await js(`(() => { const g=__game.editor.gizmoPosition(), a=__game.editor.gizmoAxisPoint(), sc=__game.view.scene, cam=__game.view.rig.camera, eng=sc.getEngine();
@@ -5065,7 +5065,7 @@ const scenarios = {
         );
 
         // Mover la copia con el gizmo real.
-        await click('button', '✥ Mover');
+        await click('button', 'Mover');
         await until(`__game.editor.gizmoAxisPoint() !== null`, 3000, 'gizmo de copia');
         const axis =
             await js(`(() => { const g=__game.editor.gizmoPosition(),a=__game.editor.gizmoAxisPoint(),sc=__game.view.scene,cam=__game.view.rig.camera,eng=sc.getEngine();
@@ -6769,6 +6769,56 @@ const scenarios = {
         await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=8; })()`);
         await sleep(600);
         await shot('jl142-fauna-resumen');
+    },
+
+    /** JL-143: Utilería de la cripta — verificación de datos, GLB y render. */
+    async utileriaCripta() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-143 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        /* Partida nueva con energía alta. */
+        await newGame('QA Utileria');
+        await js(`${S}.energy.value=100`);
+
+        /* Los 5 pisos a mano (índices 0-4). */
+        const handFloors = [
+            { floor: 0, id: 'atrio' },
+            { floor: 1, id: 'galeria' },
+            { floor: 2, id: 'camara' },
+            { floor: 3, id: 'patio' },
+            { floor: 4, id: 'santuario' },
+        ];
+
+        for (const { floor, id } of handFloors) {
+            /* Entrar al piso. */
+            await js(`__game.crypt.enter(${floor},'above')`);
+            await until(`__game.crypt.floor===${floor}`, 15000, `piso ${floor + 1} (${id})`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, `piso ${floor + 1} listo`).catch(() => {});
+            await sleep(800);
+
+            /* Verificar que el piso se renderiza. */
+            const floorMeshes = await js(`__game.view.scene.meshes.filter(m=>m.isEnabled()&&m.name.startsWith('dFloor')).length`);
+            record(`Piso ${floor + 1} (${id}): se renderiza`, floorMeshes > 0, `dFloor: ${floorMeshes}`);
+
+            /* Verificar que el GLB es accesible. */
+            const glbOk = await js(`fetch('/assets/models/utileria_cripta.glb').then(r=>r.ok).catch(()=>false)`);
+            record(`Piso ${floor + 1}: utileria_cripta.glb accesible`, glbOk, String(glbOk));
+
+            /* Verificar que no hay meshes dProp- (hallazgo: floor.props vacío). */
+            const dPropCount = await js(`__game.view.scene.transformNodes.filter(n=>n.name.startsWith('dProp-')).length`);
+            record(`Piso ${floor + 1}: meshes dProp`, dPropCount > 0, `dProp: ${dPropCount} (hallazgo: floor.props vacío en generateHandFloor)`);
+
+            /* Captura del piso. */
+            await shot(`jl143-piso-${floor + 1}-${id}`);
+        }
+
+        /* Salir de la cripta. */
+        await js(`__game.crypt.leave?.()`);
+        await until(`__game.crypt.floor===null`, 10000, 'salida').catch(() => {});
+        record('Salida: fuera de la cripta', !(await js(`__game.crypt.inside`)), 'OK');
     },
 
     /** JL-121: Guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. */
