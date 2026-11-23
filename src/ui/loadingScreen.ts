@@ -101,7 +101,7 @@ export class LoadingScreen {
                 if (calm >= 3) break;
                 await nextFrame();
             }
-            if (this.deps.ready) await Promise.race([this.deps.ready().catch(() => undefined), wait(5000)]);
+            if (this.deps.ready) await Promise.race([this.deps.ready().catch((e: unknown) => { console.warn('[carga] deps.ready falló', e); return undefined; }), wait(5000)]);
             this.progress(1, tr('Listo'));
         } finally {
             this.deps.pause(false);

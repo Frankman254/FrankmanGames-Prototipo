@@ -49,7 +49,10 @@ export async function loadSamples(
                     s.file,
                     bytesOf(url)
                         .then((b) => ctx.decodeAudioData(b))
-                        .catch(() => null),
+                        .catch((e: unknown) => {
+                            console.warn('[audio] no se pudo decodificar', s.file, e);
+                            return null;
+                        }),
                 );
             const buf = await decoded.get(s.file)!;
             if (buf) out.set(id, buf);

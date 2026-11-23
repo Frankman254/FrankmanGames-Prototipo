@@ -4296,3 +4296,14 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** Suite 3727/3727 en verde, tsc limpio (solo balM3.ts ajeno), build OK. Pruebas de antorchas (j16, tor01, jl64b, jl88, jl144) sin regresiones.
 
 **Evidencia:** `tests/jl164_checkProps.test.ts` (3 pruebas verdes).
+
+## 2026-11-23 — JL-179: Error que no se traga (Junie)
+
+**Archivos:** `src/audio/samples.ts`, `src/render/assetCache.ts`, `src/render/dungeonView.ts`, `src/ui/loadingScreen.ts`, `src/ui/menus/index.ts`, `work/junie-jl179/LISTA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Barrido de `.catch()` y `catch {}` vacíos en `src/`. Se encontraron 19 `.catch()` en total: 12 ya registran el error, 7 tragan el error en silencio. Los 7 silenciosos se cambiaron a `console.warn` con la ruta del archivo que falló: `samples.ts` (WAV de efectos), `assetCache.ts` (GLB genéricos), `dungeonView.ts` (utileria_cripta.glb), `loadingScreen.ts` (deps.ready), y 3 en `menus/index.ts` (Keyboard Layout API, requestFullscreen, exitFullscreen). Lista completa en `work/junie-jl179/LISTA.md`.
+
+**Cómo se verificó:** `npx vitest run` → 3770/3770 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). `npx vite build` OK. LISTA.md en `work/junie-jl179/`.
+
+---
+

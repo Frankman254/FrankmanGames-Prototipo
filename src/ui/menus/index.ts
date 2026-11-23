@@ -255,7 +255,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             setKeyboardLayout(m);
             rebuildHud();
         })
-        .catch(() => undefined);
+        .catch((e: unknown) => { console.warn('[menus] no se pudo leer el layout del teclado', e); });
     const seed = opts.seed ?? (() => (Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0);
 
     const actionFns: ((a: Action) => void)[] = [];
@@ -1106,14 +1106,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     function applyFullscreen(on: boolean): void {
         const isOn = Boolean(document.fullscreenElement);
         if (on && !isOn) {
-            void document.documentElement.requestFullscreen?.().catch(() => {
+            void document.documentElement.requestFullscreen?.().catch((e: unknown) => {
+                console.warn('[menus] requestFullscreen falló', e);
                 // Fallback: fullscreen nativo de Electron si el DOM no puede.
                 const desktop = (window as unknown as { frankmanDesktop?: { setFullScreen(on: boolean): void } })
                     .frankmanDesktop;
                 desktop?.setFullScreen(true);
             });
         } else if (!on && isOn) {
-            void document.exitFullscreen?.().catch(() => undefined);
+            void document.exitFullscreen?.().catch((e: unknown) => { console.warn('[menus] exitFullscreen falló', e); });
         }
     }
 

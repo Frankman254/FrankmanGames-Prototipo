@@ -486,8 +486,8 @@ export class DungeonFloorView {
                 clone.isPickable = false;
             }
             container.dispose();
-        }).catch(() => {
-            // GLB no disponible: sin utilería, sin error.
+        }).catch((e: unknown) => {
+            console.warn('[dungeon] no se pudo cargar utileria_cripta.glb', e);
         });
     }
 

@@ -53,7 +53,10 @@ export class AssetCache {
             p = track(
                 LoadAssetContainerAsync(url, this.scene, { pluginExtension: ext === '.gltf' ? '.gltf' : '.glb' }),
             );
-            p.catch(() => this.containers.delete(id)); // permite reintentar
+            p.catch((e: unknown) => {
+                console.warn('[assets] no se pudo cargar', id, e);
+                this.containers.delete(id); // permite reintentar
+            });
             this.containers.set(id, p);
         }
         return p;
