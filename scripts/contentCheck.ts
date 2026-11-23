@@ -576,6 +576,22 @@ export function checkContent(data?: SyntheticData): Problem[] {
     checkRefs(problems, 'rpg/quests.json', qid, spellRefs, spellIds, 'learnSpell');
   }
 
+  // ---- Cada NPC no-mercader debe tener posición (x, y) ----
+  // Los NPCs con "merchant": true son de interfaz y no necesitan posición en el mundo.
+  for (const [nid, npc] of Object.entries(npcs)) {
+    if (npc['merchant'] === true) continue;
+    const pos = npc['position'];
+    if (!pos || typeof pos !== 'object' || Array.isArray(pos)) {
+      problems.push({ file: 'rpg/npcs.json', id: nid, detail: 'sin posición (position ausente o no es objeto)' });
+    } else {
+      const px = (pos as Json)['x'];
+      const py = (pos as Json)['y'];
+      if (typeof px !== 'number' || typeof py !== 'number') {
+        problems.push({ file: 'rpg/npcs.json', id: nid, detail: `posición incompleta (x=${px}, y=${py})` });
+      }
+    }
+  }
+
   // ---- Referencias: NPC → misión ----
   for (const [nid, npc] of Object.entries(npcs)) {
     const questRefs = npcQuestIds(npc);
@@ -634,13 +650,13 @@ export function checkContent(data?: SyntheticData): Problem[] {
   return problems;
 }
 
-// Ejecución directa: siempre ejecutar checkContent; process.exit solo si es el entry point.
-const _problems = checkContent();
-if (_problems.length > 0 && process.argv[1]) {
-  // vite-node pasa el script como argv[1] cuando es el entry point.
-  // Cuando se importa desde tests/, argv[1] es vite-node, no este script.
-  // Usamos un flag en globalThis para distinguir.
-  if (!(globalThis as any).__CONTENT_CHECK_IMPORT_ONLY) {
+// Ejecución directa: solo si se lanza con vite-node (no cuando se importa desde tests/).
+// Con vite-node, process.argv contiene 'vite-node'; con vitest (tinypool worker),
+// contiene 'tinypool' pero no 'vite-node'.
+const _isViteNode = process.argv.some((a) => a.includes('vite-node'));
+if (_isViteNode) {
+  const _problems = checkContent();
+  if (_problems.length > 0) {
     process.exit(1);
   }
 }

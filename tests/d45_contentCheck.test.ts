@@ -4,11 +4,11 @@
 // modificar los archivos reales. Las pruebas pasan datos sintéticos
 // directamente.
 
+// Marcar ANTES del import para que contentCheck.ts no haga process.exit.
+(globalThis as any).__CONTENT_CHECK_IMPORT_ONLY = true;
+
 import { describe, expect, it } from 'vitest';
 import { checkContent, type SyntheticData } from '../scripts/contentCheck';
-
-// Marcar para que contentCheck.ts no haga process.exit al importarse.
-(globalThis as any).__CONTENT_CHECK_IMPORT_ONLY = true;
 
 /** Datos sintéticos con referencias rotas para probar la detección. */
 function getSyntheticData(): SyntheticData {

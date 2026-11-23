@@ -1,4 +1,9 @@
 ## 2026-11-23 — JL-198: escenario profesiones en QA Electron (Junie)
+## 2026-11-23 — JL-199: content:check valida posición de NPCs
+
+- **Qué:** `content:check` ahora verifica que cada NPC no-mercader de `data/rpg/npcs.json` tenga `position` con `x` e `y` numéricos. Los NPCs con `merchant: true` se excluyen (son de interfaz).
+- **Archivos:** `scripts/contentCheck.ts` (validación + fix de `process.exit` para vitest), `tests/jl199_npcPosition.test.ts` (8 pruebas), `tests/d45_contentCheck.test.ts` (flag movido antes del import).
+- **Validación:** 8 pruebas verdes, suite 4124/4125 (1 fallo pre-existente de OMP), tsc limpio, `content:check` OK sobre datos reales.
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl198/`.
 
