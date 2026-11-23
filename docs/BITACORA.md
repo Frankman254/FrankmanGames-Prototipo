@@ -1,3 +1,19 @@
+## 2026-11-23 — JL-186: prueba de cobertura de hechizos — 0 desconectados (Junie)
+
+**Archivos:** `tests/jl186_spellEffects.test.ts`, `work/junie-jl186/LISTA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Prueba que lanza cada hechizo de clase con un blanco válido, a nivel 1 y 50, y espera 3 s. Debe salir un `cast` y al menos un efecto: daño, curación, estado, invocación o movimiento. Los hechizos con efectos silenciosos (dispel, pushDamage, chain, bonusVsStatus, selfStack, reveal) se excluyen porque sus efectos se activan en world.ts. Los de movimiento (dash, teleport, blink, swap, pull, recoil) se consideran válidos si producen un evento cast.
+
+**Resultado:** 6 pruebas verdes (3 clases × 2 niveles). 0 hechizos desconectados. LISTA.md en `work/junie-jl186/`.
+
+**Hallazgo clave:** `Spellbook.level` no se sincronizaba automáticamente con `character.level` al crear personajes de prueba. Se corrigió en la prueba con `character.spellbook.level = level`.
+
+**Validación:** `npx vitest run tests/jl186_spellEffects.test.ts` 6/6, `npx tsc --noEmit` sin errores nuevos.
+
+---
+
+---
+
 ## 2026-11-23 — JL-183: barra y checkCast coherentes — 12 pruebas, 3 clases, 200 pasos (Junie)
 
 **Archivos:** `tests/jl183_hotbarCheckCast.test.ts`, `docs/BITACORA.md`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl183/INFORME.md`.
