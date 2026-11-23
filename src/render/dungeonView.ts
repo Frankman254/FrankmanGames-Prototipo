@@ -30,6 +30,7 @@ import type { HeightField } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
 import { TorchRig } from './torchFlame';
 import type { LampPost } from './vegetationView';
+import utileriaCriptaUrl from '/assets/models/utileria_cripta.glb?url';
 
 /** Lo que se puede usar con clic: escaleras, cofres, puertas, jarras, estanques, hilo de retorno y la boca de la cripta. */
 export type DungeonFeature =
@@ -194,18 +195,13 @@ const CHEST_SCALE = 0.85;
 const CHEST_OUTLINE = 0.012;
 const chestModels = new WeakMap<Scene, Promise<AssetContainer>>();
 
-const CRYPT_PROP_URLS: Record<string, string> = import.meta.glob('/assets/models/utileria_cripta.glb', {
-    query: '?url',
-    import: 'default',
-    eager: true,
-});
 const cryptPropModels = new WeakMap<Scene, Promise<AssetContainer>>();
 
 /** Carga utileria_cripta.glb una sola vez por escena. */
 function cryptPropModel(scene: Scene): Promise<AssetContainer> {
     let p = cryptPropModels.get(scene);
     if (!p) {
-        p = LoadAssetContainerAsync(CRYPT_PROP_URLS['/assets/models/utileria_cripta.glb']!, scene, {
+        p = LoadAssetContainerAsync(utileriaCriptaUrl, scene, {
             pluginExtension: '.glb',
         });
         cryptPropModels.set(scene, p);

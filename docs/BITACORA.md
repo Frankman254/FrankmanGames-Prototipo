@@ -4129,3 +4129,16 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** Escenario `opciones` 6/6 en verde. Typecheck limpio (solo `balM3.ts` ajeno). Captura en `work/qa/jl115-opciones.jpg`.
 
 **Evidencia:** `work/qa/jl115-opciones.jpg`, `work/qa/resultado.json`.
+
+## 2026-11-23 — JL-164: utilería de la cripta visible (Junie)
+
+**Archivos:** `src/render/dungeonView.ts`, `tests/jl164_checkProps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **Causa:** `CRYPT_PROP_URLS` en `dungeonView.ts` usaba `import.meta.glob('/assets/models/utileria_cripta.glb', ...)` con `eager: true`, pero el archivo no era alcanzable desde el glob (no estaba en ningún entry point de Vite). La promesa de `cryptPropModel()` fallaba y `.catch(() => {})` tragaba el error en silencio → 0 meshes `dProp-*` en escena.
+- **Arreglo:** Reemplazado `import.meta.glob` por `import utileriaCriptaUrl from '/assets/models/utileria_cripta.glb?url'` — import directo que Vite resuelve siempre que el archivo exista.
+- `floor.props` ya llegaba correctamente desde `generateHandFloor()` (verificado con pruebas): el problema era solo la carga del GLB.
+
+**Validación:** Suite 3727/3727 en verde, tsc limpio (solo balM3.ts ajeno), build OK. Pruebas de antorchas (j16, tor01, jl64b, jl88, jl144) sin regresiones.
+
+**Evidencia:** `tests/jl164_checkProps.test.ts` (3 pruebas verdes).

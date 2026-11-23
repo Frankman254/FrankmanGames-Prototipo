@@ -1290,11 +1290,7 @@ Claude se ocupa a la vez de estos archivos. **No los toques**:
 
 - [x] JL-162 **El creador de personaje se desborda en pantallas pequeñas y se pierde contenido.** — commit «JL-162: CSS responsive del creador y escenario creadorPantallas» — creacion.css: media query max-height: 850px (reduce alturas, fuentes, padding, iconos, vista 3D a 160px mínimo) y max-width: 980px (2 columnas). Escenario `creadorPantallas` en qaElectron.mjs: 4 tamaños, verifica botón Empezar, deslizadores, vista 3D ≥ 260px, pestañas y botón Volver. tsc limpio, build OK, push OK. Electron no disponible para capturas (sin display). Evidencia en work/junie-jl162/.
 - [x] JL-163 **JL-137 oculta el error en vez de arreglarlo**, y eso va contra la regla 5 de AGENTS.md. — commit «JL-163: PaintStyle limpio en resetRun, sin filtro postProcessManager» — arenaView.ts: resetRun() destruye y recrea PaintStyle para limpiar observers colgantes del DepthRenderer. main.ts: filtro quitado. qaElectron.mjs: 3 filtros quitados. Suite 3718/3718, tsc limpio. DIAGNOSTICO.md en work/junie-jl163/.
-- [ ] JL-164 **La utilería de la cripta no se ve** (hallazgo de JL-143: `floor.props` vacío y `dProp: 0`).
-  - Encuentra por qué `DESIGNED_DUNGEON.floors[i].props` llega vacío en tiempo de ejecución, aunque el JSON los tiene, y por qué el `.catch(() => {})` de `dungeonView.ts` se lo traga.
-  - Corrígelo con un cambio pequeño y una prueba en Vitest.
-  - En `dungeonView.ts`, toca solo la carga de la utilería.
-  - Hecho cuando `utileriaCripta` pasa de 12/17 a 17/17, con capturas en `work/junie-jl164/`.
+- [x] JL-164 **La utilería de la cripta no se ve** (hallazgo de JL-143: `floor.props` vacío y `dProp: 0`). — commit «JL-164: utilería cripta — import ?url en vez de import.meta.glob» — 3 pruebas verdes (jl164_checkProps.test.ts), suite 3727/3727, tsc limpio, build OK. Causa: import.meta.glob no incluía utileria_cripta.glb; reemplazado por import directo ?url. floor.props ya llegaba bien desde generateHandFloor(). Evidencia en tests/jl164_checkProps.test.ts.
 - [ ] JL-165 **Rehacer JL-130 de verdad.** Este Mac tiene pantalla, como ya se dijo; el escenario de JL-130 se saltó la pantalla completa real.
   - `pantallaCompleta` debe entrar en pantalla completa real con F11 o con la opción, esperar a que termine la animación de macOS (hasta 2 s), medir que `innerWidth` coincide con la pantalla y salir.
   - Hecho cuando sale con 3/3 pasadas en verde, con una captura de dentro y otra de fuera en `work/junie-jl165/`.
