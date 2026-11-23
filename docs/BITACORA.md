@@ -1,3 +1,14 @@
+## 2026-11-23 — JL-154: cita rota JL-79 corregida (Junie)
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/BITACORA.md`, `work/junie-jl154/VERIFICACION.md`.
+
+**Qué:** JL-154 pide revisar que cada casilla `[x]` de JL-73…108 cite un commit o evidencia real. Se verificaron 36 tareas contra `git log` y `work/`. Solo se encontró **1 cita rota**: JL-79 citaba `commit «JL-79: escenario audio ya pasa — sin código»`, pero ese commit no existe. JL-79 y JL-80 se cerraron juntas en `06da5151` («JL-80: escenario castillo ya pasa — sin código»). Se corrigió la cita para referenciar el commit real.
+
+**Cómo se verificó:** `git log --oneline --all | grep 'JL-79'` → 0 resultados. `git show 06da5151 -- work/prompts-noche/COLA_JUNIE.md` confirma que ambas casillas se cerraron en ese commit. Todas las rutas `work/junie-jl*` y archivos de evidencia (`tests/*.test.ts`) existen. Informe completo en `work/junie-jl154/VERIFICACION.md`.
+
+---
+
+
 ## 2026-11-23 — JL-153: RESUMEN.md actualizado a 321/25 (Junie)
 
 **Archivos:** `work/junie-qa01/RESUMEN.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
