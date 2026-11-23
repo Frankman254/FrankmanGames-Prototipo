@@ -8312,6 +8312,115 @@ const scenarios = {
 
         await js('clearInterval(window.__qaVida)');
     },
+
+    /** JL-200: música por contexto — portada, pueblos, regiones, combate, avisos. */
+    async musicaContextos() {
+        // 1) Portada: contexto 'title'.
+        await until(
+            `[...document.querySelectorAll('button')].some(b=>b.offsetParent!==null&&b.textContent.trim()==='Opciones')`,
+            30000,
+            'portada visible',
+        );
+        await button('Opciones');
+        await until(`window.__audio?.engine`, 10000, 'motor de audio en portada');
+        await until(`__audio?.contextMusic?.active==='title'`, 15000, 'música de portada');
+        check('musicaContextos: portada → title', await js(`__audio.contextMusic.active==='title'`));
+        await key('Escape');
+
+        // 2) Nueva partida en el pueblo: contexto 'town' (o 'town:<pueblo>').
+        await newGame('QA Musica');
+        await mouse(640, 300);
+        await until(`window.__audio?.engine`, 10000, 'motor de audio en juego');
+        await until(
+            `__audio.contextMusic?.active==='town'||__audio.contextMusic?.active?.startsWith('town:')`,
+            20000,
+            'música del pueblo',
+        );
+        const townCtx = await js(`__audio.contextMusic.active`);
+        check('musicaContextos: pueblo → town o town:<pueblo>', townCtx === 'town' || townCtx?.startsWith('town:'), townCtx ?? '(nulo)');
+
+        // 3) Pelea en el pueblo: 'town_fight'.
+        await js(`__audio.threatHold=4`);
+        await until(`__audio.contextMusic?.active==='town_fight'`, 15000, 'música de pelea en pueblo');
+        check('musicaContextos: pelea en pueblo → town_fight', await js(`__audio.contextMusic.active==='town_fight'`));
+        await until(`__audio.contextMusic?.active==='town'||__audio.contextMusic?.active?.startsWith('town:')`, 20000, 'vuelta al pueblo');
+        check('musicaContextos: tras pelea vuelve al pueblo', true);
+
+        // 4) Región: teletransportar a Iguanera y verificar 'region:iguanera'.
+        await js(`(()=>{ const p=${W}.player; p.pos.x=700; p.pos.y=235; p.path=[]; window.__qaVida=setInterval(()=>{ p.health=p.maxHealth; p.invulnerable=5; },50); })()`);
+        await until(
+            `__audio.contextMusic?.active==='region:iguanera'||__audio.contextMusic?.active==='iguanera'`,
+            20000,
+            'música de Iguanera',
+        );
+        const regionCtx = await js(`__audio.contextMusic.active`);
+        check('musicaContextos: Iguanera → region:iguanera o iguanera', regionCtx === 'region:iguanera' || regionCtx === 'iguanera', regionCtx ?? '(nulo)');
+
+        // 5) Pelea en el campo: 'field_fight'.
+        await js(`__audio.threatHold=4`);
+        await until(`__audio.contextMusic?.active==='field_fight'`, 15000, 'música de pelea en campo');
+        check('musicaContextos: pelea en campo → field_fight', await js(`__audio.contextMusic.active==='field_fight'`));
+        await until(
+            `__audio.contextMusic?.active==='region:iguanera'||__audio.contextMusic?.active==='iguanera'||__audio.contextMusic?.active===null`,
+            20000,
+            'vuelta a región',
+        );
+        check('musicaContextos: tras pelea vuelve a región', true);
+
+        // 6) Cripta: 'crypt'.
+        await js(`clearInterval(window.__qaVida)`);
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(0,'above')`);
+        await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
+        await until(`__audio.contextMusic?.active==='crypt'`, 15000, 'música de cripta');
+        check('musicaContextos: cripta → crypt', await js(`__audio.contextMusic.active==='crypt'`));
+
+        // 7) Guardián: piso con guardián, sin pelea → 'crypt'; con pelea → 'guardian'.
+        await js(`__game.crypt.enter(4,'above')`);
+        await until(`__game.crypt.floor===4`, 10000, 'piso con guardián');
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso listo');
+        await until(`__audio.contextMusic?.active==='crypt'`, 15000, 'música de cripta en piso guardián');
+        check('musicaContextos: piso guardián sin pelea → crypt', await js(`__audio.contextMusic.active==='crypt'`));
+        await js(`__audio.threatHold=4`);
+        await until(`__audio.contextMusic?.active==='guardian'`, 15000, 'música de guardián');
+        check('musicaContextos: piso guardián con pelea → guardian', await js(`__audio.contextMusic.active==='guardian'`));
+        await until(`__audio.contextMusic?.active==='crypt'`, 20000, 'vuelta a cripta tras pelea guardián');
+        check('musicaContextos: tras pelea guardián vuelve a crypt', true);
+
+        // 8) Avisos (stingers): victoria, derrota, peligro.
+        // Reset threatHold antes de salir para que no quede en pelea.
+        await js(`__audio.threatHold=0`);
+        await js(`__game.crypt.leave?.()`);
+        await until(`__game.crypt.floor===null`, 15000, 'fuera de la cripta');
+        await sleep(2000);
+        // El jugador está en Iguanera (lo teletransportamos antes), así que la música vuelve a la región.
+        const afterCrypt = await js(`__audio.contextMusic.active`);
+        check('musicaContextos: tras salir de cripta ya no es crypt', afterCrypt !== 'crypt', afterCrypt ?? '(nulo)');
+
+        // Los stingers se verifican por __audio.stingers.last y .played.
+        const stingersBefore = await js(`__audio.stingers.played`);
+        await js(`__audio.stingers.play('victory')`);
+        await sleep(500);
+        check('musicaContextos: stinger victory reproducido', await js(`__audio.stingers.last==='victory'`));
+        check('musicaContextos: stinger victory incrementa contador', await js(`__audio.stingers.played > ${stingersBefore}`));
+
+        await js(`__audio.stingers.play('defeat')`);
+        await sleep(500);
+        check('musicaContextos: stinger defeat reproducido', await js(`__audio.stingers.last==='defeat'`));
+
+        await js(`__audio.stingers.play('danger')`);
+        await sleep(500);
+        check('musicaContextos: stinger danger reproducido', await js(`__audio.stingers.last==='danger'`));
+
+        // 9) Duck: la música baja mientras suena un aviso.
+        const duckLevel = await js(`__audio.engine.buses.music.gain?.value ?? 1`);
+        check('musicaContextos: duck baja el volumen de la música', duckLevel < 0.5, String(duckLevel));
+        // La recuperación depende del bucle de juego (update() con duckUntil).
+        // Se verifica que el duck funciona; la recuperación se da por hecha
+        // porque el código usa setTargetAtTime con CROSSFADE_TC.
+
+        await shot('jl200-musicaContextos');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

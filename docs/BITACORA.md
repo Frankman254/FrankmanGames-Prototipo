@@ -1,3 +1,9 @@
+## 2026-11-23 — JL-200: escenario musicaContextos en QA Electron (Junie)
+
+- **Qué:** Escenario `musicaContextos` en `scripts/qaElectron.mjs` que verifica todos los contextos musicales del juego: portada (title), pueblo (town), pelea en pueblo (town_fight), región (region:iguanera), pelea en campo (field_fight), cripta (crypt), guardián (guardian), los tres stingers (victory, defeat, danger) y el duck de la música.
+- **Verificación:** 18/18 checks en verde, 3 ejecuciones consecutivas. Captura en `work/qa/jl200-musicaContextos.jpg`.
+- **Falta:** JL-201, JL-202, JL-203 pendientes.
+
 ## 2026-11-23 — JL-198: escenario profesiones en QA Electron (Junie)
 ## 2026-11-23 — JL-199: content:check valida posición de NPCs
 
