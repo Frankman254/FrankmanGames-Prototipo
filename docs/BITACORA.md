@@ -1,3 +1,16 @@
+## 2026-11-23 — JL-194: pruebas de energy.ts y spoils.ts — 50 pruebas (Junie)
+
+**Archivos:** `tests/rpg/energySpoils.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Ampliación de `tests/rpg/energySpoils.test.ts` de 5 a 50 pruebas, cubriendo toda la lógica de `src/rpg/energy.ts` y `src/rpg/spoils.ts`:
+
+- **Energy** (25 pruebas): `tick()` con regenPerMinute, `rest()` con perSecond, `itemAmount()` con registro y sin registro, `view()` con y sin penalty, `penaltyMods()` vacío y con agotado, `gain()` con 0, negativo, sobre máximo y desactivando exhausted, `die()` con justExhausted y con resto, `toSave()` redondeo, constructor con NaN, Infinity, negativo, guardado exhausted/clearAt, ENERGY_SOURCE.
+- **Spoils** (25 pruebas): `shares()` vacío, uno, solo curación, todos cero, negativos; `distribute()` con items, minXpShare, orden descendente, pool vacío, sin participantes, gold remainder; `Encounter` damage(0), damage(negativo), healing fuera/dentro de combate, reset, tick con aggro > 0, tick acumula tiempo, addKill con xp/gold negativo, tick devuelve kills/seconds, tick wiped con present vacío.
+
+**Validación:** `npx vitest run tests/rpg/energySpoils.test.ts` → 50/50 verdes. `npx tsc --noEmit` limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-193: pruebas de shapes.ts — 71 pruebas, 6 formas (Junie)
 
 **Archivos:** `tests/jl193_shapes.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
