@@ -1,3 +1,13 @@
+## 2026-11-22 — JL-148: escenario teclasModos — Z y X ciclan modos de cámara y lanzar (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `src/main.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** Escenario `teclasModos` en el arnés de QA para verificar que (1) la tecla Z cicla los 4 modos de cámara (Manual, Semiautomático, Automático, Encuadre de combate) y muestra el toast «Cámara: …» en cada cambio, y (2) una tecla asignada a `castModeNext` (X, vía `__game.keys.rebind`) cicla los 3 modos de lanzar (pressClick, indicator, press) y muestra el toast «Lanzar: …». Para que el arnés pueda asignar teclas, se expone `__game.keys` (KeyMap) en el objeto de depuración de `main.ts`.
+
+**Cómo se verificó:** `perl -e 'alarm 600; exec @ARGV' node scripts/qaElectron.mjs teclasModos` → 10/10 en verde. Z recorre los 4 modos de cámara, X recorre los 3 modos de lanzar, toasts visibles en ambos casos, 0 errores en consola. Captura en `work/qa/jl148-teclas-modos.jpg`. Suite 3715/3715, tsc sin errores nuevos.
+
+---
+
 ## 2026-11-22 — JL-147: escenario monturasAndar — andar, girar y frenar montado (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

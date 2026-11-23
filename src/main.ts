@@ -1647,6 +1647,10 @@ if (import.meta.env.DEV) {
             get castInput() {
                 return castInput;
             },
+            /** JL-148: acceso de QA a KeyMap para asignar teclas. */
+            get keys() {
+                return menus?.keys ?? null;
+            },
         },
     });
 }

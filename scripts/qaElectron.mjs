@@ -6926,6 +6926,79 @@ const scenarios = {
         record('Salida: fuera de la cripta', !(await js(`__game.crypt.inside`)), 'OK');
     },
 
+    /** JL-148: Escenario teclasModos — Z cambia el modo de cámara y la tecla asignada a castModeNext cambia el modo de lanzar.
+     * Cada cambio muestra su toast de confirmación. */
+    async teclasModos() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-148 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        /* 1. Partida nueva. */
+        await newGame('QA TeclasModos');
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+        await sleep(1000);
+
+        /* 2. Leer el modo de cámara inicial. */
+        const modeBefore = await js(`__game.view.rig.mode`);
+        record('2. Modo de cámara inicial', modeBefore != null, `modo=${modeBefore}`);
+
+        /* 3. Pulsar Z → cambia el modo de cámara y muestra toast. */
+        await key('KeyZ', 'z');
+        await sleep(600);
+        const modeAfterZ = await js(`__game.view.rig.mode`);
+        record('3. Z cambia el modo de cámara', modeAfterZ !== modeBefore, `${modeBefore} → ${modeAfterZ}`);
+
+        /* Verificar que el toast de cámara aparece. */
+        const cameraToast = await js(`[...document.querySelectorAll('.toast')].map(t=>t.textContent).join('|')`);
+        record('3b. Toast de cámara visible', cameraToast.includes('Cámara:'), cameraToast.slice(0, 80));
+
+        /* 4. Pulsar Z 3 veces más para recorrer los 4 modos. */
+        const modos = [modeAfterZ];
+        for (let i = 0; i < 3; i++) {
+            await key('KeyZ', 'z');
+            await sleep(400);
+            const m = await js(`__game.view.rig.mode`);
+            modos.push(m);
+        }
+        const unicos = new Set(modos);
+        record('4. Los 4 modos de cámara se recorren con Z', unicos.size === 4, `modos=[${modos.join(', ')}]`);
+
+        /* 5. Asignar tecla X a castModeNext (no tiene tecla por defecto). */
+        await js(`__game.keys.rebind('castModeNext','KeyX')`);
+        await sleep(200);
+        const castModeBefore = await js(`__game.castInput.mode`);
+        record('5. castModeBefore (modo de lanzar)', castModeBefore != null, `modo=${castModeBefore}`);
+
+        /* 6. Pulsar X → cambia el modo de lanzar y muestra toast. */
+        await key('KeyX', 'x');
+        await sleep(600);
+        const castModeAfterX = await js(`__game.castInput.mode`);
+        record('6. X cambia el modo de lanzar', castModeAfterX !== castModeBefore, `${castModeBefore} → ${castModeAfterX}`);
+
+        /* Verificar que el toast de lanzar aparece. */
+        const castToast = await js(`[...document.querySelectorAll('.toast')].map(t=>t.textContent).join('|')`);
+        record('6b. Toast de lanzar visible', castToast.includes('Lanzar:'), castToast.slice(0, 80));
+
+        /* 7. Pulsar X 2 veces más para recorrer los 3 modos de lanzar. */
+        const castModos = [castModeAfterX];
+        for (let i = 0; i < 2; i++) {
+            await key('KeyX', 'x');
+            await sleep(400);
+            const cm = await js(`__game.castInput.mode`);
+            castModos.push(cm);
+        }
+        const castUnicos = new Set(castModos);
+        record('7. Los 3 modos de lanzar se recorren con X', castUnicos.size === 3, `modos=[${castModos.join(', ')}]`);
+
+        /* 8. Sin errores en consola. */
+        const errors = await js(`(()=>{ const t=window.__consola?.errores?.(20); if(!t) return 0; if(typeof t==='string') return (t.split('\\n').filter(l=>l&&!l.includes('postProcessManager'))).length; if(Array.isArray(t)) return t.filter(e=>typeof e==='string'&&!e.includes('postProcessManager')).length; return 0; })()`);
+        record('8. Sin errores en consola', errors === 0, `errores=${errors}`);
+
+        await shot('jl148-teclas-modos');
+    },
+
     /** JL-121: Guardar en el piso 5 de la cripta, recargar y aparecer en el piso 5. */
     async guardadoCargar() {
         const failures = [];
