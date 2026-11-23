@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-187: prueba de textos de bloqueo — 18 CastBlock cubiertos (Junie)
+
+**Archivos:** `tests/jl187_castBlockText.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Prueba que verifica que cada valor del tipo `CastBlock` (18 motivos) tiene texto en español en `CAST_BLOCK_TEXT` (`src/sim/combat.ts`), sin huecos ni textos vacíos. Los 18 valores ya estaban cubiertos; no fue necesario añadir texto.
+
+**Verificación:** 4 pruebas verdes (jl187_castBlockText.test.ts), `npx tsc --noEmit` sin errores nuevos (solo `balM3.ts` ajeno).
+
+---
+
 ## 2026-11-23 — JL-186: prueba de cobertura de hechizos — 0 desconectados (Junie)
 
 **Archivos:** `tests/jl186_spellEffects.test.ts`, `work/junie-jl186/LISTA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
