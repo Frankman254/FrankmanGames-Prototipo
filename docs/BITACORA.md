@@ -1,3 +1,26 @@
+## 2026-11-23 — JL-190: pruebas de pets.ts — 52 pruebas, creación, comportamientos, aura, guardado (Junie)
+
+**Archivos:** `tests/jl190_pets.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Pruebas completas de `src/rpg/pets.ts`, un módulo sin cobertura propia que gestiona mascotas y aliados invocados. El módulo no tiene sistema de alimentación ni niveles (la descripción de la tarea era genérica). Las 52 pruebas cubren:
+
+- **Creación de Pet** (9 pruebas): stats con maxHealth y speed del def, maxHealth por defecto 50, vida llena al inicio, auraEffect con/sin aura, comportamiento según def, team "player", radius 0.35, name del def.
+- **PET_BEHAVIORS** (2 pruebas): 3 claves (fighter, collector, guardian), cada una devuelve la clase correcta.
+- **shouldApplyGuardianAura** (7 pruebas): sin auraEffect, dueño muerto, HealEffect con vida llena/baja, StatusEffect con tick heal con vida llena/baja, aura no curativa siempre aplica.
+- **TTL y expired** (3 pruebas): sin TTL nunca expira, con TTL expira tras el tiempo, TTL no expirado antes.
+- **Cooldowns** (2 pruebas): attackCooldown baja con el tiempo y no pasa de 0, onHitCooldown igual.
+- **prevPos** (1 prueba): se actualiza cada tick.
+- **FighterBehavior** (5 pruebas): sin enemigo sigue al dueño, teleporta a >25 m, con enemigo a rango ataca, con enemigo lejos se acerca, respeta cooldown.
+- **CollectorBehavior** (3 pruebas): sin botín sigue, con botín a rango recoge, con botín lejos se acerca.
+- **GuardianBehavior** (3 pruebas): sigue al dueño, aplica aura cada `every` segundos, aplica varias veces.
+- **Character: mascota activa** (8 pruebas): setActivePet con amuleto válido/inválido, setActivePet(null), checkPetCharm retira si el amuleto ya no está, ownerBonus se aplica y retira.
+- **Character: guardado** (4 pruebas): toSave incluye activePetItemUid, toSave sin mascota, fromSave restaura, fromSave con nulo.
+- **Datos reales** (5 pruebas): behavior válido, fighter tiene attack, guardian tiene aura, ownerBonus sin source, speed y followDistance positivos.
+
+**Verificación:** 52 pruebas verdes (jl190_pets.test.ts), `npx tsc --noEmit` sin errores nuevos (solo `balM3.ts` ajeno).
+
+---
+
 ## 2026-11-23 — JL-189: pruebas de hinder.ts — 28 pruebas, 4 funciones (Junie)
 
 **Archivos:** `tests/jl189_hinder.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
