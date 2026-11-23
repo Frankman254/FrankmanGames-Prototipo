@@ -1,3 +1,19 @@
+## 2026-11-23 — JL-182: prueba de barrido de la barra — 3 clases, 30 hechizos, 0 falsos positivos (Junie)
+
+**Archivos:** `tests/jl182_noFalseRed.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl182/LISTA.md`.
+
+**Qué:** Prueba que recorre todos los hechizos de las 3 clases y los universales. Para cada clase, personaje a nivel 200 con todos los hechizos aprendidos y en la barra. Dos escenarios:
+1. Sin enemigos, cursor a 2 m del jugador: todos los huecos dan `inRange: true` y `cooldownRemaining: 0`.
+2. Con un enemigo a 2 m bajo el cursor: mismos resultados.
+
+**Resultado:** 6 pruebas verdes (3 clases × 2 escenarios). Cada clase tiene 30 hechizos en la barra. Ningún hueco sale en rojo sin motivo. LISTA.md en `work/junie-jl182/`.
+
+**Sin cambios de código:** Solo prueba nueva. Suite 3791/3792 (1 fallo pre-existente assets.test.ts de OMP).
+
+---
+
+---
+
 ## 2026-11-23 — JL-181: escenario barraRoja — indicador fuera de alcance en la barra de hechizos (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
