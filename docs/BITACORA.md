@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-173: Icono y etiqueta de Puertobelo — BLOQUEADA (Junie)
+
+**Archivos:** `work/junie-jl173/BLOQUEO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** JL-173 (Icono y etiqueta de Puertobelo en el minimapa y el mapa grande) no se puede ejecutar porque la zona **Puertobelo no existe** en el juego. `data/zones.json` no tiene zona «puertobelo», `data/ambient.json` no tiene piezas del kit, y `assets/models/puertobelo_kit.glb` no existe (pendiente de OMP-PB-01). Sin zona construida, no hay icono ni etiqueta que dibujar.
+
+**Cómo se verificó:** Búsqueda de «puertobelo» en `data/zones.json` y `data/ambient.json`: 0 resultados. `assets/models/puertobelo_kit.glb` no existe. `work/omp-pb-01/HUELLAS.md` no existe. BLOQUEO.md en `work/junie-jl173/`.
+
+**Sin commit:** Tarea sin código (bloqueada). Su casilla, TAREAS y BITACORA entran en el commit de la siguiente tarea con código.
+
+---
+
 ## 2026-11-23 — CLA-CASA1: la casa del creador en Blender, como PROPUESTA (Claude)
 
 **Archivos:** `scripts/blender/casa_creador.py`, `scripts/blender/validar_casa_creador.py`, `arte/blender/casa_creador.blend`, `assets/models/casa_creador.glb`, `PROCEDENCIA.md`.
@@ -5,6 +17,18 @@
 **Qué:** Modelo reproducible de la casa de los planos del creador (6,30 × 12 m, techo a dos aguas, portal con columna, rejas negras con rojo, puerta articulada, losa de estacionamiento) con texturas propias pintadas por código. Sin datos personales: en el repo sólo se llama «casa del creador». Dos pasadas de comparación con la fachada: se corrigió un cimiento desplazado, una cortina tapada por el interior oscuro y el remate de la cumbrera.
 
 **Cómo se verificó:** `validar_casa_creador.py` en verde (3.708 tri, muros 6,30 × 12,02 m, puerta de 2,13 m). Láminas en `work/claude-casa1/v1/` y `v2/`. Cargada en Electron junto al jugador con el cargador de Babylon del juego (`work/claude-casa1/enjuego.js`, captura `enjuego.jpg`). `tests/assets.test.ts` y `tests/jl168_procedencia.test.ts` en verde.
+
+---
+
+## 2026-11-23 — JL-172: Rendimiento de Puertobelo — BLOQUEADA (Junie)
+
+**Archivos:** `work/junie-jl172/BLOQUEO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** JL-172 (Rendimiento de Puertobelo) no se puede ejecutar porque depende de JL-171 (zona jugable Puertobelo), que a su vez depende de JL-169 (kit de Puertobelo en `data/ambient.json`), que depende de **OMP-PB-01** (`puertobelo_kit.glb`). Ninguno de estos artefactos existe: no hay GLB, no hay huellas, no hay piezas registradas. Sin zona construida, no hay qué medir.
+
+**Cómo se verificó:** Se confirmó que `assets/models/puertobelo_kit.glb` no existe, `work/omp-pb-01/HUELLAS.md` no existe y `data/ambient.json` no tiene piezas de Puertobelo. BLOQUEO.md en `work/junie-jl172/`.
+
+**Sin commit:** Tarea sin código (bloqueada). Su casilla, TAREAS y BITACORA entran en el commit de la siguiente tarea con código.
 
 ---
 

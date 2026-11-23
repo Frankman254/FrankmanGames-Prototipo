@@ -1311,8 +1311,8 @@ Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`
   - Pinta los caminos en `navpaint` para que se pueda recorrer sin atascarse, y añade una conexión con el resto del mapa.
   - Clima `hot`, `safe: false`, y monstruos solo de los arquetipos que ya existen. No inventes cifras: usa el nivel de una zona vecina y anótalo en `docs/ACCIONES_CREADOR.md` para que el creador lo decida.
   - Hecho con un escenario `puertobelo` en `qaElectron.mjs` que entra en la zona, recorre el baluarte de punta a punta sin atascarse y guarda 6 capturas en `work/junie-jl171/`.
-- [ ] JL-172 **Rendimiento de Puertobelo.** Depende de JL-171. Mide los fps como en JL-152. Si baja de 60 en este Mac, prueba con instancias en vez de clones o con LOD, sin quitar piezas. Informe en `work/junie-jl172/`.
-- [ ] JL-173 **Icono y etiqueta de Puertobelo en el minimapa y en el mapa grande** (`src/ui/map/mapDraw.ts`). Los bastiones se dibujan como `castle` y la zona sale con su nombre. Captura en `work/junie-jl173/`.
+- [!] JL-172 **Rendimiento de Puertobelo.** — BLOQUEADA: depende de JL-171 (zona Puertobelo), que a su vez espera OMP-PB-01 (`puertobelo_kit.glb` no existe). Sin zona construida, no hay qué medir. BLOQUEO.md en work/junie-jl172/.
+- [!] JL-173 **Icono y etiqueta de Puertobelo en el minimapa y en el mapa grande** (`src/ui/map/mapDraw.ts`). — BLOQUEADA: depende de JL-171 (zona Puertobelo en `data/zones.json`), que a su vez depende de JL-169 (kit en `data/ambient.json`), que depende de OMP-PB-01 (`puertobelo_kit.glb`). La zona no existe: sin zona, no hay icono ni etiqueta que dibujar. BLOQUEO.md en `work/junie-jl173/`.
 - [ ] JL-174 **La casa del creador en el mundo.** Depende de CLA-CASA1 (Claude, `assets/models/casa_creador.glb`).
   - Colócala como `landmark` en las afueras de Villa Raspadura, en un solar libre que no tape caminos ni PNJ.
   - Añade colisión de las paredes en `navpaint` y deja la puerta y el portal transitables.
