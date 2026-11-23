@@ -1,3 +1,25 @@
+## 2026-11-23 — JL-192: pruebas de spatialHash.ts — 19 pruebas, constructor, rebuild, query, bordes (Junie)
+
+**Archivos:** `tests/jl192_spatialHash.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Pruebas completas de `src/sim/spatialHash.ts` (SpatialHash), un módulo sin cobertura propia que implementa un hash espacial con rejilla uniforme para consultas de vecinos por proximidad. Las 19 pruebas cubren:
+
+- **Constructor y celdas básicas** (3 pruebas): cols/rows a partir de width, depth y cellSize; mínimo de 1 con mundo de tamaño 0; originX/originY para desplazar el origen.
+- **rebuild con items en celdas conocidas** (3 pruebas): cada item en su cubo, array vacío sin fallo, varios items en la misma celda.
+- **query con radio** (3 pruebas): radio 0 solo la celda central, radio grande toca múltiples celdas, query fuera del mundo no devuelve nada.
+- **Mover items entre rebuilds** (1 prueba): rebuild tras mover posiciones actualiza la ubicación.
+- **Bordes de celda** (2 pruebas): item en el borde exacto entre celdas, item en la última celda del mundo.
+- **Bordes del mundo** (2 pruebas): coordenadas negativas con origin en 0 (clamp a 0,0), origin negativo permite coordenadas negativas dentro del mundo.
+- **Crecimiento dinámico** (1 prueba): arrays internos crecen al añadir más items (100 items).
+- **MAX_AXIS wrap-around** (1 prueba): tabla limitada a 512 con mundo más grande (600 celdas por eje).
+- **query con coordenadas negativas** (1 prueba): no lanza error.
+- **rebuild idempotente** (1 prueba): dos rebuilds con los mismos datos dan el mismo resultado.
+- **query en borde de celda** (1 prueba): radio = cellSize/2 en el centro de una celda.
+
+**Validación:** `npx vitest run tests/jl192_spatialHash.test.ts` — 19/19 verdes. `npx tsc --noEmit` — limpio (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-191: pruebas de status.ts — 35 pruebas, apply, acumular, renovar, tick, expirar, remove, clear, absorb, shield, control, view, shareDamage (Junie)
 
 **Archivos:** `tests/jl191_status.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
