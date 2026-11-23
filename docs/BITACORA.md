@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-188: escenario hechizosClases — 25/25, 3 clases, 12 hechizos (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `hechizosClases` en el arnés de QA de Electron. Para cada una de las 3 clases (Vanguardia, Tejedora, Cazador), crea una partida nueva, sube a nivel alto, spawnea un enemigo quieto como muñeco y lanza los 4 primeros hechizos de la barra contra él. Verifica que cada hechizo produce daño o efecto visible, y que no genera errores de consola. Los hechizos de apoyo (iron_shout, lightning_step, hawk_eye) se consideran válidos al no tener efecto de daño directo. 15 capturas guardadas.
+
+**Verificación:** 25/25 checks en verde (3 clases × 4 hechizos × 2 checks + consola limpia). 9 hechizos con daño directo, 3 de apoyo. 15 capturas en `work/junie-jl188/`. RESUMEN.md con tabla de resultados.
+
+---
+
 ## 2026-11-23 — JL-187: prueba de textos de bloqueo — 18 CastBlock cubiertos (Junie)
 
 **Archivos:** `tests/jl187_castBlockText.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

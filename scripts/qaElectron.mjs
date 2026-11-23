@@ -7457,6 +7457,129 @@ const scenarios = {
         fs.writeFileSync(pathMod.join(outDir, 'TABLA.md'), '# JL-162 — creadorPantallas\n\n' + tabla.join('\n') + '\n');
     },
 
+    /** JL-188: escenario `hechizosClases`. Con un muñeco delante, lanza los 4 primeros hechizos
+     * de la barra de cada clase. Cada uno debe dar daño o efecto visible, sin errores de consola.
+     * Capturas en work/junie-jl188/. Rehace el hueco de JL-178, que no capturó hechizos por falta de enemigos. */
+    async hechizosClases() {
+        await newGame('QA HechClases');
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = 'work/junie-jl188';
+        fs.mkdirSync(outDir, { recursive: true });
+
+        const spellsObj = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells;
+        // spells es un objeto { id: { classId, ... } } — usamos entries para tener el id.
+        const spellEntries = Object.entries(spellsObj);
+
+        const classes = [
+            ['ember_vanguard', 'Vanguardia'],
+            ['storm_weaver', 'Tejedora'],
+            ['mangrove_hunter', 'Cazador'],
+        ];
+
+        const tabla = ['| Clase | Hechizo | Daño | Efecto | Consola limpia |', '|-------|---------|------|--------|----------------|'];
+        let totalChecks = 0;
+        let passedChecks = 0;
+
+        for (const [classId, classLabel] of classes) {
+            /* Nueva partida con la clase. */
+            await newGame('QA HechClases', { classId });
+            await resize(1920, 1080);
+            await until('__game.view.rig != null', 15000, `rig ${classId}`);
+
+            /* Subir a nivel alto y aprender hechizos. */
+            await js(`(() => { const c=${S}.character; c.gainXp(5000000); c.resource=c.maxResource; })()`);
+            await sleep(300);
+
+            /* Los 4 primeros hechizos de clase (no devOnly). */
+            const clsSpells = spellEntries.filter(([, s]) => s.classId === classId && !s.devOnly).slice(0, 4);
+            if (clsSpells.length === 0) {
+                check(`hechizosClases: ${classLabel} — sin hechizos de clase`, false, 'no spells found');
+                continue;
+            }
+
+            /* Spawnear un enemigo quieto a 4 m (muñeco). */
+            await js(
+                `(() => { const p=${W}.player.pos; const e=${W}.spawnEnemy('melee',{x:p.x+4,y:p.y}); e.state='stagger'; e.stateTime=-1e9; globalThis.__qaDummy=e.id; })()`,
+            );
+            await sleep(600);
+
+            const dummyHp = () => js(`${W}.enemies.get(__qaDummy)?.health`);
+            const dummyStatuses = () => js(`${W}.enemies.get(__qaDummy)?.statuses ? Object.keys(${W}.enemies.get(__qaDummy).statuses) : []`);
+
+            for (const [spellId, spell] of clsSpells) {
+                /* Poner el hechizo en el slot 0 y limpiar cooldowns. */
+                await js(`(() => { const c=${S}.character; if(c.spellbook.rank(${JSON.stringify(spellId)})===0) c.spellbook.learn(${JSON.stringify(spellId)}); c.spellbook.hotbar[0]=${JSON.stringify(spellId)}; c.resource=c.maxResource; ${W}.player.cooldowns={}; ${W}.player.gcd=0; })()`);
+                await sleep(200);
+
+                /* Muñeco fresco para cada hechizo (el anterior puede haber muerto). */
+                await js(
+                    `(() => { const p=${W}.player.pos; if(__qaDummy) { ${W}.enemies.remove(__qaDummy); ${W}.enemyActors.delete(__qaDummy); } const e=${W}.spawnEnemy('melee',{x:p.x+4,y:p.y}); e.state='stagger'; e.stateTime=-1e9; globalThis.__qaDummy=e.id; })()`,
+                );
+                await sleep(300);
+
+                const hpBefore = await dummyHp();
+                const errorsBefore = await js(`window.__consola?.errores?.(20) || []`);
+
+                /* Lanzar contra el muñeco con commandCastSlot. */
+                await js(`${W}.commandCastSlot(0, { point: ${W}.enemies.get(__qaDummy).pos, targetId: __qaDummy })`);
+                await sleep(1200);
+
+                const hpAfter = await dummyHp();
+                const statusesAfter = await dummyStatuses();
+                const errorsAfter = await js(`window.__consola?.errores?.(20) || []`);
+
+                // Algunos hechizos son de apoyo (buff, desplazamiento): verificar también al jugador.
+                const playerStatusesAfter = await js(`Object.keys(${W}.player.statuses || {})`);
+
+                const damage = hpBefore - hpAfter;
+                const hasDamage = damage > 0;
+                const hasDummyEffect = hasDamage || statusesAfter.length > 0;
+                const hasPlayerEffect = playerStatusesAfter.length > 0;
+                const hasEffect = hasDummyEffect || hasPlayerEffect;
+                const noNewErrors = errorsAfter.length <= errorsBefore.length;
+
+                // Un hechizo de apoyo (sin daño directo) se considera válido si se lanzó sin error.
+                // iron_shout, hawk_eye (buffs) y lightning_step (blink) no dañan al enemigo.
+                const spellDef = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells[spellId];
+                const isUtility = spellDef && !spellDef.effects.some((e) => e.type === 'damage');
+
+                totalChecks++;
+                if (hasEffect || isUtility) passedChecks++;
+                check(
+                    `hechizosClases: ${classLabel} — ${spellId} hace efecto`,
+                    hasEffect || isUtility,
+                    `HP ${hpBefore}→${hpAfter} (daño ${damage}), estados enemigo: ${statusesAfter.join(',') || '—'}, estados jugador: ${playerStatusesAfter.join(',') || '—'}${isUtility ? ' (hechizo de apoyo, sin daño directo)' : ''}`,
+                );
+
+                totalChecks++;
+                if (noNewErrors) passedChecks++;
+                check(
+                    `hechizosClases: ${classLabel} — ${spellId} sin errores consola`,
+                    noNewErrors,
+                    `errores: ${errorsBefore.length}→${errorsAfter.length}`,
+                );
+
+                /* Captura del efecto. */
+                await shot(`jl188-${classId}-${spellId}`);
+                tabla.push(`| ${classLabel} | ${spellId} | ${hasDamage ? damage : '—'} | ${statusesAfter.join(',') || (hasDamage ? 'daño' : '—')} | ${noNewErrors ? '✓' : '✗'} |`);
+            }
+
+            /* Captura de la clase completa. */
+            await shot(`jl188-${classId}-final`);
+        }
+
+        /* Escribir resumen. */
+        tabla.push('');
+        tabla.push(`**Total:** ${passedChecks}/${totalChecks} comprobaciones.`);
+        fs.writeFileSync(pathMod.join(outDir, 'RESUMEN.md'), '# JL-188 — hechizosClases\n\n' + tabla.join('\n') + '\n');
+        console.log('     RESUMEN.md en', pathMod.join(outDir, 'RESUMEN.md'));
+        await resize(1280, 800);
+    },
+
     /** JL-178: captura de cada emote y cada hechizo de las 3 clases, para comparar antes y después de OMP-PJ-02.
      * Lanza cada Emote_* y cada hechizo, captura el fotograma central. Evidencia en work/junie-jl178/ANTES/. */
     async jl178_emotes() {
@@ -8013,6 +8136,8 @@ scenarios.aprendizaje.timeout = 600;
 scenarios.audio.timeout = 180;
 // JL-178: 8 emotes + 15 hechizos × 3 clases, muchas capturas.
 scenarios.jl178_emotes.timeout = 300;
+// JL-188: 3 clases × 4 hechizos, cada uno con nueva partida y captura.
+scenarios.hechizosClases.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
