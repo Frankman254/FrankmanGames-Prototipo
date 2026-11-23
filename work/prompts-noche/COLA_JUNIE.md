@@ -1295,6 +1295,35 @@ Claude se ocupa a la vez de estos archivos. **No los toques**:
   - `pantallaCompleta` debe entrar en pantalla completa real con F11 o con la opción, esperar a que termine la animación de macOS (hasta 2 s), medir que `innerWidth` coincide con la pantalla y salir.
   - Hecho cuando sale con 3/3 pasadas en verde, con una captura de dentro y otra de fuera en `work/junie-jl165/`.
 
+### Tanda del 2026-11-23 (coordinador), autorizada por el creador: «recuerda ponerle artas tareas a junie para que su cola no se vacíe». En este orden, después de JL-165
+
+Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`, `characterPreview.ts`, `arenaView.ts`), ni `hudLayout.ts` ni `hudProfiles.ts`. Claude modela `arte/blender/casa_creador.blend`, y OMP modela `puertobelo_kit` (OMP-PB-01): no los toques. Una tarea que dependa de algo que aún no está, se marca `[!]` con el motivo y se pasa a la siguiente.
+
+- [ ] JL-166 **`chaman.glb` no carga en el editor web.** En `npm run dev:web` (Vite) la consola dice `enemy10: no se pudo cargar /assets/models/chaman.glb`, aunque el archivo existe en `assets/models/`. Averigua si es la ruta, el tamaño, una textura externa o una extensión glTF que falta. Corrígelo con un cambio pequeño. Hecho cuando la consola queda limpia al entrar en la partida de prueba, con captura en `work/junie-jl166/`.
+- [ ] JL-167 **Prueba: todo GLB que citan `data/` y `src/` existe.** Prueba en Vitest que recorra los `model`, `file` y rutas `assets/models/*.glb` de `data/**/*.json` y compruebe que el archivo existe. Si falla por un caso real, anótalo en la tarea: no lo silencies.
+- [ ] JL-168 **Prueba: todo asset de `assets/models/` tiene fila en `PROCEDENCIA.md`.** Solo lectura de `PROCEDENCIA.md`, que no se edita. La lista de huérfanos va a `work/junie-jl168/HUERFANOS.md` y a `docs/ACCIONES_CREADOR.md` si hay alguno.
+- [ ] JL-169 **Kit de Puertobelo en `data/ambient.json`.** Depende de OMP-PB-01. Da de alta cada nodo de `puertobelo_kit.glb` en `pieces` con la huella `w`/`d`/`h` de `work/omp-pb-01/HUELLAS.md` y `solid: true` en muros, garita, arco y cañones. Amplía la prueba de huellas que ya existe para que cubra el kit.
+- [ ] JL-170 **El editor ofrece las piezas del kit y mide su huella.** En `src/editor/doc.ts`, `add()` fija `w` en 10 para `castillo`/`iglesia` y en 3 para el resto. Haz que la huella de un `model:` salga de la que declara `data/ambient.json` o de la caja del GLB, con 3 como respaldo. Es un cambio pequeño con prueba en Vitest; no reescribas el editor.
+- [ ] JL-171 **Zona jugable «Puertobelo».** Depende de JL-169. El nombre es provisional y ya figura en `data/panama.json`.
+  - Con el editor, en la costa caribe del mapa, monta una zona en `data/zones.json` y su terreno: bahía, orilla, ladera y una explanada.
+  - Coloca un baluarte con muros, troneras con cañones, garita, puerta de arco, empedrado, casas en ruina y muelle, con el kit.
+  - Pinta los caminos en `navpaint` para que se pueda recorrer sin atascarse, y añade una conexión con el resto del mapa.
+  - Clima `hot`, `safe: false`, y monstruos solo de los arquetipos que ya existen. No inventes cifras: usa el nivel de una zona vecina y anótalo en `docs/ACCIONES_CREADOR.md` para que el creador lo decida.
+  - Hecho con un escenario `puertobelo` en `qaElectron.mjs` que entra en la zona, recorre el baluarte de punta a punta sin atascarse y guarda 6 capturas en `work/junie-jl171/`.
+- [ ] JL-172 **Rendimiento de Puertobelo.** Depende de JL-171. Mide los fps como en JL-152. Si baja de 60 en este Mac, prueba con instancias en vez de clones o con LOD, sin quitar piezas. Informe en `work/junie-jl172/`.
+- [ ] JL-173 **Icono y etiqueta de Puertobelo en el minimapa y en el mapa grande** (`src/ui/map/mapDraw.ts`). Los bastiones se dibujan como `castle` y la zona sale con su nombre. Captura en `work/junie-jl173/`.
+- [ ] JL-174 **La casa del creador en el mundo.** Depende de CLA-CASA1 (Claude, `assets/models/casa_creador.glb`).
+  - Colócala como `landmark` en las afueras de Villa Raspadura, en un solar libre que no tape caminos ni PNJ.
+  - Añade colisión de las paredes en `navpaint` y deja la puerta y el portal transitables.
+  - En `docs/ACCIONES_CREADOR.md`, pregunta al creador si la quiere ahí o en otro sitio, y si debe ser la casa del jugador.
+  - Capturas de frente, de lado y desde la cámara de juego en `work/junie-jl174/`.
+- [ ] JL-175 **Escenario `barraCandado` en `qaElectron.mjs`** (ya arreglado en CLA-BAR1). Para 1280×720, 1920×1080 y 2560×1080, y con escala 1 y 0,82×0,68: arrastra la barra de hechizos al fondo, cierra el candado, recarga y comprueba que el borde inferior coincide con `innerHeight` (±2 px). Después pulsa Restablecer y comprueba que la barra queda abajo y centrada. Solo cambia `scripts/qaElectron.mjs`.
+- [ ] JL-176 **Escenario `creadorCuerpo`.** Depende de CLA-CR1. En el creador, pon la altura al mínimo y al máximo y la complexión al mínimo y al máximo, por clase y sexo. Captura cada combinación y mide en píxeles la altura de la silueta, que debe cambiar de forma visible. Evidencia en `work/junie-jl176/`.
+- [ ] JL-177 **Escenario `jinetes`.** Depende de CLA-MON1. Monta al héroe en cada montura y saca una captura de lado con la cámara fija. Mide la distancia entre la cadera y la silla con un rayo, como en JL-143. Evidencia en `work/junie-jl177/`.
+- [ ] JL-178 **Escenario `emotes`.** Lanza cada `Emote_*` y cada hechizo de las tres clases y captura el fotograma central, para comparar antes y después de OMP-PJ-02. Evidencia en `work/junie-jl178/ANTES/`.
+- [ ] JL-179 **Error que no se traga.** Busca en `src/` los `.catch(() => {})` y `catch {}` vacíos (JL-164 encontró uno que ocultaba un fallo real). Haz una lista en `work/junie-jl179/LISTA.md`. En los que cargan assets o datos, cambia el silencio por `console.warn` con la ruta. No toques los archivos de Claude.
+- [ ] JL-180 **Sonido de Puertobelo.** Depende de JL-171. Asigna a la zona el ambiente de costa y viento que ya existe en `data/audio`; no generes audio nuevo. Prueba en Vitest de que la zona tiene ambiente.
+
 - [x] JL-152 Rendimiento de la cripta: el piso 100 va a 58 fps, cuando el pueblo va a 61 y la cripta normal a 119. Mide qué cuesta más (utilería de JL-88, luces o antorchas) y deja un informe con las cifras. Sin cambios si no hay una causa clara y pequeña.
   — commit «JL-152: rendimiento piso 100 — 120 fps en Mac M5, sin cuello de botella» — INFORME.md en work/junie-jl152/. El piso 100 rinde a 120 fps con 117 enemigos (msRender 3.5, msSim 0.1, msAnim 0.9, msSombras 0.4). El problema de 58 fps es en Windows (WIN-01). Sin cambios de código.
 - [ ] JL-153 Actualizar `work/junie-qa01/RESUMEN.md`: la cabecera aún habla de 271/68. Que refleje la última cifra y enlace a `work/junie-jl107/`.
