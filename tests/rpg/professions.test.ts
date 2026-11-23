@@ -256,4 +256,106 @@ describe('fabricar', () => {
         delete save.professions;
         expect(Character.fromSave(data.rpg, save, new Rng(2)).professions.level('smith')).toBe(1);
     });
+
+    it('las recetas se desbloquean al subir el nivel del oficio', () => {
+        const { w, s, data } = atForge();
+        const recipes = data.rpg.professions.recipes;
+
+        // Smith nivel 1: solo short_sword (nivel 1).
+        s.character.give('ore', 20);
+        s.character.give('wood_cedar', 20);
+        s.character.give('wood_guayacan', 10);
+        s.character.give('iron_nugget', 10);
+        s.character.give('fang', 5);
+        expect(s.character.professions.level('smith')).toBe(1);
+        expect(s.craft('short_sword').ok).toBe(true); // nivel 1
+        expect(s.craft('oak_buckler').ok).toBe(false); // nivel 2
+        expect(s.craft('woodcutter_axe').ok).toBe(false); // nivel 2
+        expect(s.craft('rozador_machete').ok).toBe(false); // nivel 3
+        expect(s.craft('guayacan_club').ok).toBe(false); // nivel 8
+
+        // Subir a nivel 2: se desbloquean oak_buckler y woodcutter_axe.
+        s.character.give('hide', 20);
+        reachProfessionLevel(s, 'smith', 2);
+        expect(s.craft('oak_buckler').ok).toBe(true);
+        expect(s.craft('woodcutter_axe').ok).toBe(true);
+        expect(s.craft('rozador_machete').ok).toBe(false); // nivel 3
+        expect(s.craft('guayacan_club').ok).toBe(false); // nivel 8
+
+        // Subir a nivel 3: se desbloquea rozador_machete.
+        reachProfessionLevel(s, 'smith', 3);
+        expect(s.craft('rozador_machete').ok).toBe(true);
+        expect(s.craft('guayacan_club').ok).toBe(false); // nivel 8
+
+        // Subir a nivel 8: se desbloquea guayacan_club.
+        reachProfessionLevel(s, 'smith', 8);
+        expect(s.craft('guayacan_club').ok).toBe(true);
+    });
+
+    it('las recetas de tailor se desbloquean al subir el nivel', () => {
+        const r = setup();
+        const loom = r.data.rpg.professions.stations['loom']!;
+        moveTo(r.w, loom.x + 1, loom.y);
+        const { s, data } = r;
+
+        s.character.give('fiber_bijao', 30);
+        s.character.give('hide', 20);
+        s.character.give('cotton_boll', 20);
+        s.character.give('ore', 10);
+        s.character.give('fang', 5);
+
+        // Tailor nivel 1: solo recetas de nivel 1.
+        expect(s.character.professions.level('tailor')).toBe(1);
+        expect(s.craft('copper_ring').ok).toBe(false); // nivel 2
+        expect(s.craft('cabuya_belt').ok).toBe(false); // nivel 3
+        expect(s.craft('reed_hat').ok).toBe(false); // nivel 5
+        expect(s.craft('straw_cape').ok).toBe(false); // nivel 7
+        // Las de nivel 1 sí pasan (y suben el oficio con su XP).
+        expect(s.craft('padded_vest').ok).toBe(true);
+        expect(s.craft('leather_bracers').ok).toBe(true);
+        expect(s.craft('traveler_boots').ok).toBe(true);
+
+        // Subir a nivel 2: copper_ring.
+        reachProfessionLevel(s, 'tailor', 2);
+        expect(s.craft('copper_ring').ok).toBe(true);
+        expect(s.craft('cabuya_belt').ok).toBe(false);
+
+        // Subir a nivel 3: cabuya_belt.
+        reachProfessionLevel(s, 'tailor', 3);
+        expect(s.craft('cabuya_belt').ok).toBe(true);
+        expect(s.craft('reed_hat').ok).toBe(false);
+
+        // Subir a nivel 5: reed_hat.
+        reachProfessionLevel(s, 'tailor', 5);
+        expect(s.craft('reed_hat').ok).toBe(true);
+        expect(s.craft('straw_cape').ok).toBe(false);
+
+        // Subir a nivel 7: straw_cape.
+        reachProfessionLevel(s, 'tailor', 7);
+        expect(s.craft('straw_cape').ok).toBe(true);
+    });
+
+    it('professions.json tiene recetas en todos los niveles de 1 a maxLevel', () => {
+        const { rpg } = loadGameData();
+        const { recipes, rules, professions } = rpg.professions;
+        const levels = new Set<number>();
+        for (const r of Object.values(recipes)) {
+            levels.add(r.level);
+        }
+        // Las recetas cubren al menos los niveles 1, 2, 3, 5, 7, 8.
+        expect(levels.has(1)).toBe(true);
+        expect(levels.has(2)).toBe(true);
+        expect(levels.has(3)).toBe(true);
+        expect(levels.has(5)).toBe(true);
+        expect(levels.has(7)).toBe(true);
+        expect(levels.has(8)).toBe(true);
+        // Ninguna receta supera maxLevel.
+        for (const r of Object.values(recipes)) {
+            expect(r.level, r.id).toBeLessThanOrEqual(rules.maxLevel);
+        }
+        // Cada receta pertenece a un oficio existente.
+        for (const r of Object.values(recipes)) {
+            expect(professions[r.profession], r.id).toBeDefined();
+        }
+    });
 });

@@ -1,3 +1,17 @@
+## 2026-11-23 — JL-195: pruebas de desbloqueo de recetas por nivel de oficio (Junie)
+
+**Archivos:** `tests/rpg/professions.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 3 pruebas nuevas en `tests/rpg/professions.test.ts` que cubren el desbloqueo progresivo de recetas al subir el nivel de oficio:
+
+- **Smith** (nivel 1→2→3→8): `short_sword` pasa en nivel 1; `oak_buckler` y `woodcutter_axe` se desbloquean en nivel 2; `rozador_machete` en nivel 3; `guayacan_club` en nivel 8. Cada paso verifica que las recetas del siguiente nivel fallan hasta subir.
+- **Tailor** (nivel 1→2→3→5→7): `padded_vest`, `leather_bracers`, `traveler_boots` pasan en nivel 1; `copper_ring` en nivel 2; `cabuya_belt` en nivel 3; `reed_hat` en nivel 5; `straw_cape` en nivel 7. Se verifica primero que las de nivel alto fallan, luego se fabrican las de nivel 1 (que suben el oficio con su XP).
+- **Validación de datos**: todas las recetas de `professions.json` tienen nivel ≤ maxLevel, pertenecen a un oficio existente y cubren los niveles 1, 2, 3, 5, 7, 8.
+
+**Validación:** `npx vitest run tests/rpg/professions.test.ts` → 19/19 verdes. Suite completa: 4073/4074 (1 fallo pre-existente `assets.test.ts` de OMP). `npx tsc --noEmit` limpio (solo `balM3.ts` ajeno).
+
+---
+
 ## 2026-11-23 — JL-194: pruebas de energy.ts y spoils.ts — 50 pruebas (Junie)
 
 **Archivos:** `tests/rpg/energySpoils.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
