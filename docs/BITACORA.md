@@ -1,3 +1,17 @@
+## 2026-11-23 — JL-180: Sonido de Puertobelo — BLOQUEADA (Junie)
+
+**Archivos:** `work/junie-jl180/BLOQUEO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** JL-180 (Sonido de Puertobelo) no se puede ejecutar porque la zona **Puertobelo no existe** en el juego. `data/zones.json` no tiene zona "puertobelo", `data/ambient.json` no tiene piezas del kit, y `assets/models/puertobelo_kit.glb` no existe (pendiente de OMP-PB-01). Sin zona construida, no hay a qué asignar ambiente. El sistema de ambiente global (`data/audio/ambience.json`) ya tiene viento y agua configurados y se activan automáticamente por zona; una vez exista la zona, basta con que herede el clima `hot`.
+
+**Cómo se verificó:** Búsqueda de "puertobelo" en `data/zones.json` y `data/ambient.json`: 0 resultados. `assets/models/puertobelo_kit.glb` no existe. `work/omp-pb-01/HUELLAS.md` no existe. BLOQUEO.md en `work/junie-jl180/`.
+
+**Sin commit de código:** Tarea sin código (bloqueada). Su casilla, TAREAS y BITACORA entran en este commit de cierre.
+
+---
+
+---
+
 ## 2026-11-23 — JL-177: escenario jinetes — 8/10 (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
