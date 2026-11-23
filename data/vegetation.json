@@ -86,7 +86,16 @@
     { "kind": "lamp", "x": 125, "y": 92,  "w": 0.4, "d": 0.4, "rotDeg": 0 },
     { "kind": "lamp", "x": 205, "y": 77,  "w": 0.4, "d": 0.4, "rotDeg": 0 },
     { "kind": "house", "x": 250.41, "y": 234.29, "w": 6, "d": 6, "rotDeg": 0 },
-    { "kind": "landmark", "model": "casa_creador", "x": 170, "y": 175, "w": 6.3, "d": 12, "rotDeg": 0 }
+    { "kind": "landmark", "model": "casa_creador_espejo", "x": 155, "y": 221, "w": 6.5, "d": 12, "rotDeg": 0 },
+    { "kind": "landmark", "model": "casa_creador", "x": 165, "y": 221, "w": 6.5, "d": 12, "rotDeg": 0 },
+    { "kind": "landmark", "model": "casa_creador_espejo", "x": 175, "y": 221, "w": 6.5, "d": 12, "rotDeg": 0 },
+    { "kind": "landmark", "model": "casa_creador", "x": 185, "y": 221, "w": 6.5, "d": 12, "rotDeg": 0 },
+    { "kind": "lamp", "x": 160, "y": 206.45, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 170, "y": 206.45, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 180, "y": 206.45, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 152, "y": 199.55, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 166, "y": 199.55, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 180, "y": 199.55, "w": 0.4, "d": 0.4, "rotDeg": 0 }
   ],
   "exclusions": [{ "kind": "indio_desnudo", "x": 45.06, "y": 48.58 }],
   "placements": []

@@ -1,0 +1,12 @@
+{
+  "_nota": "CLA-CASA2 (creador, 2026-11-23): «no veo planificacion vial que pedi [...] no tiene calle, los arboles invaden la propiedad». Calle asfaltada con cordón, franja de grama y acera, y lotes despejados con las casas del creador (base y espejo alternadas). Metros del mundo; la calle corre en x a la altura y. Cada lote: esquina (x0, y0) del lado de la calle, `ancho` en x y `fondo` en y; la casa va centrada en el ancho con la fachada a `retiro` m de la acera, mirando a la calle (rotDeg 0 = −Z). Medidas de la calle y de los lotes: PROPUESTA. La casa del juego estaba en (170, 175), pegada a la Piedra Pintada (176, 176) y al alzador (174, 174): la urbanización va al norte, sin nada colocado.",
+  "calles": [
+    { "id": "calle_casas", "x0": 142, "x1": 194, "y": 203, "calzada": 6, "cordon": 0.15, "grama": 0.6, "acera": 1.2 }
+  ],
+  "lotes": [
+    { "id": "lote_1", "x0": 150, "y0": 208, "ancho": 10, "fondo": 21.5, "retiro": 7, "modelo": "casa_creador_espejo" },
+    { "id": "lote_2", "x0": 160, "y0": 208, "ancho": 10, "fondo": 21.5, "retiro": 7, "modelo": "casa_creador" },
+    { "id": "lote_3", "x0": 170, "y0": 208, "ancho": 10, "fondo": 21.5, "retiro": 7, "modelo": "casa_creador_espejo" },
+    { "id": "lote_4", "x0": 180, "y0": 208, "ancho": 10, "fondo": 21.5, "retiro": 7, "modelo": "casa_creador" }
+  ]
+}

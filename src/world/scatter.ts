@@ -12,6 +12,7 @@ import type { Vec2 } from '../sim/vec2';
 import { fbm, type FbmDef } from './noise';
 import { type HeightField, type TerrainDef } from './terrain';
 import { pathEdgeDistance } from '../sim/paths';
+import { URBANIZACION, insideLot, insideStreet } from './urbanizacion';
 
 /** Tamaño de página: el mismo reparto en la parcela y en el mundo (data/terrain.json). */
 const SCATTER_PAGE = 128;
@@ -350,6 +351,11 @@ export function scatterRegion(
                 if (start && Math.hypot(x - start.x, z - start.y) < veg.clearRadiusAroundStart) continue;
                 if (terrain.ponds.some((p) => Math.hypot(x - p.x, z - p.y) < p.radius + p.shore + 1)) continue;
                 if (veg.props.some((p) => insideRect({ x, y: z }, p, 0.8))) continue;
+                // CLA-CASA2: en los lotes de la urbanización sólo hierba; en la calle, nada.
+                // Árboles y arbustos más lejos, para que la copa no tape la calzada ni el lote.
+                const copa = k.shape === 'grass' ? 0 : 3;
+                if (insideStreet(x, z, URBANIZACION, 1 + copa)) continue;
+                if (k.shape !== 'grass' && insideLot(x, z, URBANIZACION, 0.5 + copa)) continue;
                 const y = hf.sample(x, z);
                 if (dryAbove !== null && y < dryAbove + 0.6) continue;
                 const r = k.blockRadius * scale;

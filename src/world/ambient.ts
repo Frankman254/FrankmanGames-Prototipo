@@ -10,6 +10,7 @@ import type { VegetationRing } from './detail';
 import { fbm, type FbmDef } from './noise';
 import { biomeAt, type BiomeDef, type PropDef } from './scatter';
 import type { FlatAreaDef, PondDef } from './terrain';
+import { URBANIZACION, insideLot, insideStreet } from './urbanizacion';
 
 export const AMBIENT_RINGS = ['detail', 'prop'] as const;
 export type AmbientRing = (typeof AMBIENT_RINGS)[number];
@@ -269,6 +270,8 @@ export function scatterAmbient(
                 if (site.props.some((p) => Math.abs(x - p.x) < p.w / 2 + 0.4 && Math.abs(z - p.y) < p.d / 2 + 0.4))
                     continue;
                 if (blockers.some((b) => Math.hypot(x - b.x, z - b.y) < b.r)) continue;
+                // CLA-CASA2: ni en los lotes ni en la calle de la urbanización.
+                if (insideLot(x, z, URBANIZACION, 0.3) || insideStreet(x, z, URBANIZACION, 0.5)) continue;
                 if (!site.playable(x, z)) continue;
                 const y = site.height(x, z);
                 if (y < dry) continue;

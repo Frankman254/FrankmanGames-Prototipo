@@ -1,6 +1,8 @@
 import { loadGameData } from './data';
 import { tr } from './i18n';
 import { dayLengthSeconds, dayPhaseName } from './world/dayNight';
+import { casaCreadorDoor, isCasaCreador } from './world/casaCreador';
+import { StreetView } from './render/streetView';
 import type { GameOptions } from './ui/menus/saveStore';
 import { loadWorldData } from './data/worldData';
 import { Matrix, SceneInstrumentation, Vector3 } from '@babylonjs/core';
@@ -178,6 +180,8 @@ const npcView = new NpcView(
     view.atmosphere,
 );
 const zoneBorder = new ZoneBorderView(view.scene, view.heights);
+// CLA-CASA2: calle y lotes de la urbanización de las casas del creador.
+const streetView: StreetView | null = benchMode ? null : new StreetView(view.scene, view.groundExact);
 const landmarks = new LandmarkView(
     view.scene,
     view.groundExact,
@@ -191,6 +195,10 @@ if (!benchMode) {
         ...placed.map((p) => {
             // Las lanchas van en el agua, no sobre el suelo (data/terrain.json → structures.afloat).
             const afloat = overworld.def.structures.afloat[p.model!];
+            // CLA-CASA2: la casa del creador tiene la fachada en −Y de Blender, como las casas: gira
+            // 180° para que rotDeg cuente desde −Z, y se asienta en el suelo de su puerta de reja.
+            if (isCasaCreador(p.model))
+                return { model: p.model, x: p.x, y: p.y, rotDeg: p.rotDeg + 180, groundAt: casaCreadorDoor(p).door };
             return { model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg, ...(afloat ? { afloat: afloat.draft } : {}) };
         }),
         ...loadWorldData()
@@ -426,6 +434,7 @@ function switchInterior(inside: boolean): void {
     view.vegetation.setVisible(!inside);
     view.ambient.setVisible(!inside);
     landmarks.setVisible(!inside);
+    streetView?.setVisible(!inside);
     waterView.setVisible(!inside);
     npcView.setVisible(!inside);
     view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
@@ -471,6 +480,7 @@ const houses: HouseScene | null = benchMode
           },
           loadWorldData().vegetation.props.filter((p) => p.kind === 'house'),
           loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model === 'castillo'),
+          loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && isCasaCreador(p.model)),
       );
 /**
  * Cajas sólidas que no salen de `buildProps` (el modo edición las rehace y se
@@ -694,6 +704,7 @@ function editorApply(
                         houses?.setHouses(
                             overworld.vegetation.props.filter((p) => p.kind === 'house'),
                             overworld.vegetation.props.filter((p) => p.kind === 'landmark' && p.model === 'castillo'),
+                            overworld.vegetation.props.filter((p) => p.kind === 'landmark' && isCasaCreador(p.model)),
                         ),
                 },
                 files,
@@ -2490,6 +2501,7 @@ const LANDMARK_MODEL_TO_KIND: Record<string, string> = {
     muelle: 'dock',
     lancha: 'boat',
     casa_creador: 'house',
+    casa_creador_espejo: 'house',
 };
 
 /** Minimapa y mapa grande: jugador, cámara, marcadores, piedras de viaje y objetivo de la misión. */

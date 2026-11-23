@@ -15,8 +15,10 @@ describe('JL-174: La casa del creador en el mundo', () => {
         expect(casa!.model).toBe('casa_creador');
     });
 
-    it('tiene dimensiones coherentes con el GLB (6.3 × 12 m)', () => {
-        expect(casa!.w).toBe(6.3);
+    // CLA-CASA2 (creador, 2026-11-23: «te di los planos exactos»): los planos dan 6,50 m de frente
+    // de muros (antes se midió 6,30). La medida cambia con la especificación, no para tapar un fallo.
+    it('tiene dimensiones coherentes con el GLB (6.5 × 12 m)', () => {
+        expect(casa!.w).toBe(6.5);
         expect(casa!.d).toBe(12);
     });
 
@@ -25,7 +27,7 @@ describe('JL-174: La casa del creador en el mundo', () => {
         const flatArea = terrain.flatAreas.find((a: any) => a.x === 128 && a.y === 128);
         expect(flatArea).toBeDefined();
         const dist = Math.hypot(casa!.x - flatArea!.x, casa!.y - flatArea!.y);
-        // La casa (170, 175) está a ~69 m del centro, muy fuera del radio 24 + falloff 10.
+        // CLA-CASA2: la casa base del lote 2 de la urbanización (165, 221), muy fuera del radio 24 + falloff 10.
         expect(dist).toBeGreaterThan(flatArea!.radius + flatArea!.falloff);
     });
 

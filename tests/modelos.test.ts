@@ -43,6 +43,9 @@ describe('assets/models', () => {
             'escenografia_regional.glb',
             'moneda_exposicion_1915.glb',
             'prop_hilo_retorno.glb',
+            // CLA-CASA2: interiores caminables de la casa del creador (sala fija, sin clips).
+            'casa_creador_interior.glb',
+            'casa_creador_espejo_interior.glb',
         ];
         const missing = readdirSync(DIR).filter(
             (f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0,

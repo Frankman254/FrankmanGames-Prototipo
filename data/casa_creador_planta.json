@@ -1,0 +1,84 @@
+{
+  "_nota": "CLA-CASA2 (creador, 2026-11-23): planta de la casa del creador, medida de sus planos. Una sola fuente para el modelo (scripts/blender/casa_creador.py) y para el interior caminable (src/world/casaCreador.ts). Metros. x: de izquierda a derecha mirando la fachada (0 = cara exterior del muro izquierdo); d: desde la cara exterior del muro del fondo (0) hasta la fachada (12). Muros como rectángulos [x0,x1]×[d0,d1]; `ext` dice qué cara da afuera; los huecos van a lo largo del muro (en d si el muro corre en d, en x si corre en x). Muebles: centro (x, d), medidas w (en x) y p (en d), alto. La versión espejada es esta misma planta con x → ancho − x. Los muebles son PROPUESTA; la planta, de los planos.",
+  "ancho": 6.5,
+  "fondo": 12,
+  "alto": 2.7,
+  "piso": 0.15,
+  "huecos": {
+    "V-A": { "alfeizar": 1.0, "alto": 1.2, "reja": "aspa" },
+    "V-B": { "alfeizar": 1.0, "alto": 1.2, "reja": "barras" },
+    "V-C": { "alfeizar": 1.7, "alto": 0.5, "reja": "barras" },
+    "P1": { "alfeizar": 0, "alto": 2.175, "puerta": true },
+    "P2": { "alfeizar": 0, "alto": 2.175, "puerta": true },
+    "P3": { "alfeizar": 0, "alto": 2.175, "puerta": true },
+    "P4": { "alfeizar": 0, "alto": 2.1, "puerta": true }
+  },
+  "muros": [
+    { "id": "izquierdo", "x0": 0, "x1": 0.1, "d0": 0, "d1": 12, "ext": "izq", "huecos": [{ "tipo": "V-B", "desde": 6.3, "hasta": 8.1 }] },
+    { "id": "fondo", "x0": 0, "x1": 6.5, "d0": 0, "d1": 0.1, "ext": "fondo", "huecos": [{ "tipo": "V-B", "desde": 0.6, "hasta": 2.4 }] },
+    { "id": "derecho", "x0": 6.4, "x1": 6.5, "d0": 0, "d1": 10.5, "ext": "der", "huecos": [
+      { "tipo": "V-C", "desde": 0.45, "hasta": 1.15 },
+      { "tipo": "V-C", "desde": 2.0, "hasta": 2.7 },
+      { "tipo": "P4", "desde": 3.85, "hasta": 4.85 }
+    ] },
+    { "id": "fachada_recamara", "x0": 0, "x1": 3.0, "d0": 11.9, "d1": 12, "ext": "frente", "huecos": [{ "tipo": "V-A", "desde": 0.6, "hasta": 2.4 }] },
+    { "id": "fachada_sala", "x0": 3.0, "x1": 6.5, "d0": 10.4, "d1": 10.5, "ext": "frente", "huecos": [
+      { "tipo": "P1", "desde": 3.05, "hasta": 4.05 },
+      { "tipo": "V-A", "desde": 4.35, "hasta": 6.15 }
+    ] },
+    { "id": "pasillo", "x0": 2.9, "x1": 3.0, "d0": 0.1, "d1": 12, "ext": "der", "extDesde": 10.5, "huecos": [
+      { "tipo": "P2", "desde": 0.85, "hasta": 1.75 },
+      { "tipo": "P2", "desde": 4.9, "hasta": 5.8 },
+      { "tipo": "P2", "desde": 8.3, "hasta": 9.2 }
+    ] },
+    { "id": "principal_recamara2", "x0": 0.1, "x1": 2.9, "d0": 4.75, "d1": 4.85, "huecos": [] },
+    { "id": "recamara2_recamara1", "x0": 0.1, "x1": 2.9, "d0": 8.15, "d1": 8.25, "huecos": [] },
+    { "id": "banos", "x0": 4.0, "x1": 4.1, "d0": 0.1, "d1": 3.2, "huecos": [
+      { "tipo": "P3", "desde": 0.1, "hasta": 0.8 },
+      { "tipo": "P3", "desde": 2.35, "hasta": 3.05 }
+    ] },
+    { "id": "entre_banos", "x0": 4.1, "x1": 6.4, "d0": 1.6, "d1": 1.7, "huecos": [] },
+    { "id": "banos_cocina", "x0": 4.0, "x1": 6.4, "d0": 3.05, "d1": 3.2, "huecos": [] },
+    { "id": "cocina_sala", "x0": 5.4, "x1": 6.4, "d0": 5.45, "d1": 5.55, "huecos": [] }
+  ],
+  "ambientes": [
+    { "id": "recamara_principal", "nombre": "Recámara principal", "x0": 0.1, "x1": 2.9, "d0": 0.1, "d1": 4.75, "suelo": "ceramica" },
+    { "id": "recamara_2", "nombre": "Recámara 2", "x0": 0.1, "x1": 2.9, "d0": 4.85, "d1": 8.15, "suelo": "ceramica" },
+    { "id": "recamara_1", "nombre": "Recámara 1", "x0": 0.1, "x1": 2.9, "d0": 8.25, "d1": 11.9, "suelo": "ceramica" },
+    { "id": "pasillo", "nombre": "Pasillo", "x0": 3.0, "x1": 4.0, "d0": 0.1, "d1": 3.2, "suelo": "ceramica" },
+    { "id": "bano_2", "nombre": "Baño 2", "x0": 4.1, "x1": 6.4, "d0": 0.1, "d1": 1.6, "suelo": "bano" },
+    { "id": "bano_1", "nombre": "Baño 1", "x0": 4.1, "x1": 6.4, "d0": 1.7, "d1": 3.05, "suelo": "bano" },
+    { "id": "cocina", "nombre": "Cocina", "x0": 3.0, "x1": 6.4, "d0": 3.2, "d1": 5.5, "suelo": "ceramica" },
+    { "id": "sala_comedor", "nombre": "Sala-comedor", "x0": 3.0, "x1": 6.4, "d0": 5.5, "d1": 10.4, "suelo": "ceramica" },
+    { "id": "portal", "nombre": "Portal", "x0": 3.0, "x1": 6.5, "d0": 10.5, "d1": 12, "suelo": "portal" }
+  ],
+  "columna": { "x": 6.3, "d": 11.8, "r": 0.15 },
+  "lavanderia": { "x0": 6.5, "x1": 8.0, "d0": 3.2, "d1": 4.9 },
+  "tanqueGas": { "x": 6.75, "d": 7.0 },
+  "muebles": [
+    { "id": "cama_doble", "x": 1.05, "d": 2.4, "w": 1.9, "p": 1.4, "alto": 0.55, "tipo": "cama" },
+    { "id": "mesita_principal_a", "x": 0.33, "d": 1.4, "w": 0.45, "p": 0.4, "alto": 0.5, "tipo": "mesita" },
+    { "id": "mesita_principal_b", "x": 0.33, "d": 3.4, "w": 0.45, "p": 0.4, "alto": 0.5, "tipo": "mesita" },
+    { "id": "ropero_principal", "x": 2.6, "d": 4.0, "w": 0.55, "p": 1.3, "alto": 2.0, "tipo": "ropero" },
+    { "id": "cama_2", "x": 1.05, "d": 5.45, "w": 1.9, "p": 0.95, "alto": 0.5, "tipo": "cama" },
+    { "id": "escritorio_2", "x": 0.4, "d": 7.4, "w": 0.6, "p": 1.0, "alto": 0.75, "tipo": "escritorio" },
+    { "id": "ropero_2", "x": 2.6, "d": 7.4, "w": 0.55, "p": 1.1, "alto": 2.0, "tipo": "ropero" },
+    { "id": "cama_1", "x": 1.05, "d": 10.1, "w": 1.9, "p": 0.95, "alto": 0.5, "tipo": "cama" },
+    { "id": "mesita_1", "x": 0.33, "d": 9.3, "w": 0.45, "p": 0.4, "alto": 0.5, "tipo": "mesita" },
+    { "id": "ropero_1", "x": 2.6, "d": 11.0, "w": 0.55, "p": 1.2, "alto": 2.0, "tipo": "ropero" },
+    { "id": "inodoro_2", "x": 5.05, "d": 0.38, "w": 0.4, "p": 0.55, "alto": 0.42, "tipo": "inodoro" },
+    { "id": "lavamanos_2", "x": 4.38, "d": 1.36, "w": 0.45, "p": 0.38, "alto": 0.85, "tipo": "lavamanos" },
+    { "id": "ducha_2", "x": 5.97, "d": 0.85, "w": 0.86, "p": 1.48, "alto": 0.06, "tipo": "ducha", "pisable": true },
+    { "id": "inodoro_1", "x": 5.05, "d": 1.98, "w": 0.4, "p": 0.55, "alto": 0.42, "tipo": "inodoro" },
+    { "id": "lavamanos_1", "x": 4.38, "d": 1.92, "w": 0.45, "p": 0.38, "alto": 0.85, "tipo": "lavamanos" },
+    { "id": "ducha_1", "x": 5.97, "d": 2.37, "w": 0.86, "p": 1.33, "alto": 0.06, "tipo": "ducha", "pisable": true },
+    { "id": "refrigeradora", "x": 4.45, "d": 3.55, "w": 0.7, "p": 0.65, "alto": 1.75, "tipo": "refrigeradora" },
+    { "id": "meson", "x": 5.6, "d": 3.5, "w": 1.6, "p": 0.6, "alto": 0.9, "tipo": "meson" },
+    { "id": "estufa", "x": 5.9, "d": 5.15, "w": 0.6, "p": 0.6, "alto": 0.9, "tipo": "estufa" },
+    { "id": "mesa_comedor", "x": 4.75, "d": 6.45, "w": 1.2, "p": 0.8, "alto": 0.76, "tipo": "mesa" },
+    { "id": "sofa", "x": 5.95, "d": 8.75, "w": 0.85, "p": 1.9, "alto": 0.8, "tipo": "sofa" },
+    { "id": "mesa_centro", "x": 4.95, "d": 8.75, "w": 0.5, "p": 0.9, "alto": 0.4, "tipo": "mesa_centro" },
+    { "id": "mueble_tv", "x": 3.27, "d": 7.0, "w": 0.4, "p": 1.3, "alto": 0.55, "tipo": "mueble_tv" },
+    { "id": "mecedora", "x": 5.6, "d": 11.25, "w": 0.6, "p": 0.7, "alto": 0.9, "tipo": "silla" }
+  ]
+}

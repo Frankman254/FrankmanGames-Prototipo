@@ -4,9 +4,20 @@ import { MeshBuilder, TransformNode, type Mesh, type StandardMaterial } from '@b
 import type { GameData } from '../data';
 import { goldOutline } from '../render/interactOutline';
 import { solidMaterial } from '../render/materials';
+import { modelFile } from '../render/modelFiles';
+import { OcclusionPlugin } from '../render/occlusion';
 import { staticMesh, staticTexture } from '../render/staticModels';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
+import {
+    CASA_CELL,
+    CASA_NAV_RADIUS,
+    casaCreadorDoor,
+    casaRoomExit,
+    casaRoomSize,
+    casaRoomSolids,
+    casaRoomStart,
+} from '../world/casaCreador';
 import { surfaceHeight, type Platform } from '../world/steps';
 import type { SwitchableHeightField } from '../world/switchableGround';
 import type { BankHost } from './bankScene';
@@ -54,7 +65,12 @@ export function castleGate(p: HouseProp): HouseDoor {
 
 const REACH = 1.6;
 
-type RoomId = 'hogar' | 'taller' | 'salon';
+type RoomId = 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo';
+
+/** Casa del creador en el mapa (landmark `casa_creador` o `casa_creador_espejo`). */
+export interface CreatorHouseProp extends HouseProp {
+    model?: string;
+}
 
 interface Room {
     name: string;
@@ -65,6 +81,29 @@ interface Room {
     solids: readonly { x: number; z: number; w: number; d: number }[];
     /** Suelos elevados a los que se sube andando: no son obstáculos. */
     platforms?: readonly Platform[];
+    /** Sala hecha de un GLB entero de assets/models/ (CLA-CASA2), en vez de piezas de interiores.glb. */
+    model?: string;
+    start?: Vec2;
+    exit?: { mesh: Vec2; pos: Vec2 };
+    /** Rejilla más fina que la del mundo, para puertas de 0,70 m. */
+    cellSize?: number;
+    navRadius?: number;
+}
+
+function casaRoom(espejo: boolean): Room {
+    const { width, depth } = casaRoomSize();
+    return {
+        name: 'Casa del creador',
+        width,
+        depth,
+        zoom: 11,
+        solids: casaRoomSolids(espejo).map((o) => ({ x: o.x, z: o.y, w: o.w, d: o.d })),
+        model: espejo ? 'casa_creador_espejo_interior' : 'casa_creador_interior',
+        start: casaRoomStart(espejo),
+        exit: casaRoomExit(espejo),
+        cellSize: CASA_CELL,
+        navRadius: CASA_NAV_RADIUS,
+    };
 }
 
 export const ROOMS: Record<RoomId, Room> = {
@@ -103,6 +142,8 @@ export const ROOMS: Record<RoomId, Room> = {
         ],
         platforms: [{ x: 12, z: 19.85, w: 6, d: 3.7, height: 0.72, run: 1.5, steps: 3 }],
     },
+    casa: casaRoom(false),
+    casaEspejo: casaRoom(true),
 };
 
 type Target = { action: 'enter'; pos: Vec2; door: HouseDoor; room: RoomId } | { action: 'leave'; pos: Vec2 };
@@ -165,6 +206,8 @@ const ROOM_PIECES: Record<RoomId, ReadonlyArray<readonly [string, string]>> = {
         ['salon_dorado', 'gilt'],
         ['salon_brasas', 'lamp'],
     ],
+    casa: [],
+    casaEspejo: [],
 };
 
 export class HouseScene {
@@ -181,6 +224,7 @@ export class HouseScene {
         private readonly host: HouseHost,
         houses: readonly HouseProp[],
         castles: readonly HouseProp[] = [],
+        creatorHouses: readonly CreatorHouseProp[] = [],
     ) {
         const scene = host.view.scene;
         this.exterior = new TransformNode('house-exterior', scene);
@@ -192,21 +236,28 @@ export class HouseScene {
             m.parent = this.exterior;
             m.material = wood;
             // En las casas se ve la puerta del modelo, con su contorno; aquí solo se recibe el clic.
-            if (name === 'house-door') m.visibility = 0;
+            if (name === 'house-door' || name === 'creator-house-door') m.visibility = 0;
             else goldOutline(m);
             this.targets.set(m, { action: 'enter', pos: d.outside, door: d, room });
         };
         // Las casas se turnan entre los dos tipos de habitación.
         houses.forEach((p, i) => door('house-door', houseDoor(p), 1.2, 2.1, i % 2 === 0 ? 'hogar' : 'taller'));
         for (const p of castles) door('castle-gate', castleGate(p), 4.4, 4.6, 'salon');
+        for (const p of creatorHouses) this.creatorDoor(door, p);
         for (const id of Object.keys(ROOMS) as RoomId[]) this.buildRoom(id);
         this.door = door;
     }
 
     private readonly door?: (name: string, d: HouseDoor, w: number, h: number, room: RoomId) => void;
 
+    /** CLA-CASA2: la puerta de reja (hueco P1 de la planta) lleva a la sala de la casa del creador. */
+    private creatorDoor(door: (name: string, d: HouseDoor, w: number, h: number, room: RoomId) => void, p: CreatorHouseProp): void {
+        const c = casaCreadorDoor({ model: p.model, x: p.x, y: p.y, rotDeg: p.rotDeg });
+        door('creator-house-door', { door: c.door, outside: c.outside, rotDeg: c.rotDeg }, 1.0, 2.2, c.espejo ? 'casaEspejo' : 'casa');
+    }
+
     /** Modo edición: las puertas siguen a casas y castillos movidos o nuevos. */
-    setHouses(houses: readonly HouseProp[], castles: readonly HouseProp[]): void {
+    setHouses(houses: readonly HouseProp[], castles: readonly HouseProp[], creatorHouses: readonly CreatorHouseProp[] = []): void {
         if (!this.door) return;
         for (const mesh of [...this.targets.keys()]) {
             if (mesh.parent === this.exterior) mesh.dispose();
@@ -214,6 +265,7 @@ export class HouseScene {
         }
         houses.forEach((p, i) => this.door!('house-door', houseDoor(p), 1.2, 2.1, i % 2 === 0 ? 'hogar' : 'taller'));
         for (const p of castles) this.door!('castle-gate', castleGate(p), 4.4, 4.6, 'salon');
+        for (const p of creatorHouses) this.creatorDoor(this.door, p);
     }
 
     get inside(): boolean {
@@ -277,7 +329,9 @@ export class HouseScene {
                 originY: 0,
                 width: room.width,
                 depth: room.depth,
-                playerStart: { x: room.width / 2, y: 2.4 },
+                ...(room.cellSize ? { cellSize: room.cellSize } : {}),
+                ...(room.navRadius ? { navRadius: room.navRadius } : {}),
+                playerStart: room.start ? { ...room.start } : { x: room.width / 2, y: 2.4 },
                 navPaint: undefined,
                 obstacles: room.solids.map((f) => ({ x: f.x, y: f.z, w: f.w, d: f.d })),
             },
@@ -347,15 +401,41 @@ export class HouseScene {
             m.material = this.material(material);
             m.isPickable = false;
         }
-        const W = ROOMS[id].width;
+        const room = ROOMS[id];
+        if (room.model) this.loadRoomModel(root, room.model);
+        const W = room.width;
         const exit = staticMesh(scene, 'salida', 'house-exit');
-        exit.position.set(W / 2, 0, 0.2);
+        exit.position.set(room.exit?.mesh.x ?? W / 2, 0, room.exit?.mesh.y ?? 0.2);
         exit.parent = root;
         exit.material = this.material('wood');
         exit.isPickable = true;
         goldOutline(exit);
-        this.targets.set(exit, { action: 'leave', pos: { x: W / 2, y: 1.6 } });
+        this.targets.set(exit, { action: 'leave', pos: room.exit ? { ...room.exit.pos } : { x: W / 2, y: 1.6 } });
         root.setEnabled(false);
+    }
+
+    /**
+     * El GLB va en coordenadas de la sala: Blender (X, Y) → (x, z) con el giro de 180° (el cargador de
+     * glTF deja la X y la Y de Blender en −x y −z). Los muros que tapen al personaje se recortan.
+     */
+    private loadRoomModel(root: TransformNode, model: string): void {
+        const scene = this.host.view.scene;
+        const turn = new TransformNode(`${root.name}-model`, scene);
+        turn.parent = root;
+        turn.rotation.y = Math.PI;
+        void modelFile(scene, model)
+            .then((c) => {
+                const entries = c.instantiateModelsToScene((n) => `${root.name}-${n}`, false, { doNotInstantiate: true });
+                for (const node of entries.rootNodes) node.parent = turn;
+                const mats = new Set<NonNullable<Mesh['material']>>();
+                for (const node of entries.rootNodes)
+                    for (const m of node.getChildMeshes(false)) {
+                        m.isPickable = false;
+                        if (m.material) mats.add(m.material);
+                    }
+                for (const m of mats) new OcclusionPlugin(m);
+            })
+            .catch((e: unknown) => console.warn(`[casa] no se pudo cargar ${model}`, e));
     }
 
     private material(name: string): StandardMaterial {

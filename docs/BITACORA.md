@@ -1,3 +1,10 @@
+## 2026-11-23 — CLA-CASA2: casa del creador exacta, espejo, calle e interior (Coord)
+
+- **Planta exacta.** `data/casa_creador_planta.json` es la única fuente para Blender y para el juego: 3 recámaras, 2 baños con sus dos ventanas altas, cocina, sala-comedor y portal. La reja de la puerta copia la foto. Cuatro GLB: exterior e interior, cada uno en versión base y espejo. Validador verde.
+- **Calle.** `data/urbanizacion.json`: calle con aceras y faroles, y 4 lotes alternando base y espejo. Ni árboles ni rocas en lotes y calle. Las losas salían negras porque las normales apuntaban hacia abajo; se invirtió el orden de los vértices.
+- **Interior.** Clic en la puerta → sala caminable; se recorren todos los ambientes y se sale por el tapete, en las dos casas. QA Electron y capturas en `work/claude-casa2/qa/`.
+- **Personaje invisible.** Lo tapa la arpía montada en pose erguida; el arreglo es OMP-PJ-03 (pose de montada y `Asiento`). Sin montura se ve bien.
+
 ## 2026-11-23 — AUD-CTX-07, HUD-ROJO-02 y tanda JL-181…203 (Coord)
 
 - **Pueblos con canción propia.** Cinco piezas nuevas en `assets/audio/music/pueblo/` (90–124 s en bucle, −16,5 a −18 LUFS), compuestas con `work/claude-aud-regiones/pueblos.py`. Cableadas con `TOWN_TRACK`. QA Electron 7/7: `work/claude-aud-regiones/qa_pueblos_resultado.txt`. Registradas en PROCEDENCIA y en `catalogar.py`.
