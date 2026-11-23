@@ -9,6 +9,7 @@ import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples'
 import { AudioEngine } from '../src/audio/engine';
 import { ContextMusicPlayer, DungeonPlaylist, musicContext, REGION_TRACK } from '../src/audio/contextMusic';
 import { localMusicOverrides } from '../src/audio/director';
+import { DANGER_HEALTH, StingerPlayer, dangerCrossed } from '../src/audio/stingers';
 import {
     ambienceMix,
     composeBar,
@@ -497,6 +498,60 @@ describe('audio: música por zona', () => {
         expect(localMusicOverrides('region:darien', true)).toBe(true);
         expect(localMusicOverrides('field_fight', true)).toBe(true);
         expect(localMusicOverrides('town', true)).toBe(false);
+    });
+
+    it('la portada es la pieza orquestal propia y los tres avisos son Ogg/Opus registrados', () => {
+        for (const path of [
+            'assets/audio/music/titulo/tierra_del_istmo.ogg',
+            'assets/audio/music/avisos/victoria.ogg',
+            'assets/audio/music/avisos/derrota.ogg',
+            'assets/audio/music/avisos/peligro.ogg',
+        ]) {
+            const bytes = readFileSync(path);
+            expect(bytes.subarray(0, 4).toString('ascii'), path).toBe('OggS');
+            expect(bytes.subarray(0, 64).includes(Buffer.from('OpusHead')), path).toBe(true);
+            expect(readFileSync('PROCEDENCIA.md', 'utf8'), path).toContain(path);
+        }
+        expect(readFileSync('src/audio/contextMusic.ts', 'utf8')).toContain('titulo/tierra_del_istmo.ogg');
+    });
+
+    it('el aviso de peligro suena solo al cruzar el umbral de vida en pelea', () => {
+        expect(dangerCrossed(0.5, DANGER_HEALTH - 0.01, true, true)).toBe(true);
+        expect(dangerCrossed(0.5, 0.2, false, true)).toBe(false);
+        expect(dangerCrossed(0.2, 0.1, true, true)).toBe(false);
+        expect(dangerCrossed(0.5, 0, true, false)).toBe(false);
+    });
+
+    it('un aviso baja la música de fondo y no se repite dentro de su enfriamiento', async () => {
+        const ctx = new FakeCtx();
+        const engine = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
+        const player = new ContextMusicPlayer(engine, async () => new Response(new ArrayBuffer(8)));
+        player.update('town', false);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        const trackGain = ctx.nodes.filter((node) => node.kind === 'gain').at(-1)!;
+        expect(trackGain.gain.value).toBe(1);
+        const urls: string[] = [];
+        const stingers = new StingerPlayer(
+            engine,
+            (s) => player.duck(s),
+            async (url) => {
+                urls.push(String(url));
+                return new Response(new ArrayBuffer(8));
+            },
+        );
+        expect(stingers.play('danger')).toBe(true);
+        expect(stingers.play('danger')).toBe(false);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        expect(urls[0]).toContain('peligro.ogg');
+        expect(stingers.last).toBe('danger');
+        expect(trackGain.gain.value).toBeLessThan(0.5);
+        // Durante el aviso el fotograma no devuelve la música a pleno volumen.
+        player.update('town', false);
+        expect(trackGain.gain.value).toBeLessThan(0.5);
+        ctx.currentTime = 10;
+        player.update('town', false);
+        expect(trackGain.gain.value).toBe(1);
+        expect(stingers.play('victory')).toBe(true);
     });
 
     it('la pista empaquetada funde la generativa y cede ante la música local', async () => {

@@ -24,6 +24,7 @@ import { AudioEngine } from './engine';
 import { loadSamples } from './samples';
 import { AmbiencePlayer, MusicPlayer } from './players';
 import { ambienceMix, moodTargets } from './score';
+import { StingerPlayer, dangerCrossed } from './stingers';
 import { ContextMusicPlayer, isOpenWorldContext, musicContext, type MusicContext } from './contextMusic';
 import type { UiSoundEvent } from '../ui/menus/uiSound';
 import type { MenuScreen } from '../ui/menus';
@@ -71,6 +72,8 @@ export class AudioDirector {
     music: MusicPlayer | null = null;
     ambience: AmbiencePlayer | null = null;
     contextMusic: ContextMusicPlayer | null = null;
+    stingers: StingerPlayer | null = null;
+    private healthFrac = 1;
     private vol: VolumeOptions = { volume: 1, musicVolume: 1, sfxVolume: 1, ambienceVolume: 1, uiVolume: 1 };
     private footsteps = 0;
     private lootCache = new Map<number, LootInfo>();
@@ -152,6 +155,9 @@ export class AudioDirector {
         this.music = new MusicPlayer(this.engine, this.data.music);
         this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
         this.contextMusic = new ContextMusicPlayer(this.engine);
+        const music = this.contextMusic;
+        this.stingers = new StingerPlayer(this.engine, (seconds) => music.duck(seconds));
+        this.stingers.preload();
         // Mientras se decodifican (o si fallan) suenan las recetas sintetizadas.
         void loadSamples(ctx, this.data.sfx).then((m) => (this.samples = m));
         // Música local de pruebas: el módulo sólo existe en desarrollo (el build lo descarta entero).
@@ -196,7 +202,13 @@ export class AudioDirector {
     onEvents(world: World, events: readonly GameEvent[]): void {
         if (!this.engine || events.length === 0) return;
         const ctx = this.cueContext(world);
-        for (const e of events) for (const c of cuesForEvent(e, ctx)) this.play(c, world);
+        for (const e of events) {
+            for (const c of cuesForEvent(e, ctx)) this.play(c, world);
+            // Avisos musicales: derrota al morir; victoria al vencer a un guardián o limpiar el lugar.
+            if (e.type === 'playerDeath') this.stingers?.play('defeat');
+            else if (e.type === 'outcome' && e.outcome === 'victory') this.stingers?.play('victory');
+            else if (e.type === 'enemyDeath' && world.enemies.get(e.enemyId)?.guardian) this.stingers?.play('victory');
+        }
     }
 
     private onSession(e: SessionEvent): void {
@@ -289,6 +301,9 @@ export class AudioDirector {
             if (ENGAGED.has(e.state) && Math.hypot(e.pos.x - p.x, e.pos.y - p.y) <= md.threatRange) engaged++;
         this.threatHold = engaged > 0 ? md.threatHoldSeconds : Math.max(0, this.threatHold - dt);
         const threat = engaged > 0 ? Math.min(1, engaged / 2) : this.threatHold > 0 ? 0.6 : 0;
+        const health = world.player.maxHealth > 0 ? world.player.health / world.player.maxHealth : 1;
+        if (dangerCrossed(this.healthFrac, health, threat > 0, world.player.alive)) this.stingers?.play('danger');
+        this.healthFrac = health;
         const sunY = this.m.view.atmosphere.state.toSun[1];
         const mix = ambienceMix(this.data.ambience, sunY, this.waterDistance(world));
         this.music?.setZone(world.interior ? null : (world.currentZone?.id ?? null));

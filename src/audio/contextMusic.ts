@@ -72,7 +72,8 @@ const TRACK_URL: Partial<Record<TrackId, string>> = {
     // No incrustar estos archivos largos en el JS: Vite los copia con hash y Electron
     // los carga como los GLB. Los efectos cortos sí siguen inline (vite.config).
     // Las canciones de orquesta van en Ogg/Opus (work/claude-aud-juego-musica/exportar.py).
-    title: new URL('../../assets/audio/music/titulo/titulo_mix.wav?no-inline', import.meta.url).href,
+    // Creador (2026-11-22): portada orquestal propia en vez de la mezcla sintética titulo_mix.wav.
+    title: new URL('../../assets/audio/music/titulo/tierra_del_istmo.ogg?no-inline', import.meta.url).href,
     town: new URL('../../assets/audio/music/pueblo/fiesta_en_el_atrio.ogg?no-inline', import.meta.url).href,
     town_fight: new URL('../../assets/audio/music/pueblo_pelea/choque_en_la_plaza.ogg?no-inline', import.meta.url)
         .href,
@@ -125,6 +126,8 @@ export class DungeonPlaylist {
 const CROSSFADE_DURATION = 2.0;
 /** Constante de tiempo exponencial para setTargetAtTime (segundos). 5 constantes ≈ CROSSFADE_DURATION para llegar al 99 %. */
 const CROSSFADE_TC = CROSSFADE_DURATION / 5;
+/** Nivel de la música de fondo mientras suena un aviso (victoria, derrota, peligro). */
+export const DUCK_LEVEL = 0.25;
 
 /**
  * Contexto empaquetado; null conserva el perfil generativo regional.
@@ -163,6 +166,7 @@ export class ContextMusicPlayer {
     private current: Playing | null = null;
     private wanted: MusicContext | null = null;
     private overridden = false;
+    private duckUntil = 0;
 
     /** `devDungeon`: rotación de los OGG de estudio en vez de la cripta propia (solo en `npm run dev`, apagada por defecto). */
     constructor(
@@ -184,6 +188,15 @@ export class ContextMusicPlayer {
         return this.current?.track ?? null;
     }
 
+    /** Baja la música de fondo durante `seconds` para dejar oír un aviso. */
+    duck(seconds: number): void {
+        const ctx = this.engine.ctx;
+        this.duckUntil = Math.max(this.duckUntil, ctx.currentTime + seconds);
+        const level = this.current && !this.overridden ? 0 : 1;
+        this.engine.musicIn.gain.setTargetAtTime(level * DUCK_LEVEL, ctx.currentTime, 0.05);
+        this.current?.gain.gain.setTargetAtTime(this.overridden ? 0 : DUCK_LEVEL, ctx.currentTime, 0.05);
+    }
+
     /** Cambia de contexto con fundido; `overridden` deja el bus a la música local. */
     update(id: MusicContext | null, overridden: boolean): void {
         this.overridden = overridden;
@@ -194,8 +207,11 @@ export class ContextMusicPlayer {
         }
         const packaged = this.current?.id === id && !overridden;
         const now = this.engine.ctx.currentTime;
-        this.engine.musicIn.gain.setTargetAtTime(packaged || overridden ? 0 : 1, now, CROSSFADE_TC);
-        this.current?.gain.gain.setTargetAtTime(packaged ? 1 : 0, now, CROSSFADE_TC);
+        const ducked = now < this.duckUntil;
+        const full = ducked ? DUCK_LEVEL : 1;
+        const tc = ducked ? 0.05 : CROSSFADE_TC;
+        this.engine.musicIn.gain.setTargetAtTime(packaged || overridden ? 0 : full, now, tc);
+        this.current?.gain.gain.setTargetAtTime(packaged ? full : 0, now, tc);
     }
 
     private buffer(track: TrackId): Promise<AudioBuffer | null> {

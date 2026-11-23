@@ -164,6 +164,12 @@ Verificación: 98/98 pruebas focales/de foco/i18n/chat en verde; Vite de producc
 
 ---
 
+## 2026-11-23 — AUD-CTX-06: portada orquestal y avisos de victoria, derrota y peligro (Claude)
+
+**Archivos:** `src/audio/stingers.ts`, `src/audio/contextMusic.ts`, `src/audio/director.ts`, `tests/audio.test.ts`, `assets/audio/music/titulo/tierra_del_istmo.ogg`, `assets/audio/music/avisos/*.ogg`, `PROCEDENCIA.md`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`.
+
+La portada sintética se sustituye por «Tierra del Istmo»: re jónico, 76 BPM, trompa y violines con timbal solemne y sala de iglesia, 2:57 en bucle a −16 LUFS. La compuso el mismo compositor de regiones. Los avisos se escribieron nota a nota en `work/claude-aud-regiones/avisos.py`, todos a −15 LUFS: victoria con llamada de trompeta (4,3 s), derrota con oboe que cae sobre chelos (8,6 s) y peligro con trémolo y trompas en tritono (4,1 s). Mientras suena un aviso, la canción de fondo baja al 25 %. Pruebas: 3718/3718. QA Electron 5/5: portada en bucle, peligro con bajada y vuelta de la música, derrota al morir y victoria (`work/claude-aud-regiones/qa_avisos_resultado.txt`). `npm run build` lo bloquea `scripts/balance/balM3.ts`, de otro agente y sin versionar; `vite build`, `buildMain` y `checkPublishable` pasan por separado.
+
 ## 2026-11-22 — AUD-CTX-05: música propia por región y pelea en el camino (Claude)
 
 **Archivos:** `src/audio/contextMusic.ts`, `src/audio/director.ts`, `tests/audio.test.ts`, `assets/audio/music/region/*.ogg`, `PROCEDENCIA.md`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`.
