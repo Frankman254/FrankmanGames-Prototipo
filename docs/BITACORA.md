@@ -1,3 +1,14 @@
+## 2026-11-23 — JL-153: RESUMEN.md actualizado a 321/25 (Junie)
+
+**Archivos:** `work/junie-qa01/RESUMEN.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué:** La cabecera de `work/junie-qa01/RESUMEN.md` aún mostraba las cifras de JL-58 (271 OK / 68 FALLA). Actualizada a las cifras de JL-107 (321 OK / 25 FALLA) y añadida sección JL-153 que resume los arreglos de JL-124 a JL-180 y los bloqueos restantes (JL-74b, JL-85b, Puertobelo depende de OMP-PB-01).
+
+**Cómo se verificó:** Lectura de `work/junie-jl107/RESUMEN.md` para confirmar las cifras 321/25. Revisión de las casillas de JL-124 a JL-180 en COLA_JUNIE.md para enumerar los arreglos. Sin código cambiado.
+
+---
+
+
 ## 2026-11-23 — JL-180: Sonido de Puertobelo — BLOQUEADA (Junie)
 
 **Archivos:** `work/junie-jl180/BLOQUEO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

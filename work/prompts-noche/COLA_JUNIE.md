@@ -1323,7 +1323,7 @@ Sigue sin tocar los archivos de Claude de la lista de arriba (`gltfCharacter.ts`
 
 - [x] JL-152 Rendimiento de la cripta: el piso 100 va a 58 fps, cuando el pueblo va a 61 y la cripta normal a 119. Mide qué cuesta más (utilería de JL-88, luces o antorchas) y deja un informe con las cifras. Sin cambios si no hay una causa clara y pequeña.
   — commit «JL-152: rendimiento piso 100 — 120 fps en Mac M5, sin cuello de botella» — INFORME.md en work/junie-jl152/. El piso 100 rinde a 120 fps con 117 enemigos (msRender 3.5, msSim 0.1, msAnim 0.9, msSombras 0.4). El problema de 58 fps es en Windows (WIN-01). Sin cambios de código.
-- [ ] JL-153 Actualizar `work/junie-qa01/RESUMEN.md`: la cabecera aún habla de 271/68. Que refleje la última cifra y enlace a `work/junie-jl107/`.
+- [x] JL-153 Actualizar `work/junie-qa01/RESUMEN.md`: la cabecera aún habla de 271/68. Que refleje la última cifra y enlace a `work/junie-jl107/`. — commit «JL-153: RESUMEN.md actualizado a 321/25» — Cabecera actualizada, sección JL-153 con resumen de arreglos JL-124…JL-180. Evidencia en work/junie-qa01/RESUMEN.md.
 - [ ] JL-154 Revisar que cada casilla `[x]` de JL-73…108 cite un commit o una evidencia que exista de verdad: ruta en `work/` y hash en `git log`. Corrige solo las citas rotas.
 
 ### Cierre de la tanda

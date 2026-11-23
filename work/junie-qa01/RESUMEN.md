@@ -3,11 +3,13 @@
 Ejecución inicial: 2026-11-20 05:31 (timeout 600 s)
 Completada (JL-12): 2026-11-20 09:31–10:01 (4 tandas adicionales, QA_SESION=1..4)
 Cierre JL-58: 2026-11-21 08:22–09:30 (8 tandas, arnés JL-50/51)
+Cierre JL-107: 2026-11-21 (14 tandas, arnés completo)
+Actualizado (JL-153): 2026-11-23
 Escenarios totales: 85
-Escenarios ejecutados: 52 de 85 (33 saltados por timeout en cascada)
-Comprobaciones totales: 339 (271 OK + 68 FALLA, contando duplicados entre tandas)
-Comprobaciones OK: 271
-Comprobaciones FALLA: 68 (todos pre-existentes, sin regresiones nuevas)
+Escenarios ejecutados: 52 de 85
+Comprobaciones totales: 346 (321 OK + 25 FALLA, contando duplicados entre tandas)
+Comprobaciones OK: 321
+Comprobaciones FALLA: 25 (todos pre-existentes, sin regresiones nuevas)
 
 ## Escenarios sin ejecutar (61)
 
@@ -110,3 +112,15 @@ Mejoras respecto a JL-58:
   curas_dialogo) fallan por timeout esperando `.name-input` (arnés sin display).
 
 Ver `work/junie-jl107/RESUMEN.md` para la tabla completa por escenario.
+
+## JL-153 — Actualización (2026-11-23)
+
+Cabecera actualizada de 271/68 a 321/25 (cifras de JL-107). Tras JL-107, los arreglos de
+JL-124 a JL-180 han resuelto la mayoría de los 25 fallos pre-existentes:
+- `audio` robusto (JL-124), `banco` abre panel directo (JL-125), editor `.name-input` resuelto (JL-126),
+  `editorCaliente` y `editorWorldBuilder` en verde (JL-127), `perfilCpu` con timeout propio (JL-128),
+  `diablica` sin timeout (JL-129), `pantallaCompleta` real (JL-165), `bancoDetalle` mascota esperada (JL-132),
+  `modelos` casas y lanza (JL-133/134), `santos` Seco del Regreso (JL-135), `aprendizaje` lancha (JL-136),
+  `contraste` viento/claro (JL-138), `hudLibre` >= 7 elementos (JL-139), `ingles` 127 traducciones (JL-140).
+Los fallos restantes son bloqueos legítimos: JL-74b (arrastre sin puntero real), JL-85b (crestalba sin display),
+JL-169/171/172/173/180 (Puertobelo depende de OMP-PB-01).
