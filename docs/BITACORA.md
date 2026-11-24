@@ -1,3 +1,17 @@
+## 2026-11-24 — JL-301: inventario de mallas de conjuntos (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Hallazgo:** de 812 piezas asociadas a los 137 conjuntos, 24 tienen geometría propia bajo el nodo `obj_<itemId>` en `assets/models/equipo.glb`; 788 no tienen malla dedicada. No se contaron como mallas propias las piezas genéricas del modelo del personaje. No hay referencias a conjuntos inexistentes.
+
+**Estado:** tarea completada como auditoría. Los 788 IDs pendientes quedan en una lista exhaustiva compactada por conjuntos y sufijos; su expansión se comparó con los datos y el GLB (0 omitidos, 0 extras). No se modificaron datos ni assets; la revisión no juzga calidad visual ni ajuste.
+
+**Validación:** comparación exacta **PASS**; `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl301/INVENTARIO.md`. No aplica captura Electron porque no hubo cambio visual.
+
+---
+
 ## 2026-11-24 — JL-300: 64 archivos de audio pendientes de decisión (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
