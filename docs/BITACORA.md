@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-240: forma del indicador = forma del daño (Junie)
+
+**Archivos:** `tests/jl240_indicatorShape.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué.** El creador pedía verificar que el indicador visual de cada hechizo de área usa la misma forma y tamaño que la simulación usa para el daño. Prueba pura que recorre los ~57 hechizos de área de las tres clases.
+
+**Resultado.** Los 6 tipos de forma (circle, cone, line, cross, square, star) coinciden entre `spellFx.ts` (indicador visual) y `world.ts:targetsOf` (daño). Ambos derivan del mismo `AreaDef` de `data/rpg/spells.json` y construyen el mismo `ShapeDef`. `shapeHitsCircle` confirma que el centro siempre toca y un punto lejano nunca. 7 pruebas verdes, tsc limpio, build OK. Sin cambios de código necesarios.
+
+**Evidencia:** `tests/jl240_indicatorShape.test.ts` (7 pruebas).
+
+---
+
 ## 2026-11-24 — JL-239: barra tras cambiar de lugar — diagnóstico (Junie)
 
 **Archivos:** `tests/jl239_hotbarAfterTravel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
