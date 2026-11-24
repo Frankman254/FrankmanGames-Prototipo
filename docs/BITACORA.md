@@ -1,3 +1,17 @@
+## 2026-11-23 — Reparto de tareas: JL-204…JL-253, OMP-BARR-01, CDX-01/02 y CLA-BARR2 (coordinador)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/prompts-noche/COLA_OMP.md`.
+
+**Qué se hizo:** El creador pidió «asigna tareas a todos unas 50 tareas a junie y asignate unas a ti mismo, te dejo el control».
+- **Junie:** 50 tareas (JL-204…JL-253) en una tanda nueva de su cola. Los módulos sin prueba salen de un barrido con `grep` de importaciones reales en `tests/`, porque la BOLSA_3 daba por descubiertos seis módulos que sí tenían pruebas. Incluye el seguimiento de la barriada (escenario Electron, guardado, viaje desde dentro, minimapa, fugas y rendimiento).
+- **OMP Blender:** OMP-BARR-01, tres añadidos para variar las casas de la barriada.
+- **Codex:** CDX-01, auditoría de la barriada y la casa del creador, y CDX-02, auditoría de la calidad de las pruebas de Junie. Las dos son de solo lectura.
+- **Coordinador:** CLA-BARR2, con farolas, árboles y parques en la barriada y la integración de OMP-BARR-01.
+
+**Validación:** `npm run docs:check`.
+
+---
+
 ## 2026-11-23 — JL-202/203: cierre de la tanda (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl202/INFORME.md`, `work/junie-propuestas/BOLSA_SIGUIENTE_3.md`.

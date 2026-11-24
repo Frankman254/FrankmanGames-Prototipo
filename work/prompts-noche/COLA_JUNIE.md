@@ -1376,3 +1376,82 @@ Contexto del coordinador:
   — commit «JL-201: consola limpia — 8 escenarios, 0 errores nuevos» — 80/81 checks (1 fallo pre-existente en previa). INFORME.md en work/junie-jl201/.
 - [x] JL-202 Reintento obligatorio de lo que haya quedado `[!]` en JL-181…201, con lo aprendido. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta. — Ya estaba hecho: 0 tareas bloqueadas en el rango. INFORME.md en work/junie-jl202/.
 - [x] JL-203 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_3.md` con 20 tareas pequeñas que hayas visto. Cada una con evidencia **comprobada**: si propones una prueba que falta, pon el `grep` que lo demuestra. Son propuestas: no las empieces. — BOLSA_SIGUIENTE_3.md con JL-204 a JL-229 (12 pruebas de módulos sin cobertura, 4 escenarios QA, 6 validaciones de datos, 3 calidad de código, 1 cierre).
+
+## Tanda del 2026-11-23, tarde (el creador: «asigna tareas a todos unas 50 tareas a junie […] te dejo el control»). JL-204…JL-253, en este orden.
+
+Contexto del coordinador:
+- Suite en verde (3786), tsc limpio salvo `scripts/balance/balM3.ts`, que es ajeno: no lo toques ni lo incluyas.
+- **Novedad: barriada Praderas del Norte** (CLA-BARR1, commits `17805baa` y `a3d944b0`). Zona aparte 1:1 en el origen (6000, 0), con 7 calles, una transversal y unas 430 casas en instancias finas. Se entra por `__game.travelStone('praderas_norte')` y se sale con clic en la piedra de la plaza. Código: `src/world/barriada.ts` (puro), `src/render/barriadaView.ts`, sala `barriada` en `src/scenes/houseScene.ts`, `switchInterior(inside, outdoor)` en `src/main.ts`. Pruebas: `tests/cla_barr1_barriada.test.ts`. Scripts de QA a mano del coordinador: `work/claude-barriada/qa1.js`, `qa2.js` y `qa3.js`.
+- **Privacidad:** en código, datos, docs y capturas solo se dice «casa del creador». Ninguna dirección, número de lote real ni nombre de persona.
+- **Lo que no se toca:** `data/barriada.json` (trazado y colores son del coordinador), cifras de balance, `src/sim/` y `src/world/` salvo pruebas nuevas o un arreglo pequeño y claro con su prueba.
+- Las pruebas de módulos sin cobertura salen de un barrido del coordinador: ningún archivo de `tests/` importa estos módulos (`grep -rlE "/<módulo>(\.ts)?['\"]" tests` → 0). Si una prueba destapa un fallo, se informa y no se relaja.
+- `scripts/qaElectron.mjs` es tuyo: usa su perfil propio, no `work/qa-manual/` (puerto 9351).
+
+### Pruebas de módulos sin cobertura
+- [ ] JL-204 Prueba de `src/sim/chasers.ts`: persecución, alcance y abandono de la persecución, con casos de borde.
+- [ ] JL-205 Prueba de `src/sim/crowd.ts` (`separate`): cuerpos solapados, tocándose y separados; la separación nunca empuja a un cuerpo a una celda no transitable si el módulo lo contempla.
+- [ ] JL-206 Prueba de `src/sim/fishing.ts`: estados de la pesca de principio a fin, tiempo agotado y cancelación. Relaciónala con el hallazgo de JL-197 (el pez no llega a la mochila): si la prueba lo reproduce, déjala en `it.todo` con la pregunta y sigue; el arreglo es JL-224.
+- [ ] JL-207 Prueba de `src/sim/shoals.ts`: creación de bancos, movimiento y reacción al jugador, con semilla fija.
+- [ ] JL-208 Prueba de `src/sim/traps.ts`: colocación, disparo por proximidad, daño, enfriamiento y desactivación.
+- [ ] JL-209 Prueba de `src/rpg/enemy.ts`: creación desde la definición, daño, muerte y lo que exponga.
+- [ ] JL-210 Prueba de `src/world/noise.ts`: determinista con la misma semilla, rango de salida y continuidad entre puntos vecinos.
+- [ ] JL-211 Prueba de `src/world/shape.ts`: un caso feliz y un borde por función exportada.
+- [ ] JL-212 Prueba de `src/world/switchableGround.ts`: altura plana al activar `flatHeight` y vuelta al terreno al quitarlo (es lo que usan la casa y la barriada).
+- [ ] JL-213 Prueba de `src/world/bankSite.ts`: el banco cae dentro del mundo, en celda transitable y lejos de las Piedras Pintadas.
+
+### Barriada Praderas del Norte
+- [ ] JL-214 **Escenario `barriada`** en `qaElectron.mjs`, a partir de `work/claude-barriada/qa1.js`…`qa3.js`: viajar por la piedra, comprobar `__game.houses.inside` y el nombre del lugar, andar hasta el cruce de la calle 2, sacar capturas a ras de calle y desde arriba, volver con clic en la piedra y comprobar que se sale al mapa junto a (1015, 1775). Consola sin errores. Verde tres veces seguidas; capturas en `work/junie-jl214/`.
+- [ ] JL-215 **Guardar dentro de la barriada.** Guarda dentro y carga la partida: ¿dónde aparece el personaje? Lo correcto es en la barriada o junto a su piedra en el mapa, nunca en (6000, …) fuera de toda zona. Prueba en `tests/` y, si falla, un arreglo pequeño siguiendo cómo lo resuelve la casa del creador. Si el arreglo exige tocar el formato de guardado, para y anota la pregunta.
+- [ ] JL-216 **Viajar desde dentro.** Con el menú de piedras abierto dentro de la barriada, viajar a otra piedra: debe salir de la sala, restaurar terreno, vegetación y cámara (`switchInterior(false)`). Escenario o paso de JL-214 y, si falla, arreglo pequeño con prueba.
+- [ ] JL-217 **Minimapa en la barriada.** Hoy muestra una mancha beige. Diagnostica qué dibuja y propón un arreglo: calles y casas de `barriadaLosas()` y `barriadaCasas()`, o el mapa de la sala. Haz el arreglo si cabe en `src/ui/map/` sin tocar `src/world/`; si no, `DIAGNOSTICO.md` en `work/junie-jl217/`.
+- [ ] JL-218 **Mapa grande (M) dentro de la barriada.** Qué muestra hoy y qué debería mostrar. Mismo criterio que JL-217.
+- [ ] JL-219 **Montura dentro de la barriada.** Montar, correr y volar (Falcopama): ¿se puede salir del rectángulo de la zona o quedar sobre un techo? Solo diagnóstico con capturas; si hay salida del borde, propuesta de arreglo.
+- [ ] JL-220 **Fugas al entrar y salir.** Entra y sal de la barriada 20 veces, y de la casa del creador otras 20: cuenta mallas, materiales y texturas de `__game.view.scene` en cada vuelta. Deben quedar estables. Tabla en `work/junie-jl220/`.
+- [ ] JL-221 **Rendimiento de la barriada.** FPS, tiempo de render y draw calls en la plaza, en el cruce de la calle 2 y desde arriba, con calidad baja y alta. Solo medir; tabla en `work/junie-jl221/`.
+- [ ] JL-222 **Noche y lluvia en la barriada.** Capturas a mediodía, al atardecer y de noche, y con lluvia si el clima se puede forzar en desarrollo. Solo informa: qué se ve mal (sin farolas, lluvia que no sigue al jugador, etc.).
+- [ ] JL-223 **Opciones gráficas dentro de la barriada.** Cambiar calidad, estilo de pintura y distancia de vista estando dentro no rompe nada (sin errores de consola y sin que vuelva la niebla azul). Capturas antes y después.
+
+### Hallazgos pendientes
+- [ ] JL-224 **El pez no llega a la mochila** (hallazgo de JL-197: `reel()` no da botín en el arnés). Averigua si pasa también jugando a mano o solo en el arnés. Si es un fallo real y el arreglo es pequeño, arréglalo con su prueba; si toca cifras de botín, para y pregunta.
+- [ ] JL-225 Reintento de **JL-74** (solape de personaje y mascota en el escenario `barra`), con el arnés actual y lo aprendido en JL-181…201.
+- [ ] JL-226 Reintento de **JL-85** (`crestalba` no carga y cae CDP), con el arnés actual. Si sigue sin display, deja el diagnóstico exacto y la orden para que el creador lo corra.
+
+### Datos y contenido
+Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. Si la hay, «ya estaba hecho» con la ruta.
+- [ ] JL-227 Todo objeto que venden los mercaderes existe en los objetos del juego. Prueba con un mercader sintético que venda un id inexistente y haga fallar la comprobación.
+- [ ] JL-228 Cada misión cita PNJ, monstruos y objetos que existen.
+- [ ] JL-229 Cada zona hostil de `data/zones.json` tiene al menos un área, y todas sus áreas caen dentro del mundo.
+- [ ] JL-230 Cada clip que pide `data/animation.json` existe en su GLB.
+- [ ] JL-231 Cada Piedra Pintada de `data/stones.json` cae dentro del mundo y en celda transitable, o es la entrada de una zona aparte conocida (hoy solo `praderas_norte`), y tiene nombre en inglés.
+- [ ] JL-232 Cripta: cada piso tiene escalera de subida (salvo el 1) y de bajada (salvo el último), sobre baldosas válidas.
+
+### Escenarios que faltan
+- [ ] JL-233 **Escenario `misiones`:** hablar con un PNJ con misión, aceptarla, cumplirla con ayudas de desarrollo y entregarla; el registro de misiones cambia de estado.
+- [ ] JL-234 **Escenario `oficios`:** usar un puesto de oficio, fabricar un objeto y comprobar que llega a la mochila (JL-198 solo cubre la recolección).
+- [ ] JL-235 **Escenario `casaCreador`:** calle de Los Santos, clic en la puerta de reja, recorrer sala, baños y recámaras, salir por el tapete, y lo mismo en la casa espejo. Base: `work/claude-casa2/qa1.js`…`qa7.js`. Verde tres veces.
+- [ ] JL-236 **Escenario `todasLasPiedras`:** viajar a cada Piedra Pintada, comprobar que el personaje queda en celda transitable y sin errores de consola, y volver. Tabla con el tiempo de carga de cada viaje.
+- [ ] JL-237 **Escenario `guardadoBarriadaCasa`:** guardar y cargar dentro de la casa del creador y dentro de la barriada (une JL-215 y la casa) y comprobar dónde aparece el personaje.
+
+### Hechizos (el creador sigue viendo fallos)
+- [ ] JL-238 **Hechizos montado.** Con montura de tierra y voladora: qué hechizos se pueden lanzar, cuáles se bloquean y con qué texto. Solo medir; si un hechizo se lanza y no hace nada, anótalo con pasos para reproducirlo.
+- [ ] JL-239 **Barra tras cambiar de lugar.** Tras viajar por piedra, entrar en la casa o en la barriada y volver, la barra no queda en rojo ni con enfriamientos colgados. Escenario corto y prueba si el fallo es de la sim.
+- [ ] JL-240 **Forma del indicador = forma del daño.** Para cada hechizo de área, el indicador que se dibuja usa la misma forma y tamaño que `src/sim/shapes.ts` usa para el daño. Prueba pura que recorra los hechizos de las tres clases.
+- [ ] JL-241 **Hechizos junto a paredes.** Lanzar los de línea y proyectil pegado a una pared de la cripta y a una casa: ¿atraviesan? Solo diagnóstico, con capturas y la lista.
+
+### Calidad del código (solo `src/sim/`, `src/world/` y `src/rpg/`)
+- [ ] JL-242 Ningún `.catch()` vacío: cada uno registra el error. Lista y arreglos de una línea.
+- [ ] JL-243 `as any` y `as unknown as`: lista con archivo y línea, y quita solo los que se resuelvan con un tipo que ya exista. El resto, en la lista con su motivo.
+- [ ] JL-244 Exportaciones sin uso: lista comprobada con `grep`. **No borres nada**: el coordinador decide.
+
+### Robustez y arte
+- [ ] JL-245 Cada GLB de `assets/models/` tiene su `scripts/blender/validar_<modelo>.py`, o está en una lista de excepciones con su motivo. Hoy solo lista; prueba si la lista sale corta.
+- [ ] JL-246 Cada archivo de `assets/` aparece en `PROCEDENCIA.md`. Si `tests/jl168_procedencia.test.ts` ya lo cubre, «ya estaba hecho»; si no, amplíala. `PROCEDENCIA.md` no se edita.
+- [ ] JL-247 **Calle de Los Santos:** que ningún enemigo de la zona aparezca encima de la calle o dentro de un lote de la urbanización (hoy los enemigos pueden pisar la calle: ver ESTADO_ACTUAL). Solo prueba y diagnóstico; si el arreglo toca el reparto de enemigos, pregunta.
+- [ ] JL-248 **Escenario `rendimiento` en tres lugares** (Villa Raspadura, Los Santos junto a la urbanización y la barriada) con la misma cámara. Tabla comparada en `work/junie-jl248/`.
+- [ ] JL-249 **Arranque en frío:** tiempo desde abrir Electron hasta poder mover al personaje, tres veces. Solo medir.
+
+### Cierre de la tanda
+- [ ] JL-250 Consola limpia: todos los escenarios nuevos de esta tanda sin errores nuevos. INFORME en `work/junie-jl250/`.
+- [ ] JL-251 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
+- [ ] JL-252 Reintento obligatorio de lo que haya quedado `[!]` en JL-204…251. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
+- [ ] JL-253 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_4.md` con 20 tareas pequeñas, cada una con su evidencia **comprobada** (el `grep` que lo demuestra). Ojo: en la BOLSA_3, `weather`, `fields`, `gathering`, `levelRange`, `telemetry` y `frameStats` sí tenían pruebas. Son propuestas: no las empieces.
