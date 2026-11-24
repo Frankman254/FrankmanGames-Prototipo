@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-204: pruebas de chasers.ts (Junie)
+
+**Archivos:** `tests/jl204_chasers.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Primera tarea de la tanda JL-204…JL-253. 21 pruebas para `src/sim/chasers.ts` (ChaserSystem): spawn con stagger, clear, persecución en línea recta (acercamiento, prevPos, facing), alcance (vacía camino al llegar, mantiene camino fuera de alcance), persecución con A* (rodea muro, presupuesto de repaths, timer de replanificación, camino vacío fuerza búsqueda), línea de visión vs A* (directa sin gastar repath, cambia a directa al aparecer visión), y casos de borde (dt=0, sin chasers, múltiples chasers, misma posición, stagger alto).
+
+**Validación:** `npx vitest run tests/jl204_chasers.test.ts` → 21/21 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — Reparto de tareas: JL-204…JL-253, OMP-BARR-01, CDX-01/02 y CLA-BARR2 (coordinador)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/prompts-noche/COLA_OMP.md`.
