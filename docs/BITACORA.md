@@ -4882,3 +4882,13 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 **Validación:** `npx vitest run tests/jl205_crowd.test.ts` 17/17 en verde. `npx tsc --noEmit` limpio (solo balM3.ts ajeno).
 
+## 2026-11-23 — JL-214: escenario `barriada` en qaElectron.mjs (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `barriada` en `scripts/qaElectron.mjs` basado en `work/claude-barriada/qa1.js`…`qa3.js`: viajar a Praderas del Norte por la Piedra Pintada, comprobar `__game.houses.inside` y el nombre del lugar, posición cerca de la plaza de inicio, vista cenital desde arriba, andar hasta el cruce de la calle 2, capturas a ras de calle y mirando al oeste, salir de la barriada con `houses.leave()` (clickMesh falla en outdoor porque el mesh no se picka bien), comprobar que se sale al mapa cerca de la piedra de Praderas del Norte (~1015, 1775), consola sin errores. 5 capturas: plaza, alto, calle2, calle2-oeste, vuelta.
+
+**Validación:** `node scripts/qaElectron.mjs barriada` → 8/8 en verde en 3 ejecuciones consecutivas. Suite completa: 4351/4351 en verde. `npx tsc --noEmit` sin errores nuevos.
+
+---
+

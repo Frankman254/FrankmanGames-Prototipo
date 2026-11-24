@@ -8421,6 +8421,75 @@ const scenarios = {
 
         await shot('jl200-musicaContextos');
     },
+
+    /** JL-214: Barriada Praderas del Norte — viajar, entrar, andar, capturar y volver. */
+    async barriada() {
+        await newGame('QA Barriada');
+        await sleep(5000);
+
+        // 1) Viajar a la barriada por la Piedra Pintada.
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+
+        // 2) Comprobar que estamos dentro de la barriada.
+        const inside = await js(`__game.houses.inside`);
+        check('barriada: dentro de la barriada', inside, String(inside));
+        const place = await js(`JSON.stringify(__game.houses.place)`);
+        check('barriada: place es Praderas del Norte', place && JSON.parse(place).name === 'Praderas del Norte', place);
+        const pos1 = await js(`(()=>{ const p=${W}.player.pos; return {x:Math.round(p.x),y:Math.round(p.y)}; })()`);
+        // barriadaInicio() = origen + plaza.inicio = (6000+235, 0+394) = (6235, 394).
+        check('barriada: posición cerca de la plaza de inicio', Math.hypot(pos1.x - 6235, pos1.y - 394) < 3, JSON.stringify(pos1));
+        await shot('jl214-barriada-plaza');
+
+        // 3) Vista cenital desde arriba.
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=20; r.pitchDeg=55; r.jumpTo(60); })()`);
+        await sleep(2500);
+        await shot('jl214-barriada-alto');
+
+        // 4) Andar hasta el cruce de la calle 2.
+        await js(`${W}.commandMove({x:6235,y:306.5})`);
+        await until(
+            `Math.hypot(${W}.player.pos.x-6235,${W}.player.pos.y-306.5)<1.5`,
+            30000,
+            'llegar al cruce de la calle 2',
+        );
+        await sleep(1000);
+        const pos2 = await js(`(()=>{ const p=${W}.player.pos; return {x:Math.round(p.x),y:Math.round(p.y)}; })()`);
+        check('barriada: llegó al cruce de la calle 2', Math.hypot(pos2.x - 6235, pos2.y - 306.5) < 2, JSON.stringify(pos2));
+
+        // 5) Captura a ras de calle.
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=90; r.pitchDeg=30; r.jumpTo(20); })()`);
+        await sleep(2500);
+        await shot('jl214-barriada-calle2');
+
+        // 6) Captura mirando al oeste.
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=270; r.pitchDeg=22; r.jumpTo(14); })()`);
+        await sleep(2500);
+        await shot('jl214-barriada-calle2-oeste');
+
+        // 7) Volver al mapa: salir de la barriada.
+        await js(`${W}.commandMove({x:6241,y:395})`);
+        await until(
+            `Math.hypot(${W}.player.pos.x-6241,${W}.player.pos.y-395)<2`,
+            30000,
+            'llegar a la piedra de salida',
+        );
+        await sleep(1000);
+        // Salir directamente (clickMesh falla en outdoor porque el mesh no se picka bien).
+        await js(`__game.houses.leave()`);
+        await until(`!__game.houses.inside`, 15000, 'salir de la barriada');
+        await sleep(3000);
+        const pos3 = await js(`(()=>{ const p=${W}.player.pos; return {x:Math.round(p.x),y:Math.round(p.y)}; })()`);
+        check('barriada: fuera de la barriada', !await js(`__game.houses.inside`), String(await js(`__game.houses.inside`)));
+        // El jugador debería estar cerca de la piedra de Praderas del Norte en el mapa (~1015,1775).
+        check('barriada: posición cerca de la piedra en el mapa', pos3.x > 900 && pos3.x < 1100 && pos3.y > 1700 && pos3.y < 1900, JSON.stringify(pos3));
+        await shot('jl214-barriada-vuelta');
+
+        // 8) Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('barriada: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
