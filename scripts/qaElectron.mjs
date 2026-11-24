@@ -8682,6 +8682,60 @@ const scenarios = {
         check('barriadaRendimiento: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
+    /** JL-222: Noche y lluvia en la barriada — capturas a mediodía, atardecer y noche. Solo diagnóstico. */
+    async barriadaNoche() {
+        await newGame('QA BarriadaNoche');
+        await sleep(5000);
+
+        // 1) Viajar a la barriada.
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+        check('barriadaNoche: dentro de la barriada', await js(`__game.houses.inside`), String(await js(`__game.houses.inside`)));
+
+        // Posición fija para las capturas: plaza central.
+        const snap = async (label, timeOfDay, yaw, pitch, dist) => {
+            // Forzar la hora y detener el ciclo.
+            await js(`__game.world.timeOfDay = ${timeOfDay}; __game.world.timeScale = 0;`);
+            await sleep(2000); // esperar que la iluminación se aplique.
+            // Mover la cámara.
+            await js(`(()=>{ const r=__game.view.rig; r.yawDeg=${yaw}; r.pitchDeg=${pitch}; r.jumpTo(${dist}); })()`);
+            await sleep(2500);
+            const phase = await js(`__game.world.timeOfDay`);
+            check(`barriadaNoche: hora ${label} (t=${timeOfDay})`, Math.abs(phase - timeOfDay) < 0.01, String(phase));
+            await shot(`jl222-barriada-${label}`);
+        };
+
+        // 2) Mediodía (t=0.5, sol arriba).
+        await snap('mediodia', 0.5, 90, 22, 18);
+
+        // 3) Atardecer (t=0.75, sol bajo al oeste).
+        await snap('atardecer', 0.75, 270, 18, 18);
+
+        // 4) Noche (t=0.9, luna, farolas).
+        await snap('noche', 0.9, 90, 22, 14);
+
+        // 5) Noche cenital — para ver las farolas encendidas.
+        await snap('noche-alto', 0.9, 20, 55, 60);
+
+        // 6) Diagnóstico de lluvia.
+        // El clima es automático por zona (data/weather.json). No hay API pública
+        // para forzar un clima concreto desde el arnés. world.weather existe en runtime
+        // pero no expone def.kinds (el parser no lo guarda así).
+        // La lluvia se activa sola según el clima de la zona y el tiempo de juego.
+        const weatherActive = await js(`__game.world.weather !== undefined`);
+        check('barriadaNoche: sistema de clima activo en el mundo', weatherActive, String(weatherActive));
+        // No se puede forzar lluvia desde el arnés sin modificar el código del juego.
+        // La tarea JL-223 (opciones gráficas) podría añadir un modo de desarrollo.
+
+        // Restaurar el ciclo.
+        await js(`__game.world.timeScale = 1;`);
+
+        // 7) Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('barriadaNoche: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
+
     /** JL-220: Fugas al entrar y salir de la barriada y la casa del creador. */
     async fugas() {
         await newGame('QA Fugas');

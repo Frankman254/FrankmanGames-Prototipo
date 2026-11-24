@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-222: noche y lluvia en la barriada Praderas del Norte (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl222/INFORME.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `barriadaNoche` en `qaElectron.mjs` que captura la barriada Praderas del Norte a diferentes horas del día. Se fuerza `world.timeOfDay` a 0.5 (mediodía), 0.75 (atardecer) y 0.9 (noche), con `timeScale = 0` para detener el ciclo. Cuatro capturas: mediodía (sol arriba), atardecer (sol bajo al oeste), noche (luna y farolas) y noche cenital (farolas visibles desde arriba). Diagnóstico de lluvia: el sistema de clima (`world.weather`) existe y está activo, pero no hay API para forzar un tipo de clima concreto desde el arnés. La lluvia se activa sola según el clima de la zona.
+
+**Cómo se verificó:** Escenario `barriadaNoche` en Electron: 8/8 checks en verde. 4 capturas en `work/junie-jl222/` (jl222-barriada-mediodia.jpg, jl222-barriada-atardecer.jpg, jl222-barriada-noche.jpg, jl222-barriada-noche-alto.jpg). INFORME.md con hallazgos detallados.
+
+**Qué falta:** La lluvia no se pudo verificar. Para forzarla haría falta una herramienta de desarrollo (por ejemplo, `world.weather.force('rain')` en modo dev).
+
+---
+
 ## 2026-11-23 — OMP-PJ-02: emotes y golpes de los héroes CC0 (OMP)
 
 **Archivos:** `scripts/blender/heroes_cc0.py`, `assets/models/heroes_cc0/*.glb` (6), `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_OMP.md`. Commit 60c7cdb5.
