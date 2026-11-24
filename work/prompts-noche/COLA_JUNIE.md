@@ -1525,7 +1525,7 @@ Contexto del coordinador:
 
 ### D. Datos y contenido
 Antes de cada una, busca si ya existe.
-- [ ] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más.
+- [!] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md` antes de modificar traducciones o su presentación; hallazgos y verificación en `work/junie-jl297/INFORME.md`.
 - [ ] JL-298 Cada objeto tiene icono y el archivo del icono existe.
 - [ ] JL-299 Cada efecto que pide `data/fx.json` existe (partículas y texturas).
 - [ ] JL-300 Cada sonido que piden los datos existe en `assets/audio/`, y ningún archivo de audio sobra.

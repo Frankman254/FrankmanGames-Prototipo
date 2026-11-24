@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-297: paridad i18n bloqueada por documento rector ausente (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** La revisión detectó 55 textos sin inglés, 442 claves sin coincidencia literal y 12 duplicados en conflicto; los tests existentes cubren solo el sentido español→inglés. No se modificaron datos, código ni pruebas porque falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, necesario antes de implementar los cambios.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos: 4.911 aprobadas, 1 omitida y 1 `todo`; tests i18n dirigidos, 13/13.
+
+**Evidencia:** `work/junie-jl297/INFORME.md`. No aplica captura Electron porque no hubo cambio visual.
+
+---
+
 ## 2026-11-24 — JL-295: transición de piso bloqueada por documento rector ausente (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
