@@ -8490,6 +8490,84 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('barriada: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+
+    /** JL-219: Montura dentro de la barriada — diagnóstico de límites. */
+    async barriadaMontura() {
+        await newGame('QA BarriadaM');
+        await sleep(5000);
+
+        // 1) Entrar a la barriada.
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+        check('jl219: dentro de la barriada', await js(`__game.houses.inside`), String(await js(`__game.houses.inside`)));
+
+        // Bounds de la barriada: origen (6000,0), ancho 420, fondo 420 → (6000..6420, 0..420).
+        const inBounds = () =>
+            js(`(()=>{const p=${W}.player.pos;return{x:Math.round(p.x),y:Math.round(p.y),dentro:p.x>=6000&&p.x<=6420&&p.y>=0&&p.y<=420}})()`);
+
+        // 2) Montar la montura de tierra (dev_harpy).
+        await js(
+            `(()=>{ const c=${W}.character; c.give('mount_dev_harpy'); const it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_harpy'); ${S}.equip(it.uid, 'mount'); })()`,
+        );
+        await sleep(2000);
+        check('jl219: montura equipada', await js(`${W}.character.equipment.get('mount')?.itemId`), 'mount_dev_harpy');
+
+        // 3) Correr hacia cada borde y ver si se sale.
+        const bordes = [
+            { nombre: 'norte', target: { x: 6210, y: 5 } },
+            { nombre: 'sur', target: { x: 6210, y: 415 } },
+            { nombre: 'oeste', target: { x: 6005, y: 210 } },
+            { nombre: 'este', target: { x: 6415, y: 210 } },
+        ];
+        for (const b of bordes) {
+            await js(`${W}.commandMove({x:${b.target.x},y:${b.target.y}})`);
+            await until(`${W}.player.path.length===0`, 30000, 'llegar borde ' + b.nombre);
+            await sleep(1000);
+            const pos = await inBounds();
+            check(`jl219: borde ${b.nombre} — posición dentro de la barriada`, pos.dentro, JSON.stringify(pos));
+        }
+        await shot('jl219-montado-bordes');
+
+        // 4) Cambiar a Falcopama (voladora) y verificar si puede volar.
+        await js(
+            `(()=>{ const c=${W}.character; let it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_falcopama'); if(!it){c.give('mount_dev_falcopama'); it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_falcopama');} return ${S}.equip(it.uid, 'mount'); })()`,
+        );
+        await sleep(2000);
+        check('jl219: Falcopama equipada', await js(`${W}.character.equipment.get('mount')?.itemId`), 'mount_dev_falcopama');
+
+        // 5) Verificar canFly() — dentro de la barriada, world.interior=true bloquea el vuelo.
+        const canFly = await js(`${W}.canFly()`);
+        check('jl219: canFly dentro de la barriada', canFly, String(canFly));
+        const interior = await js(`${W}.interior`);
+        check('jl219: world.interior dentro de la barriada', interior, String(interior));
+
+        // Intentar despegar con Tab: si canFly es false, el juego avisa "Hace falta una montura que vuele".
+        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
+        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
+        await sleep(1000);
+        const vuela = await js(`!!${W}.player.flight`);
+        check('jl219: vuelo activado con Tab', vuela, String(vuela));
+
+        // 6) Si no vuela, intentar mover más allá del borde a pie con Falcopama equipada.
+        if (!vuela) {
+            await js(`${W}.commandMove({x:6210,y:-20})`);
+            await until(`${W}.player.path.length===0`, 30000, 'llegar borde norte a pie');
+            await sleep(1000);
+            const pos = await inBounds();
+            check(`jl219: Falcopama a pie — borde norte dentro de la barriada`, pos.dentro, JSON.stringify(pos));
+        }
+        await shot('jl219-falcopama');
+
+        // 7) Altura del jugador — verificar que no queda sobre un techo.
+        const altura = await js(`(()=>{ const p=${W}.player; return {x:Math.round(p.pos.x),y:Math.round(p.pos.y),z:Math.round(p.pos.z*10)/10, vuelo:!!p.flight}; })()`);
+        check('jl219: jugador a pie, sin vuelo', !altura.vuelo, JSON.stringify(altura));
+        await shot('jl219-aterrizado');
+
+        // 8) Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('jl219: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -8506,6 +8584,8 @@ scenarios.audio.timeout = 180;
 scenarios.jl178_emotes.timeout = 300;
 // JL-188: 3 clases × 4 hechizos, cada uno con nueva partida y captura.
 scenarios.hechizosClases.timeout = 300;
+// JL-219: 8 movimientos a bordes + vuelo + aterrizaje.
+scenarios.barriadaMontura.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-219: diagnóstico de monturas en la barriada (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl219/DIAGNOSTICO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `barriadaMontura` en `qaElectron.mjs` para diagnosticar el comportamiento de las monturas dentro de la barriada Praderas del Norte. Hallazgos: (1) la montura de tierra (dev_harpy) no se sale de la barriada al correr hacia los 4 bordes — el sistema de navegación A* respeta los sólidos de las casas y los límites del terreno; (2) el vuelo está bloqueado porque `world.interior` es `true` dentro de la barriada — `canFly()` en `world.ts:2901` exige `!this.interior`; la barriada usa `HouseScene.enter()` que crea un mundo con `interior: true` (aunque visualmente es outdoor); (3) no hay riesgo de quedar sobre un techo. DIAGNOSTICO.md con tabla de resultados y propuesta de arreglo si el creador quiere permitir vuelo.
+
+**Cómo se verificó:** Escenario `barriadaMontura` en Electron: 11/14 checks (3 "fallos" son hallazgos esperados: canFly=false, vuelo no activado, aviso en consola). Capturas en `work/qa/`.
+
+**Qué falta:** Si el creador quiere que se pueda volar en la barriada, hay que decidir si la barriada debe comportarse como interior o exterior para la simulación.
+
+---
+
 ## 2026-11-23 — JL-218: mapa grande de la barriada Praderas del Norte (Junie)
 
 **Archivos:** `src/ui/map/barriadaMap.ts`, `src/ui/map/worldMap.ts`, `tests/jl218_barriadaWorldMap.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
