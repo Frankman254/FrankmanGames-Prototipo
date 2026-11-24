@@ -1458,7 +1458,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [x] JL-250 Consola limpia: todos los escenarios nuevos de esta tanda sin errores nuevos. INFORME en `work/junie-jl250/`.
   — commit «JL-250: consola limpia — 16 escenarios, 187/202 checks, 0 errores nuevos» — INFORME.md en work/junie-jl250/.
 - [x] JL-251 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones. — commit «JL-251: cierre de tanda — suite 4844/4844, typecheck y build limpios» — 4844/4844, tsc limpio (balM3 excluido), build OK, Electron previa 8/11, iguanera 7/7, criptaAccesos 4/4. tsconfig.json excluye balM3.ts. Evidencia en work/junie-jl251/RESULTADOS.md.
-- [ ] JL-252 Reintento obligatorio de lo que haya quedado `[!]` en JL-204…251. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
+- [x] JL-252 Reintento obligatorio de lo que haya quedado `[!]` en JL-204…251. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta. — commit «JL-252: cierre de reintentos JL-204…JL-251 — 0 tareas bloqueadas» — 0 tareas `[!]` en el rango. INFORME.md en work/junie-jl252/.
 - [ ] JL-253 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_4.md` con 20 tareas pequeñas, cada una con su evidencia **comprobada** (el `grep` que lo demuestra). Ojo: en la BOLSA_3, `weather`, `fields`, `gathering`, `levelRange`, `telemetry` y `frameStats` sí tenían pruebas. Son propuestas: no las empieces.
 
 ## Tanda del 2026-11-24 (el creador: «ya me quede sin omp haz unas 100 tareas para junie»). JL-254…JL-353, en este orden.

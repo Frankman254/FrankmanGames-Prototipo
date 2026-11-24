@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-252: Cierre de reintentos JL-204…JL-251 (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl252/INFORME.md`.
+
+**Qué se hizo:** Reintento obligatorio de tareas bloqueadas en JL-204…JL-251. Búsqueda de `-[!]` en COLA_JUNIE.md filtrando por ese rango: 0 coincidencias. Todas las tareas están completas (`[x]`). Sin reintentos pendientes.
+
+**Validación:** Suite 4844/4844 en verde, typecheck limpio.
+
+**Evidencia:** `work/junie-jl252/INFORME.md`.
+
+---
+
 ## 2026-11-24 — CLA-TEL1: capas y pelo con huesos con retraso (coordinador)
 
 **Archivos:** `scripts/blender/fg_telas.py`, `scripts/blender/telas_heroes.py`, `assets/models/{cazador,centinela,oraculo}{,_f}_anime.glb`, `src/render/characters/bodyMass.ts`, `tests/claCr1_bodyMass.test.ts`.
