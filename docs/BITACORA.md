@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-258: Diagnóstico de las 7 piedras pendientes de JL-236 (Junie)
+
+**Archivos:** `data/stones.json`, `data/zones.json`, `data/terrain.json`, `data/i18n/en.content.json`, `work/qa/todasLasPiedras.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Diagnóstico puro (sin cambios de código) de las 7 Piedras Pintadas que JL-236 dejó pendientes: praderas_norte, porvenil, la_palmita, sambua, llano_tugru, bocas_torito y david. Se verificó cada una contra `data/zones.json` (cobertura de áreas), `data/terrain.json` (clearings y flatAreas), `data/i18n/en.content.json` (traducción) y el código de renderizado (modelo). Hallazgo principal: **ninguna de las 7 tiene una zona en `zones.json`** que cubra sus coordenadas. Las 6 estándar tienen clearing en terrain.json pero sin flatArea ni zona; praderas_norte es especial (barriada CLA-BARR1, funciona parcialmente con walk=true pero active=false). Todas tienen traducción completa y modelo disponible. El bloqueo es de diseño de contenido: definir las zonas con áreas, niveles, clima y fauna.
+
+**Validación:** Sin código que cambiar. Suite 4854/4854 en verde, typecheck limpio.
+
+**Evidencia:** `work/junie-jl258/INFORME.md` (tabla diagnóstica con las 7 piedras, análisis por categoría y provincias sugeridas).
+
+---
+
 ## 2026-11-24 — JL-257: 7 exportaciones sin uso eliminadas (Junie)
 
 **Archivos:** `src/sim/vec2.ts`, `src/ui/editor/panel.ts`, `src/ui/menus/itemFilters.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
