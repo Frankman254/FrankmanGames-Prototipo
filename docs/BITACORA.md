@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-207: pruebas de shoals.ts (Junie)
+
+**Archivos:** `tests/jl207_shoals.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Pruebas puras de `src/sim/shoals.ts` (ShoalField): 37 pruebas cubriendo constructor (perSpot por spot, IDs únicos, bancos dentro del radio, cargas iniciales, spot vacío), place() (determinismo con semilla fija, semilla diferente → posiciones diferentes, separación entre bancos, spot pequeño), tick() (cuenta regresiva del respawn, restauración de cargas y reposicionamiento, tick parcial, dt mayor que respawn, spot eliminado), at() (punto dentro, en el borde, fuera, banco en respawn, varios bancos, lista vacía), nearest() (más cercano, filtro por spotId, ignora respawn, spotId inexistente, todos en respawn), consume() (resta carga, activa respawn al agotar, no afecta bancos en respawn, id inexistente, consume + tick + reaparece, no afecta otros bancos) y flujo completo (crear → consumir → respawn → reubicar → consumir de nuevo, dos spots independientes).
+
+**Validación:** `npx vitest run tests/jl207_shoals.test.ts` → 37/37 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). Suite completa 4227/4227.
+
+---
+
 ## 2026-11-23 — JL-206: pruebas de fishing.ts (Junie)
 
 **Archivos:** `tests/jl206_fishing.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
