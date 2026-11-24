@@ -1389,7 +1389,7 @@ Contexto del coordinador:
 
 ### Pruebas de módulos sin cobertura
 - [x] JL-204 Prueba de `src/sim/chasers.ts`: persecución, alcance y abandono de la persecución, con casos de borde. — commit «JL-204: pruebas de chasers.ts — 21 pruebas» — 21 pruebas verdes (jl204_chasers.test.ts), tsc sin errores nuevos, push OK. Spawn, clear, persecución en línea recta, alcance, A*, línea de visión vs A*, casos de borde. Evidencia en tests/jl204_chasers.test.ts.
-- [ ] JL-205 Prueba de `src/sim/crowd.ts` (`separate`): cuerpos solapados, tocándose y separados; la separación nunca empuja a un cuerpo a una celda no transitable si el módulo lo contempla.
+- [x] JL-205 Prueba de `src/sim/crowd.ts` (`separate`): cuerpos solapados, tocándose y separados; la separación nunca empuja a un cuerpo a una celda no transitable si el módulo lo contempla. — commit «JL-205: pruebas de crowd.ts — 17 pruebas, hallazgo cuerpos superpuestos» — 17 pruebas verdes (jl205_crowd.test.ts), tsc sin errores nuevos, push OK. Hallazgo: cuerpos exactamente superpuestos no se separan (d=1 → push=0). Evidencia en tests/jl205_crowd.test.ts.
 - [ ] JL-206 Prueba de `src/sim/fishing.ts`: estados de la pesca de principio a fin, tiempo agotado y cancelación. Relaciónala con el hallazgo de JL-197 (el pez no llega a la mochila): si la prueba lo reproduce, déjala en `it.todo` con la pregunta y sigue; el arreglo es JL-224.
 - [ ] JL-207 Prueba de `src/sim/shoals.ts`: creación de bancos, movimiento y reacción al jugador, con semilla fija.
 - [ ] JL-208 Prueba de `src/sim/traps.ts`: colocación, disparo por proximidad, daño, enfriamiento y desactivación.

@@ -16,6 +16,22 @@
 
 ---
 
+## 2026-11-23 — OMP-PJ-01: los seis héroes CC0 animan de verdad (OMP Blender)
+
+**Archivos:** `scripts/blender/heroes_cc0.py`, `scripts/blender/validar_heroes_cc0.py`, `assets/models/heroes_cc0/*.glb`, `arte/blender/heroes_cc0.blend`, `PROCEDENCIA.md`, `tests/jl168_procedencia.test.ts`, `docs/TAREAS.md`.
+
+**Qué se hizo:** Se completó la entrega de los seis héroes (cazador, centinela, oráculo, hombre y mujer) sobre Universal Base Characters con clips horneados de Universal Animation Library 1 y 2 (Quaternius, CC0 1.0). El hallazgo de esta pasada: **los 18 clips salían planos en el GLB** —el muslo con 2 claves constantes— aunque en Blender las acciones horneadas tenían 41 claves animadas. Causa raíz: `emote()` dejaba todos los huesos del armazón en modo `XYZ` al terminar, y el exportador glTF muestrea el canal de rotación según el *modo actual del hueso*; con los fcurves en `rotation_quaternion` y el hueso en modo euler, exportaba constantes. Corregido: los emotes se escriben ahora en cuaterniones (`Euler(...).to_quaternion()`), mismos gestos, mismo contrato. Reconstruidos los seis GLB y el `.blend` máster.
+
+**Triangleados:** centinela 6 881 / centinela_f 6 884 / cazador 6 241 / cazador_f 6 260 / oráculo 6 167 / oráculo_f 6 162 (presupuesto ≤ 12 000). Alturas 1,74 m hombres y 1,65 m mujeres, base en el suelo.
+
+**Validación:** `scripts/blender/validar_heroes_cc0.py` OK (6 héroes, 18 clips, shape keys, piezas del contrato); decodificación directa de los GLB: `thighL` 41 claves en `Caminar`, 40 en `Montar`, 16 en `Lanzar` (antes 2); los cuatro emotes con muslo plano son gestos de pie correctos (animan arriba: wave 2/71 es la palma — ver PJ-02, que pide poses legibles). `npm test` 4 148/4 148 en verde (incluye jl168 recursivo, adaptado a la subcarpeta `heroes_cc0/`, y cobertura de rutas completas en `PROCEDENCIA.md`). Los dos fallos previos de PROCEDENCIA eran de esta entrega sin cerrar, no pre-existentes.
+
+**Evidencia:** `work/omp-pj-01/` — láminas por clase (frente/lado/tres cuartos, dos complexiones), `lam_comparativa.png` (los seis junto a la heroína actual, distinguibles por silueta), 18 tiras de 5 fotogramas en `tiras/` (`*_Caminar.png`, `*_Lanzar.png`, `*_Montar.png`): el caminar avanza con apoyo alternado, `Lanzar` extiende el brazo hacia delante, `Montar` abre las piernas a la silla. `node scripts/qaElectron.mjs` no ejercita estos GLB (el juego aún no los carga — entrega PROPUESTA); la carga se verificó decodificando los canales de animación y con el parser de Babylon en `work/omp-pj-01/carga_glb.mjs` (18 animGroups, sin avisos).
+
+**Pendiente para el creador:** mirar `work/omp-pj-01/lam_comparativa.png` y las tiras; si aprueba el aspecto, Claude conecta el esqueleto nuevo. PJ-02 (anticipación/impacto en hechizos, emotes legibles) y PJ-03 (`Asiento` en monturas) siguen abiertas en la cola.
+
+---
+
 ## 2026-11-23 — JL-204: pruebas de chasers.ts (Junie)
 
 **Archivos:** `tests/jl204_chasers.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -4774,4 +4790,15 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 - `locomotion.ts` (12 pruebas): `pickGait` con histéresis (caso feliz run/walk, transición run→walk y walk→run, banda conserva marcha, sin clip de caminar, naturalRun ≤ 0, umbrales exactos, velocidad cero).
 
 **Cómo se verificó:** `npx vitest run tests/jl196_` → 43/43 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+
+## 2026-11-23 — JL-205: pruebas de crowd.ts (Junie)
+
+**Archivos:** `tests/jl205_crowd.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 17 pruebas unitarias para `separate()` de `src/sim/crowd.ts` (separación de cuerpos en la multitud). Cubren: cuerpos solapados, separados, tocándose en el borde, casi superpuestos, cuerpo fijo (no se mueve, solo empuja), tres cuerpos con una llamada y con varias, slide contra pared (no atraviesa obstáculos), radios distintos, maxRadius, array vacío, un solo cuerpo, fijo con varios cuerpos, y separación en diagonal.
+
+**Hallazgo:** `crowd.ts:32-36` — cuando dos cuerpos están exactamente en la misma posición (d < 1e-6), el código fija `d = 1` para calcular la dirección de separación, pero luego `push = (minD - d) / 2` usa ese d=1, dando push=0. Los cuerpos no se separan. No se arregla: el creador decide si es relevante (los spawns del juego rara vez colocan dos cuerpos en la misma coordenada exacta).
+
+**Validación:** `npx vitest run tests/jl205_crowd.test.ts` 17/17 en verde. `npx tsc --noEmit` limpio (solo balM3.ts ajeno).
 
