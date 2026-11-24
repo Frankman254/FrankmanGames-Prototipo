@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-206: pruebas de fishing.ts (Junie)
+
+**Archivos:** `tests/jl206_fishing.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 25 pruebas para `src/sim/fishing.ts` (FishingManager): spotAt (encuentra estanque, null sin estanques), command lanzar (cerca del agua, corcho clipped, estanque más cercano, muerto, espectral, lejos → pending), command sacar (escape early, catch con botín), tick (waiting→bite, bite→escape late, nibble), stop (cancela, sin pesca), pending (llega a orilla → lanza, muere → cancela), shoals (sin bancos, sin banco activo → fishNoShoal, banco activo → pesca en banco), night loot (usa nightLootTable de noche), edge cases (reel con pesca en curso, tick sin pesca, facing al corcho). El hallazgo de JL-197 (reel sin botín en el arnés) no se reproduce en pruebas: `reel()` llama correctamente a `rollLoot()`.
+
+**Validación:** `npx vitest run tests/jl206_fishing.test.ts` → 25/25 en verde. Suite completa: 4190/4190. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — CLA-BARR2: farolas y árboles en la barriada (coordinador)
 
 **Archivos:** `src/world/barriada.ts`, `src/render/barriadaView.ts`, `src/render/atmosphere.ts`, `src/scenes/houseScene.ts`, `tests/cla_barr1_barriada.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`.
