@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-208: pruebas de traps.ts (Junie)
+
+**Archivos:** `tests/jl208_traps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 31 pruebas puras de `src/sim/traps.ts` (TrapManager): spot() (posición válida si pisable y sin trampas cercanas, null si no pisable, null si trampa del mismo bando cerca, permite trampas rivales cerca, respeta minSpacing pasado como parámetro), place() (coloca y emite trapPlaced, null y trapBlocked si inválido, elimina trampas viejas al superar maxActive, usa maxActive de reglas si spec no declara, inicializa arming con armSeconds, revealedUntil en -Infinity), remove() (elimina y emite trapGone, idempotente si ya no está), reveal() (revela trampas rivales dentro del radio, no revela propias, no revela fuera del radio, emite evento con conteo), visible() (muestra siempre las propias, oculta rivales no reveladas, muestra rivales reveladas mientras dure, oculta cuando expira la revelación) y tick() (reduce remaining y arming, expira al llegar a 0, expira si el lanzador muere, no se dispara si aún armando, se dispara con víctima y armada, no se dispara sin víctima, aplica efectos a la víctima, emite trapTriggered con posición y bando, procesa múltiples trampas, no aplica efectos si la víctima murió en el primer efecto).
+
+**Validación:** `npx vitest run tests/jl208_traps.test.ts` → 31/31 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-207: pruebas de shoals.ts (Junie)
 
 **Archivos:** `tests/jl207_shoals.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
