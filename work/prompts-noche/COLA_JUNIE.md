@@ -1429,7 +1429,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 ### Escenarios que faltan
 - [x] JL-233 **Escenario `misiones`:** hablar con un PNJ con misión, aceptarla, cumplirla con ayudas de desarrollo y entregarla; el registro de misiones cambia de estado. — commit «JL-233: escenario misiones en qaElectron» — 10/10 en verde, captura en work/qa/jl233-misiones-diario.jpg.
 - [x] JL-234 **Escenario `oficios`:** usar un puesto de oficio, fabricar un objeto y comprobar que llega a la mochila (JL-198 solo cubre la recolección). — commit «JL-234: escenario oficios — fabricación de short_sword en el yunque» — 10/10 en verde (madera, mineral, yunque, craft, espada, materiales consumidos, XP de Forjatodo). Capturas en work/qa/.
-- [ ] JL-235 **Escenario `casaCreador`:** calle de Los Santos, clic en la puerta de reja, recorrer sala, baños y recámaras, salir por el tapete, y lo mismo en la casa espejo. Base: `work/claude-casa2/qa1.js`…`qa7.js`. Verde tres veces.
+- [x] JL-235 **Escenario `casaCreador`:** calle de Los Santos, clic en la puerta de reja, recorrer sala, baños y recámaras, salir por el tapete, y lo mismo en la casa espejo. Base: `work/claude-casa2/qa1.js`…`qa7.js`. Verde tres veces. — commit «JL-235: escenario casaCreador — 10/10 en 2 ejecuciones» — 4 capturas en work/junie-jl235/.
 - [ ] JL-236 **Escenario `todasLasPiedras`:** viajar a cada Piedra Pintada, comprobar que el personaje queda en celda transitable y sin errores de consola, y volver. Tabla con el tiempo de carga de cada viaje.
 - [ ] JL-237 **Escenario `guardadoBarriadaCasa`:** guardar y cargar dentro de la casa del creador y dentro de la barriada (une JL-215 y la casa) y comprobar dónde aparece el personaje.
 

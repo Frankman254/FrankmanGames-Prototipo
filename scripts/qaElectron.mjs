@@ -9103,6 +9103,97 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('Misiones: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+
+    /** JL-235: Casa del creador — entrar, recorrer interior, salir; repetir con la casa espejo. */
+    async casaCreador() {
+        await newGame('QA CasaCreador');
+        // Viajar a Cerro Punta (zona de Los Santos donde está la casa).
+        await js(`__game.travelStone('cerro_punta')`);
+        await sleep(5000);
+
+        // --- Casa base (165, 221) ---
+        // Acercarse a la puerta de reja.
+        await js(`(()=>{const p=${W}.player.pos; p.x=167; p.y=199.5; p.path=[];})()`);
+        await sleep(3000);
+
+        // Captura exterior — fachada.
+        await js(`(()=>{const r=__game.view.rig; r.yawDeg=0; r.pitchDeg=25; r.jumpTo(14);})()`);
+        await sleep(1500);
+        await shot('jl235-casa-fachada');
+
+        // Clic en la puerta para entrar (mesh 'creator-house-door').
+        await clickMesh('creator-house-door');
+        await until('__game.houses.inside', 20000, 'entrar en la casa del creador');
+        check('Casa base: dentro tras clic en puerta', await js(`!!__game.houses.inside`));
+        await sleep(2500);
+
+        // Captura interior — sala.
+        await js(`(()=>{const r=__game.view.rig; r.pitchDeg=60; r.jumpTo(16);})()`);
+        await sleep(1500);
+        await shot('jl235-casa-interior-sala');
+
+        // Moverse por el interior: hacia la cocina (zona central).
+        await js(`${W}.commandMove({x:5.0,y:9.0})`);
+        await sleep(4000);
+        const cocinaPos = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        check('Casa base: moverse por el interior', cocinaPos.x > 3.0 && cocinaPos.x < 7.0, JSON.stringify(cocinaPos));
+
+        // Moverse hacia el pasillo y las recámaras (fondo de la casa).
+        await js(`${W}.commandMove({x:2.0,y:13.0})`);
+        await sleep(4000);
+        const recPos = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        check('Casa base: llegar a zona de recámaras', recPos.x < 4.0, JSON.stringify(recPos));
+
+        // Salir: moverse al tapete de salida (portal, cerca de la fachada interior).
+        await js(`${W}.commandMove({x:5.0,y:2.5})`);
+        await sleep(3000);
+        // Clic en el tapete de salida.
+        await clickMesh('house-exit');
+        await until('!__game.houses.inside', 15000, 'salir de la casa del creador');
+        check('Casa base: fuera tras salir', !(await js(`!!__game.houses.inside`)));
+        await sleep(1500);
+        const fueraPos = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        check('Casa base: posición al salir (cerca de la puerta)', fueraPos.x > 160 && fueraPos.x < 180 && fueraPos.y > 210, JSON.stringify(fueraPos));
+
+        // --- Casa espejo (175, 221) ---
+        // Acercarse a la puerta de la casa espejo.
+        await js(`(()=>{const p=${W}.player.pos; p.x=174.7; p.y=212.5; ${W}.player.path=[];})()`);
+        await sleep(1500);
+
+        // Captura exterior — fachada espejo.
+        await js(`(()=>{const r=__game.view.rig; r.yawDeg=0; r.pitchDeg=25; r.jumpTo(12);})()`);
+        await sleep(1200);
+        await shot('jl235-espejo-fachada');
+
+        // Clic en la puerta de la casa espejo.
+        await clickMesh('creator-house-door');
+        await until('__game.houses.inside', 20000, 'entrar en la casa espejo');
+        check('Casa espejo: dentro tras clic en puerta', await js(`!!__game.houses.inside`));
+        await sleep(2500);
+
+        // Captura interior — sala espejo.
+        await js(`(()=>{const r=__game.view.rig; r.yawDeg=0; r.pitchDeg=65; r.jumpTo(17);})()`);
+        await sleep(1500);
+        await shot('jl235-espejo-interior');
+
+        // Moverse por el interior de la casa espejo.
+        await js(`${W}.commandMove({x:7.0,y:9.0})`);
+        await sleep(4000);
+        const espejoPos = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        check('Casa espejo: moverse por el interior', espejoPos.x > 3.0 && espejoPos.x < 8.0, JSON.stringify(espejoPos));
+
+        // Salir de la casa espejo.
+        await js(`${W}.commandMove({x:5.0,y:2.5})`);
+        await sleep(3000);
+        await clickMesh('house-exit');
+        await until('!__game.houses.inside', 15000, 'salir de la casa espejo');
+        check('Casa espejo: fuera tras salir', !(await js(`!!__game.houses.inside`)));
+        await sleep(1000);
+
+        // Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('Casa del creador: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

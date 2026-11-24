@@ -1,3 +1,11 @@
+## 2026-11-23 — JL-235: escenario casaCreador — casa del creador y espejo (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+Escenario `casaCreador` en `scripts/qaElectron.mjs`: viaja a Cerro Punta, entra en la casa del creador (mesh `creator-house-door`), recorre el interior (cocina, recámaras), sale por el tapete (`house-exit`), y repite con la casa espejo. 10/10 comprobaciones en 2 ejecuciones consecutivas, sin errores de consola. 4 capturas en `work/junie-jl235/` (fachada, interior sala, fachada espejo, interior espejo).
+
+---
+
 ## 2026-11-23 — JL-234: escenario oficios — fabricación de short_sword (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
