@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-218: mapa grande de la barriada Praderas del Norte (Junie)
+
+**Archivos:** `src/ui/map/barriadaMap.ts`, `src/ui/map/worldMap.ts`, `tests/jl218_barriadaWorldMap.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Al abrir el mapa grande (tecla M) dentro de la barriada Praderas del Norte, la ventana mostraba solo niebla de guerra sin contenido. Causa: `worldMap.ts` salta el dibujo de piedras, PNJ, landmarks y jugador cuando `f.inside` está activo (línea 506: `if (f && !f.inside)`). El minimapa ya tenía un caso especial para la barriada (JL-217), pero el mapa grande no. Arreglo: `drawBarriadaWorldMap()` en `barriadaMap.ts` dibuja calles, casas, piedra de vuelta y jugador; `worldMap.ts` detecta `f.inside === 'Praderas del Norte'` y delega a esa función. `center()` centra en el centro de la barriada; el pan es libre (sin clamping al mundo base).
+
+**Cómo se verificó:** 10 pruebas verdes (jl218_barriadaWorldMap.test.ts): bounds, piedra, entrada, losas dentro de bounds, casas dentro de bounds, renderizado sin errores con contexto mock, zoom bajo y alto. Suite 4377/4377, tsc limpio, build OK. Escenario `barriada` en Electron 8/8.
+
+**Qué falta:** Nada.
+
+---
+
 ## 2026-11-23 — JL-217: minimapa de la barriada Praderas del Norte (Junie)
 
 **Archivos:** `src/ui/map/barriadaMap.ts`, `src/ui/map/mapFeed.ts`, `src/ui/map/minimap.ts`, `tests/jl217_barriadaMinimap.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

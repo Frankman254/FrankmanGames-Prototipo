@@ -30,6 +30,7 @@ import {
 } from './mapLogic';
 import type { MapState } from './mapState';
 import { drawPanama, fitAtlas, regionAtView, regionInfo } from './panamaMap';
+import { drawBarriadaWorldMap, barriadaWorldBounds } from './barriadaMap';
 import type { AtlasRegion } from '../../world/atlas';
 
 export const MAP_LAYERS = [
@@ -167,8 +168,20 @@ export class WorldMap extends Panel {
     /** Centra la vista en el jugador (o en el mundo). */
     center(): void {
         const w = this.state.world;
-        const p = this.state.frame?.player;
+        const f = this.state.frame;
         if (!w) return;
+        // JL-218: en la barriada, centramos en el centro de la zona.
+        if (f && f.inside === 'Praderas del Norte') {
+            const bounds = barriadaWorldBounds();
+            this.view = {
+                cx: (bounds.x0 + bounds.x1) / 2,
+                cy: (bounds.y0 + bounds.y1) / 2,
+                zoom: this.view?.zoom ?? this.state.def.bigMap.zoom,
+            };
+            this.timer = 0;
+            return;
+        }
+        const p = f?.player;
         this.view = {
             cx: p?.x ?? w.width / 2,
             cy: p?.y ?? w.depth / 2,
@@ -243,12 +256,16 @@ export class WorldMap extends Panel {
                 const p = this.local(ev);
                 if (!moved && Math.hypot(p.x - start.x, p.y - start.y) < 4) return;
                 moved = true;
-                const w = this.state.world!;
-                // Con fondo de mundo, el mapa grande se mueve también fuera de la parcela.
                 const v = this.view!;
-                this.view = w.backdrop
-                    ? { ...v, cx: v.cx - (p.x - last.x) / v.zoom, cy: v.cy + (p.y - last.y) / v.zoom }
-                    : panView(v, { x: p.x - last.x, y: p.y - last.y }, w.width, w.depth);
+                // JL-218: en la barriada, el pan es libre (sin clamping al mundo).
+                if (this.state.frame?.inside === 'Praderas del Norte') {
+                    this.view = { ...v, cx: v.cx - (p.x - last.x) / v.zoom, cy: v.cy + (p.y - last.y) / v.zoom };
+                } else {
+                    const w = this.state.world!;
+                    this.view = w.backdrop
+                        ? { ...v, cx: v.cx - (p.x - last.x) / v.zoom, cy: v.cy + (p.y - last.y) / v.zoom }
+                        : panView(v, { x: p.x - last.x, y: p.y - last.y }, w.width, w.depth);
+                }
                 last = p;
                 this.timer = 0;
             };
@@ -407,6 +424,21 @@ export class WorldMap extends Panel {
         }
         const ctx = this.canvas.getContext('2d')!;
         const C = st.def.colors;
+
+        // JL-218: si estamos en la barriada, dibujamos su mapa en lugar del mundo.
+        if (f && f.inside === 'Praderas del Norte' && !this.panama) {
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const bounds = barriadaWorldBounds();
+            const barCx = (bounds.x0 + bounds.x1) / 2;
+            const barCy = (bounds.y0 + bounds.y1) / 2;
+            // Centramos la vista en el jugador si es la primera vez, o mantenemos el pan.
+            const barView = this.view;
+            const ppm = st.def.bigMap.zoom * st.def.pixelsPerMeter;
+            drawBarriadaWorldMap(ctx, ppm, f.player, barView.cx, barView.cy, cw, ch);
+            this.exploredEl.textContent = 'Praderas del Norte';
+            return;
+        }
+
         if (this.panama && w.atlas) {
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             drawPanama(

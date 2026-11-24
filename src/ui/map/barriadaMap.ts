@@ -129,3 +129,85 @@ export function barriadaWorldBounds() {
     const o = BARRIADA.origen;
     return { x0: o.x, y0: o.y, x1: o.x + BARRIADA.ancho, y1: o.y + BARRIADA.fondo };
 }
+
+// ─── Mapa grande (JL-218) ───────────────────────────────────────────────────
+
+/**
+ * Dibuja la barriada en el mapa grande (tecla M).
+ * Similar a drawBarriadaMinimap pero con la proyección del mapa grande
+ * (zoom, pan, sin rotación de cámara).
+ * @param ctx Contexto 2D
+ * @param ppm Píxeles por metro del mapa grande (bigMap.zoom / pixelsPerMeter)
+ * @param playerPos Posición del jugador en metros del mundo
+ * @param cx Centro X de la vista en metros del mundo
+ * @param cy Centro Y de la vista en metros del mundo
+ * @param cw Ancho del canvas en píxeles CSS
+ * @param ch Alto del canvas en píxeles CSS
+ */
+export function drawBarriadaWorldMap(
+    ctx: CanvasRenderingContext2D,
+    ppm: number,
+    playerPos: { x: number; y: number },
+    cx: number,
+    cy: number,
+    cw: number,
+    ch: number,
+): void {
+    const def = BARRIADA;
+    const ox = def.origen.x;
+    const oy = def.origen.y;
+
+    // Fondo: grama.
+    ctx.fillStyle = BAR_COLORS.grass;
+    ctx.fillRect(0, 0, cw, ch);
+
+    ctx.save();
+    // Centrar la vista en (cx, cy). El eje Y del mundo crece hacia abajo en el canvas.
+    ctx.translate(cw / 2 - cx * ppm, ch / 2 - (oy + def.fondo / 2 - cy) * ppm);
+    ctx.scale(ppm, ppm);
+
+    // Trasladar al origen del mundo para que las coordenadas de losa/casa funcionen.
+    ctx.translate(-ox, -oy);
+    ctx.imageSmoothingEnabled = false;
+
+    // Calzadas y áreas pavimentadas.
+    const losas = barriadaLosas(def);
+    for (const losa of losas) {
+        ctx.fillStyle = piezaColor(losa.pieza);
+        ctx.fillRect(losa.x0, losa.y0, losa.x1 - losa.x0, losa.y1 - losa.y0);
+    }
+
+    // Casas como rectángulos con tejado (coordenadas ya absolutas).
+    const casas = barriadaCasas(def);
+    for (const casa of casas) {
+        const w = 6;
+        const d = 5;
+        ctx.fillStyle = BAR_COLORS.house;
+        ctx.fillRect(casa.x - w / 2, casa.y - d / 2, w, d);
+        ctx.strokeStyle = BAR_COLORS.roof;
+        ctx.lineWidth = 0.3;
+        ctx.strokeRect(casa.x - w / 2, casa.y - d / 2, w, d);
+    }
+
+    ctx.restore();
+
+    // Piedra de vuelta.
+    const stone = barriadaPiedra();
+    const sx = cw / 2 + (stone.x - cx) * ppm;
+    const sy = ch / 2 - (stone.y - cy) * ppm;
+    ctx.fillStyle = BAR_COLORS.stone;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Jugador en el centro visual.
+    const px = cw / 2 + (playerPos.x - cx) * ppm;
+    const py = ch / 2 - (playerPos.y - cy) * ppm;
+    ctx.fillStyle = '#4fc3f7';
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+}
