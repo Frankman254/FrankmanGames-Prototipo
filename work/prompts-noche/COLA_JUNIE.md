@@ -1435,7 +1435,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 
 ### Hechizos (el creador sigue viendo fallos)
 - [x] JL-238 **Hechizos montado.** — commit «JL-238: hechizos montado — medición de bloqueo en vuelo» — 11 pruebas verdes (jl238_mountSpells.test.ts), tsc sin errores nuevos, push OK. Con montura de tierra y voladora en el suelo: todos los hechizos funcionan. En vuelo activo (F21): todos bloqueados con 'flying' → "En vuelo no se lanzan hechizos". Bloqueo binario, sin distinción por tipo. INFORME.md en work/junie-jl238/.
-- [ ] JL-239 **Barra tras cambiar de lugar.** Tras viajar por piedra, entrar en la casa o en la barriada y volver, la barra no queda en rojo ni con enfriamientos colgados. Escenario corto y prueba si el fallo es de la sim.
+- [x] JL-239 **Barra tras cambiar de lugar.** — commit «JL-239: barra tras cambiar de lugar — diagnóstico y pruebas» — 7 pruebas verdes (jl239_hotbarAfterTravel.test.ts), tsc limpio salvo balM3.ts ajeno, push OK. Diagnóstico: el código ya funciona correctamente. Al crear un nuevo World (casa, barriada, cripta), cooldowns, GCD y lastTarget se reinician. Sin enemigos, inRange es true. Sin cambios de código. Evidencia en tests/jl239_hotbarAfterTravel.test.ts.
 - [ ] JL-240 **Forma del indicador = forma del daño.** Para cada hechizo de área, el indicador que se dibuja usa la misma forma y tamaño que `src/sim/shapes.ts` usa para el daño. Prueba pura que recorra los hechizos de las tres clases.
 - [ ] JL-241 **Hechizos junto a paredes.** Lanzar los de línea y proyectil pegado a una pared de la cripta y a una casa: ¿atraviesan? Solo diagnóstico, con capturas y la lista.
 

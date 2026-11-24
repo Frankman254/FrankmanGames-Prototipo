@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-239: barra tras cambiar de lugar — diagnóstico (Junie)
+
+**Archivos:** `tests/jl239_hotbarAfterTravel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué.** El creador reportaba que la barra de hechizos quedaba en rojo o con enfriamientos colgados tras viajar por piedra, entrar en la casa o en la barriada y volver. Diagnóstico: ¿el código deja cooldowns colgados al cambiar de lugar?
+
+**Resultado.** El código ya funciona correctamente. Al crear un nuevo World (casa, barriada, cripta), el constructor inicializa `cooldowns: {}`, `gcd: 0` y `lastTarget: null`. Sin enemigos en el nuevo lugar, `hotbarState()` devuelve `inRange: true` para todos los hechizos. El HUD lee `hotbarState()` cada fotograma, por lo que se actualiza al instante. No se encontraron bugs; la tarea se cierra con pruebas que documentan el comportamiento correcto.
+
+**Evidencia.** 7 pruebas verdes (`tests/jl239_hotbarAfterTravel.test.ts`), tsc limpio salvo `balM3.ts` ajeno. Sin cambios de código.
+
+---
+
 ## 2026-11-24 — JL-238: hechizos montado — medición (Junie)
 
 **Archivos:** `tests/jl238_mountSpells.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
