@@ -9194,6 +9194,126 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('Casa del creador: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+    /** JL-237: Guardar y cargar dentro de la casa del creador y dentro de la barriada,
+     * comprobando que el personaje reaparece en el lugar correcto. */
+    async guardadoBarriadaCasa() {
+        const failures = [];
+        const record = (step, ok, detail) => {
+            check(`JL-237 ${step}`, ok, detail);
+            if (!ok) failures.push(`${step}: ${detail}`);
+        };
+
+        /* === PARTE A: Casa del creador === */
+
+        /* 1. Partida nueva y viajar a Cerro Punta (zona de Los Santos). */
+        await newGame('QA GuardadoCasa');
+        await js(`${S}.energy.value=100`);
+        await js(`__game.travelStone('cerro_punta')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga Cerro Punta');
+        await sleep(3000);
+
+        /* 2. Entrar en la casa del creador. */
+        await js(`(()=>{const p=${W}.player.pos; p.x=167; p.y=199.5; p.path=[];})()`);
+        await sleep(2000);
+        await clickMesh('creator-house-door');
+        await until('__game.houses.inside', 20000, 'entrar en la casa del creador');
+        const insideBefore = await js(`!!__game.houses.inside`);
+        record('A1: dentro de la casa del creador', insideBefore, String(insideBefore));
+        await sleep(2000);
+
+        /* 3. Moverse a un punto conocido dentro de la casa. */
+        await js(`${W}.commandMove({x:5.0,y:9.0})`);
+        await sleep(3000);
+        const posBefore = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        record('A2: posición dentro de la casa', posBefore.x > 2 && posBefore.x < 8, JSON.stringify(posBefore));
+        await shot('jl237-casa-antes-guardado');
+
+        /* 4. Guardar y cargar desde dentro de la casa. */
+        await saveAndLoad();
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga tras guardado casa');
+        await sleep(3000);
+
+        /* 5. Verificar que reaparecemos dentro de la casa.
+         * HALLAZGO: el personaje reaparece fuera de la casa (cerca de la puerta exterior).
+         * El guardado dentro de interiores no restaura la escena interior.
+         * Se registra como hallazgo; no se rompe el flujo. */
+        const insideAfter = await js(`!!__game.houses.inside`);
+        record('A3: tras cargar, dentro de la casa', insideAfter, String(insideAfter));
+        const posAfter = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
+        // Si está fuera, la posición será cerca de la puerta exterior (~165,214).
+        // Si está dentro, la posición será dentro del interior (0..10, 0..15).
+        const posAfterInside = posAfter.x > 0 && posAfter.x < 10 && posAfter.y > 0 && posAfter.y < 15;
+        record('A4: posición tras cargar (dentro de la casa)', posAfterInside, JSON.stringify(posAfter));
+        await shot('jl237-casa-despues-carga');
+
+        /* 6. Si estamos dentro, salir; si estamos fuera, ya estamos fuera. */
+        if (insideAfter) {
+            await js(`${W}.commandMove({x:5.0,y:2.5})`);
+            await sleep(2000);
+            try { await clickMesh('house-exit'); } catch { /* house-exit no visible */ }
+            await until('!__game.houses.inside', 15000, 'salir de la casa').catch(() => {});
+        }
+        record('A5: fuera de la casa', !(await js(`!!__game.houses.inside`)), 'OK');
+        await sleep(1500);
+
+        /* === PARTE B: Barriada Praderas del Norte === */
+
+        /* 7. Viajar a la barriada. */
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+        const barriadaInside = await js(`!!__game.houses.inside`);
+        record('B1: dentro de la barriada', barriadaInside, String(barriadaInside));
+        const barriadaPlace = await js(`__game.houses.place?.name ?? 'null'`);
+        record('B2: place es Praderas del Norte', barriadaPlace === 'Praderas del Norte', barriadaPlace);
+        await shot('jl237-barriada-antes-guardado');
+
+        /* 8. Moverse a un punto conocido dentro de la barriada (calle 2). */
+        await js(`${W}.commandMove({x:6235,y:306.5})`);
+        await until(
+            `Math.hypot(${W}.player.pos.x-6235,${W}.player.pos.y-306.5)<2`,
+            30000,
+            'llegar a calle 2',
+        );
+        await sleep(1000);
+        const barriadaPosBefore = await js(`({x:Math.round(${W}.player.pos.x),y:Math.round(${W}.player.pos.y)})`);
+        record('B3: posición en calle 2', Math.hypot(barriadaPosBefore.x - 6235, barriadaPosBefore.y - 306.5) < 3, JSON.stringify(barriadaPosBefore));
+
+        /* 9. Guardar y cargar desde dentro de la barriada. */
+        await saveAndLoad();
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga tras guardado barriada');
+        await sleep(5000);
+
+        /* 10. Verificar que reaparecemos dentro de la barriada. */
+        const barriadaInsideAfter = await js(`!!__game.houses.inside`);
+        record('B4: tras cargar, dentro de la barriada', barriadaInsideAfter, String(barriadaInsideAfter));
+        const barriadaPlaceAfter = await js(`__game.houses.place?.name ?? 'null'`);
+        record('B5: place tras cargar es Praderas del Norte', barriadaPlaceAfter === 'Praderas del Norte', barriadaPlaceAfter);
+        const barriadaPosAfter = await js(`({x:Math.round(${W}.player.pos.x),y:Math.round(${W}.player.pos.y)})`);
+        // La posición debe estar dentro de la barriada (6000..6420, 0..420).
+        const inBarriadaBounds = barriadaPosAfter.x >= 6000 && barriadaPosAfter.x <= 6420 && barriadaPosAfter.y >= 0 && barriadaPosAfter.y <= 420;
+        record('B6: posición tras cargar dentro de la barriada', inBarriadaBounds, JSON.stringify(barriadaPosAfter));
+        await shot('jl237-barriada-despues-carga');
+
+        /* 11. Salir de la barriada para limpiar. */
+        if (barriadaInsideAfter) {
+            await js(`${W}.commandMove({x:6241,y:395})`);
+            await until(
+                `Math.hypot(${W}.player.pos.x-6241,${W}.player.pos.y-395)<2`,
+                30000,
+                'llegar a la piedra de salida',
+            ).catch(() => {});
+            await sleep(1000);
+            await js(`__game.houses.leave()`);
+            await until('!__game.houses.inside', 15000, 'salir de la barriada').catch(() => {});
+        }
+        record('B7: fuera de la barriada tras salir', !(await js(`!!__game.houses.inside`)), 'OK');
+
+        /* 12. Consola sin errores. */
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        record('C: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
+
     /** JL-236: viajar a cada Piedra Pintada, comprobar suelo transitable y medir tiempo de carga. */
     async todasLasPiedras() {
         await newGame('QA Piedras');
@@ -9281,6 +9401,8 @@ scenarios.barriadaRendimiento.timeout = 180;
 scenarios.barriadaOpciones.timeout = 180;
 // JL-236: 24 viajes + vuelta, cada uno con carga de página.
 scenarios.todasLasPiedras.timeout = 300;
+// JL-237: casa + barriada, cada una con viaje, entrar, guardar, cargar y salir.
+scenarios.guardadoBarriadaCasa.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

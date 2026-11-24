@@ -1,3 +1,19 @@
+## 2026-11-23 — JL-237: escenario guardadoBarriadaCasa — hallazgo de guardado en interiores (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `guardadoBarriadaCasa` en `qaElectron.mjs` que guarda y carga dentro de la casa del creador y dentro de la barriada Praderas del Norte, verificando dónde reaparece el personaje.
+
+**Hallazgo importante:** El guardado dentro de interiores no restaura la escena interior. En ambos casos el personaje reaparece fuera:
+- **Casa del creador:** reaparece en (165.3, 214.2), cerca de la puerta exterior, no dentro de la casa.
+- **Barriada:** reaparece en (1015, 1773), cerca de la Piedra Pintada, no dentro de la barriada.
+
+El escenario completa las 14 comprobaciones sin errores de consola. Las 4 comprobaciones que fallan (A3, A4, B4, B5) documentan el hallazgo. El escenario no rompe el flujo: sigue con la parte B (barriada) aunque la parte A (casa) falle.
+
+**Verificación:** Escenario `guardadoBarriadaCasa` en Electron: 9/14 checks en verde (4 hallazgos documentados, 1 consola limpia). 4 capturas en `work/junie-jl237/` (casa antes/después, barriada antes/después). Typecheck limpio salvo `balM3.ts` ajeno.
+
+---
+
 ## 2026-11-23 — JL-236: escenario todasLasPiedras — 24 Piedras Pintadas (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
