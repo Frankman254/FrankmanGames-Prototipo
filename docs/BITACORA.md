@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-221: rendimiento de la barriada Praderas del Norte (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl221/MEDICION.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `barriadaRendimiento` en `qaElectron.mjs` que mide FPS, p95, draw calls, mallas activas, triángulos y tiempos de render en la barriada Praderas del Norte. Tres posiciones (plaza, cruce de calle 2, vista cenital) × dos calidades (baja y alta). Calidad baja: 119–120 fps constantes. Calidad alta: 70–98 fps (calle 2 = 70 fps, punto más bajo, por renderScale 1.0 → 3600×2160). Draw calls estables (148–160), sin fugas de mallas. El cuello de botella en calidad alta es el framebuffer más grande, no los shaders ni las sombras.
+
+**Cómo se verificó:** Escenario `barriadaRendimiento` en Electron: 10/10 checks en verde. MEDICION.md con tabla completa en `work/junie-jl221/`. Datos crudos en `work/qa/jl221-barriada-rendimiento-ultima.json`.
+
+**Qué falta:** Nada. El problema de rendimiento de Windows (WIN-01) no se reproduce en Mac M5.
+
+---
+
 ## 2026-11-23 — JL-219: diagnóstico de monturas en la barriada (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl219/DIAGNOSTICO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

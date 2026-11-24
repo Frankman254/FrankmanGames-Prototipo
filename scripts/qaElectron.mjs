@@ -8569,6 +8569,119 @@ const scenarios = {
         check('jl219: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
+    /** JL-221: Rendimiento de la barriada Praderas del Norte — plaza, calle 2 y cenital, calidad baja y alta. */
+    async barriadaRendimiento() {
+        await newGame('QA BarriadaPerf');
+        await sleep(5000);
+
+        // Entrar a la barriada.
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+        check('barriadaRendimiento: dentro de la barriada', await js(`__game.houses.inside`), String(await js(`__game.houses.inside`)));
+
+        // Instrumentación (mismo patrón que rendimientoHondo).
+        await js(`(()=>{ const g=__game, sc=g.view.scene, en=sc.getEngine(), t=window.__qaH={frames:[],last:performance.now(),dc:0,tick:0,sync:0,render:0,loop:0,anim:0,active:0,targets:0};
+      const wrap=(o,k,key)=>{ const f=o[k]; o[k]=function(...a){ const s=performance.now(); try { return f.apply(this,a); } finally { t[key]+=performance.now()-s; } }; };
+      const rd=en._reportDrawCall; en._reportDrawCall=function(n=1){ t.dc+=n; return rd.call(this,n); };
+      wrap(Object.getPrototypeOf(g.world),'tick','tick'); wrap(g.view,'sync','sync'); wrap(sc,'render','render');
+      en._activeRenderLoops.forEach((f,i)=>{ en._activeRenderLoops[i]=function(){ const s=performance.now(); try { return f(); } finally { t.loop+=performance.now()-s; } }; });
+      let a0=0,b0=0,c0=0;
+      sc.onBeforeAnimationsObservable.add(()=>{a0=performance.now()}); sc.onAfterAnimationsObservable.add(()=>{t.anim+=performance.now()-a0});
+      sc.onBeforeActiveMeshesEvaluationObservable.add(()=>{b0=performance.now()}); sc.onAfterActiveMeshesEvaluationObservable.add(()=>{t.active+=performance.now()-b0});
+      sc.onBeforeRenderTargetsRenderObservable.add(()=>{c0=performance.now()}); sc.onAfterRenderTargetsRenderObservable.add(()=>{t.targets+=performance.now()-c0});
+      const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+        const reset = `(()=>{const t=window.__qaH; for (const k of ['dc','tick','sync','render','loop','anim','active','targets']) t[k]=0; t.frames=[];})()`;
+        const read = `(()=>{const t=window.__qaH, sc=__game.view.scene, en=sc.getEngine(), f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length), r=x=>Math.round(x*10)/10;
+      const loop=t.loop/n, known=(t.tick+t.sync+t.render)/n;
+      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), drawCalls:Math.round(t.dc/n),
+        activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, triangulos:Math.round(sc.getActiveIndices()/3), luces:sc.lights.filter(l=>l.isEnabled()).length,
+        msJs:r(loop), msSim:r(t.tick/n), msVista:r(t.sync/n), msRender:r(t.render/n), msResto:r(loop-known), msAnim:r(t.anim/n), msActivas:r(t.active/n), msSombras:r(t.targets/n),
+        tam:en.getRenderWidth()+'x'+en.getRenderHeight(), gpu:en.getGlInfo().renderer};})()`;
+
+        const out = {};
+        const measure = async (name, ms = 5000) => {
+            await js(reset);
+            await sleep(ms);
+            out[name] = await js(read);
+            console.log(name, JSON.stringify(out[name]));
+        };
+
+        // Definiciones de calidad gráfica.
+        const calidadBaja = { shadows: 'no', vegetationDensity: 0.2, viewDistance: 80, particles: 0.2, renderScale: 0.5, antialias: 'no', occlusionCut: false };
+        const calidadAlta = { shadows: 'altas', vegetationDensity: 1.0, viewDistance: 400, particles: 1.0, renderScale: 1.0, antialias: 'fxaa', occlusionCut: true };
+
+        // Posiciones: plaza (6235, 394), cruce calle 2 (6235, 306.5).
+        const place = (x, y) =>
+            js(`(() => { const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.prevPos.x=${x}; p.prevPos.y=${y}; p.path=[]; })()`);
+
+        // === Calidad baja ===
+        await js(`__game.view.applyGraphics(${JSON.stringify(calidadBaja)})`);
+        await sleep(2000);
+
+        // 1) Plaza, calidad baja.
+        await place(6235, 394);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=90; r.pitchDeg=22; r.jumpTo(14); })()`);
+        await sleep(1000);
+        await measure('baja-plaza');
+        await shot('jl221-baja-plaza');
+
+        // 2) Cruce calle 2, calidad baja.
+        await place(6235, 306.5);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=90; r.pitchDeg=22; r.jumpTo(14); })()`);
+        await sleep(1000);
+        await measure('baja-calle2');
+        await shot('jl221-baja-calle2');
+
+        // 3) Vista cenital, calidad baja.
+        await place(6235, 394);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=20; r.pitchDeg=55; r.jumpTo(60); })()`);
+        await sleep(1000);
+        await measure('baja-cenital');
+        await shot('jl221-baja-cenital');
+
+        // === Calidad alta ===
+        await js(`__game.view.applyGraphics(${JSON.stringify(calidadAlta)})`);
+        await sleep(2000);
+
+        // 4) Plaza, calidad alta.
+        await place(6235, 394);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=90; r.pitchDeg=22; r.jumpTo(14); })()`);
+        await sleep(1000);
+        await measure('alta-plaza');
+        await shot('jl221-alta-plaza');
+
+        // 5) Cruce calle 2, calidad alta.
+        await place(6235, 306.5);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=90; r.pitchDeg=22; r.jumpTo(14); })()`);
+        await sleep(1000);
+        await measure('alta-calle2');
+        await shot('jl221-alta-calle2');
+
+        // 6) Vista cenital, calidad alta.
+        await place(6235, 394);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=20; r.pitchDeg=55; r.jumpTo(60); })()`);
+        await sleep(1000);
+        await measure('alta-cenital');
+        await shot('jl221-alta-cenital');
+
+        // Guardar datos.
+        fs.writeFileSync(
+            path.join(OUT, `jl221-barriada-rendimiento-${process.env.QA_ETIQUETA ?? 'ultima'}.json`),
+            JSON.stringify(out, null, 1),
+        );
+
+        // Verificar que se midieron todos los puntos.
+        check('barriadaRendimiento: midió 6 puntos', Object.keys(out).length === 6, Object.keys(out).join(', '));
+        for (const [k, v] of Object.entries(out)) {
+            check(`barriadaRendimiento: ${k} — fps > 0`, v.fps > 0, `${v.fps} fps`);
+        }
+
+        // Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('barriadaRendimiento: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
+
     /** JL-220: Fugas al entrar y salir de la barriada y la casa del creador. */
     async fugas() {
         await newGame('QA Fugas');
@@ -8712,6 +8825,8 @@ scenarios.hechizosClases.timeout = 300;
 scenarios.barriadaMontura.timeout = 300;
 // JL-220: 40 ciclos de entrar/salir (20 barriada + 20 casa), cada uno con carga.
 scenarios.fugas.timeout = 600;
+// JL-221: 6 mediciones de rendimiento (3 posiciones × 2 calidades), cada una con 5 s de muestreo.
+scenarios.barriadaRendimiento.timeout = 180;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
