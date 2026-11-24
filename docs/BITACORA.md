@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-230: clips de animation.json vs. rigs procedurales (Junie)
+
+**Archivos:** `tests/jl230_animationClips.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Prueba dedicada que verifica la coherencia entre `data/animation.json` y el sistema de animación procedural de `src/world/rigs.ts`. `animation.json` define eventos por fotograma para 8 modelos procedurales (humanoid, archer, shaman, imp, wolf, fox, turtle, owl) — no son GLB, sino rigs definidos por código. La prueba comprueba: (1) los modelos de `animation.json` coinciden con `PROCEDURAL_MODELS`; (2) cada clip referenciado en los eventos de cada modelo existe en el rig correspondiente; (3) todos los tipos de evento son válidos (footstep, hit, cast); (4) todos los instantes t están en [0, 1). Nota: `animation.test.ts:129-143` ya cubría parcialmente esto, pero JL-230 pide una prueba específica y más exhaustiva.
+
+**Verificación:** `npx vitest run tests/jl230_animationClips.test.ts` → 12/12 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-226/227/228: crestalba en verde, mercaderes ya cubiertos, referencias de misiones (Junie)
 
 **Archivos:** `tests/jl228_questRefs.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
