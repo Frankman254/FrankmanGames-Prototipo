@@ -1,3 +1,13 @@
+## 2026-11-24 — CLA-COLA: la cola de hechizos ya guarda las pulsaciones (Claude)
+
+**Archivos:** `src/sim/world.ts`, `data/player.json` (solo la descripción), `tests/jug06_commandQueue.test.ts`, `tests/combat.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`.
+
+**Estado:** la ventana de la cola (0,3 s, sin cambiar) cuenta ahora lo que le falta al jugador para quedar libre: lo que queda del lanzamiento más su GCD, o el GCD. Si falta eso o menos, el hechizo se guarda y sale en cuanto puede. Se guarda uno solo y la última pulsación manda. Las pruebas de JUG-06 describían la regla rota (encolar al principio de la animación) y se reescribieron a la nueva, pedida por el creador. JL-185 pasa de 0 encolados a 14 (nivel 1) y 65 (nivel 50). No se probó en Electron: el cambio es de `src/sim/`.
+
+**Validación:** `npx vitest run` (4913 en verde), typecheck, `npm run docs:check`. Salida en `work/claude-cola/jl185_y_jug06.txt`.
+
+---
+
 ## 2026-11-24 — Pruebas en grupo: tareas GRP-01…GRP-05 (Claude)
 
 **Archivos:** `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`.

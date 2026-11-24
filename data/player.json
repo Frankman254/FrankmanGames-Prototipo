@@ -16,7 +16,7 @@
   "_clickRadius": "Distancia (m) en el plano del suelo desde el punto clicado. Si un enemigo está más cerca que clickAttackRadius, el clic ataca en vez de mover. Si un PNJ está más cerca que clickTalkRadius, el clic va a hablar.",
   "clickAttackRadius": 2.0,
   "clickTalkRadius": 2.5,
-  "_commandQueueWindow": "Ventana (s) para encolar un hechizo pulsado durante una animación. Si el jugador pulsa un hechizo mientras está ocupado (casting o GCD) y han pasado menos de commandQueueWindow segundos desde que empezó la animación actual, el hechizo se encola y se lanza al acabarla. 0 = desactivado.",
+  "_commandQueueWindow": "Ventana (s) para encolar un hechizo. Si el jugador pulsa un hechizo mientras está ocupado (lanzando o en GCD) y le faltan commandQueueWindow segundos o menos para quedar libre, la orden se guarda y se lanza en cuanto pueda. Se guarda una sola: la última pulsación sustituye a la anterior. 0 = desactivado.",
   "commandQueueWindow": 0.3,
   "_aimAssistRadius": "Radio (m) de asistencia al apuntar. Si el cursor cae dentro de este radio de un enemigo, el apuntado se pega al enemigo más cercano. 0 = desactivado.",
   "aimAssistRadius": 1.5

@@ -338,10 +338,11 @@ export class World implements SessionWorld {
     devReactions = false;
     /** Acumulador de regeneración: solo emite evento heal cuando alcanza ≥ 1. */
     private _regenAccum = 0;
-    /** JUG-06: Cola de órdenes — hechizos encolados durante una animación. */
+    /**
+     * JUG-06 / CLA-COLA: cola de órdenes. Guarda una sola orden: la última pulsación hecha
+     * cuando faltan `commandQueueWindow` segundos o menos para quedar libre.
+     */
     private _castQueue: { spellId: string; aim: Aim }[] = [];
-    /** JUG-06: Instante en que empezó la animación actual (casting o GCD). -1 = ninguna. */
-    private _animStart = -1;
 
     constructor(
         readonly data: GameData,
@@ -1124,14 +1125,14 @@ export class World implements SessionWorld {
             }
         }
         if (block) {
-            // JUG-06: si el bloqueo es por ocupado o GCD y estamos dentro de la ventana, encolar.
-            if ((block === 'busy' || block === 'gcd') && this._animStart >= 0) {
-                const elapsed = this.time - this._animStart;
-                if (elapsed < this.data.player.commandQueueWindow && this._castQueue.length < 4) {
-                    this._castQueue.push({ spellId, aim });
-                    this.events.push({ type: 'castBlocked', ability: s.id, reason: 'queued' as CastBlock });
-                    return 'queued' as CastBlock;
-                }
+            // CLA-COLA: si está ocupado o en GCD y le falta poco para quedar libre, la orden se
+            // guarda y sustituye a la que hubiera (la última pulsación manda).
+            const window = this.data.player.commandQueueWindow;
+            if ((block === 'busy' || block === 'gcd') && window > 0 && this.freeIn() <= window) {
+                this._castQueue.length = 0;
+                this._castQueue.push({ spellId, aim });
+                this.events.push({ type: 'castBlocked', ability: s.id, reason: 'queued' as CastBlock });
+                return 'queued' as CastBlock;
             }
             this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
             return block;
@@ -1160,19 +1161,13 @@ export class World implements SessionWorld {
             p.gcd = Math.max(p.gcd, s.globalCooldown, DAZE_FAIL_GCD);
             p.gcdTotal = p.gcd;
             this.events.push({ type: 'castBlocked', ability: s.id, reason: 'dazed' });
-            // JUG-06: el GCD por daze también cuenta como animación.
-            this._animStart = this.time;
             return;
         }
         const castTime = s.castTime + extra;
         if (castTime > 0) {
             p.casting = { ability: s.id, targetId, dir, aim, remaining: castTime };
-            // JUG-06: marca el inicio de la animación de lanzamiento.
-            this._animStart = this.time;
             return;
         }
-        // JUG-06: un lanzamiento instantáneo también marca animación (GCD).
-        this._animStart = this.time;
         this.execute(s, targetId, dir, aim);
     }
 
@@ -1194,6 +1189,17 @@ export class World implements SessionWorld {
         }
         const baseDelay = d.hinder.castDelay ?? 0;
         return baseDelay * (1 - stability);
+    }
+
+    /**
+     * Segundos que faltan para que el jugador pueda lanzar otra vez: lo que queda del
+     * lanzamiento en curso más el GCD que dejará, o el GCD que corre ahora.
+     */
+    private freeIn(): number {
+        const p = this.player;
+        if (!p.casting) return Math.max(0, p.gcd);
+        const gcdAfter = this.spell(p.casting.ability).globalCooldown;
+        return Math.max(p.gcd, p.casting.remaining + Math.max(0, gcdAfter));
     }
 
     /** JUG-06: intenta lanzar el primer hechizo de la cola si el jugador ya está libre. */
@@ -3057,7 +3063,6 @@ export class World implements SessionWorld {
             p.pickupTarget = null;
             // JUG-06: la muerte vacía la cola.
             this._castQueue.length = 0;
-            this._animStart = -1;
             this.stopFishing();
             this.events.push({ type: 'playerDeath' });
         }

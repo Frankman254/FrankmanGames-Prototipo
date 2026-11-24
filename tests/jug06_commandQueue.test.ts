@@ -1,3 +1,8 @@
+// JUG-06 y CLA-COLA (2026-11-24): cola de órdenes. Un hechizo pulsado cuando al jugador le
+// faltan `commandQueueWindow` segundos o menos para quedar libre se guarda y sale en cuanto
+// puede. Se guarda una sola orden: la última pulsación sustituye a la anterior.
+// Antes la ventana contaba desde el principio de la animación y, con GCD de 0,5–0,8 s, la
+// pulsación de quien vuelve a pulsar al final de la espera se perdía siempre (JL-185).
 import { describe, it, expect } from 'vitest';
 import { loadGameData } from '../src/data';
 import { Character } from '../src/rpg/character';
@@ -13,7 +18,6 @@ function run(w: World, seconds: number): GameEvent[] {
     return w.drainEvents();
 }
 
-/** Arena con la Tejedora (tiene hechizos con castTime > 0). */
 function arena(): World {
     const data = loadGameData();
     const character = Character.create(data.rpg, 'storm_weaver', 'Prueba', new Rng(1));
@@ -23,127 +27,111 @@ function arena(): World {
     return w;
 }
 
-describe('JUG-06: Cola de órdenes', () => {
-    it('encola un hechizo instantáneo pulsado durante GCD', () => {
+const casts = (ev: GameEvent[]): string[] =>
+    ev.filter((x): x is Extract<GameEvent, { type: 'cast' }> => x.type === 'cast').map((x) => x.ability);
+
+describe('JUG-06 / CLA-COLA: cola de órdenes', () => {
+    it('pulsar al final del GCD encola y el hechizo sale al acabar', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
-        // spark es instantáneo con GCD.
+        e.health = 1e6;
         const spark = w.spell('spark');
         expect(w.commandCast('spark', aim(15, 10, e.id))).toBeNull();
+        w.drainEvents();
+        run(w, spark.globalCooldown - 0.2);
         expect(w.player.gcd).toBeGreaterThan(0);
-        w.drainEvents(); // limpiar el cast del primero.
-
-        // Segundo spark durante GCD → encolado.
-        const block2 = w.commandCast('spark', aim(15, 10, e.id));
-        expect(block2).toBe('queued');
-        w.drainEvents(); // limpiar el castBlocked queued.
-
-        // Esperar a que termine el GCD y se desencolde.
-        const ev = run(w, spark.globalCooldown + 0.1);
-
-        // El segundo spark debería haberse lanzado.
-        const casts = ev.filter((x) => x.type === 'cast');
-        expect(casts.length).toBeGreaterThanOrEqual(1);
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
+        w.drainEvents();
+        expect(casts(run(w, 0.3))).toEqual(['spark']);
     });
 
-    it('encola durante casting con castTime > 0', () => {
+    it('pulsar al principio del GCD no encola', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
-        // Se necesita un hechizo con castTime > 0. La Tejedora tiene 'searing_mark' con castTime.
-        const spell = w.spell('searing_mark');
-        if (spell.castTime <= 0) {
-            // Si no tiene castTime, saltar.
-            return;
-        }
-        expect(w.commandCast('searing_mark', aim(15, 10, e.id))).toBeNull();
+        const spark = w.spell('spark');
+        expect(spark.globalCooldown).toBeGreaterThan(w.data.player.commandQueueWindow);
+        w.commandCast('spark', aim(15, 10, e.id));
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('gcd');
+    });
+
+    it('durante un lanzamiento con tiempo, cuenta lo que falta del lanzamiento y su GCD', () => {
+        const w = arena();
+        const e = w.spawnEnemy('melee', { x: 15, y: 10 });
+        e.health = 1e6;
+        w.player.resource = w.player.maxResource;
+        // Venda ligera es el hechizo con tiempo de lanzamiento más cercano; pide subir de nivel.
+        w.character.spellbook.level = 99;
+        expect(w.character.learnSpell('light_bandage').ok).toBe(true);
+        const lento = w.spell('light_bandage');
+        expect(lento.castTime).toBeGreaterThan(w.data.player.commandQueueWindow);
+        expect(w.commandCast(lento.id, aim(15, 10, e.id))).toBeNull();
         expect(w.player.casting).not.toBeNull();
-
-        // Intentar spark mientras está casting → encolado.
-        const block = w.commandCast('spark', aim(15, 10, e.id));
-        expect(block).toBe('queued');
-
-        // Esperar a que termine el casting + GCD.
-        run(w, spell.castTime + spell.globalCooldown + 0.2);
-        const ev = w.drainEvents();
-        const casts = ev.filter((x) => x.type === 'cast');
-        const abilities = casts.map((x) => x.ability);
-        expect(abilities).toContain('searing_mark');
-        expect(abilities).toContain('spark');
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('busy');
+        // Hasta que falte la ventana o menos para quedar libre.
+        const libre = lento.castTime + lento.globalCooldown;
+        run(w, libre - w.data.player.commandQueueWindow / 2);
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
+        expect(casts(run(w, 1))).toContain('spark');
     });
 
-    it('no encola si la ventana expiró', () => {
+    it('la última pulsación sustituye a la encolada', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
-        const spell = w.spell('searing_mark');
-        if (spell.castTime <= 0) return;
-        w.commandCast('searing_mark', aim(15, 10, e.id));
-        // Avanzar más allá de la ventana de 0.3s.
-        run(w, 0.35);
-        const block = w.commandCast('spark', aim(15, 10, e.id));
-        expect(block).toBe('busy');
-    });
-
-    it('no encola si la cola ya tiene 4 elementos', () => {
-        const w = arena();
-        const e = w.spawnEnemy('melee', { x: 15, y: 10 });
-        const spell = w.spell('searing_mark');
-        if (spell.castTime <= 0) return;
-        w.commandCast('searing_mark', aim(15, 10, e.id));
-        for (let i = 0; i < 4; i++) {
-            const block = w.commandCast('spark', aim(15, 10, e.id));
-            expect(block).toBe('queued');
-        }
-        const block5 = w.commandCast('spark', aim(15, 10, e.id));
-        expect(block5).toBe('busy');
+        e.health = 1e6;
+        w.player.resource = w.player.maxResource;
+        w.commandCast('spark', aim(15, 10, e.id));
+        w.player.gcd = 0.1;
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
+        expect(w.commandCast('frost_nova', aim(15, 10, e.id))).toBe('queued');
+        w.drainEvents();
+        const salen = casts(run(w, 1));
+        expect(salen).toEqual(['frost_nova']);
     });
 
     it('no encola si el bloqueo no es busy ni gcd', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
         w.player.resource = 0;
-        const block = w.commandCast('spark', aim(15, 10, e.id));
-        expect(block).toBe('resource');
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('resource');
     });
 
     it('emite castBlocked con reason queued al encolar', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
         w.commandCast('spark', aim(15, 10, e.id));
-        w.drainEvents(); // limpiar el cast del primero.
-        const ev2 = w.commandCast('spark', aim(15, 10, e.id));
-        expect(ev2).toBe('queued');
-        const blocked = w.drainEvents().filter((x): x is Extract<typeof x, { type: 'castBlocked' }> => x.type === 'castBlocked' && x.reason === 'queued');
-        expect(blocked.length).toBe(1);
-        expect(blocked[0]!.ability).toBe('spark');
+        w.drainEvents();
+        w.player.gcd = 0.1;
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
+        const blocked = w
+            .drainEvents()
+            .filter((x): x is Extract<GameEvent, { type: 'castBlocked' }> => x.type === 'castBlocked' && x.reason === 'queued');
+        expect(blocked.map((b) => b.ability)).toEqual(['spark']);
     });
 
     it('con ventana en 0, no encola nada', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
-        // Desactivar la cola.
         w.data.player.commandQueueWindow = 0;
         w.commandCast('spark', aim(15, 10, e.id));
-        const block = w.commandCast('spark', aim(15, 10, e.id));
-        expect(block).toBe('gcd');
+        w.player.gcd = 0.01;
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('gcd');
     });
 
-    it('desencola varios hechizos en cadena', () => {
+    it('machacar la tecla no pierde lanzamientos: sale uno por cada GCD', () => {
         const w = arena();
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
-        e.health = 1e6; // inmortal para que no muera al primer spark
+        e.health = 1e6;
         const spark = w.spell('spark');
-        w.player.resource = w.player.maxResource; // asegurar recurso
-        // Lanzar el primero.
-        w.commandCast('spark', aim(15, 10, e.id));
-        w.drainEvents();
-        // Encolar dos más.
-        w.commandCast('spark', aim(15, 10, e.id));
-        w.commandCast('spark', aim(15, 10, e.id));
-        w.drainEvents(); // limpiar los queued.
-        // Esperar a que se procesen los dos encolados (cada GCD = 0.8s).
-        const ev = run(w, spark.globalCooldown * 3 + 0.3);
-        // run() ya devuelve los eventos drenados.
-        const casts = ev.filter((x) => x.type === 'cast');
-        expect(casts.length).toBeGreaterThanOrEqual(2);
+        let lanzados = 0;
+        const segundos = 6;
+        const paso = 0.1;
+        for (let t = 0; t < segundos; t += paso) {
+            w.player.resource = w.player.maxResource;
+            w.commandCast('spark', aim(15, 10, e.id));
+            lanzados += casts(run(w, paso)).length;
+        }
+        // Sin cola real saldría uno cada GCD más el hueco hasta la siguiente pulsación.
+        // Con ella, uno por GCD, con una tolerancia de un tick por lanzamiento.
+        expect(lanzados).toBeGreaterThanOrEqual(Math.floor(segundos / (spark.globalCooldown + DT)) - 1);
     });
 });

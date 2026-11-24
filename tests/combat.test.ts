@@ -49,9 +49,12 @@ describe('hechizos del jugador', () => {
         expect(w.commandCast('spark', aim(15, 10, e.id))).toBeNull();
         expect(w.player.resource).toBe(w.player.maxResource - spark.cost);
         expect(w.player.gcd).toBeCloseTo(spark.globalCooldown);
-        // Recast inmediato: JUG-06 encola el hechizo dentro de la ventana de GCD.
-        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
+        // Recast inmediato: al principio del GCD no se encola (CLA-COLA).
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('gcd');
         expect(w.checkCast(w.spell('basic'), e.id)).toBe('gcd');
+        // Al final del GCD, dentro de la ventana, sí (JUG-06 / CLA-COLA).
+        w.player.gcd = w.data.player.commandQueueWindow / 2;
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
         w.player.resource = spark.cost - 0.01;
         w.player.gcd = 0;
         expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('resource');
