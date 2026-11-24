@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-255: Enemigos no nacen en la calle ni los lotes de Los Santos (Junie)
+
+**Archivos:** `src/sim/zones.ts`, `src/sim/world.ts`, `tests/jl247_urbanizacion.test.ts`, `tests/simPurity.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Arreglo del hallazgo de JL-247: `ZonePopulation.scan()` podía colocar puntos de spawn de enemigos encima de la calle de Los Santos y dentro de los lotes de la urbanización. Se añadió el método opcional `spawnBlocked?(p: Vec2): boolean` a la interfaz `ZoneHost` en `src/sim/zones.ts`, se filtró en `scan()` y se implementó en `src/sim/world.ts` importando `insideStreet`/`insideLot` de `src/world/urbanizacion.ts`. Los puntos dentro de la calle o de un lote se descartan antes de añadirlos a la lista de anclas. `tests/simPurity.test.ts` actualizado para permitir `../world/urbanizacion` (código puro: datos JSON + funciones). No cambia la cantidad de enemigos en la zona, solo dónde no pueden nacer.
+
+**Validación:** 12 pruebas verdes en `tests/jl247_urbanizacion.test.ts` (9 originales + 3 nuevas JL-255). Suite completa 4854/4854. `npx tsc --noEmit` limpio.
+
+**Evidencia:** `tests/jl247_urbanizacion.test.ts`.
+
+---
+
 ## 2026-11-24 — JL-253: BOLSA_SIGUIENTE_4.md con 20 propuestas de pruebas (Junie)
 
 **Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_4.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

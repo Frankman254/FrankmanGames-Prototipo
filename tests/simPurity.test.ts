@@ -9,7 +9,9 @@ import { describe, expect, it } from 'vitest';
 
 const SIM_DIR = join(__dirname, '..', 'src', 'sim');
 // Las dependencias que sí puede tener el núcleo: datos y el modelo de contenido.
-const ALLOWED = ['../data', '../rpg', './', 'vitest', 'node:'];
+// ../world/urbanizacion es puro (datos JSON + funciones) — lo usa world.ts para
+// que spawnBlocked filtre la calle y los lotes de Los Santos (JL-255).
+const ALLOWED = ['../data', '../rpg', './', '../world/urbanizacion', 'vitest', 'node:'];
 
 function importSpecifiers(source: string): string[] {
     const out: string[] = [];

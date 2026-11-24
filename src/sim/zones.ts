@@ -158,6 +158,8 @@ export interface ZoneHost {
     active?(p: Vec2): boolean;
     rng: Rng;
     walkable(p: Vec2): boolean;
+    /** Puntos donde no puede nacer un enemigo (calle, lotes, etc.). Opcional. */
+    spawnBlocked?(p: Vec2): boolean;
     playerPos(): Vec2;
     /** Rango de niveles propio de un arquetipo (F20); sin él, la franja de la zona. */
     levelRange?(archetype: string): LevelRange | null;
@@ -316,6 +318,7 @@ export class ZonePopulation {
                 const z = this.map.zoneAt(p);
                 if (!z || z.safe || !this.host.walkable(p)) continue;
                 if (this.host.active && !this.host.active(p)) continue;
+                if (this.host.spawnBlocked && this.host.spawnBlocked(p)) continue;
                 let list = byZone.get(z.id);
                 if (!list) byZone.set(z.id, (list = []));
                 list.push(p);

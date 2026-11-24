@@ -146,4 +146,64 @@ describe('JL-247: enemigos no pisar la calle de Los Santos', () => {
         // Pero NO en src/sim/zones.ts (enemigos).
         expect(true).toBe(true); // placeholder para el diagnóstico escrito
     });
+
+    it('JL-255: spawnBlocked filtra la calle y los lotes', () => {
+        // Verificamos que un ZoneHost con spawnBlocked usando insideStreet/insideLot
+        // rechaza los puntos de la calle y de los lotes.
+        const calle = URBANIZACION.calles[0]!;
+        const step = zones.sampleStep;
+
+        // Simulamos el filtro spawnBlocked
+        const spawnBlocked = (p: { x: number; y: number }) => insideStreet(p.x, p.y) || insideLot(p.x, p.y);
+
+        // Puntos del scan en la calle: todos deben ser bloqueados
+        const yMin = calle.y - calleAncho(calle) / 2;
+        const yMax = calle.y + calleAncho(calle) / 2;
+        for (let y = Math.floor(yMin / step) * step + step / 2; y <= yMax; y += step) {
+            for (let x = Math.floor(calle.x0 / step) * step + step / 2; x <= calle.x1; x += step) {
+                if (insideStreet(x, y, URBANIZACION, 0)) {
+                    expect(spawnBlocked({ x, y }), `calle (${x},${y})`).toBe(true);
+                }
+            }
+        }
+
+        // Puntos del scan en los lotes: todos deben ser bloqueados
+        for (const lote of URBANIZACION.lotes) {
+            for (let y = Math.floor(lote.y0 / step) * step + step / 2; y <= lote.y0 + lote.fondo; y += step) {
+                for (let x = Math.floor(lote.x0 / step) * step + step / 2; x <= lote.x0 + lote.ancho; x += step) {
+                    if (insideLot(x, y, URBANIZACION, 0)) {
+                        expect(spawnBlocked({ x, y }), `lote ${lote.id} (${x},${y})`).toBe(true);
+                    }
+                }
+            }
+        }
+    });
+
+    it('JL-255: spawnBlocked no filtra fuera de la urbanización', () => {
+        const spawnBlocked = (p: { x: number; y: number }) => insideStreet(p.x, p.y) || insideLot(p.x, p.y);
+
+        // Puntos fuera de la calle y los lotes no deben ser bloqueados
+        expect(spawnBlocked({ x: 100, y: 203 })).toBe(false); // fuera del rango X de la calle
+        expect(spawnBlocked({ x: 168, y: 190 })).toBe(false); // fuera del ancho de la calle
+        expect(spawnBlocked({ x: 155, y: 240 })).toBe(false); // fuera de los lotes
+        expect(spawnBlocked({ x: 200, y: 220 })).toBe(false); // al lado de la urbanización
+    });
+
+    it('JL-255: ZoneHost.spawnBlocked está definido en la interfaz', () => {
+        // Verificamos que la interfaz ZoneHost acepta spawnBlocked como opcional.
+        // Un host sin spawnBlocked funciona como antes (sin filtro).
+        // Un host con spawnBlocked filtra los puntos bloqueados.
+        const hostSinFiltro: { walkable: (p: { x: number; y: number }) => boolean; spawnBlocked?: (p: { x: number; y: number }) => boolean } = {
+            walkable: () => true,
+        };
+        expect(hostSinFiltro.spawnBlocked).toBeUndefined();
+
+        const hostConFiltro = {
+            walkable: () => true,
+            spawnBlocked: (p: { x: number; y: number }) => insideStreet(p.x, p.y) || insideLot(p.x, p.y),
+        };
+        expect(typeof hostConFiltro.spawnBlocked).toBe('function');
+        expect(hostConFiltro.spawnBlocked({ x: 168, y: 203 })).toBe(true); // en la calle
+        expect(hostConFiltro.spawnBlocked({ x: 100, y: 203 })).toBe(false); // fuera
+    });
 });

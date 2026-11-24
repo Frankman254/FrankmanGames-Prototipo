@@ -76,6 +76,7 @@ import { levelRangeOf, sizeForLevel, type LevelRange } from './levelRange';
 import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
 import { isNight, WeatherSystem } from './weather';
 import { edgeDistance, evaluateTackle, type LockMode } from './lock';
+import { insideLot, insideStreet } from '../world/urbanizacion';
 import type { Element } from '../rpg/contracts';
 import {
     ElementalMarkTracker,
@@ -498,6 +499,7 @@ export class World implements SessionWorld {
                 {
                     rng: this.rng,
                     walkable: (p) => this.grid.walkable(p),
+                    spawnBlocked: (p) => insideStreet(p.x, p.y) || insideLot(p.x, p.y),
                     ...(z.shared ? { active: (p: Vec2) => z.shared!.isActive(p.x, p.y) } : {}),
                     playerPos: () => this.player.pos,
                     levelRange: (archetype) => this.levelRangeOf(archetype),
