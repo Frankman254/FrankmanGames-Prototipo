@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-282: orden y porcentajes del medidor de daño (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de modificar código: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron `src/ui/dev/damageMeterView.ts` ni sus pruebas.
+
+**Validación:** `npm test`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl282/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-281: etiquetas emergentes (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

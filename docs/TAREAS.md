@@ -349,6 +349,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
 - D-44, solo si hay choques reales entre agentes.
+- JL-282: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`. `npm test` (380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck` y `npm run docs:check` pasaron. Evidencia en `work/junie-jl282/INFORME.md`.
 - JL-274: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl274/INFORME.md`.
 - JL-275: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl275/INFORME.md`.
 - JL-277: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
