@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-271: chat (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de modificar código: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se inició la extracción de `src/ui/menus/chat.ts` ni se cambiaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npm run docs:check` correcto. La primera suite completa pasó (380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`); una repetición durante la validación falló solo por una medición transitoria de JL-70 (0,578 ms frente a 0,5 ms). JL-70 pasó aislada (15/15) y la última suite completa pasó con 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** La ruta del documento obligatorio se comprobó y devolvió que no existe. No aplica captura Electron porque no hubo cambio visual.
+
+---
+
 ## 2026-11-24 — JL-269: decoración del minimapa según escala (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

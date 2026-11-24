@@ -1496,7 +1496,7 @@ Contexto del coordinador:
 - [x] JL-268 `src/ui/map/worldMap.ts`: el encuadre del mapa grande y el paso de clic a mundo. — commit «JL-268: encuadre y clics del mapa grande» — 14/14 pruebas dirigidas; suite 4.911 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. Evidencia: `tests/mapView.test.ts`; sin captura (extracción matemática).
 - [!] JL-269 `src/ui/map/minimapDecor.ts`: qué decoración se dibuja según la escala. — BLOQUEADA: no existe `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa; no se modificó código. Línea base: typecheck limpio, suite 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-270 `src/ui/map/mapFeed.ts`: qué se manda al mapa y con qué frecuencia.
-- [ ] JL-271 `src/ui/menus/chat.ts`: filtro por pestañas, límite de líneas y órdenes con `/`.
+- [!] JL-271 `src/ui/menus/chat.ts`: filtro por pestañas, límite de líneas y órdenes con `/`. — BLOQUEADA: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código. `npx tsc --noEmit` y `npm run docs:check` limpios; suite final: 4.911 aprobadas, 1 omitida y 1 `todo`. Ejecución intermedia: JL-70 midió 0,578 ms frente a 0,5 ms; pasó aislada y en la suite final.
 - [ ] JL-272 `src/ui/menus/dialogue.ts`: el avance entre nodos del diálogo.
 - [ ] JL-273 `src/ui/menus/journal.ts` y `questTracker.ts`: el orden y el texto de las misiones.
 - [ ] JL-274 `src/ui/menus/drag.ts`: el ajuste de la ventana a los bordes de la pantalla.
