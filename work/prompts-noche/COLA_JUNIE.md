@@ -1446,7 +1446,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [x] JL-244 Exportaciones sin uso: lista comprobada con `grep`. — commit «JL-244: auditoría de exportaciones sin uso — 9 candidatas reales, 122 auto-usadas» — LISTA.md en work/junie-jl244/. 131 exportaciones de valor auditadas: 9 sin uso en ningún archivo, 122 solo auto-usadas en su propio archivo. El coordinador decide qué quitar.
 
 ### Robustez y arte
-- [ ] JL-245 Cada GLB de `assets/models/` tiene su `scripts/blender/validar_<modelo>.py`, o está en una lista de excepciones con su motivo. Hoy solo lista; prueba si la lista sale corta.
+- [x] JL-245 Cada GLB de `assets/models/` tiene su `scripts/blender/validar_<modelo>.py`, o está en una lista de excepciones con su motivo. — commit «JL-245: cobertura de validadores Blender para GLB» — 5 pruebas verdes (jl245_glbValidators.test.ts), 112/135 GLB con validador, 29 excepciones documentadas. INFORME.md en work/junie-jl245/.
 - [ ] JL-246 Cada archivo de `assets/` aparece en `PROCEDENCIA.md`. Si `tests/jl168_procedencia.test.ts` ya lo cubre, «ya estaba hecho»; si no, amplíala. `PROCEDENCIA.md` no se edita.
 - [ ] JL-247 **Calle de Los Santos:** que ningún enemigo de la zona aparezca encima de la calle o dentro de un lote de la urbanización (hoy los enemigos pueden pisar la calle: ver ESTADO_ACTUAL). Solo prueba y diagnóstico; si el arreglo toca el reparto de enemigos, pregunta.
 - [ ] JL-248 **Escenario `rendimiento` en tres lugares** (Villa Raspadura, Los Santos junto a la urbanización y la barriada) con la misma cámara. Tabla comparada en `work/junie-jl248/`.

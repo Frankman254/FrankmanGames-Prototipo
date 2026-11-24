@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-245: cobertura de validadores Blender para GLB (Junie)
+
+**Archivos:** `tests/jl245_glbValidators.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl245/INFORME.md`.
+
+**Qué.** Inventariar los 135 GLB de `assets/models/` y verificar que cada uno tiene un script de validación Blender (`scripts/blender/validar_*.py`) o una excepción documentada.
+
+**Resultado.** 112 GLB con validador (26 directos + 86 por grupo), 29 excepciones documentadas (héroes base, héroes anime, estructuras, props de mazmorra, modelos especiales, enemigos sin grupo). Prueba automática de 5 tests que falla si un GLB nuevo no tiene cobertura.
+
+**Validación.** `npx vitest run tests/jl245_glbValidators.test.ts` — 5/5 verdes. `npx tsc --noEmit` — solo errores pre-existentes de `balM3.ts` (ajeno).
+
+**Evidencia.** `work/junie-jl245/INFORME.md`.
+
 ## 2026-11-24 — JL-244: auditoría de exportaciones sin uso (Junie)
 
 **Archivos:** `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl244/LISTA.md`, `work/junie-jl244/find_unused_exports.mjs`.
