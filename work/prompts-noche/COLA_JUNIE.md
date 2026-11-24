@@ -1511,7 +1511,7 @@ Contexto del coordinador:
 - [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
 - [!] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; línea base: `npx tsc --noEmit` limpio y `npx vitest run` con 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl284/INFORME.md`.
 - [!] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; línea base: `npx tsc --noEmit` limpio y `npx vitest run` con 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl285/INFORME.md`.
-- [ ] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza.
+- [!] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl286/INFORME.md`.
 - [ ] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador.
 - [ ] JL-288 `src/render/gatherView.ts`: el estado visual de un recurso (lleno, gastado, rebrotando).
 - [ ] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven.
