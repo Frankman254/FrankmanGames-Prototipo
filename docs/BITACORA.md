@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-209: pruebas de enemy.ts (Junie)
+
+**Archivos:** `tests/jl209_enemy.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 26 pruebas para `src/rpg/enemy.ts` (EnemyActor): creación desde la definición (nombre, nivel, XP, equipo), escalado por nivel (XP, oro, tiradas extra, stats como fuente "level"), estadísticas base (maxHealth, moveSpeed, tackle/escape melee vs ranged, hechizo corto = melee), vida y daño (health getter/setter, takeDamage con onDamage, heal, alive), posición (expone body.pos), recompensa (rewarded inicia en false) e info (elemento y lootTable).
+
+**Validación:** `npx vitest run tests/jl209_enemy.test.ts` → 26/26 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-208: pruebas de traps.ts (Junie)
 
 **Archivos:** `tests/jl208_traps.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
