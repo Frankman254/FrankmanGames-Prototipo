@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-302: auditoría de arquetipos bloqueada (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-302 no figura como Autorizada en `docs/TAREAS.md`, por lo que no se inició la auditoría ni se inspeccionaron `data/assets.json`, los GLB o las pruebas. Además, falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, cuya ruta no existe.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl302/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-301: inventario de mallas de conjuntos (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
