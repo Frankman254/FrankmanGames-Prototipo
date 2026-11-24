@@ -117,6 +117,21 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 
 **Detalle técnico** (para contexto): en `src/sim/world.ts`, `hasLineOfSight()` devuelve `true` sin verificar para cualquier hechizo cuyo `area.type` no sea `'single'` (línea 991). Además, `shapeHitsCircle()` en la línea 1387 solo comprueba si el enemigo está dentro de la forma geométrica, sin mirar paredes. Captura en `work/junie-jl256/`.
 
+### JL-261 — Vuelo en la barriada (2026-11-24)
+
+| ID | Pregunta | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|---|
+| JL-261 | En la barriada de Praderas del Norte no puedes volar con una montura que vuele. La causa es técnica: la barriada comparte el sistema de "salas" con las casas y el banco, por lo que `interior=true` y `canFly()` lo bloquea. ¿Quieres que se permita volar en la barriada? | | | |
+
+**Opciones:**
+
+- **A — Permitir vuelo en la barriada, sin restricciones.** Se quita el bloqueo de `interior` para la barriada. El jugador vuela como en el mundo abierto.
+- **B — Permitir vuelo con tope de altura.** Por ejemplo, máximo 30 m sobre el suelo, para que se vean las casas desde arriba sin salir de la zona.
+- **C — Permitir vuelo con tope de altura y borde.** Tope de altura (p. ej., 30 m) y un radio máximo desde la piedra (p. ej., 80 m), para que no vuele más allá de las casas construidas.
+- **D — No permitir vuelo en la barriada.** Se mantiene el bloqueo; la barriada es un espacio peatonal.
+
+**Detalle técnico:** en `src/scenes/houseScene.ts:383`, `enter()` pasa `interior: true` a `makeWorld` para todas las salas, incluida la barriada. `canFly()` en `src/sim/world.ts:2903` devuelve `false` cuando `this.interior` es `true`. La barriada es un espacio exterior (calle, casas, cielo) pero usa la infraestructura de salas interiores. Si el creador elige A, B o C, el arreglo es pequeño: o bien `enterBarriada` pasa `interior: false`, o `canFly()` distingue la barriada de las salas cerradas.
+
 ## Pendiente de ti
 
 ### Probar en el juego

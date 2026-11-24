@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-261: Pregunta al creador sobre vuelo en la barriada (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl261/INFORME.md`.
+
+**Qué se hizo:** Diagnóstico de JL-219: en la barriada de Praderas del Norte no se puede volar con una montura que vuele. Causa raíz: `houseScene.ts:383` pasa `interior: true` a `makeWorld` para todas las salas, incluida la barriada; `canFly()` en `world.ts:2903` devuelve `false` cuando `this.interior` es `true`. La barriada es un espacio exterior (calle, casas, cielo) pero usa la infraestructura de salas interiores. Se escribió la pregunta en `docs/ACCIONES_CREADOR.md` con 4 opciones: A) vuelo sin restricciones, B) vuelo con tope de altura, C) vuelo con tope y borde, D) mantener bloqueo. Sin cambios de código.
+
+**Validación:** Sin código que cambiar. Suite 4862/4862 en verde, typecheck limpio.
+
+**Evidencia:** `work/junie-jl261/INFORME.md`, `docs/ACCIONES_CREADOR.md` (§ JL-261).
+
+---
+
 ## 2026-11-24 — JL-259: Validador GLB sin Blender (Junie)
 
 **Archivos:** `tests/jl259_glbValidator.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
