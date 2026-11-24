@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-266: verificación de la interfaz del editor (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** La tabla de ED-01 no deja correcciones de interfaz pendientes: el único fallo concreto (gizmo de mover/girar/escalar) ya se resolvió en ED-02 (`54748f9`); selección, paneles e inspector ya constaban como funcionales. El pincel de navegación solo figuraba como no probado, no como defectuoso, así que no se inventó un arreglo.
+
+**Validación:** `editorWorldBuilder` en Electron pasó 10/10, con selección desde jerarquía y viewport, arrastre real, giro, escala, deshacer/rehacer, duplicar/borrar, guardar/reabrir y consola limpia. `npx tsc --noEmit` limpio y `npx vitest run` con 4.908 pruebas en verde, 1 omitida y 1 `todo` (línea base sin cambios de código).
+
+**Evidencia:** Capturas revisadas en `work/qa/editor-world-builder-gizmo.jpg` y `work/qa/editor-world-builder-movido.jpg`.
+
+---
+
 ## 2026-11-24 — JL-265: Tema por profundidad en la cripta (Junie)
 
 **Archivos:** `src/data/dungeonSchema.ts`, `src/render/dungeonView.ts`, `data/dungeon.json`, `tests/jl265_dungeonTheme.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -330,6 +330,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
   - Q09, «Curas» sin origen y la tecla 1 en diálogos;
   - E03, editor de casas.
 
+## Cierre de la tanda 2026-11-24
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-266 | J | Hecho (commit «JL-266: confirmar la interfaz del editor en Electron»; sin cambios de código, hallazgos ya resueltos por ED-02) | Electron `editorWorldBuilder`: 10/10, incluida selección, arrastre, giro, escala, historial, duplicar/borrar y guardar/reabrir; consola limpia. Capturas revisadas: `work/qa/editor-world-builder-gizmo.jpg` y `work/qa/editor-world-builder-movido.jpg` |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
