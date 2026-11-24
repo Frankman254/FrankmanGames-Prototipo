@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-238: hechizos montado — medición (Junie)
+
+**Archivos:** `tests/jl238_mountSpells.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué.** Medición autorizada por el creador: qué hechizos se pueden lanzar con montura de tierra y voladora, cuáles se bloquean y con qué texto.
+
+**Resultado.** Con montura de tierra (mule, tapir, horse) y con montura voladora en el suelo, todos los hechizos funcionan normalmente. Solo en vuelo activo (F21 presionado) se bloquean **todos** los hechizos con el motivo `flying` y el texto `"En vuelo no se lanzan hechizos"`. El bloqueo es binario: no hay distinción por tipo de hechizo. `commandCast` en `src/sim/world.ts` intercepta antes que `checkCast`, por lo que la barra no refleja el bloqueo por vuelo en `hotbarState()`.
+
+**Evidencia.** 11 pruebas verdes (`tests/jl238_mountSpells.test.ts`), INFORME.md en `work/junie-jl238/`.
+
+---
+
 ## 2026-11-23 — JL-237: escenario guardadoBarriadaCasa — hallazgo de guardado en interiores (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
