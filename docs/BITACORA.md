@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-210: pruebas de noise.ts (Junie)
+
+**Archivos:** `tests/jl210_noise.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 21 pruebas puras de `src/world/noise.ts`: valueNoise (determinismo con misma semilla, cambia con distinta semilla, rango [0,1) con 100 semillas × 577 coordenadas, puntos enteros estables, continuidad entre vecinos a 0.01 de distancia, puntos lejanos no correlacionados, coordenadas negativas, suavidad fraccionaria con 21 muestras, periodicidad en X, Y y negativos, period=0 no periódico) y fbm (determinismo, rango [0,1), continuidad, más octavas = más detalle, persistence=0 iguala 1 octava, scale controla frecuencia, coordenadas negativas, periodicidad).
+
+**Validación:** `npx vitest run tests/jl210_noise.test.ts` → 21/21 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-209: pruebas de enemy.ts (Junie)
 
 **Archivos:** `tests/jl209_enemy.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
