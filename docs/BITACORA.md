@@ -1,3 +1,21 @@
+## 2026-11-24 — Tanda de OMP: Blender y programador (coordinador)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_OMP.md` (ignorado por Git).
+
+**Qué se hizo:** La cola de OMP tiene una tanda nueva con dos listas ordenadas.
+- **Modo Blender**, 13 tareas:
+  - primero OMP-PB-01, porque cinco tareas de Junie esperan el kit de Puertobelo;
+  - luego OMP-BARR-01, el asiento de las monturas (PJ-03), y las tareas nuevas OMP-BARR-02 y 03 (casas nuevas y utilería de calle);
+  - después POL-13, las cejas y los ojos de los héroes (CR1 y CR2) y POL-10;
+  - al final OMP-BARR-04…06 (tienda, autos y parque) y POL-11.
+- **Modo programador**, 5 tareas: UI-04, VIS-02, POL-12, POL-02b y ED-04.
+
+Solo OMP-BARR-02…06 son nuevas; el resto ya estaba autorizado.
+
+**Validación:** `npm run docs:check`.
+
+---
+
 ## 2026-11-24 — JL-245: cobertura de validadores Blender para GLB (Junie)
 
 **Archivos:** `tests/jl245_glbValidators.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl245/INFORME.md`.
