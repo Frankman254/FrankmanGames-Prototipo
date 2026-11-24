@@ -1,3 +1,16 @@
+## 2026-11-23 — JL-226/227/228: crestalba en verde, mercaderes ya cubiertos, referencias de misiones (Junie)
+
+**Archivos:** `tests/jl228_questRefs.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **JL-226:** Reintento de JL-85 (`crestalba` no carga y cae CDP). El escenario `crestalba` pasa 5/5 con el arnés actual: 33 meshes, 7 clips (idle_ground, walk, run, takeoff, fly_idle, fly_forward, land), rider_root confirmado, 59.6 FPS, sin errores. Ya resuelto por JL-85b (commit `49501d48`). Sin cambios de código.
+- **JL-227:** Verificar que todo objeto vendido por mercaderes existe. Ya cubierta por `tests/jl13_dataIntegrity.test.ts:167-188` ("merchants apuntan a items existentes") y `tests/d45_contentCheck.test.ts:264-268` (prueba sintética con merchant roto). Sin cambios.
+- **JL-228:** Cada misión cita PNJ, monstruos y objetos que existen. `jl13` ya valida giver/turnIn (PNJ), objectives.itemId y rewards (objetos). Pero no validaba `objectives.type "kill"` → `archetypes` (enemies.json) ni `objectives.type "talk"` → `npcId` (npcs.json). Nuevas pruebas en `tests/jl228_questRefs.test.ts`: 4 tests (kill→archetypes, talk→npcId, fish→itemIds, prueba sintética con archetype inexistente).
+
+**Verificación:** `npx vitest run tests/jl228_questRefs.test.ts` → 4/4 verdes. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). Escenario `crestalba` en Electron: 5/5.
+
+---
+
 ## 2026-11-23 — JL-225: reintento de JL-74 — ya estaba hecho (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl225/DIAGNOSTICO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

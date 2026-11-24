@@ -1415,12 +1415,12 @@ Contexto del coordinador:
 ### Hallazgos pendientes
 - [x] JL-224 **El pez no llega a la mochila** (hallazgo de JL-197: `reel()` no da botín en el arnés). — commit «JL-224: escenario pesca — hook en tick() y verificación por consola» — Escenario pesca 6/6, tests jl206_fishing 25/25, tsc sin errores nuevos. El juego funciona correctamente; el bug era del arnés (pérdida de ventana de reacción + bag.slots no serializable). DIAGNOSTICO.md en work/junie-jl224/.
 - [x] JL-225 Reintento de **JL-74** (solape de personaje y mascota en el escenario `barra`), con el arnés actual y lo aprendido en JL-181…201. — commit «JL-225: escenario barra ya en verde — sin cambios de código» — Escenario barra 6/6 en Electron. JL-74b (49501d48) ya corrigió el solape; el arnés actualizado no introdujo regresiones. DIAGNOSTICO.md en work/junie-jl225/.
-- [ ] JL-226 Reintento de **JL-85** (`crestalba` no carga y cae CDP), con el arnés actual. Si sigue sin display, deja el diagnóstico exacto y la orden para que el creador lo corra.
+- [x] JL-226 Reintento de **JL-85** (`crestalba` no carga y cae CDP), con el arnés actual. — commit «JL-226/227/228: crestalba en verde, mercaderes ya cubiertos, referencias de misiones» — Escenario crestalba 5/5 (33 meshes, 7 clips, rider_root, 59.6 FPS). JL-227 ya cubierta por jl13_dataIntegrity.test.ts:167-188. JL-228: 4 pruebas nuevas (jl228_questRefs.test.ts): kill→archetypes, talk→npcId, fish→itemIds, prueba sintética. Evidencia en work/junie-jl228/.
 
 ### Datos y contenido
 Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. Si la hay, «ya estaba hecho» con la ruta.
-- [ ] JL-227 Todo objeto que venden los mercaderes existe en los objetos del juego. Prueba con un mercader sintético que venda un id inexistente y haga fallar la comprobación.
-- [ ] JL-228 Cada misión cita PNJ, monstruos y objetos que existen.
+- [x] JL-227 Todo objeto que venden los mercaderes existe en los objetos del juego. — ya estaba hecho (jl13_dataIntegrity.test.ts:167-188 "merchants apuntan a items existentes" + d45_contentCheck.test.ts:264-268). Commit junto con JL-226/228.
+- [x] JL-228 Cada misión cita PNJ, monstruos y objetos que existen. — commit «JL-226/227/228: crestalba en verde, mercaderes ya cubiertos, referencias de misiones» — 4 pruebas verdes (jl228_questRefs.test.ts): kill→archetypes, talk→npcId, fish→itemIds, prueba sintética. jl13 ya cubre giver/turnIn/items. Evidencia en tests/jl228_questRefs.test.ts.
 - [ ] JL-229 Cada zona hostil de `data/zones.json` tiene al menos un área, y todas sus áreas caen dentro del mundo.
 - [ ] JL-230 Cada clip que pide `data/animation.json` existe en su GLB.
 - [ ] JL-231 Cada Piedra Pintada de `data/stones.json` cae dentro del mundo y en celda transitable, o es la entrada de una zona aparte conocida (hoy solo `praderas_norte`), y tiene nombre en inglés.
