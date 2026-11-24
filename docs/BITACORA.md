@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-212: pruebas de switchableGround.ts (Junie)
+
+**Archivos:** `tests/jl212_switchableGround.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 15 pruebas puras de `src/world/switchableGround.ts` (SwitchableHeightField): sin flatHeight devuelve el terreno base, flatHeight activa devuelve altura plana en todos los puntos, quitar flatHeight restaura el terreno, flatHeight con relief suma el relieve, quitar relief mantiene flatHeight sin relieve, quitar flatHeight con relief activa vuelve al terreno base, flatHeight cero es válido, flatHeight negativo es válido, relief con valores negativos resta a flatHeight, conserva las propiedades del base (width, depth, step, origin), interpolación del terreno base sin flatHeight, flatHeight ignora la interpolación, cambiar flatHeight varias veces, cambiar relief varias veces, relief depende de las coordenadas (x, z).
+
+**Validación:** `npx vitest run tests/jl212_switchableGround.test.ts` → 15/15 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-211: pruebas de shape.ts (Junie)
 
 **Archivos:** `tests/jl211_shape.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
