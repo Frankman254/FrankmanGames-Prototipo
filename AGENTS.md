@@ -15,8 +15,11 @@ Documentación vigente:
 ## Autoridad
 
 - Solo el creador decide reglas de juego, historia, nombres y cifras. Las únicas reglas de juego vigentes son las `DEC-*` de `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que no se modifica, y las decisiones fechadas de `docs/diseno/00_DECISIONES.md`.
+  - En esta Mac las carpetas vecinas (`../FrankmanGames/`, `../Dofus-ReverseEngineering/`, `../FATE-ReverseEngineering/`) **no existen**. Las `DEC-*` (DEC-2026-001…005) están en `docs/referencias/FRANKMANGAMES.md`, la copia portátil hecha a petición del creador: se lee esa. Que falte una carpeta vecina no bloquea ninguna tarea.
 - Las propuestas de agentes, los tests en verde y las cifras de `data/` (`PROPUESTA`) no son aprobación. El silencio del creador no autoriza nada.
 - Un agente solo ejecuta las tareas que `docs/TAREAS.md` marca **Autorizada**. Las dudas se anotan en la tarea o en `ACCIONES_CREADOR.md`; el coordinador decide si bloquean.
+  - Una fila de lote (`JL-254…JL-353 | Autorizada`) autoriza cada tarea del lote, aunque no tenga fila propia.
+  - Si dos tareas seguidas se bloquean por **la misma causa**, el agente para la cola, lo anota una vez en `ACCIONES_CREADOR.md` y termina la sesión. No se bloquean tareas en serie.
 - Las respuestas originales del creador (`docs/FrankmanGames_Respuestas_Originales_Intactas.md`, `docs/PREGUNTAS_CREADOR.md`) y las skills de `.agents/skills/` se conservan intactas.
 
 ## Reglas duras
@@ -102,7 +105,7 @@ Cada encargo, en `TAREAS.md` o en la cola, dice:
 
 ## Leer antes de escribir código
 
-1. `../FrankmanGames/04_VISION_Y_DECISIONES.md` (`DEC-*`).
+1. Las `DEC-*`: `docs/referencias/FRANKMANGAMES.md` (en Windows, `../FrankmanGames/04_VISION_Y_DECISIONES.md`).
 2. `docs/diseno/README.md` y `docs/diseno/00_DECISIONES.md`.
 3. `docs/ARQUITECTURA.md`.
-4. Solo si la tarea lo pide: `../FrankmanGames/07_PROPUESTA_PROTOTIPO_JUGABLE.md`, `../FrankmanGames/08_CONSOLIDADO_ANALISIS.md`, `../Dofus-ReverseEngineering/guia/GUIA_PROYECTO.md` y las fichas de `../FrankmanGames/fichas/FATE/` y `../Dofus-ReverseEngineering/fichas/`.
+4. Solo si la tarea lo pide y la carpeta existe (en Mac no existe; ver `docs/referencias/`): `../FrankmanGames/07_PROPUESTA_PROTOTIPO_JUGABLE.md`, `../FrankmanGames/08_CONSOLIDADO_ANALISIS.md`, `../Dofus-ReverseEngineering/guia/GUIA_PROYECTO.md` y las fichas de `../FrankmanGames/fichas/FATE/` y `../Dofus-ReverseEngineering/fichas/`.
