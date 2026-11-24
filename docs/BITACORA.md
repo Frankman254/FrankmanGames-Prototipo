@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-231: prueba de posición y traducción de Piedras Pintadas (Junie)
+
+**Archivos:** `tests/jl231_stones.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Prueba dedicada que verifica las 24 Piedras Pintadas de `data/stones.json`: (1) cada una cae dentro del mundo por páginas; (2) cada una está en tierra de Panamá (no en país vecino); (3) cada una, salvo `praderas_norte`, tiene sitio de llegada transitable (usando `prepareStoneArrival` para cargar la página antes de verificar); (4) `praderas_norte` se confirma como entrada de la barriada (fuera de la parcela principal); (5) cada piedra tiene nombre en inglés en `data/i18n/en.content.json` (24/24, sin duplicados).
+
+**Verificación:** `npx vitest run tests/jl231_stones.test.ts` → 6/6 verdes. `npx tsc --noEmit` sin errores nuevos. Suite completa 4403/4403.
+
+---
+
 ## 2026-11-23 — JL-230: clips de animation.json vs. rigs procedurales (Junie)
 
 **Archivos:** `tests/jl230_animationClips.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
