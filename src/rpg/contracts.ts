@@ -947,6 +947,8 @@ export interface SavePlace {
     name?: string;
     /** CLA-BARR1: true si el jugador estaba dentro de la barriada de Praderas del Norte. */
     barriada?: boolean;
+    /** JL-254: ID de la sala interior (hogar, taller, salon, casa, casaEspejo) si el jugador estaba dentro de una casa. */
+    houseRoom?: string;
 }
 
 // ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────

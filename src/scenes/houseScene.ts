@@ -303,6 +303,11 @@ export class HouseScene {
         return this.room === 'barriada';
     }
 
+    /** JL-254: ID de la sala actual (para guardar/cargar). */
+    get currentRoom(): RoomId | null {
+        return this.room;
+    }
+
     get place(): { name: string; levelMin: number; levelMax: number } | null {
         return this.room ? { name: ROOMS[this.room].name, levelMin: 1, levelMax: 1 } : null;
     }

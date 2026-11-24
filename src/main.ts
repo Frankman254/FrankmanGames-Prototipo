@@ -1081,6 +1081,11 @@ function enterPlace(place: SavePlace | null, seed: number, dungeonState?: Dungeo
             const stone = stones.get(BARRIADA_STONE);
             if (stone) houses?.enterBarriada(arriveAt(stone));
         }
+        // JL-254: si el guardado era dentro de una casa, entrar de nuevo en la sala.
+        else if (place?.houseRoom && houses) {
+            const at = r.pos;
+            houses.enter({ door: at, outside: { ...at }, rotDeg: 0 }, place.houseRoom as 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo');
+        }
         return;
     }
     if (r.kind === 'dungeon') {
@@ -1107,6 +1112,8 @@ function currentPlace(): SavePlace {
     const inside = crypt?.inside ?? false;
     const inBarriada = houses?.inBarriada ?? false;
     const zone = bank?.inside ? 'El Cruce' : inBarriada ? 'Praderas del Norte' : houses?.inside ? 'Villa Raspadura' : worldInfo().zone;
+    // JL-254: guardar la sala si el jugador está dentro de una casa (no la barriada).
+    const houseRoom = houses?.inside && !houses.inBarriada ? houses.currentRoom ?? null : null;
     return {
         scene: inside ? 'dungeon' : 'overworld',
         dungeon: inside ? 'crypt' : null,
@@ -1119,6 +1126,7 @@ function currentPlace(): SavePlace {
         playSeconds: Math.round(playSeconds),
         ...(zone ? { name: zone } : {}),
         ...(inBarriada ? { barriada: true } : {}),
+        ...(houseRoom ? { houseRoom } : {}),
     };
 }
 

@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-254: Guardar dentro de la casa y la barriada (Junie)
+
+**Archivos:** `src/rpg/contracts.ts`, `src/scenes/houseScene.ts`, `src/main.ts`, `tests/jl254_houseRoomSave.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Arreglo del hallazgo de JL-237: al guardar dentro de una casa (hogar, taller, salón, casa del creador) y cargar la partida, el jugador aparecía fuera de la puerta sin entrar en la escena interior. `SavePlace` tenía `barriada?: boolean` para la barriada, pero no campo para las salas de casas. Se añadió `houseRoom?: string` a `SavePlace`, se expuso `HouseScene.currentRoom`, `currentPlace()` guarda el ID de la sala cuando el jugador está dentro de una casa (no la barriada), y `enterPlace()` restaura la sala con `houses.enter()`.
+
+**Validación:** 7 pruebas verdes en `tests/jl254_houseRoomSave.test.ts`. Suite completa 4851/4851. `npx tsc --noEmit` limpio. Escenario Electron no ejecutado (CDP no disponible de forma confiable).
+
+**Evidencia:** `work/junie-jl254/INFORME.md`.
+
+---
+
 ## 2026-11-24 — JL-252: Cierre de reintentos JL-204…JL-251 (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl252/INFORME.md`.
