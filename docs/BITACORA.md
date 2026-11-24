@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-295: transición de piso bloqueada por documento rector ausente (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/scenes/cryptScene.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron código ni pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** La ruta del documento rector no existe. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-294: celdas del grid bloqueadas por documento rector ausente (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

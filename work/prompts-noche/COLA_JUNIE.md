@@ -1520,7 +1520,7 @@ Contexto del coordinador:
 - [!] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble). — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
 - [!] JL-294 `src/render/gridView.ts`: qué celdas se pintan. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; no se inspeccionó ni modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [ ] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon.
+- [!] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-296 `src/editor/hotApply.ts`: qué se rehace según el archivo cambiado.
 
 ### D. Datos y contenido
