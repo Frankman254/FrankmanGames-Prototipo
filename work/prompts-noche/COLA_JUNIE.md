@@ -1440,7 +1440,8 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [x] JL-241 **Hechizos junto a paredes.** — commit «JL-241: diagnóstico de hechizos junto a paredes» — DIAGNOSTICO.md en work/junie-jl241/. Los hechizos de single-target no atraviesan paredes (hasLineOfSight verifica grid), pero los de área (línea, cono) SÍ alcanzan enemigos detrás de paredes: targetsOf() usa shapeHitsCircle() puramente matemático, sin awareness de obstáculos. Los efectos visuales tampoco se bloquean. Electrón funciona (previa 9/11, cripta 3/3), pero no se creó escenario dedicado (solo diagnóstico).
 
 ### Calidad del código (solo `src/sim/`, `src/world/` y `src/rpg/`)
-- [ ] JL-242 Ningún `.catch()` vacío: cada uno registra el error. Lista y arreglos de una línea.
+- [x] JL-242 Ningún `.catch()` vacío: cada uno registra el error. Lista y arreglos de una línea.
+  — commit «JL-242: catch vacíos — ya estaba hecho» — 0 catch vacíos en src/sim/, src/world/, src/rpg/. El único catch (designedDungeon.ts:108) ya registra el error. INFORME.md en work/junie-jl242/.
 - [ ] JL-243 `as any` y `as unknown as`: lista con archivo y línea, y quita solo los que se resuelvan con un tipo que ya exista. El resto, en la lista con su motivo.
 - [ ] JL-244 Exportaciones sin uso: lista comprobada con `grep`. **No borres nada**: el coordinador decide.
 

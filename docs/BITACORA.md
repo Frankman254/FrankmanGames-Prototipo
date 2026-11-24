@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-242: catch vacíos — ya estaba hecho (Junie)
+
+**Archivos:** `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl242/INFORME.md`.
+
+**Qué.** Verificar que ningún `.catch()` en `src/sim/`, `src/world/` y `src/rpg/` esté vacío — cada uno debe registrar el error.
+
+**Resultado.** No hay ningún `.catch()` vacío. `src/sim/` y `src/rpg/` no contienen ningún bloque `try/catch` ni `.catch()`. `src/world/` tiene un solo `catch` en `designedDungeon.ts:108` que ya registra el error en el retorno `{ ok: false, errors: [...] }`. Sin cambios de código necesarios.
+
+**Evidencia:** `work/junie-jl242/INFORME.md` con tabla de búsqueda por directorio.
+
+---
+
 ## 2026-11-24 — JL-241: hechizos junto a paredes — diagnóstico (Junie)
 
 **Archivos:** `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl241/DIAGNOSTICO.md`.
