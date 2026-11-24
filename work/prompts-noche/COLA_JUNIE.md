@@ -1526,7 +1526,7 @@ Contexto del coordinador:
 ### D. Datos y contenido
 Antes de cada una, busca si ya existe.
 - [!] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md` antes de modificar traducciones o su presentación; hallazgos y verificación en `work/junie-jl297/INFORME.md`.
-- [ ] JL-298 Cada objeto tiene icono y el archivo del icono existe.
+- [!] JL-298 Cada objeto tiene icono y el archivo del icono existe. — BLOQUEADA: no figura como Autorizada en `docs/TAREAS.md`; no se inició la auditoría de iconos. Evidencia: `work/junie-jl298/INFORME.md`; `npx tsc --noEmit` limpio, `npx vitest run`: 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-299 Cada efecto que pide `data/fx.json` existe (partículas y texturas).
 - [ ] JL-300 Cada sonido que piden los datos existe en `assets/audio/`, y ningún archivo de audio sobra.
 - [ ] JL-301 Cada pieza de conjunto de `data/rpg/sets` tiene su malla o queda en una lista de pendientes.

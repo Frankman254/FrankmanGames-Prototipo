@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-298: auditoría de iconos bloqueada por falta de autorización (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** La primera casilla pendiente de la cola no aparece como Autorizada en `docs/TAREAS.md`. Por la regla del proyecto, no se inició la inspección de objetos ni iconos y no se modificaron datos, assets, código ni pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl298/INFORME.md`. No aplica captura Electron porque no hubo cambio visual.
+
+---
+
 ## 2026-11-24 — JL-297: paridad i18n bloqueada por documento rector ausente (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

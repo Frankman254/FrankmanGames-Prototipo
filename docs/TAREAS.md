@@ -353,6 +353,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-294 | J | Bloqueada | No se inspeccionó ni modificó `src/render/gridView.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 | JL-295 | J | Bloqueada | No se inspeccionó ni modificó `src/scenes/cryptScene.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 | JL-297 | J | Bloqueada | La paridad de i18n requiere cambios en traducciones y en el chat de combate, pero falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se modificaron datos, código ni pruebas. Evidencia: `work/junie-jl297/INFORME.md`; tsc limpio, suite 4.911 aprobadas/1 omitida/1 `todo`, tests i18n dirigidos 13/13 |
+| JL-298 | J | Bloqueada | No se inició la auditoría de iconos: JL-298 no figura como Autorizada en este tablero. No se modificaron datos, assets, código ni pruebas. Evidencia: `work/junie-jl298/INFORME.md`; `npx tsc --noEmit` limpio, `npx vitest run`: 4.911 aprobadas, 1 omitida y 1 `todo` |
 
 ## Bloqueadas
 
@@ -368,3 +369,4 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 - JL-290: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base. Evidencia en `work/junie-jl290/INFORME.md`.
 - JL-294: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
 - JL-295: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
+- JL-298: bloqueada porque no figura como Autorizada en este tablero; no se inició la auditoría de iconos. Línea base: typecheck y suite completa en verde. Evidencia en `work/junie-jl298/INFORME.md`.
