@@ -107,6 +107,8 @@ export class Atmosphere {
     weather: { dim: number; fog: number; tint: [number, number, number] } = { dim: 0, fog: 0, tint: [1, 1, 1] };
     state: LightState;
     private readonly tmp = new Vector3();
+    /** CLA-BARR2: farolas de una zona aparte (la barriada); mientras no es null, sustituye a las del mapa. */
+    zoneLamps: readonly LampPost[] | null = null;
     /** Interior (piso de mazmorra): luz fija sin ciclo de día y antorchas en lugar de farolas. */
     private interior: { light: DungeonLightDef; torches: readonly LampPost[]; time: number } | null = null;
 
@@ -385,9 +387,10 @@ export class Atmosphere {
         );
         if (this.lampPick-- <= 0) {
             this.lampPick = 15;
-            const idx = on > 0.01 ? nearestLamps(this.lamps, focus.x, focus.z, this.lampLights.length) : [];
+            const lamps = this.zoneLamps ?? this.lamps;
+            const idx = on > 0.01 ? nearestLamps(lamps, focus.x, focus.z, this.lampLights.length) : [];
             this.lampLights.forEach((l, i) => {
-                const lamp = idx[i] !== undefined ? this.lamps[idx[i]!] : undefined;
+                const lamp = idx[i] !== undefined ? lamps[idx[i]!] : undefined;
                 lightOn(l, lamp !== undefined);
                 if (lamp) l.position.set(lamp.x, lamp.y - 0.3, lamp.z);
             });

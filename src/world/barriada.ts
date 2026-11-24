@@ -116,9 +116,117 @@ export function barriadaCasas(def: BarriadaDef = BARRIADA): BarriadaCasa[] {
     });
 }
 
-/** Lo que no se pisa: cada casa entera (no se entra a las de la barriada). */
+/** Lo que no se pisa: cada casa entera (no se entra a las de la barriada), postes y troncos. */
 export function barriadaSolids(def: BarriadaDef = BARRIADA): RectObstacle[] {
-    return barriadaCasas(def).map((c) => ({ x: c.x, y: c.y, w: PLANTA.ancho, d: PLANTA.fondo }));
+    return [
+        ...barriadaCasas(def).map((c) => ({ x: c.x, y: c.y, w: PLANTA.ancho, d: PLANTA.fondo })),
+        ...barriadaFarolas(def).map((f) => ({ x: f.x, y: f.y, w: 0.3, d: 0.3 })),
+        ...barriadaArboles(def).map((a) => ({ x: a.x, y: a.y, w: 0.4 * a.escala, d: 0.4 * a.escala })),
+    ];
+}
+
+/** Farola en la franja de grama. `haciaY`: hacia dónde cuelga el farol (el centro de la calle). */
+export interface BarriadaFarola {
+    x: number;
+    y: number;
+    haciaY: 1 | -1;
+}
+
+/** Árbol: `especie` es un tipo de `data/vegetation.json`. */
+export interface BarriadaArbol {
+    x: number;
+    y: number;
+    especie: string;
+    escala: number;
+    rotDeg: number;
+}
+
+/** Centro de la franja de grama de una calle, a un lado (+1: hacia +y). */
+function franja(def: BarriadaDef, calleY: number, lado: 1 | -1): number {
+    const c = def.calle;
+    return def.origen.y + calleY + lado * (c.calzada / 2 + c.cordon + c.grama / 2);
+}
+
+/**
+ * CLA-BARR2: una farola cada tres lotes, alternando la acera, en la linde entre dos lotes. Ahí no
+ * hay andén ni entrada de auto: las dos caen dentro del ancho de la casa.
+ */
+export function barriadaFarolas(def: BarriadaDef = BARRIADA): BarriadaFarola[] {
+    const out: BarriadaFarola[] = [];
+    const { ancho } = def.lote;
+    for (const c of def.calles)
+        for (const [a, b] of c.tramos) {
+            const n = Math.floor((b - a) / ancho);
+            const start = a + (b - a - n * ancho) / 2;
+            for (let i = 1, k = 0; i < n; i += 3, k++) {
+                const lado: 1 | -1 = k % 2 === 0 ? 1 : -1;
+                out.push({ x: def.origen.x + start + i * ancho, y: franja(def, c.y, lado), haciaY: lado === 1 ? -1 : 1 });
+            }
+        }
+    return out;
+}
+
+/** Especies de calle y de parque: las de un barrio de Panamá. */
+const ESPECIES_CALLE = ['roble', 'guayacan', 'indio_desnudo'] as const;
+const ESPECIES_PARQUE = ['roble', 'guayacan', 'palma', 'indio_desnudo', 'arbol_panama', 'corotu'] as const;
+
+/**
+ * CLA-BARR2: árboles en la franja de grama (en lindes de lote sin farola, uno de cada tres) y en los
+ * terrenos que no son lote, calle ni plaza (los extremos de cada calle y los bordes de la zona).
+ */
+export function barriadaArboles(def: BarriadaDef = BARRIADA): BarriadaArbol[] {
+    const out: BarriadaArbol[] = [];
+    const pick = <T>(list: readonly T[], h: number): T => list[h % list.length]!;
+    const { ancho } = def.lote;
+    for (const c of def.calles)
+        c.tramos.forEach(([a, b], t) => {
+            const n = Math.floor((b - a) / ancho);
+            const start = a + (b - a - n * ancho) / 2;
+            for (let i = 1; i < n; i++) {
+                if ((i - 1) % 3 === 0) continue; // ahí va la farola
+                for (const lado of [1, -1] as const) {
+                    const h = hash(`${c.id}_${t}_${i}_${lado}`);
+                    if (h % 3 !== 0) continue;
+                    out.push({
+                        x: def.origen.x + start + i * ancho,
+                        y: franja(def, c.y, lado),
+                        especie: pick(ESPECIES_CALLE, h >>> 4),
+                        escala: 0.7 + ((h >>> 12) % 100) / 400,
+                        rotDeg: (h >>> 20) % 360,
+                    });
+                }
+            }
+        });
+    // Parques: rejilla de 9 m con un poco de desorden fijo, fuera de lotes, calles y plaza.
+    const b = barriadaBounds(def);
+    const lotes = barriadaLotes(def);
+    const losas = barriadaLosas(def);
+    const plaza = { x: def.origen.x + def.plaza.x, y: def.origen.y + def.plaza.y };
+    const libre = (x: number, y: number): boolean =>
+        x > b.x0 + 4 &&
+        x < b.x1 - 4 &&
+        y > b.y0 + 4 &&
+        y < b.y1 - 4 &&
+        !lotes.some((l) => x > l.x0 - 2 && x < l.x0 + l.ancho + 2 && y > l.y0 - 2 && y < l.y0 + l.fondo + 2) &&
+        !losas.some((l) => x > l.x0 - 3 && x < l.x1 + 3 && y > l.y0 - 3 && y < l.y1 + 3) &&
+        Math.abs(x - plaza.x) > 16 &&
+        Math.abs(y - plaza.y) > 12;
+    for (let gx = b.x0 + 6; gx < b.x1; gx += 9)
+        for (let gy = b.y0 + 6; gy < b.y1; gy += 9) {
+            const h = hash(`parque_${gx}_${gy}`);
+            if (h % 5 === 0) continue; // claros
+            const x = gx + ((h >>> 3) % 50) / 10 - 2.5;
+            const y = gy + ((h >>> 9) % 50) / 10 - 2.5;
+            if (!libre(x, y)) continue;
+            out.push({
+                x,
+                y,
+                especie: pick(ESPECIES_PARQUE, h >>> 15),
+                escala: 0.8 + ((h >>> 21) % 100) / 200,
+                rotDeg: (h >>> 7) % 360,
+            });
+        }
+    return out;
 }
 
 /** Dónde aparece el personaje y dónde está la piedra de vuelta. */

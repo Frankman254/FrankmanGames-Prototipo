@@ -7,7 +7,9 @@ import { NavGrid } from '../src/sim/navGrid';
 import { PLANTA, casaCreadorDoor } from '../src/world/casaCreador';
 import {
     BARRIADA,
+    barriadaArboles,
     barriadaBounds,
+    barriadaFarolas,
     barriadaCalleAncho,
     barriadaCasas,
     barriadaInicio,
@@ -154,5 +156,44 @@ describe('CLA-BARR1 barriada de Praderas del Norte', () => {
             expect(l.x1).toBeGreaterThan(l.x0);
             expect(l.y1).toBeGreaterThan(l.y0);
         }
+    });
+    // CLA-BARR2: farolas y árboles.
+    it('farolas en la grama de todas las calles, sin pisar andenes ni entradas de auto', () => {
+        const farolas = barriadaFarolas();
+        for (const c of BARRIADA.calles) {
+            const cy = BARRIADA.origen.y + c.y;
+            const mias = farolas.filter((f) => Math.abs(f.y - cy) < barriadaCalleAncho() / 2);
+            expect(mias.length, c.id).toBeGreaterThan(3);
+            for (const f of mias) {
+                // En la franja de grama, entre el cordón y la acera, y colgando hacia la calle.
+                const d = Math.abs(f.y - cy);
+                expect(d).toBeGreaterThan(BARRIADA.calle.calzada / 2 + BARRIADA.calle.cordon);
+                expect(d).toBeLessThan(BARRIADA.calle.calzada / 2 + BARRIADA.calle.cordon + BARRIADA.calle.grama);
+                expect(Math.sign(cy - f.y)).toBe(f.haciaY);
+            }
+        }
+        const pasos = barriadaLosas().filter((l) => l.pieza === 'concreto');
+        for (const p of [...farolas, ...barriadaArboles()]) {
+            const pisa = pasos.some((l) => p.x > l.x0 - 0.3 && p.x < l.x1 + 0.3 && p.y > l.y0 - 0.3 && p.y < l.y1 + 0.3);
+            expect(pisa, `${p.x},${p.y}`).toBe(false);
+        }
+    });
+
+    it('ningún árbol cae en la calzada, dentro de un lote ni fuera de la zona, y son los de siempre', () => {
+        const arboles = barriadaArboles();
+        expect(arboles.length).toBeGreaterThan(100);
+        const vegetation = JSON.parse(readFileSync('data/vegetation.json', 'utf-8')) as {
+            kinds: Record<string, { shape: string }>;
+        };
+        const b = barriadaBounds();
+        const asfalto = barriadaLosas().filter((l) => l.pieza === 'asfalto');
+        const lotes = barriadaLotes();
+        for (const a of arboles) {
+            expect(vegetation.kinds[a.especie]?.shape, a.especie).toBe('tree');
+            expect(a.x > b.x0 && a.x < b.x1 && a.y > b.y0 && a.y < b.y1).toBe(true);
+            expect(asfalto.some((l) => a.x > l.x0 && a.x < l.x1 && a.y > l.y0 && a.y < l.y1)).toBe(false);
+            expect(lotes.some((l) => a.x > l.x0 && a.x < l.x0 + l.ancho && a.y > l.y0 && a.y < l.y0 + l.fondo)).toBe(false);
+        }
+        expect(barriadaArboles()).toEqual(arboles);
     });
 });

@@ -14,17 +14,27 @@ import {
     type Mesh,
     type Scene,
 } from '@babylonjs/core';
+import vegetationJson from '../../data/vegetation.json';
 import {
+    barriadaArboles,
     barriadaBounds,
     barriadaCasas,
+    barriadaFarolas,
     barriadaLosas,
     barriadaPiedra,
+    type BarriadaArbol,
     type BarriadaCasa,
 } from '../world/barriada';
 import { modelFile } from './modelFiles';
 import { OcclusionPlugin } from './occlusion';
 import { staticMesh } from './staticModels';
 import { StreetView } from './streetView';
+import type { LampPost } from './vegetationView';
+
+/** Piezas y color de cada especie de árbol (las del mapa). */
+const KINDS = (vegetationJson as unknown as {
+    kinds: Record<string, { pieces: Array<{ piece: string; color: [number, number, number]; thin?: boolean }> }>;
+}).kinds;
 
 const FLAT = { sample: (): number => 0 };
 
@@ -41,6 +51,10 @@ export class BarriadaView {
     readonly stone: Mesh;
     private crystal: Mesh;
     private time = 0;
+    /** CLA-BARR2: dónde va la luz de cada farola; la atmósfera enciende las más cercanas de noche. */
+    readonly lamps: LampPost[] = barriadaFarolas().map((f) => ({ x: f.x, y: 2.6, z: f.y + f.haciaY * 0.5 }));
+    /** Material del farol (`Luz`): brilla sólo cuando las farolas están encendidas. */
+    private glow: { mat: { emissiveColor: Color3 }; base: Color3 } | null = null;
 
     constructor(
         private readonly scene: Scene,
@@ -92,6 +106,7 @@ export class BarriadaView {
             m.parent = stoneRoot;
             m.isPickable = m === this.stone;
         }
+        this.trees();
         this.root.setEnabled(false);
         void this.houses();
     }
@@ -100,9 +115,10 @@ export class BarriadaView {
         this.root.setEnabled(on);
     }
 
-    update(dt: number): void {
+    update(dt: number, lampsOn = 0): void {
         if (!this.root.isEnabled()) return;
         this.time += dt;
+        if (this.glow) this.glow.base.scaleToRef(lampsOn, this.glow.mat.emissiveColor);
         this.crystal.position.y = 1.6 + Math.sin(this.time * 1.6) * 0.12;
         this.crystal.rotation.y = this.time * 0.8;
     }
@@ -115,17 +131,72 @@ export class BarriadaView {
             if (list.length === 0) continue;
             try {
                 const container = await modelFile(this.scene, model);
-                this.instance(container, model, list);
+                // Como LandmarkView: la fachada está en −Y de Blender y rotDeg cuenta desde −Z.
+                this.instance(container, model, list.map((c) => ({ x: c.x, y: c.y, yawDeg: c.rotDeg + 180 })), list);
             } catch (e) {
                 console.warn(`[barriada] no se pudo cargar ${model}`, e);
             }
         }
+        // CLA-BARR2: farolas, con el farol colgando hacia el centro de la calle.
+        try {
+            const container = await modelFile(this.scene, 'farola');
+            const farolas = barriadaFarolas();
+            this.instance(
+                container,
+                'farola',
+                farolas.map((f) => ({ x: f.x, y: f.y, yawDeg: f.haciaY === 1 ? 90 : -90 })),
+            );
+        } catch (e) {
+            console.warn('[barriada] no se pudo cargar farola', e);
+        }
     }
 
+    /** CLA-BARR2: árboles de calle y de parque, una malla por pieza y especie, con instancias finas. */
+    private trees(): void {
+        const byKind = new Map<string, BarriadaArbol[]>();
+        for (const a of barriadaArboles()) byKind.set(a.especie, [...(byKind.get(a.especie) ?? []), a]);
+        const m4 = new Matrix();
+        const q = new Quaternion();
+        const sc = new Vector3();
+        const t = new Vector3();
+        for (const [kind, list] of byKind) {
+            const def = KINDS[kind];
+            if (!def) continue;
+            const mats = new Float32Array(list.length * 16);
+            list.forEach((a, i) => {
+                Quaternion.RotationYawPitchRollToRef((a.rotDeg * Math.PI) / 180, 0, 0, q);
+                sc.setAll(a.escala);
+                t.set(a.x, 0, a.y);
+                Matrix.ComposeToRef(sc, q, t, m4);
+                m4.copyToArray(mats, i * 16);
+            });
+            for (const p of def.pieces) {
+                const mesh = staticMesh(this.scene, p.piece, `barriada:${kind}:${p.piece}`);
+                const mat = new StandardMaterial(`barriada-${kind}-${p.piece}`, this.scene);
+                mat.diffuseColor = new Color3(...p.color);
+                mat.specularColor = new Color3(0.03, 0.03, 0.03);
+                mat.backFaceCulling = !p.thin;
+                mat.twoSidedLighting = !!p.thin;
+                mat.fogEnabled = false;
+                new OcclusionPlugin(mat);
+                mesh.material = mat;
+                mesh.parent = this.root;
+                mesh.isPickable = false;
+                mesh.thinInstanceSetBuffer('matrix', mats.slice(), 16, true);
+                mesh.thinInstanceRefreshBoundingInfo(false);
+                mesh.receiveShadows = true;
+                this.shadows?.addShadowCaster(mesh, false);
+                mesh.freezeWorldMatrix();
+            }
+        }
+    }
+
+    /** Una pieza por malla del GLB, con una instancia fina por sitio; `casas` da el color de cada una. */
     private instance(
         container: Awaited<ReturnType<typeof modelFile>>,
         model: string,
-        list: readonly BarriadaCasa[],
+        sitios: ReadonlyArray<{ x: number; y: number; yawDeg: number }>,
+        casas?: readonly BarriadaCasa[],
     ): void {
         const entries = container.instantiateModelsToScene((n) => `barriada:${model}:${n}`, true, {
             doNotInstantiate: true,
@@ -155,14 +226,13 @@ export class BarriadaView {
         });
         for (const node of entries.rootNodes) node.dispose(true, false);
 
-        const mats = new Float32Array(list.length * 16);
+        const mats = new Float32Array(sitios.length * 16);
         const m4 = new Matrix();
         const q = new Quaternion();
         const one = new Vector3(1, 1, 1);
         const t = new Vector3();
-        list.forEach((c, i) => {
-            // Como LandmarkView: la fachada está en −Y de Blender y rotDeg cuenta desde −Z.
-            Quaternion.RotationYawPitchRollToRef(((c.rotDeg + 180) * Math.PI) / 180, 0, 0, q);
+        sitios.forEach((c, i) => {
+            Quaternion.RotationYawPitchRollToRef((c.yawDeg * Math.PI) / 180, 0, 0, q);
             t.set(c.x, 0, c.y);
             Matrix.ComposeToRef(one, q, t, m4);
             m4.copyToArray(mats, i * 16);
@@ -173,10 +243,11 @@ export class BarriadaView {
             m.isPickable = false;
             m.thinInstanceSetBuffer('matrix', mats, 16, true);
             // Los materiales clonados llevan el nombre del archivo delante («barriada:casa_creador:Repello»).
-            const key = m.material ? TINT[m.material.name.split(':').pop()!.replace(/^Clone of /, '')] : undefined;
-            if (key) {
-                const cols = new Float32Array(list.length * 4);
-                list.forEach((c, i) => {
+            const matName = m.material ? m.material.name.split(':').pop()!.replace(/^Clone of /, '') : '';
+            const key = casas ? TINT[matName] : undefined;
+            if (key && casas) {
+                const cols = new Float32Array(casas.length * 4);
+                casas.forEach((c, i) => {
                     const rgb = c[key];
                     cols.set([rgb[0], rgb[1], rgb[2], 1], i * 4);
                 });
@@ -189,6 +260,12 @@ export class BarriadaView {
                 // La niebla del mapa está pensada para kilómetros de terreno; en esta zona de 420 m teñía de
                 // azul y lila las casas a partir de unos 30 m, mientras calle y grama seguían limpias.
                 m.material.fogEnabled = false;
+                // El farol: su brillo sigue al encendido de las farolas (update).
+                if (matName === 'Luz' && 'emissiveColor' in m.material) {
+                    const mat = m.material as unknown as { emissiveColor: Color3 };
+                    this.glow = { mat, base: mat.emissiveColor.clone() };
+                    mat.emissiveColor.setAll(0);
+                }
             }
             m.receiveShadows = true;
             this.shadows?.addShadowCaster(m, false);

@@ -324,7 +324,11 @@ export class HouseScene {
     }
 
     update(): void {
-        if (this.room === 'barriada') this.barriada?.update(1 / 60);
+        // CLA-BARR2: dentro de la barriada se encienden sus farolas, no las del mapa.
+        const atmosphere = this.host.view.atmosphere;
+        const inBarriada = this.room === 'barriada' && this.barriada !== null;
+        atmosphere.zoneLamps = inBarriada ? this.barriada!.lamps : null;
+        if (inBarriada) this.barriada!.update(1 / 60, atmosphere.state.lampsOn);
         const target = this.pending;
         if (!target) return;
         const w = this.host.world();

@@ -1,3 +1,21 @@
+## 2026-11-23 — CLA-BARR2: farolas y árboles en la barriada (coordinador)
+
+**Archivos:** `src/world/barriada.ts`, `src/render/barriadaView.ts`, `src/render/atmosphere.ts`, `src/scenes/houseScene.ts`, `tests/cla_barr1_barriada.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`.
+
+**Qué se hizo:**
+- **Farolas.** `barriadaFarolas()` pone 70 farolas, una cada tres lotes y alternando acera. Van en la grama, en la linde entre dos lotes, donde no hay andén ni entrada de auto. Se dibujan con `farola.glb` en instancias finas, con el farol hacia la calle, y el farol solo brilla de noche.
+- **Luz de noche.** `Atmosphere.zoneLamps`: mientras se está en la barriada, las luces reales se reparten entre sus farolas y no entre las del mapa.
+- **Árboles.** `barriadaArboles()` pone unos 510, fijos por lote. Los de la franja de grama son roble, guayacán e indio desnudo; el resto forma parques en los extremos de las calles y en los bordes de la zona. Son las especies de `data/vegetation.json`.
+- Postes y troncos se suman a `barriadaSolids()`.
+
+**Validación:**
+- `tests/cla_barr1_barriada.test.ts`: 9/9, con dos pruebas nuevas.
+- Suite completa: 4145/4148. Las 3 que fallaron (`ui03_mountLooks`, `jl42_compPreview`) pasan 16/16 solas, así que fue por carga.
+- `tsc` limpio salvo `balM3`, que no es mío; build con `checkPublishable` limpio.
+- QA Electron: `work/claude-barriada/qa4.js` y `probe3.js`, sin errores de consola. Capturas en `work/qa-manual/shots/barr3-*.jpg`.
+
+---
+
 ## 2026-11-23 — JL-204: pruebas de chasers.ts (Junie)
 
 **Archivos:** `tests/jl204_chasers.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
