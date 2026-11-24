@@ -277,7 +277,7 @@ export class DungeonFloorView {
                 if (floor.cells[r * floor.cols + c] && !wet((c + 0.5) * ts, (r + 0.5) * ts))
                     floorTiles.push({ x: (c + 0.5) * ts, y: 0, z: (r + 0.5) * ts });
         const tile = own(staticMesh(scene, 'd_baldosa', 'dFloor'));
-        tile.material = textured(mat(scene, 'dFloorMat', [1, 1, 1]), staticTexture(scene, 'baldosa'));
+        tile.material = textured(mat(scene, 'dFloorMat', [1, 1, 1]), staticTexture(scene, th.floorTex ?? 'baldosa'));
         const pieceScale = ts / MODEL_TILE;
         tile.thinInstanceSetBuffer(
             'matrix',
@@ -301,7 +301,7 @@ export class DungeonFloorView {
 
         // Muros: un bloque por baldosa de roca que toca suelo, con remate oscuro encima.
         const wall = own(staticMesh(scene, 'd_muro', 'dWall'));
-        wall.material = textured(mat(scene, 'dWallMat', th.wall, true), staticTexture(scene, 'muro'));
+        wall.material = textured(mat(scene, 'dWallMat', th.wall, true), staticTexture(scene, th.wallTex ?? 'muro'));
         wall.thinInstanceSetBuffer(
             'matrix',
             matrices(

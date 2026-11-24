@@ -135,6 +135,69 @@
         0.11,
         0.1
       ]
+    },
+    "raices": {
+      "_rol": "Piedra gris tibia con raíces: pisos 1–30 (PROPUESTA).",
+      "floor": [
+        0.34,
+        0.33,
+        0.32
+      ],
+      "floorVariation": 0.12,
+      "wall": [
+        0.30,
+        0.30,
+        0.29
+      ],
+      "wallTop": [
+        0.12,
+        0.12,
+        0.11
+      ],
+      "floorTex": "baldosa_raices",
+      "wallTex": "muro_raices"
+    },
+    "humedo": {
+      "_rol": "Cueva húmeda con musgo y agua: pisos 31–70 (PROPUESTA).",
+      "floor": [
+        0.24,
+        0.29,
+        0.28
+      ],
+      "floorVariation": 0.14,
+      "wall": [
+        0.25,
+        0.31,
+        0.29
+      ],
+      "wallTop": [
+        0.10,
+        0.12,
+        0.11
+      ],
+      "floorTex": "baldosa_humedo",
+      "wallTex": "muro_humedo"
+    },
+    "oro": {
+      "_rol": "Ocre cálido con vetas de oro: pisos 71–100 (PROPUESTA).",
+      "floor": [
+        0.42,
+        0.34,
+        0.20
+      ],
+      "floorVariation": 0.15,
+      "wall": [
+        0.40,
+        0.34,
+        0.22
+      ],
+      "wallTop": [
+        0.16,
+        0.13,
+        0.08
+      ],
+      "floorTex": "baldosa_oro",
+      "wallTex": "muro_oro"
     }
   },
   "floors": [
@@ -422,7 +485,7 @@
       {
         "fromLevel": 10,
         "family": "chame",
-        "theme": "losa",
+        "theme": "raices",
         "spawns": [
           {
             "archetype": "chame_crab",
@@ -447,7 +510,7 @@
       {
         "fromLevel": 20,
         "family": "boquete",
-        "theme": "osario",
+        "theme": "raices",
         "spawns": [
           {
             "archetype": "boquete_picker",
@@ -472,7 +535,7 @@
       {
         "fromLevel": 30,
         "family": "cerro_punta",
-        "theme": "musgo",
+        "theme": "raices",
         "spawns": [
           {
             "archetype": "cerropunta_peccary",
@@ -497,7 +560,7 @@
       {
         "family": "espejos",
         "fromLevel": 35,
-        "theme": "musgo",
+        "theme": "humedo",
         "spawns": [
           {
             "archetype": "espejo_bailarin",
@@ -518,7 +581,7 @@
       {
         "fromLevel": 40,
         "family": "baru",
-        "theme": "losa",
+        "theme": "humedo",
         "spawns": [
           {
             "archetype": "baru_jaguar",
@@ -543,7 +606,7 @@
       {
         "fromLevel": 50,
         "family": "darien",
-        "theme": "osario",
+        "theme": "humedo",
         "spawns": [
           {
             "archetype": "darien_neque",
@@ -568,7 +631,7 @@
       {
         "fromLevel": 60,
         "family": "bocas",
-        "theme": "musgo",
+        "theme": "humedo",
         "spawns": [
           {
             "archetype": "bocas_frog",
@@ -593,7 +656,7 @@
       {
         "fromLevel": 70,
         "family": "perlas",
-        "theme": "losa",
+        "theme": "oro",
         "spawns": [
           {
             "archetype": "perlas_oyster",
@@ -618,7 +681,7 @@
       {
         "fromLevel": 80,
         "family": "fortuna",
-        "theme": "osario",
+        "theme": "oro",
         "spawns": [
           {
             "archetype": "fortuna_gale",
@@ -643,7 +706,7 @@
       {
         "fromLevel": 90,
         "family": "ancon",
-        "theme": "musgo",
+        "theme": "oro",
         "spawns": [
           {
             "archetype": "ancon_bus",

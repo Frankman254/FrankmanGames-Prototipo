@@ -13,6 +13,10 @@ export interface DungeonThemeDef {
   floorVariation: number;
   wall: Rgb;
   wallTop: Rgb;
+  /** Textura del suelo (sin extensión). Default: "baldosa". */
+  floorTex?: string;
+  /** Textura del muro (sin extensión). Default: "muro". */
+  wallTex?: string;
 }
 
 export interface DungeonSpawnDef {
@@ -236,7 +240,10 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
     if (id.startsWith('_')) continue;
     const c = thc.child(id);
     const v = c.obj(th[id]);
-    themes[id] = { id, floor: rgb(c, v, 'floor'), floorVariation: c.num(v, 'floorVariation', { min: 0, max: 0.5 }), wall: rgb(c, v, 'wall'), wallTop: rgb(c, v, 'wallTop') };
+    const entry: DungeonThemeDef = { id, floor: rgb(c, v, 'floor'), floorVariation: c.num(v, 'floorVariation', { min: 0, max: 0.5 }), wall: rgb(c, v, 'wall'), wallTop: rgb(c, v, 'wallTop') };
+    if (v['floorTex'] !== undefined) entry.floorTex = c.str(v, 'floorTex');
+    if (v['wallTex'] !== undefined) entry.wallTex = c.str(v, 'wallTex');
+    themes[id] = entry;
   }
 
   const floors = r.arr(o, 'floors').map((raw, i): DungeonFloorDef => {

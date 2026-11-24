@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-265: Tema por profundidad en la cripta (Junie)
+
+**Archivos:** `src/data/dungeonSchema.ts`, `src/render/dungeonView.ts`, `data/dungeon.json`, `tests/jl265_dungeonTheme.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** OMP-POL-02b (era de OMP, pasó a Junie): conectar el tema por profundidad de OMP-POL-02 en la escena de la cripta. Se añadieron `floorTex` y `wallTex` opcionales a `DungeonThemeDef` y al parser de `dungeonSchema.ts`. En `dungeonView.ts`, las texturas del suelo y del muro ya no son fijas (`'baldosa'`/`'muro'`), sino que leen `th.floorTex ?? 'baldosa'` y `th.wallTex ?? 'muro'`. Se añadieron 3 temas nuevos a `data/dungeon.json` (raices, humedo, oro) con sus tintes PROPUESTA y las texturas procedurales de OMP-POL-02 (`baldosa_raices.png`, `muro_raices.png`, etc.). Los 10 tiers de `deep` se reasignaron: niveles 10–30 → raices, 35–60 → humedo, 70–90 → oro. Los 3 temas originales (losa, osario, musgo) siguen sin textura y usan el default. Los 5 pisos manuales conservan sus temas originales.
+
+**Validación:** 17 pruebas verdes en `tests/jl265_dungeonTheme.test.ts` (6 temas, texturas por tema, pisos manuales, pisos profundos, tintes). Suite completa 4908/4908. `npx tsc --noEmit` limpio. `npm run build` OK. Capturas de Electron omitidas (sin display).
+
+**Evidencia:** `work/junie-jl265/`.
+
+---
+
 ## 2026-11-24 — JL-263: 10 perfiles visuales para hechizos sin perfil (Junie)
 
 **Archivos:** `data/spell-fx.json`, `tests/spellProfile.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl263/INFORME.md`.
