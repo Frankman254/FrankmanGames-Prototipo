@@ -1443,7 +1443,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [x] JL-242 Ningún `.catch()` vacío: cada uno registra el error. Lista y arreglos de una línea.
   — commit «JL-242: catch vacíos — ya estaba hecho» — 0 catch vacíos en src/sim/, src/world/, src/rpg/. El único catch (designedDungeon.ts:108) ya registra el error. INFORME.md en work/junie-jl242/.
 - [x] JL-243 `as any` y `as unknown as`: lista con archivo y línea, y quita solo los que se resuelvan con un tipo que ya exista. El resto, en la lista con su motivo. — commit «JL-243: 8 as any eliminados en sim/rpg, 4 legítimos documentados» — 8 casos resueltos (world.ts, effects.ts ×6, content.ts), 4 no resolubles (barriada.ts, dungeon.ts, pageWorker.ts, appearance.ts: Vite JSON y worker). Actor.level añadido. Suite 4830/4830, tsc limpio. LISTA.md en work/junie-jl243/.
-- [ ] JL-244 Exportaciones sin uso: lista comprobada con `grep`. **No borres nada**: el coordinador decide.
+- [x] JL-244 Exportaciones sin uso: lista comprobada con `grep`. — commit «JL-244: auditoría de exportaciones sin uso — 9 candidatas reales, 122 auto-usadas» — LISTA.md en work/junie-jl244/. 131 exportaciones de valor auditadas: 9 sin uso en ningún archivo, 122 solo auto-usadas en su propio archivo. El coordinador decide qué quitar.
 
 ### Robustez y arte
 - [ ] JL-245 Cada GLB de `assets/models/` tiene su `scripts/blender/validar_<modelo>.py`, o está en una lista de excepciones con su motivo. Hoy solo lista; prueba si la lista sale corta.

@@ -1,3 +1,23 @@
+## 2026-11-24 — JL-244: auditoría de exportaciones sin uso (Junie)
+
+**Archivos:** `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl244/LISTA.md`, `work/junie-jl244/find_unused_exports.mjs`.
+
+**Qué.** Listar las exportaciones de valor (funciones, clases, const/enum) en `src/` que nadie importa en otro archivo.
+
+**Resultado.** 131 exportaciones de valor sin importar por nombre en otro archivo:
+- **9 candidatas reales**: no se usan en el mismo archivo ni se importan desde otro (LocalMusicPlayer, WATCH_IGNORED_FILES, vec2, dot, lerp, normalize, moveTowards, EditorPanel, elementLabel).
+- **122 auto-usadas**: exportadas pero solo consumidas localmente en su propio archivo.
+
+El script `find_unused_exports.mjs` busca `import { X }` por nombre en src/, tests/, scripts/ y electron/, y verifica el auto-uso dentro de cada archivo. Los accesos dinámicos, los barrel imports y los usos en HTML/JS del renderer pueden no detectarse.
+
+**No se borra nada**: el coordinador decide qué exportaciones quitar.
+
+**Validación:** `npx tsc --noEmit` limpio (solo balM3.ts ajeno), `npx vitest run` 4830/4830 en verde.
+
+**Evidencia:** `work/junie-jl244/LISTA.md`.
+
+---
+
 ## 2026-11-24 — JL-243: 8 `as any` eliminados en src/sim/ y src/rpg/ (Junie)
 
 **Archivos:** `src/rpg/actor.ts`, `src/rpg/character.ts`, `src/rpg/enemy.ts`, `src/rpg/effects.ts`, `src/rpg/content.ts`, `src/sim/world.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl243/LISTA.md`.
