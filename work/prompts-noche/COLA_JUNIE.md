@@ -1427,7 +1427,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [x] JL-232 Cripta: cada piso tiene escalera de subida y de bajada sobre baldosas válidas. — commit «JL-232: escaleras de la cripta — 402 pruebas» — 402 pruebas verdes (jl232_cryptStairs.test.ts), tsc sin errores nuevos, push OK. 100 pisos verificados: cada uno con upStairs en baldosa caminable, cada uno salvo el último con downStairs en baldosa caminable, subida y bajada no comparten baldosa. Pisos manuales 0-4 con coordenadas verificadas. Evidencia en tests/jl232_cryptStairs.test.ts.
 
 ### Escenarios que faltan
-- [ ] JL-233 **Escenario `misiones`:** hablar con un PNJ con misión, aceptarla, cumplirla con ayudas de desarrollo y entregarla; el registro de misiones cambia de estado.
+- [x] JL-233 **Escenario `misiones`:** hablar con un PNJ con misión, aceptarla, cumplirla con ayudas de desarrollo y entregarla; el registro de misiones cambia de estado. — commit «JL-233: escenario misiones en qaElectron» — 10/10 en verde, captura en work/qa/jl233-misiones-diario.jpg.
 - [ ] JL-234 **Escenario `oficios`:** usar un puesto de oficio, fabricar un objeto y comprobar que llega a la mochila (JL-198 solo cubre la recolección).
 - [ ] JL-235 **Escenario `casaCreador`:** calle de Los Santos, clic en la puerta de reja, recorrer sala, baños y recámaras, salir por el tapete, y lo mismo en la casa espejo. Base: `work/claude-casa2/qa1.js`…`qa7.js`. Verde tres veces.
 - [ ] JL-236 **Escenario `todasLasPiedras`:** viajar a cada Piedra Pintada, comprobar que el personaje queda en celda transitable y sin errores de consola, y volver. Tabla con el tiempo de carga de cada viaje.

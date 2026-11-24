@@ -8939,6 +8939,82 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('fugas: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+
+    /** JL-233: Escenario `misiones` — flujo completo: aceptar, cumplir y entregar q_wolf_cull. */
+    async misiones() {
+        await newGame('QA Misiones');
+        await sleep(5000);
+
+        const state = (id) => js(`${S}.questLog.state('${id}')`);
+
+        // 1) Estado inicial: q_wolf_cull disponible (sin requisitos previos).
+        check('Misiones: q_wolf_cull disponible al inicio', (await state('q_wolf_cull')) === 'available');
+
+        // 2) Aceptar la misión hablando con la sargento Odila Brezo (guard).
+        await js(`${S}.endDialogue()`);
+        await js(`${W}.commandTalk('guard')`);
+        await until(`!!${S}.dialogue()`, 15000, 'diálogo con guard');
+        await sleep(300);
+        // Elegir la opción de ofrecer la misión (kind='offer', texto incluye el nombre).
+        const offered = await js(
+            `(()=>{ const d=${S}.dialogue(); if(!d) return false; const name=${JSON.stringify('')}+(${S}.content.quests['q_wolf_cull']?.name ?? ''); const o=d.options.find(x=>x.kind==='offer'&&x.text.includes(name)); if(!o) return false; ${S}.chooseDialogue(o.index); const a=${S}.dialogue()?.options.find(x=>x.kind==='accept'); if(a) ${S}.chooseDialogue(a.index); ${S}.endDialogue(); return true; })()`,
+        );
+        check('Misiones: acepta «Satos junto al camino»', offered);
+        await sleep(500);
+        check('Misiones: estado pasa a active', (await state('q_wolf_cull')) === 'active');
+
+        // 3) Cumplir el objetivo de kill con ayudas de desarrollo: matar 3 enemigos melee.
+        // Se usan 3 colmillos (fang) en la mochila para el objetivo de collect.
+        await js(`(()=>{ const e=${W}.enemies.list.filter(x=>x.state!=='dead'); for(const en of e) ${W}.enemies.damage(en,1e6,()=>{}); })()`);
+        await sleep(1500);
+        // Tomar el botín si hay panel abierto.
+        if (await locate('button', 'Tomar todo')) await button('Tomar todo');
+        await sleep(500);
+
+        // Si no hay suficientes colmillos, añadirlos directamente (ayuda de desarrollo).
+        await js(`(()=>{ const c=${S}.character; const fang=c.items.create('fang',3); c.pickUp(fang,true); })()`);
+        await sleep(500);
+
+        // Verificar progreso: kill 3/3 y collect 2/2.
+        const progress = await js(
+            "(()=>{ const v=" + S + ".questLog.view('q_wolf_cull'); return v ? v.objectives.map(function(o){ return o.current+'/'+o.required; }).join(', ') : 'null'; })()",
+        );
+        check('Misiones: objetivos cumplidos', progress.includes('3/3') && progress.includes('2/2'), progress);
+
+        // 4) Estado ready: todos los objetivos cumplidos, falta entregar.
+        check('Misiones: estado ready (listo para entregar)', (await state('q_wolf_cull')) === 'ready');
+
+        // 5) Entregar la misión a la sargento Odila Brezo (guard).
+        await js(`${S}.endDialogue()`);
+        await js(`${W}.commandTalk('guard')`);
+        await until(`!!${S}.dialogue()`, 15000, 'diálogo con guard para entregar');
+        await sleep(300);
+        const turnedIn = await js(
+            `(()=>{ const d=${S}.dialogue(); if(!d) return false; const name=${JSON.stringify('')}+(${S}.content.quests['q_wolf_cull']?.name ?? ''); const o=d.options.find(x=>x.kind==='turnIn'&&x.text.includes(name)); if(!o) return false; ${S}.chooseDialogue(o.index); ${S}.endDialogue(); return true; })()`,
+        );
+        check('Misiones: entrega «Satos junto al camino»', turnedIn);
+        await sleep(500);
+
+        // 6) Verificar que la misión está completada.
+        check('Misiones: estado completed', (await state('q_wolf_cull')) === 'completed');
+
+        // 7) Verificar recompensas: XP y oro recibidos.
+        const gold = await js(`${S}.character.gold`);
+        check('Misiones: oro recibido (25)', gold >= 25, String(gold));
+
+        // 8) Captura del diario de misiones.
+        await js(`document.querySelector('[data-testid="journal"]')?.click()`);
+        await sleep(1500);
+        await shot('jl233-misiones-diario');
+
+        // 9) Cerrar el diario si está abierto.
+        await key('Escape', 'Escape');
+        await sleep(500);
+
+        // 10) Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('Misiones: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-233: escenario misiones en qaElectron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `misiones` en `qaElectron.mjs` que verifica el flujo completo de una misión: (1) `q_wolf_cull` ("Satos junto al camino") disponible al inicio; (2) aceptar la misión hablando con la sargento Odila Brezo (guard) mediante diálogo con opción `kind='offer'` y `kind='accept'`; (3) estado pasa a `active`; (4) cumplir objetivos con ayudas de desarrollo: matar 3 enemigos melee (kill 3/3) y añadir 2 colmillos fang (collect 2/2); (5) estado pasa a `ready`; (6) entregar la misión al guard con opción `kind='turnIn'`; (7) estado pasa a `completed`; (8) oro recibido (25). Captura del diario de misiones.
+
+**Verificación:** Escenario `misiones` en Electron: 10/10 checks en verde. Captura `jl233-misiones-diario.jpg` en `work/qa/`.
+
+---
+
 ## 2026-11-23 — JL-231: prueba de posición y traducción de Piedras Pintadas (Junie)
 
 **Archivos:** `tests/jl231_stones.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
