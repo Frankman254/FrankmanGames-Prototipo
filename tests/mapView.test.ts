@@ -7,9 +7,11 @@ import {
     FlagBook,
     bearing,
     clampToBox,
+    frameMapView,
     panView,
     projectToMinimap,
     questTarget,
+    worldMapClickPosition,
     viewToWorld,
     worldToView,
     zoomAt,
@@ -46,6 +48,24 @@ describe('minimapa', () => {
 });
 
 describe('mapa grande', () => {
+    it('encuadra al jugador o al centro de la zona y conserva el zoom', () => {
+        expect(frameMapView(100, 80, { x: 12, y: 34 }, 2.5)).toEqual({ cx: 12, cy: 34, zoom: 2.5 });
+        expect(frameMapView(100, 80, null, 1.5)).toEqual({ cx: 50, cy: 40, zoom: 1.5 });
+        expect(frameMapView(100, 80, { x: 12, y: 34 }, 2.5, { x0: 20, x1: 60, y0: 10, y1: 30 })).toEqual({
+            cx: 40,
+            cy: 20,
+            zoom: 2.5,
+        });
+    });
+
+    it('convierte clics del lienzo a mundo y excluye puntos fuera de sus límites', () => {
+        const view = { cx: 50, cy: 40, zoom: 2 };
+        expect(worldMapClickPosition(view, { x: 300, y: 150 }, 400, 200, 100, 80)).toEqual({ x: 100, y: 15 });
+        expect(worldMapClickPosition(view, { x: 200, y: 100 }, 400, 200, 100, 80)).toEqual({ x: 50, y: 40 });
+        expect(worldMapClickPosition(view, { x: -1, y: 100 }, 400, 200, 100, 80)).toBeNull();
+        expect(worldMapClickPosition(view, { x: 301, y: 150 }, 400, 200, 100, 80)).toBeNull();
+    });
+
     it('el zoom deja quieto el punto bajo el cursor y respeta los límites', () => {
         const v = { cx: 128, cy: 128, zoom: 3 };
         const cursor = { x: 100, y: 50 };

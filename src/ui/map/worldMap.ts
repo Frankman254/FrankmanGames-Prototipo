@@ -21,8 +21,10 @@ import {
 import {
     FLAG_NAME_MAX,
     clampView,
+    frameMapView,
     panView,
     viewToWorld,
+    worldMapClickPosition,
     worldToView,
     zoomAt,
     type MapView,
@@ -171,22 +173,15 @@ export class WorldMap extends Panel {
         const f = this.state.frame;
         if (!w) return;
         // JL-218: en la barriada, centramos en el centro de la zona.
-        if (f && f.inside === 'Praderas del Norte') {
-            const bounds = barriadaWorldBounds();
-            this.view = {
-                cx: (bounds.x0 + bounds.x1) / 2,
-                cy: (bounds.y0 + bounds.y1) / 2,
-                zoom: this.view?.zoom ?? this.state.def.bigMap.zoom,
-            };
-            this.timer = 0;
-            return;
-        }
         const p = f?.player;
-        this.view = {
-            cx: p?.x ?? w.width / 2,
-            cy: p?.y ?? w.depth / 2,
-            zoom: this.view?.zoom ?? this.state.def.bigMap.zoom,
-        };
+        const bounds = f?.inside === 'Praderas del Norte' ? barriadaWorldBounds() : undefined;
+        this.view = frameMapView(
+            w.width,
+            w.depth,
+            p ? { x: p.x, y: p.y } : null,
+            this.view?.zoom ?? this.state.def.bigMap.zoom,
+            bounds,
+        );
         this.timer = 0;
     }
 
@@ -301,8 +296,8 @@ export class WorldMap extends Panel {
             return;
         }
         const { w, h: hh } = this.size();
-        const at = viewToWorld(this.view, p, w, hh);
-        if (at.x < 0 || at.y < 0 || at.x > world.width || at.y > world.depth) return;
+        const at = worldMapClickPosition(this.view, p, w, hh, world.width, world.depth);
+        if (!at) return;
         const f = flags.add(at.x, at.y);
         if (!f) {
             this.ctx.toast(`Como mucho ${this.state.def.maxFlags} banderas`, 'warn');

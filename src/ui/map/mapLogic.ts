@@ -233,12 +233,37 @@ export interface MapView {
     zoom: number;
 }
 
+export function frameMapView(
+    worldW: number,
+    worldD: number,
+    player: Vec | null,
+    zoom: number,
+    bounds?: { x0: number; x1: number; y0: number; y1: number },
+): MapView {
+    const center = bounds
+        ? { x: (bounds.x0 + bounds.x1) / 2, y: (bounds.y0 + bounds.y1) / 2 }
+        : (player ?? { x: worldW / 2, y: worldD / 2 });
+    return { cx: center.x, cy: center.y, zoom };
+}
+
 export function worldToView(v: MapView, p: Vec, w: number, h: number): Vec {
     return { x: w / 2 + (p.x - v.cx) * v.zoom, y: h / 2 - (p.y - v.cy) * v.zoom };
 }
 
 export function viewToWorld(v: MapView, s: Vec, w: number, h: number): Vec {
     return { x: v.cx + (s.x - w / 2) / v.zoom, y: v.cy - (s.y - h / 2) / v.zoom };
+}
+
+export function worldMapClickPosition(
+    v: MapView,
+    point: Vec,
+    viewW: number,
+    viewH: number,
+    worldW: number,
+    worldD: number,
+): Vec | null {
+    const at = viewToWorld(v, point, viewW, viewH);
+    return at.x < 0 || at.y < 0 || at.x > worldW || at.y > worldD ? null : at;
 }
 
 /** Acerca o aleja `factor` veces dejando quieto el punto del mundo bajo el cursor `s`. */

@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-268: encuadre y clics del mapa grande (Junie)
+
+**Archivos:** `src/ui/map/mapLogic.ts`, `src/ui/map/worldMap.ts`, `tests/mapView.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se extrajo a lógica pura el encuadre del mapa grande (límites de la barriada, jugador o centro del mundo, conservando el zoom) y la conversión de clic a coordenadas del mundo con validación de límites. `WorldMap.center()` y `clickAt()` consumen `frameMapView()` y `worldMapClickPosition()` sin cambiar el comportamiento.
+
+**Validación:** Los dos casos nuevos fallaban antes de implementar por falta de los helpers. `tests/mapView.test.ts`: 14/14; `npm test`: 380 archivos, 4.911 pruebas aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. No se requiere captura Electron porque el cambio es puramente matemático y no altera lo visual.
+
+**Evidencia:** `tests/mapView.test.ts`.
+
+---
+
 ## 2026-11-24 — JL-267: aislar el ajuste de zoom del minimapa (Junie)
 
 **Archivos:** `src/ui/map/mapLogic.ts`, `src/ui/map/minimap.ts`, `tests/ui/minimapResize.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
