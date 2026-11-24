@@ -463,6 +463,18 @@ Escenario `casaCreador` en `scripts/qaElectron.mjs`: viaja a Cerro Punta, entra 
 
 ---
 
+## 2026-11-24 — JL-260: medición de sombras y árboles en Calle 2 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl260/MEDICION.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `jl260_calle2` en `qaElectron.mjs` que mide el costo individual de sombras y árboles en la calle 2 de la barriada con calidad alta (renderScale 1.0, 3600×2160). Cuatro combinaciones: base (68 fps), sin sombras (76 fps, +8), sin árboles (72 fps, +4), sin todo (76 fps, +8). Las sombras son el factor dominante (+8 fps, 11.8 %). Los árboles cuestan +4 fps (5.9 %) por 6 mallas thin instance y ~443K triángulos. El cuello principal es el framebuffer de 3600×2160 (4× más píxeles que calidad baja, que da 119 fps). Propuesta: bajar renderScale a 0.75 en calidad alta para ~90–100 fps. No se cambió la vista de la barriada.
+
+**Cómo se verificó:** Escenario `jl260_calle2` en Electron: 8/8 checks en verde. MEDICION.md con tabla completa y análisis en `work/junie-jl260/`. Datos crudos en `work/qa/jl260-calle2-rendimiento-ultima.json`.
+
+**Qué falta:** Nada. La propuesta de renderScale 0.75 es solo recomendación; el creador decide si aplica.
+
+---
+
 ## 2026-11-23 — JL-221: rendimiento de la barriada Praderas del Norte (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl221/MEDICION.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

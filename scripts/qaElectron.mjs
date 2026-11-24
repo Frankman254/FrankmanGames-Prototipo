@@ -8763,6 +8763,135 @@ const scenarios = {
         check('barriadaRendimiento: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
+    /** JL-260: Calle 2 a 70 FPS con calidad alta — aislar costo de sombras y árboles. */
+    async jl260_calle2() {
+        await newGame('QA JL260');
+        await sleep(5000);
+
+        // Entrar a la barriada.
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+        check('jl260: dentro de la barriada', await js(`__game.houses.inside`), String(await js(`__game.houses.inside`)));
+
+        // Instrumentación (mismo patrón que barriadaRendimiento).
+        await js(`(()=>{ const g=__game, sc=g.view.scene, en=sc.getEngine(), t=window.__qaH={frames:[],last:performance.now(),dc:0,tick:0,sync:0,render:0,loop:0,anim:0,active:0,targets:0};
+      const wrap=(o,k,key)=>{ const f=o[k]; o[k]=function(...a){ const s=performance.now(); try { return f.apply(this,a); } finally { t[key]+=performance.now()-s; } }; };
+      const rd=en._reportDrawCall; en._reportDrawCall=function(n=1){ t.dc+=n; return rd.call(this,n); };
+      wrap(Object.getPrototypeOf(g.world),'tick','tick'); wrap(g.view,'sync','sync'); wrap(sc,'render','render');
+      en._activeRenderLoops.forEach((f,i)=>{ en._activeRenderLoops[i]=function(){ const s=performance.now(); try { return f(); } finally { t.loop+=performance.now()-s; } }; });
+      let a0=0,b0=0,c0=0;
+      sc.onBeforeAnimationsObservable.add(()=>{a0=performance.now()}); sc.onAfterAnimationsObservable.add(()=>{t.anim+=performance.now()-a0});
+      sc.onBeforeActiveMeshesEvaluationObservable.add(()=>{b0=performance.now()}); sc.onAfterActiveMeshesEvaluationObservable.add(()=>{t.active+=performance.now()-b0});
+      sc.onBeforeRenderTargetsRenderObservable.add(()=>{c0=performance.now()}); sc.onAfterRenderTargetsRenderObservable.add(()=>{t.targets+=performance.now()-c0});
+      const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+        const reset = `(()=>{const t=window.__qaH; for (const k of ['dc','tick','sync','render','loop','anim','active','targets']) t[k]=0; t.frames=[];})()`;
+        const read = `(()=>{const t=window.__qaH, sc=__game.view.scene, en=sc.getEngine(), f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length), r=x=>Math.round(x*10)/10;
+      const loop=t.loop/n, known=(t.tick+t.sync+t.render)/n;
+      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), drawCalls:Math.round(t.dc/n),
+        activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, triangulos:Math.round(sc.getActiveIndices()/3), luces:sc.lights.filter(l=>l.isEnabled()).length,
+        msJs:r(loop), msSim:r(t.tick/n), msVista:r(t.sync/n), msRender:r(t.render/n), msResto:r(loop-known), msAnim:r(t.anim/n), msActivas:r(t.active/n), msSombras:r(t.targets/n),
+        tam:en.getRenderWidth()+'x'+en.getRenderHeight(), gpu:en.getGlInfo().renderer};})()`;
+
+        const out = {};
+        const measure = async (name, ms = 5000) => {
+            await js(reset);
+            await sleep(ms);
+            out[name] = await js(read);
+            console.log(name, JSON.stringify(out[name]));
+        };
+
+        // Calidad alta fija.
+        const calidadAlta = { shadows: 'altas', vegetationDensity: 1.0, viewDistance: 400, particles: 1.0, renderScale: 1.0, antialias: 'fxaa', occlusionCut: true };
+        await js(`__game.view.applyGraphics(${JSON.stringify(calidadAlta)})`);
+        await sleep(2000);
+
+        // Posición: cruce calle 2.
+        await js(`(() => { const p=${W}.player; p.pos.x=6235; p.pos.y=306.5; p.prevPos.x=6235; p.prevPos.y=306.5; p.path=[]; })()`);
+        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=90; r.pitchDeg=22; r.jumpTo(14); })()`);
+        await sleep(1000);
+
+        // Helper: contar mallas de árboles vs casas en la escena.
+        const countMeshes = `(()=>{ const sc=__game.view.scene, barriada=sc.getTransformNodeByName('barriada'); if(!barriada) return {arboles:0,casas:0,farolas:0};
+          const all=barriada.getChildMeshes(true); let a=0,c=0,f=0;
+          all.forEach(m=>{ const n=m.name; if(n.includes(':casa_')) c++; else if(n.includes(':farola')) f++; else if(n.includes('barriada:') && !n.includes(':suelo') && !n.includes(':piedra') && !n.includes('street')) a++; });
+          return {arboles:a,casas:c,farolas:f}; })()`;
+        const meshCount = await js(countMeshes);
+        console.log('jl260: mallas en barriada', JSON.stringify(meshCount));
+
+        // 1) Base: todo activo, sombras altas.
+        await measure('alta-calle2-base');
+        await shot('jl260-base');
+
+        // 2) Sin sombras (shadows='no').
+        await js(`__game.view.applyGraphics(${JSON.stringify({...calidadAlta, shadows: 'no'})})`);
+        await sleep(2000);
+        await measure('alta-calle2-sinSombras');
+        await shot('jl260-sinSombras');
+
+        // Restaurar calidad alta.
+        await js(`__game.view.applyGraphics(${JSON.stringify(calidadAlta)})`);
+        await sleep(2000);
+
+        // 3) Sin árboles: ocultar las mallas de árboles (barriada:*:* que no son casas, farolas, suelo ni piedra).
+        await js(`(()=>{ const sc=__game.view.scene, barriada=sc.getTransformNodeByName('barriada'); if(!barriada) return;
+          barriada.getChildMeshes(true).forEach(m=>{
+            const n=m.name;
+            if(n.includes('barriada:') && !n.includes(':casa_') && !n.includes(':farola') && !n.includes(':suelo') && !n.includes(':piedra') && !n.includes('street')){
+              m.setEnabled(false);
+            }
+          }); })()`);
+        await sleep(1000);
+        await measure('alta-calle2-sinArboles');
+        await shot('jl260-sinArboles');
+
+        // Restaurar árboles.
+        await js(`(()=>{ const sc=__game.view.scene, barriada=sc.getTransformNodeByName('barriada'); if(!barriada) return;
+          barriada.getChildMeshes(true).forEach(m=>{
+            const n=m.name;
+            if(n.includes('barriada:') && !n.includes(':casa_') && !n.includes(':farola') && !n.includes(':suelo') && !n.includes(':piedra') && !n.includes('street')){
+              m.setEnabled(true);
+            }
+          }); })()`);
+        await sleep(1000);
+
+        // 4) Sin árboles ni sombras.
+        await js(`__game.view.applyGraphics(${JSON.stringify({...calidadAlta, shadows: 'no'})})`);
+        await sleep(2000);
+        await js(`(()=>{ const sc=__game.view.scene, barriada=sc.getTransformNodeByName('barriada'); if(!barriada) return;
+          barriada.getChildMeshes(true).forEach(m=>{
+            const n=m.name;
+            if(n.includes('barriada:') && !n.includes(':casa_') && !n.includes(':farola') && !n.includes(':suelo') && !n.includes(':piedra') && !n.includes('street')){
+              m.setEnabled(false);
+            }
+          }); })()`);
+        await sleep(1000);
+        await measure('alta-calle2-sinTodo');
+        await shot('jl260-sinTodo');
+
+        // Restaurar todo.
+        await js(`(()=>{ const sc=__game.view.scene, barriada=sc.getTransformNodeByName('barriada'); if(!barriada) return;
+          barriada.getChildMeshes(true).forEach(m=>m.setEnabled(true)); })()`);
+        await js(`__game.view.applyGraphics(${JSON.stringify(calidadAlta)})`);
+        await sleep(1000);
+
+        // Guardar datos.
+        fs.writeFileSync(
+            path.join(OUT, `jl260-calle2-rendimiento-${process.env.QA_ETIQUETA ?? 'ultima'}.json`),
+            JSON.stringify(out, null, 1),
+        );
+
+        // Verificar que se midieron las 4 combinaciones.
+        check('jl260: midió 4 combinaciones', Object.keys(out).length === 4, Object.keys(out).join(', '));
+        for (const [k, v] of Object.entries(out)) {
+            check(`jl260: ${k} — fps > 0`, v.fps > 0, `${v.fps} fps`);
+        }
+
+        // Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('jl260: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
+
     /** JL-222: Noche y lluvia en la barriada — capturas a mediodía, atardecer y noche. Solo diagnóstico. */
     async barriadaNoche() {
         await newGame('QA BarriadaNoche');
@@ -9492,6 +9621,8 @@ scenarios.barriadaMontura.timeout = 300;
 scenarios.fugas.timeout = 600;
 // JL-221: 6 mediciones de rendimiento (3 posiciones × 2 calidades), cada una con 5 s de muestreo.
 scenarios.barriadaRendimiento.timeout = 180;
+// JL-260: 4 combinaciones (base, sin sombras, sin árboles, sin todo), cada una con 5 s de muestreo.
+scenarios.jl260_calle2.timeout = 180;
 // JL-223: 7 cambios de opciones gráficas + capturas dentro de la barriada.
 scenarios.barriadaOpciones.timeout = 180;
 // JL-236: 24 viajes + vuelta, cada uno con carga de página.
