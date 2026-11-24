@@ -16,10 +16,10 @@ export function boneMass(name: string): number {
     return 0;
 }
 
-/** Masa de un hueso; las cadenas `fis_` (faldas, capas, pelo) toman la del primer hueso no `fis_`. */
+/** Masa de un hueso; las cadenas `fis_` y `tela_` (faldas, capas, pelo) toman la del primer hueso del cuerpo. */
 export function chainMass(bone: Pick<Bone, 'name' | 'getParent'>): number {
     let b: Pick<Bone, 'name' | 'getParent'> | null = bone;
-    while (b && b.name.slice(b.name.indexOf(':') + 1).startsWith('fis_')) b = b.getParent();
+    while (b && /^(fis|tela)_/.test(b.name.slice(b.name.indexOf(':') + 1))) b = b.getParent();
     return b ? boneMass(b.name) : 0;
 }
 

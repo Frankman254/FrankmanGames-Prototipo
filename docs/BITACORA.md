@@ -1,3 +1,13 @@
+## 2026-11-24 — CLA-TEL1: capas y pelo con huesos con retraso (coordinador)
+
+**Archivos:** `scripts/blender/fg_telas.py`, `scripts/blender/telas_heroes.py`, `assets/models/{cazador,centinela,oraculo}{,_f}_anime.glb`, `src/render/characters/bodyMass.ts`, `tests/claCr1_bodyMass.test.ts`.
+
+**Qué se hizo:** método de la guía de Blender (creador, 2026-11-23) en un módulo común. Cada hueso `tela_*` repite el giro y el vaivén de su ancla (pecho o cabeza) con un retraso que crece hacia la punta. En los bucles la punta va un cuarto de ciclo por detrás y el bucle cierra sin salto. Encima se suman colgar, aire al andar y correr, un tope de giro y que nunca se acerque al cuerpo. Aplicado como post-proceso a los seis héroes: capa en centinela y oráculo, pelo de atrás en todos. En el cazador `Capa` es el carcaj y sigue rígido. La complexión (CLA-CR1) trata `tela_` como `fis_`. No usa el motor Verlet en tiempo real de JL-67, que solo actúa sobre huesos `fis_`.
+
+**Validación:** suite completa (375 archivos, 4844 pruebas) y typecheck limpios. Los GLB, comparados con `master`, solo ganan huesos (16 a 18 o 21 articulaciones); mallas, materiales, texturas, clips y duraciones no cambian. En Electron, Vanguardia corriendo con la capa atrás, sin errores y a 88–94 FPS. Láminas y capturas en `work/claude-telas/`.
+
+---
+
 ## 2026-11-24 — JL-250: Consola limpia tras tanda JL-204…JL-249 (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl250/INFORME.md`.

@@ -19,6 +19,7 @@ describe('CLA-CR1: masa de la complexión por huesos', () => {
         const head = bone('head');
         expect(chainMass(bone('fis_falda_2', bone('fis_falda_1', hips)))).toBe(1);
         expect(chainMass(bone('fis_pelo_1', head))).toBe(0);
+        expect(chainMass(bone('tela_capa3', bone('tela_capa2', bone('tela_capa1', bone('chest', null)))))).toBe(1);
     });
 
     it('desplaza por la normal en proporción al peso, y nada donde manda la cabeza', () => {
