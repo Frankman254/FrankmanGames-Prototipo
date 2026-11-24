@@ -5046,3 +5046,13 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 ---
 
+
+## 2026-11-23 — JL-229: zonas hostiles con áreas dentro del mundo (Junie)
+
+**Archivos:** `tests/jl229_hostileZones.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 4 pruebas que verifican que cada zona hostil activa tiene al menos un área y que todas las áreas caen dentro del mundo (límites de `terrain.json.world`). Las 9 zonas hostiles sin áreas (`baru`, `chame`, `boquete`, `cerro_punta`, `darien`, `bocas`, `perlas`, `fortuna`, `ancon`) están documentadas como planificadas (`"planned"` en `data/zones.json`): sus monstruos se usan por `extends` en zonas de Herrera, pero no tienen áreas propias porque no caben en el mundo actual.
+
+**Validación:** `npx vitest run tests/jl229_hostileZones.test.ts` → 4/4 en verde. Suite completa 4385/4385. Typecheck limpio salvo `scripts/balance/balM3.ts` (ajeno).
+
+**Evidencia:** `tests/jl229_hostileZones.test.ts`.

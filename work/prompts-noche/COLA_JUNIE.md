@@ -1421,7 +1421,7 @@ Contexto del coordinador:
 Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. Si la hay, «ya estaba hecho» con la ruta.
 - [x] JL-227 Todo objeto que venden los mercaderes existe en los objetos del juego. — ya estaba hecho (jl13_dataIntegrity.test.ts:167-188 "merchants apuntan a items existentes" + d45_contentCheck.test.ts:264-268). Commit junto con JL-226/228.
 - [x] JL-228 Cada misión cita PNJ, monstruos y objetos que existen. — commit «JL-226/227/228: crestalba en verde, mercaderes ya cubiertos, referencias de misiones» — 4 pruebas verdes (jl228_questRefs.test.ts): kill→archetypes, talk→npcId, fish→itemIds, prueba sintética. jl13 ya cubre giver/turnIn/items. Evidencia en tests/jl228_questRefs.test.ts.
-- [ ] JL-229 Cada zona hostil de `data/zones.json` tiene al menos un área, y todas sus áreas caen dentro del mundo.
+- [x] JL-229 Cada zona hostil de `data/zones.json` tiene al menos un área, y todas sus áreas caen dentro del mundo. — commit «JL-229: zonas hostiles con áreas dentro del mundo» — 4 pruebas verdes (jl229_hostileZones.test.ts), suite 4385/4385, tsc limpio, push OK. 9 zonas planificadas sin áreas documentadas. Evidencia en tests/jl229_hostileZones.test.ts.
 - [ ] JL-230 Cada clip que pide `data/animation.json` existe en su GLB.
 - [ ] JL-231 Cada Piedra Pintada de `data/stones.json` cae dentro del mundo y en celda transitable, o es la entrada de una zona aparte conocida (hoy solo `praderas_norte`), y tiene nombre en inglés.
 - [ ] JL-232 Cripta: cada piso tiene escalera de subida (salvo el 1) y de bajada (salvo el último), sobre baldosas válidas.
