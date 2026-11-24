@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-259: Validador GLB sin Blender (Junie)
+
+**Archivos:** `tests/jl259_glbValidator.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Prueba de Node que lee los 135 GLB de `assets/models/` sin Blender: parser puro de cabecera glTF 2.0 (magic, versión, chunks JSON/BINAR), extracción de accesores para triángulos y bounding box, materiales, buffers e imágenes. Clasificación automática en 12 familias (héroes, monturas, enemigos, fauna, estructuras, props, catálogos, mazmorra, NPC, personaje, objetos especiales, otro) con topes PROPUESTA de triángulos y bounding box calibrados con los modelos existentes. 8 checks: parseo sin errores, versión 2.0, triángulos dentro del tope por familia, materiales con nombre, sin URIs externas, bounding box ≤ 50 m, clasificación completa y resumen por familia. Todos los 135 GLB pasan los 8 checks.
+
+**Validación:** 8 pruebas verdes en `tests/jl259_glbValidator.test.ts`. Suite completa 4862/4862. `npx tsc --noEmit` limpio.
+
+**Evidencia:** `work/junie-jl259/` (resumen de familias en stdout de vitest).
+
+---
+
 ## 2026-11-24 — JL-258: Diagnóstico de las 7 piedras pendientes de JL-236 (Junie)
 
 **Archivos:** `data/stones.json`, `data/zones.json`, `data/terrain.json`, `data/i18n/en.content.json`, `work/qa/todasLasPiedras.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
