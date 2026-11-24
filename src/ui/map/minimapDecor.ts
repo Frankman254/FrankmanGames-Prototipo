@@ -103,8 +103,7 @@ export function drawScaleBar(
     dpr: number,
     pxPerMeter: number,
 ): void {
-    const target = px / 4 / pxPerMeter;
-    const meters = [5, 10, 20, 25, 50, 100, 200, 250, 500].find((m) => m >= target) ?? 1000;
+    const meters = selectScaleBarMeters(px, pxPerMeter);
     const len = meters * pxPerMeter;
     const x = 9 * dpr;
     const y = py - 10 * dpr;
@@ -131,6 +130,12 @@ export function drawScaleBar(
     ctx.shadowBlur = 2 * dpr;
     ctx.fillText(`${meters} m`, x + 2 * dpr, y - 4 * dpr);
     ctx.restore();
+}
+
+/** Medida de la barra de escala que mejor llena una cuarta parte del lienzo. */
+export function selectScaleBarMeters(px: number, pxPerMeter: number): number {
+    const target = px / 4 / pxPerMeter;
+    return [5, 10, 20, 25, 50, 100, 200, 250, 500].find((m) => m >= target) ?? 1000;
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {

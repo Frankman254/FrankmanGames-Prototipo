@@ -62,6 +62,18 @@ Las 39 entradas de bloqueo que Junie escribió (JL-269…JL-299 y JL-302…JL-30
 
 ---
 
+## 2026-11-24 — JL-269: selección de la escala del minimapa (Junie)
+
+**Archivos:** `src/ui/map/minimapDecor.ts`, `tests/ui/minimapDecor.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se extrajo `selectScaleBarMeters()` para decidir en función del ancho del lienzo y los píxeles por metro qué tramo de la barra se dibuja. `drawScaleBar()` reutiliza el helper y conserva la fórmula, los nueve tramos disponibles y el fallback de 1000 m.
+
+**Validación:** `tests/ui/minimapDecor.test.ts`: 2/2; `npm test`: 381 archivos, 4.913 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Electron `misionMapa` mostró el minimapa y produjo captura, pero terminó 1/2 por un `TypeError` de Babylon (`rgbdTextureTools` lee `postProcessManager` nulo), ajeno al cambio.
+
+**Evidencia:** `tests/ui/minimapDecor.test.ts`, `work/junie-jl269/EVIDENCIA.md` y `work/junie-jl269/minimapa-mision.jpg`.
+
+---
+
 ## 2026-11-24 — JL-267: aislar el ajuste de zoom del minimapa (Junie)
 
 **Archivos:** `src/ui/map/mapLogic.ts`, `src/ui/map/minimap.ts`, `tests/ui/minimapResize.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
