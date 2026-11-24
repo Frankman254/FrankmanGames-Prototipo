@@ -1494,47 +1494,47 @@ Contexto del coordinador:
 ### C. Extracciones pequeñas con su prueba (una por módulo)
 - [x] JL-267 `src/ui/map/minimap.ts`: proyección de mundo a píxeles del minimapa y el zum. — commit «JL-267: aislar el ajuste de zoom del minimapa» — `zoomMinimap()` puro, proyección y escala existentes verificadas; 7 pruebas (`minimapResize.test.ts`), suite 4.909 aprobadas, 1 omitida y 1 `todo`, typecheck limpio.
 - [x] JL-268 `src/ui/map/worldMap.ts`: el encuadre del mapa grande y el paso de clic a mundo. — commit «JL-268: encuadre y clics del mapa grande» — 14/14 pruebas dirigidas; suite 4.911 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. Evidencia: `tests/mapView.test.ts`; sin captura (extracción matemática).
-- [!] JL-269 `src/ui/map/minimapDecor.ts`: qué decoración se dibuja según la escala. — BLOQUEADA: no existe `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa; no se modificó código. Línea base: typecheck limpio, suite 4.911 aprobadas, 1 omitida y 1 `todo`.
+- [ ] JL-269 `src/ui/map/minimapDecor.ts`: qué decoración se dibuja según la escala.
 - [ ] JL-270 `src/ui/map/mapFeed.ts`: qué se manda al mapa y con qué frecuencia.
-- [!] JL-271 `src/ui/menus/chat.ts`: filtro por pestañas, límite de líneas y órdenes con `/`. — BLOQUEADA: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código. `npx tsc --noEmit` y `npm run docs:check` limpios; suite final: 4.911 aprobadas, 1 omitida y 1 `todo`. Ejecución intermedia: JL-70 midió 0,578 ms frente a 0,5 ms; pasó aislada y en la suite final.
-- [!] JL-272 `src/ui/menus/dialogue.ts`: el avance entre nodos del diálogo. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código ni pruebas. `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+- [ ] JL-271 `src/ui/menus/chat.ts`: filtro por pestañas, límite de líneas y órdenes con `/`.
+- [ ] JL-272 `src/ui/menus/dialogue.ts`: el avance entre nodos del diálogo.
 - [ ] JL-273 `src/ui/menus/journal.ts` y `questTracker.ts`: el orden y el texto de las misiones.
-- [!] JL-274 `src/ui/menus/drag.ts`: el ajuste de la ventana a los bordes de la pantalla. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl274/INFORME.md`.
-- [!] JL-275 `src/ui/menus/context.ts`: qué opciones salen según el objetivo. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl275/INFORME.md`.
+- [ ] JL-274 `src/ui/menus/drag.ts`: el ajuste de la ventana a los bordes de la pantalla.
+- [ ] JL-275 `src/ui/menus/context.ts`: qué opciones salen según el objetivo.
 - [ ] JL-276 `src/ui/menus/progressBar.ts` y `panel.ts`: el ancho y el texto de la barra.
-- [!] JL-277 `src/ui/menus/mountLooks.ts`: la lista de aspectos disponibles. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; no se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [!] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores. — BLOQUEADA: no existe `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa; no se modificó código ni pruebas.
+- [ ] JL-277 `src/ui/menus/mountLooks.ts`: la lista de aspectos disponibles.
+- [ ] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores.
 - [ ] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos.
-- [!] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [!] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa. — BLOQUEADA: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [!] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Evidencia en `work/junie-jl282/INFORME.md`; verificación: `npm test` (380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck` y `npm run docs:check` pasaron.
+- [ ] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números.
+- [ ] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa.
+- [ ] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes.
 - [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
-- [!] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; línea base: `npx tsc --noEmit` limpio y `npx vitest run` con 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl284/INFORME.md`.
-- [!] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; línea base: `npx tsc --noEmit` limpio y `npx vitest run` con 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl285/INFORME.md`.
-- [!] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl286/INFORME.md`.
+- [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.
+- [ ] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa.
+- [ ] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza.
 - [ ] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador.
 - [ ] JL-288 `src/render/gatherView.ts`: el estado visual de un recurso (lleno, gastado, rebrotando).
 - [ ] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven.
-- [!] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [!] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código ni pruebas.
-- [!] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble). — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+- [ ] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz.
+- [ ] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros.
+- [ ] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble).
 - [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
-- [!] JL-294 `src/render/gridView.ts`: qué celdas se pintan. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; no se inspeccionó ni modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [!] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+- [ ] JL-294 `src/render/gridView.ts`: qué celdas se pintan.
+- [ ] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon.
 - [ ] JL-296 `src/editor/hotApply.ts`: qué se rehace según el archivo cambiado.
 
 ### D. Datos y contenido
 Antes de cada una, busca si ya existe.
-- [!] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md` antes de modificar traducciones o su presentación; hallazgos y verificación en `work/junie-jl297/INFORME.md`.
-- [!] JL-298 Cada objeto tiene icono y el archivo del icono existe. — BLOQUEADA: no figura como Autorizada en `docs/TAREAS.md`; no se inició la auditoría de iconos. Evidencia: `work/junie-jl298/INFORME.md`; `npx tsc --noEmit` limpio, `npx vitest run`: 4.911 aprobadas, 1 omitida y 1 `todo`.
+- [ ] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más.
+- [ ] JL-298 Cada objeto tiene icono y el archivo del icono existe.
 - [ ] JL-299 Cada efecto que pide `data/fx.json` existe (partículas y texturas).
 - [!] JL-300 Cada sonido que piden los datos existe en `assets/audio/`, y ningún archivo de audio sobra. — BLOQUEADA: hay 64 archivos sin referencia de ejecución; borrar o archivar las fuentes originales registradas requiere decisión del creador. Evidencia: `work/junie-jl300/INFORME.md`.
 - [x] JL-301 Cada pieza de conjunto de `data/rpg/sets` tiene su malla o queda en una lista de pendientes. — commit «JL-301: inventario de mallas de conjuntos» — 24 piezas con geometría; lista exhaustiva de 788 pendientes validada contra 137 conjuntos y 812 piezas en `work/junie-jl301/INVENTARIO.md`.
-- [!] JL-302 Cada arquetipo de `data/assets.json` apunta a un GLB que existe y tiene los clips que pide. — BLOQUEADA: no figura como Autorizada en `docs/TAREAS.md` y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`.
+- [ ] JL-302 Cada arquetipo de `data/assets.json` apunta a un GLB que existe y tiene los clips que pide.
 - [ ] JL-303 Cada tabla de botín apunta a objetos existentes y suma probabilidades válidas, sin cambiar ninguna cifra.
 - [ ] JL-304 Cada hechizo tiene icono, texto en los dos idiomas y efecto visual.
-- [!] JL-305 Cada PNJ con diálogo tiene sus nodos completos: ningún nodo sin salida ni enlaces rotos. — BLOQUEADA: JL-305 no figura como Autorizada en `docs/TAREAS.md` y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionaron diálogos, datos, código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl305/INFORME.md`.
-- [!] JL-306 Ningún texto de la interfaz en inglés supera el ancho de su botón: lista con captura de los que se cortan. — BLOQUEADA: no figura como Autorizada en `docs/TAREAS.md`; no se inició la revisión de textos ni la inspección visual.
+- [ ] JL-305 Cada PNJ con diálogo tiene sus nodos completos: ningún nodo sin salida ni enlaces rotos.
+- [ ] JL-306 Ningún texto de la interfaz en inglés supera el ancho de su botón: lista con captura de los que se cortan.
 
 ### E. Escenarios Electron que faltan
 - [ ] JL-307 `chat`: escribir, cambiar de pestaña, usar una orden con `/` y comprobar el límite de líneas.

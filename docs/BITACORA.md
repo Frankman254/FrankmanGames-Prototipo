@@ -1,3 +1,53 @@
+## 2026-11-24 — Reabiertas 39 tareas de Junie bloqueadas en falso (Claude)
+
+**Archivos:** `AGENTS.md` (`3cf7bfcb`), `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** de JL-269 a JL-309, Junie bloqueó 39 tareas seguidas por dos causas que eran fallo de las instrucciones, no del código:
+- `../FrankmanGames/04_VISION_Y_DECISIONES.md` no existe en esta Mac; las `DEC-*` están en `docs/referencias/FRANKMANGAMES.md`.
+- El lote JL-254…JL-353 tenía una sola fila «Autorizada», y Junie la buscaba tarea por tarea.
+
+`AGENTS.md` lo aclara ahora y añade que, si dos tareas seguidas se bloquean por la misma causa, el agente para la cola. Las 39 vuelven a `[ ]` en la cola y a «Autorizada» en el tablero; los bloqueos anteriores quedan en esta bitácora. JL-300 sigue bloqueada (64 audios sin referencia: decide el creador). También se integran los registros de JL-299, 303, 304, 307 y 308, que Junie dejó sin commit.
+
+**Validación:** `npm run docs:check`.
+
+---
+
+## 2026-11-24 — JL-309: escenario del diario bloqueado (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-309 no figura como Autorizada en `docs/TAREAS.md`; no se inició el recorrido del diario ni se modificó código o pruebas.
+
+**Validación:** línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** bloqueo registrado en la fila JL-309 de `docs/TAREAS.md` y en `work/prompts-noche/COLA_JUNIE.md`; no se generó captura porque no se ejecutó Electron.
+
+---
+
+## 2026-11-24 — JL-308: escenario de diálogo bloqueado (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-308 no figura como Autorizada en `docs/TAREAS.md`. El escenario `dialogo` tampoco existe en `scripts/qaElectron.mjs` (solo hay `curas_dialogo`), y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md` para escribir código. No se modificó código ni se ejecutó Electron.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** bloqueo registrado en la fila JL-308 de `docs/TAREAS.md` y en `work/prompts-noche/COLA_JUNIE.md`; no se generó captura porque no se ejecutó el escenario.
+
+---
+
+## 2026-11-24 — JL-307: escenario de chat bloqueado (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-307 no figura como Autorizada en `docs/TAREAS.md`; no se modificó código ni pruebas. La observación manual en Electron confirmó escritura, cambio entre `Todo`/`General`/`Grupo`, orden `/g` y tope de 200 líneas (se conservan `JL307_CAP_006`–`JL307_CAP_205`).
+
+**Validación:** `npm run qa:electron -- chat`: 5/5 comprobaciones; no cubre por sí solo todos los pasos de JL-307.
+
+**Evidencia:** captura revisada `work/junie-jl307/chat-grupo-maximo.jpg`.
+
+---
+
 ## 2026-11-24 — JL-306: revisión de textos en inglés bloqueada (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -19,6 +69,30 @@
 **Validación:** línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 
 **Evidencia:** `work/junie-jl305/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
+## 2026-11-24 — JL-304: auditoría de hechizos bloqueada (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-304 no figura como Autorizada en `docs/TAREAS.md`, y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se inspeccionaron ni modificaron hechizos, iconos, traducciones, efectos, datos, assets, código o pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl304/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
+## 2026-11-24 — JL-303: auditoría de botín bloqueada por falta de autorización (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-303 no figura como Autorizada en `docs/TAREAS.md`; no se inició la auditoría ni se inspeccionaron o modificaron tablas de botín, datos, código o pruebas.
+
+**Validación:** línea base previa al bloqueo: `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl303/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
 
 ---
 
@@ -62,6 +136,18 @@
 
 ---
 
+## 2026-11-24 — JL-299: auditoría de efectos bloqueada por falta de autorización (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-299 no figura como Autorizada en `docs/TAREAS.md`; por la regla del proyecto no se inició la auditoría de `data/fx.json` ni se inspeccionaron o modificaron datos, assets, código o pruebas. El documento rector `../FrankmanGames/04_VISION_Y_DECISIONES.md` tampoco está disponible para cualquier implementación que pudiera resultar necesaria.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl299/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-298: auditoría de iconos bloqueada por falta de autorización (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -86,6 +172,18 @@
 
 ---
 
+## 2026-11-24 — JL-296: extracción de `hotApply` bloqueada (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/editor/hotApply.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md` y JL-296 no figura en `docs/TAREAS.md` como Autorizada. No se modificaron código ni pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl296/INFORME.md` registra los bloqueos y la línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-295: transición de piso bloqueada por documento rector ausente (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -107,6 +205,18 @@
 **Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 
 **Evidencia:** La ruta del documento rector no existe. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
+## 2026-11-24 — JL-293: terreno bloqueado por documento rector ausente (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/render/terrainView.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron código ni pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl293/INFORME.md`. No aplica captura Electron porque no hubo cambio visual.
 
 ---
 
@@ -146,6 +256,42 @@
 
 ---
 
+## 2026-11-24 — JL-289: visibilidad de piedras y bordes de zona (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/render/stoneView.ts` y `zoneBorderView.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron código ni pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl289/INFORME.md` registra la ruta ausente y la salida de línea base. No aplica captura Electron porque no hubo cambio visual.
+
+---
+
+## 2026-11-24 — JL-288: estado visual de los recursos (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/render/gatherView.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl288/INFORME.md` registra la ruta ausente y la salida de línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
+## 2026-11-24 — JL-287: orientación de los PNJ (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/render/npcView.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl287/INFORME.md` registra la ruta ausente y la salida de línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-286: reparto y brillo del botín (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -179,6 +325,18 @@
 **Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 
 **Evidencia:** `work/junie-jl284/INFORME.md` registra la ruta ausente y la salida de línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
+## 2026-11-24 — JL-283: inspector de entidades (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar `src/ui/dev/inspector.ts`: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl283/INFORME.md` registra la ruta ausente y la salida de la línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
 
 ---
 
@@ -218,6 +376,18 @@
 
 ---
 
+## 2026-11-24 — JL-279: progreso y consejos de carga (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar código: no está disponible `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa. No se inició el trabajo en `src/ui/loadingScreen.ts` ni se cambiaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** La ruta del documento obligatorio se comprobó y devolvió que no existe. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-278: conversión de opciones visuales (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -235,6 +405,18 @@
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
 
 **Estado:** Bloqueada antes de modificar código: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se inició la extracción de `src/ui/menus/mountLooks.ts` ni se cambiaron pruebas.
+
+**Validación:** La comprobación de la ruta requerida devolvió `missing`; `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** Comprobación de existencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md` y salida de línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
+## 2026-11-24 — JL-276: ancho y texto de la barra (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de modificar código: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se inició la extracción de `src/ui/menus/progressBar.ts` ni `panel.ts`, ni se cambiaron pruebas.
 
 **Validación:** La comprobación de la ruta requerida devolvió `missing`; `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 
@@ -266,6 +448,18 @@
 
 ---
 
+## 2026-11-24 — JL-273: orden y texto de misiones (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de modificar código: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se inició la extracción de `src/ui/menus/journal.ts` ni `questTracker.ts`, ni se cambiaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl273/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-272: avance entre nodos de diálogo (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
@@ -285,6 +479,18 @@
 **Estado:** Bloqueada antes de modificar código: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se inició la extracción de `src/ui/menus/chat.ts` ni se cambiaron pruebas.
 
 **Validación:** `npx tsc --noEmit` limpio; `npm run docs:check` correcto. La primera suite completa pasó (380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`); una repetición durante la validación falló solo por una medición transitoria de JL-70 (0,578 ms frente a 0,5 ms). JL-70 pasó aislada (15/15) y la última suite completa pasó con 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** La ruta del documento obligatorio se comprobó y devolvió que no existe. No aplica captura Electron porque no hubo cambio visual.
+
+---
+
+## 2026-11-24 — JL-270: datos del mapa y frecuencia (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de modificar código: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. La autorización del grupo JL-254…JL-353 consta en `docs/TAREAS.md`; no se inició la extracción de `src/ui/map/mapFeed.ts`.
+
+**Validación previa:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 pruebas aprobadas, 1 omitida y 1 `todo`.
 
 **Evidencia:** La ruta del documento obligatorio se comprobó y devolvió que no existe. No aplica captura Electron porque no hubo cambio visual.
 
