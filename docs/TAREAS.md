@@ -370,3 +370,4 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 - JL-294: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
 - JL-295: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
 - JL-298: bloqueada porque no figura como Autorizada en este tablero; no se inició la auditoría de iconos. Línea base: typecheck y suite completa en verde. Evidencia en `work/junie-jl298/INFORME.md`.
+- JL-300: bloqueada; 64 archivos en `assets/audio/` no tienen referencia de ejecución (63 WAV y `cripta_descenso.ogg`). Varias mezclas/stems son fuentes registradas en `PROCEDENCIA.md`; hace falta decisión del creador para conservarlas o retirarlas. Evidencia: `work/junie-jl300/INFORME.md`; typecheck, suite y `npm run docs:check` limpios.
