@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-211: pruebas de shape.ts (Junie)
+
+**Archivos:** `tests/jl211_shape.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 21 pruebas puras de `src/world/shape.ts`: plotFade (7 casos — 0 dentro de la parcela, 0 en el borde, crecimiento 0→1 al alejarse, simetría en los 4 lados, 1 a 80 m fuera, coordenadas negativas, esquina > lado), playableAt (6 casos — true en región jugable, false en el mar, false en región no jugable, claro dentro del radio, claro solo en Panamá, sin claros solo regiones en playable) y buildWorldShape (8 casos — seaLevel del atlas, macro 0 dentro de parcela, macro crece fuera, coast positivo en tierra, coast negativo en mar, playable delega a playableAt, determinismo, coast varía suavemente entre vecinos).
+
+**Validación:** `npx vitest run tests/jl211_shape.test.ts` → 21/21 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-210: pruebas de noise.ts (Junie)
 
 **Archivos:** `tests/jl210_noise.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
