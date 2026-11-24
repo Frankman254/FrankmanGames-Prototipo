@@ -4892,3 +4892,13 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 
 ---
 
+
+## 2026-11-23 — JL-215: guardado dentro de la barriada (Junie)
+
+**Archivos:** `src/rpg/contracts.ts`, `src/scenes/houseScene.ts`, `src/main.ts`, `tests/jl215_barriadaSave.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Al guardar dentro de la barriada Praderas del Norte, el guardado no recordaba que el jugador estaba dentro: al cargar, aparecía en el mapa base junto a la Piedra Pintada pero nunca entraba en la barriada. Causa: `currentPlace()` guardaba la posición de la piedra como `scene: 'overworld'` y `enterPlace()` no tenía forma de saber que debía llamar a `houses?.enterBarriada()`. Arreglo: campo opcional `barriada` en `SavePlace`, getter `inBarriada` en `HouseScene`, `currentPlace()` lo marca al guardar, `enterPlace()` lo lee al cargar y entra en la barriada. Guardados viejos sin el campo no se ven afectados.
+
+**Validación:** `tests/jl215_barriadaSave.test.ts` 6/6 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). Build falla por balM3.ts ajeno (pre-existente).
+
+---

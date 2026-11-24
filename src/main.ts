@@ -1074,6 +1074,11 @@ function enterPlace(place: SavePlace | null, seed: number, dungeonState?: Dungeo
     const r = resolvePlace(place, placeWorld());
     if (r.kind === 'overworld') {
         newWorld(seed, r.pos);
+        // CLA-BARR1: si el guardado era dentro de la barriada, entrar de nuevo.
+        if (place?.barriada) {
+            const stone = stones.get(BARRIADA_STONE);
+            if (stone) houses?.enterBarriada(arriveAt(stone));
+        }
         return;
     }
     if (r.kind === 'dungeon') {
@@ -1098,7 +1103,8 @@ function currentPlace(): SavePlace {
     // El banco no es una mazmorra persistente: cargar reaparece ante su puerta.
     const p = bank?.inside ? BANK_LOCATION.returnPoint : houses?.inside ? houses.returnPoint! : world.player.pos;
     const inside = crypt?.inside ?? false;
-    const zone = bank?.inside ? 'El Cruce' : houses?.inside ? 'Villa Raspadura' : worldInfo().zone;
+    const inBarriada = houses?.inBarriada ?? false;
+    const zone = bank?.inside ? 'El Cruce' : inBarriada ? 'Praderas del Norte' : houses?.inside ? 'Villa Raspadura' : worldInfo().zone;
     return {
         scene: inside ? 'dungeon' : 'overworld',
         dungeon: inside ? 'crypt' : null,
@@ -1110,6 +1116,7 @@ function currentPlace(): SavePlace {
         timeOfDay: Math.round(world.timeOfDay * 1e4) / 1e4,
         playSeconds: Math.round(playSeconds),
         ...(zone ? { name: zone } : {}),
+        ...(inBarriada ? { barriada: true } : {}),
     };
 }
 

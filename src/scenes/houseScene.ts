@@ -298,6 +298,11 @@ export class HouseScene {
         return this.room !== null;
     }
 
+    /** CLA-BARR1: true si el jugador está dentro de la barriada de Praderas del Norte. */
+    get inBarriada(): boolean {
+        return this.room === 'barriada';
+    }
+
     get place(): { name: string; levelMin: number; levelMax: number } | null {
         return this.room ? { name: ROOMS[this.room].name, levelMin: 1, levelMax: 1 } : null;
     }

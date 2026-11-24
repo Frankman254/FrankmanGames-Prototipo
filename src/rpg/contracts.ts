@@ -945,6 +945,8 @@ export interface SavePlace {
     playSeconds?: number;
     /** Rótulo del sitio para la lista de ranuras («Llanos de Azuero», «Cripta · piso 2»). */
     name?: string;
+    /** CLA-BARR1: true si el jugador estaba dentro de la barriada de Praderas del Norte. */
+    barriada?: boolean;
 }
 
 // ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────
