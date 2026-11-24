@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-250: Consola limpia tras tanda JL-204…JL-249 (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl250/INFORME.md`.
+
+**Qué se hizo:** Verificación de consola limpia en los 16 escenarios nuevos de la tanda JL-204…JL-249: hechizosClases (25/25), barriada (8/8), barriadaRendimiento (10/10), pesca (6/6), profesiones (1/1), oficios (1/1), misiones (10/10), musicaContextos (18/18), barraRoja (6/6), todasLasPiedras (44/44), casaCreador (10/10), guardadoBarriadaCasa (9/14, fallos pre-existentes JL-237), barriadaMontura (11/14, fallos pre-existentes JL-219), barriadaNoche (8/8), barriadaOpciones (16/16), rendimiento (4/4). Total: 187/202 checks en verde, 0 errores nuevos de consola.
+
+**Validación:** Suite 4844/4844 en verde, typecheck limpio salvo balM3.ts ajeno.
+
+**Evidencia:** `work/junie-jl250/INFORME.md`.
+
+---
+
 ## 2026-11-24 — Tanda JL-254…JL-353 para Junie (coordinador)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

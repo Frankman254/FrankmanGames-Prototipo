@@ -1455,7 +1455,8 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
   — commit «JL-249: medición de arranque en frío — ~15 s de media» — 3 ejecuciones (14910, 14944, 15130 ms; media 14995 ms ±110 ms). INFORME.md y datos.json en work/junie-jl249/.
 
 ### Cierre de la tanda
-- [ ] JL-250 Consola limpia: todos los escenarios nuevos de esta tanda sin errores nuevos. INFORME en `work/junie-jl250/`.
+- [x] JL-250 Consola limpia: todos los escenarios nuevos de esta tanda sin errores nuevos. INFORME en `work/junie-jl250/`.
+  — commit «JL-250: consola limpia — 16 escenarios, 187/202 checks, 0 errores nuevos» — INFORME.md en work/junie-jl250/.
 - [ ] JL-251 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
 - [ ] JL-252 Reintento obligatorio de lo que haya quedado `[!]` en JL-204…251. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
 - [ ] JL-253 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_4.md` con 20 tareas pequeñas, cada una con su evidencia **comprobada** (el `grep` que lo demuestra). Ojo: en la BOLSA_3, `weather`, `fields`, `gathering`, `levelRange`, `telemetry` y `frameStats` sí tenían pruebas. Son propuestas: no las empieces.
