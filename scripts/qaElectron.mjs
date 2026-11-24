@@ -9375,6 +9375,101 @@ const scenarios = {
         console.log(`     Promedio: ${promedio} ms, máximo: ${maxMs} ms (${completas.find((r) => r.ms === maxMs)?.id})`);
         console.log(`     Pendientes: ${tabla.filter((r) => r.pendiente).length} (${[...tabla.filter((r) => r.pendiente)].map((r) => r.id).join(', ')})`);
     },
+
+    /** JL-248: Rendimiento comparado en tres lugares con la misma cámara.
+     * Villa Raspadura, Los Santos (cerro_punta) y la barriada Praderas del Norte.
+     * Mide FPS, mallas, materiales, luces y enemigos. Misma cámara en cada medición. */
+    async jl248_rendimientoTres() {
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = `work/junie-jl248`;
+        fs.mkdirSync(outDir, { recursive: true });
+
+        const report = [];
+        report.push('# JL-248 — Rendimiento comparado en tres lugares');
+        report.push(`Fecha: ${new Date().toISOString()}`);
+        report.push('');
+        report.push('| Ubicación | Muestras | FPS medio | FPS mínimo | FPS máximo | Mallas | Materiales | Luces | Enemigos |');
+        report.push('|-----------|----------|-----------|------------|------------|--------|------------|-------|----------|');
+
+        const measure = async (label, setupFn) => {
+            if (setupFn) await setupFn();
+            // Esperar a que la escena se estabilice.
+            await sleep(5000);
+            // Muestrear FPS durante 5 s, cada 200 ms.
+            const samples = [];
+            for (let i = 0; i < 25; i++) {
+                const fps = await js(`__game.view.engine.getFps()`);
+                samples.push(fps);
+                await sleep(200);
+            }
+            const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
+            const min = Math.min(...samples);
+            const max = Math.max(...samples);
+            // Métricas de escena.
+            const mallas = await js(`__game.view.scene.meshes.length`);
+            const materiales = await js(`new Set(__game.view.scene.meshes.map(m=>m.material)).size`);
+            const luces = await js(`__game.view.scene.lights.filter(l=>l.isEnabled()).length`);
+            const enemigos = await js(`${W}.enemies.list.length`);
+            const row = `| ${label} | ${samples.length} | ${avg.toFixed(1)} | ${min} | ${max} | ${mallas} | ${materiales} | ${luces} | ${enemigos} |`;
+            report.push(row);
+            check(`Rendimiento ${label}: FPS medio ≥ 20`, avg >= 20, `${avg.toFixed(1)} (min ${min}, max ${max})`);
+            await shot(`jl248-${label}`);
+            return { avg, min, max, mallas, materiales, luces, enemigos };
+        };
+
+        /* 1. Villa Raspadura (pueblo inicial). */
+        await newGame('QA JL248');
+        await sleep(2000);
+        const raspadura = await measure('raspadura', async () => {
+            await js(
+                `(()=>{ const r=__game.view.scene.getTransformNodeByName('landmark:raspadura'); if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.position.x+5,y:r.position.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`,
+            );
+        });
+
+        /* 2. Los Santos (cerro_punta, junto a la urbanización). */
+        await newGame('QA JL248');
+        await sleep(2000);
+        const santos = await measure('los_santos', async () => {
+            await js(`__game.travelStone('cerro_punta')`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga cerro_punta');
+            await sleep(3000);
+            // Colocar al jugador cerca de la urbanización de Los Santos.
+            await js(
+                `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:-300,y:100})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+            );
+        });
+
+        /* 3. Barriada Praderas del Norte. */
+        await newGame('QA JL248');
+        await sleep(2000);
+        const barriada = await measure('barriada', async () => {
+            await js(`__game.travelStone('praderas_norte')`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+            await sleep(3000);
+            // En la plaza de inicio.
+        });
+
+        // Guardar informe.
+        report.push('');
+        report.push('Notas: medición sin cambios de código. Opciones gráficas por defecto. Cámara en posición predeterminada.');
+        report.push('');
+        report.push('### Resumen');
+        report.push(`- Villa Raspadura: ${raspadura?.avg.toFixed(1) ?? '?'} fps, ${raspadura?.mallas ?? '?'} mallas, ${raspadura?.luces ?? '?'} luces`);
+        report.push(`- Los Santos: ${santos?.avg.toFixed(1) ?? '?'} fps, ${santos?.mallas ?? '?'} mallas, ${santos?.luces ?? '?'} luces`);
+        report.push(`- Barriada: ${barriada?.avg.toFixed(1) ?? '?'} fps, ${barriada?.mallas ?? '?'} mallas, ${barriada?.luces ?? '?'} luces`);
+        fs.writeFileSync(pathMod.join(outDir, 'INFORME.md'), report.join('\n') + '\n');
+
+        // Guardar datos JSON para comparación futura.
+        const datos = {
+            fecha: new Date().toISOString(),
+            raspadura,
+            los_santos: santos,
+            barriada,
+        };
+        fs.writeFileSync(pathMod.join(outDir, 'datos.json'), JSON.stringify(datos, null, 2));
+        console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -9403,6 +9498,8 @@ scenarios.barriadaOpciones.timeout = 180;
 scenarios.todasLasPiedras.timeout = 300;
 // JL-237: casa + barriada, cada una con viaje, entrar, guardar, cargar y salir.
 scenarios.guardadoBarriadaCasa.timeout = 300;
+// JL-248: 3 ubicaciones × (nueva partida + 5 s espera + 5 s muestreo + captura).
+scenarios.jl248_rendimientoTres.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

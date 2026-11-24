@@ -1,3 +1,13 @@
+## 2026-11-24 — JL-248: Escenario rendimiento en tres lugares (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `jl248_rendimientoTres` en `scripts/qaElectron.mjs` que mide FPS, mallas, materiales, luces y enemigos en tres ubicaciones con la misma cámara: Villa Raspadura (119.2 fps, 2442 mallas, 72 enemigos), Los Santos en cerro_punta (120.0 fps, 1235 mallas, 0 enemigos) y la barriada Praderas del Norte (119.9 fps, 2412 mallas, 0 enemigos). Tabla comparada y datos JSON en `work/junie-jl248/`.
+
+**Validación:** `node scripts/qaElectron.mjs jl248_rendimientoTres` → 4/4 checks en verde. Sin errores de consola.
+
+---
+
 ## 2026-11-24 — JL-247: Calle de Los Santos — diagnóstico de enemigos en la urbanización (Junie)
 
 **Archivos:** `tests/jl247_urbanizacion.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
