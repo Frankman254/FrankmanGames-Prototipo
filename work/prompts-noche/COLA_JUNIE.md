@@ -1503,7 +1503,7 @@ Contexto del coordinador:
 - [!] JL-275 `src/ui/menus/context.ts`: qué opciones salen según el objetivo. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl275/INFORME.md`.
 - [ ] JL-276 `src/ui/menus/progressBar.ts` y `panel.ts`: el ancho y el texto de la barra.
 - [!] JL-277 `src/ui/menus/mountLooks.ts`: la lista de aspectos disponibles. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; no se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [ ] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores.
+- [!] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores. — BLOQUEADA: no existe `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa; no se modificó código ni pruebas.
 - [ ] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos.
 - [ ] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números.
 - [ ] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa.
