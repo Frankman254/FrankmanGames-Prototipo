@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-234: escenario oficios — fabricación de short_sword (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `oficios` en `qaElectron.mjs` que verifica el flujo completo de fabricación: (1) recoger madera de cedro (cedar) del campo de recursos; (2) recoger mineral (ore_vein) hasta tener ≥ 3 unidades; (3) verificar materiales suficientes (≥ 3 ore, ≥ 1 wood_cedar); (4) mover al jugador al yunque (forge, 134,118) y confirmar `nearStation('forge')` = true; (5) fabricar `short_sword` con `session.craft('short_sword', 0)` → ok; (6) verificar que la espada llega a la mochila; (7) verificar que 3 ore y 1 wood_cedar se consumen; (8) verificar que el oficio de Forjatodo gana experiencia. Complementa a JL-198, que solo cubría la recolección.
+
+**Verificación:** Escenario `oficios` en Electron: 10/10 checks en verde. Capturas en `work/qa/` (jl234-madera-recogida, jl234-mineral-recogido, jl234-junto-al-yunque, jl234-espada-fabricada). `npx tsc --noEmit` sin errores nuevos.
+
+---
+
 ## 2026-11-23 — JL-233: escenario misiones en qaElectron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

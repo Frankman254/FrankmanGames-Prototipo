@@ -8306,6 +8306,94 @@ const scenarios = {
         await js('clearInterval(window.__qaVida)');
     },
 
+    /** JL-234: Escenario oficios — recoger materiales, ir al yunque, fabricar una espada corta y verificar que llega a la mochila. */
+    async jl234_oficios() {
+        await newGame('QA Oficios');
+        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+        await sleep(1500);
+
+        // 1) Esperar que el campo de recursos esté disponible.
+        await until(`${W}.gatherField !== null`, 30000, 'campo de recursos');
+
+        // 2) Recoger wood_cedar (cedro) — necesario para short_sword.
+        const cedarNode = await js(
+            `(() => { const f=${W}.gatherField; if(!f) return null; const n=f.nodes.find(n=>n.kind==='cedar'&&n.respawn<=0); return n?{id:n.id,x:n.x,y:n.y}:null; })()`,
+        );
+        check('oficios: nodo de cedro disponible', cedarNode !== null, JSON.stringify(cedarNode));
+
+        // Mover cerca del cedro y recogerlo.
+        await js(`(() => { const p=${W}.player; p.pos={x:${cedarNode.x - 3},y:${cedarNode.y}}; p.path=[]; p.moveTarget=null; })()`);
+        await sleep(500);
+        await js(`${W}.commandGather(${cedarNode.id})`);
+        await until(`${W}.gathering !== null`, 15000, 'recolección cedro iniciada');
+        await until(`${W}.gathering === null`, 15000, 'recolección cedro terminada');
+        await sleep(500);
+        const cedarCount = await js(`${W}.character.inventory.count ? ${W}.character.inventory.count('wood_cedar') : 0`);
+        check('oficios: madera de cedro en la mochila', cedarCount >= 1, `wood_cedar: ${cedarCount}`);
+        await shot('jl234-madera-recogida');
+
+        // 3) Recoger ore (veta de mineral) — necesario para short_sword (3 ore).
+        // Como un nodo da 1-2 ore, puede que haya que recoger dos veces.
+        let oreCount = 0;
+        for (let intento = 0; intento < 3 && oreCount < 3; intento++) {
+            const oreNode = await js(
+                `(() => { const f=${W}.gatherField; if(!f) return null; const n=f.nodes.find(n=>n.kind==='ore_vein'&&n.respawn<=0); return n?{id:n.id,x:n.x,y:n.y}:null; })()`,
+            );
+            if (!oreNode) break;
+            await js(`(() => { const p=${W}.player; p.pos={x:${oreNode.x - 3},y:${oreNode.y}}; p.path=[]; p.moveTarget=null; })()`);
+            await sleep(500);
+            await js(`${W}.commandGather(${oreNode.id})`);
+            await until(`${W}.gathering !== null`, 15000, `recolección ore intento ${intento + 1} iniciada`);
+            await until(`${W}.gathering === null`, 15000, `recolección ore intento ${intento + 1} terminada`);
+            await sleep(500);
+            oreCount = await js(`${W}.character.inventory.count ? ${W}.character.inventory.count('ore') : 0`);
+        }
+        check('oficios: mineral en la mochila (≥ 3)', oreCount >= 3, `ore: ${oreCount}`);
+        await shot('jl234-mineral-recogido');
+
+        // 4) Verificar materiales totales antes de fabricar.
+        const beforeOre = await js(`${W}.character.inventory.count('ore')`);
+        const beforeWood = await js(`${W}.character.inventory.count('wood_cedar')`);
+        check('oficios: materiales suficientes (≥ 3 ore, ≥ 1 wood_cedar)', beforeOre >= 3 && beforeWood >= 1, `ore:${beforeOre} wood:${beforeWood}`);
+
+        // 5) Contar espadas antes de fabricar.
+        const beforeSword = await js(`${W}.character.inventory.count ? ${W}.character.inventory.count('short_sword') : 0`);
+
+        // 6) Mover al jugador al yunque (forge: 134, 118).
+        await js(`(() => { const p=${W}.player; p.pos={x:134,y:118}; p.path=[]; p.moveTarget=null; })()`);
+        await sleep(500);
+        const atForge = await js(`${S}.nearStation('forge')`);
+        check('oficios: jugador junto al yunque', atForge === true, String(atForge));
+        await shot('jl234-junto-al-yunque');
+
+        // 7) Fabricar short_sword.
+        const craftResult = await js(
+            `(() => { const r=${S}.craft('short_sword', 0); return {ok:r.ok, reason:r.reason}; })()`,
+        );
+        check('oficios: fabricar short_sword → ok', craftResult.ok === true, JSON.stringify(craftResult));
+        await shot('jl234-espada-fabricada');
+
+        // 8) Verificar que la espada llegó a la mochila.
+        const afterSword = await js(`${W}.character.inventory.count ? ${W}.character.inventory.count('short_sword') : 0`);
+        check('oficios: espada corta en la mochila', afterSword > beforeSword, `antes ${beforeSword}, después ${afterSword}`);
+
+        // 9) Verificar que los materiales se consumieron.
+        const afterOre = await js(`${W}.character.inventory.count('ore')`);
+        const afterWood = await js(`${W}.character.inventory.count('wood_cedar')`);
+        check('oficios: 3 ore consumidos', afterOre === beforeOre - 3, `antes ${beforeOre}, después ${afterOre}`);
+        check('oficios: 1 wood_cedar consumido', afterWood === beforeWood - 1, `antes ${beforeWood}, después ${afterWood}`);
+
+        // 10) Verificar que el oficio de Forjatodo ganó experiencia.
+        const smithXp = await js(
+            `(() => { const prof=${W}.character.professions; return prof.smith ? {level:prof.smith.level,xp:prof.smith.xp} : null; })()`,
+        );
+        if (smithXp && smithXp.xp > 0) {
+            check('oficios: oficio de Forjatodo con experiencia', true, JSON.stringify(smithXp));
+        }
+
+        await js('clearInterval(window.__qaVida)');
+    },
+
     /** JL-200: música por contexto — portada, pueblos, regiones, combate, avisos. */
     async musicaContextos() {
         // 1) Portada: contexto 'title'.
