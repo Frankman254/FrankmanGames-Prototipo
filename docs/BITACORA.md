@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-267: aislar el ajuste de zoom del minimapa (Junie)
+
+**Archivos:** `src/ui/map/mapLogic.ts`, `src/ui/map/minimap.ts`, `tests/ui/minimapResize.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `projectToMinimap()` y `minimapPixelsPerMeter()` ya realizaban en lógica pura la proyección y el efecto del zoom en la escala, con pruebas existentes. Se extrajo también el cálculo de aplicar el factor y limitarlo a `zoomMin`/`zoomMax` como `zoomMinimap()`, y `Minimap.zoomBy()` lo consume sin cambiar la fórmula ni el comportamiento.
+
+**Validación:** La prueba nueva falló antes de implementar (`zoomMinimap is not a function`) y quedó verde después. `tests/ui/minimapResize.test.ts`: 7/7; suite completa: 380 archivos, 4.909 pruebas aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` limpio. No se requiere captura Electron porque el cambio es una extracción matemática sin efecto visual.
+
+**Evidencia:** `src/ui/map/mapLogic.ts`, `src/ui/map/minimap.ts` y `tests/ui/minimapResize.test.ts`.
+
+---
+
 ## 2026-11-24 — JL-266: verificación de la interfaz del editor (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

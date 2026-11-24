@@ -335,6 +335,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | ID | Quién | Estado | Evidencia |
 |---|---|---|---|
 | JL-266 | J | Hecho (commit «JL-266: confirmar la interfaz del editor en Electron»; sin cambios de código, hallazgos ya resueltos por ED-02) | Electron `editorWorldBuilder`: 10/10, incluida selección, arrastre, giro, escala, historial, duplicar/borrar y guardar/reabrir; consola limpia. Capturas revisadas: `work/qa/editor-world-builder-gizmo.jpg` y `work/qa/editor-world-builder-movido.jpg` |
+| JL-267 | J | Hecho (commit «JL-267: aislar el ajuste de zoom del minimapa») | `zoomMinimap()` en `src/ui/map/mapLogic.ts`, usado por `Minimap.zoomBy()`; la proyección y escala del minimapa ya estaban en funciones puras cubiertas por pruebas. 7 pruebas dirigidas, suite 4.909 aprobadas, 1 omitida y 1 `todo`; typecheck limpio |
 
 ## Bloqueadas
 

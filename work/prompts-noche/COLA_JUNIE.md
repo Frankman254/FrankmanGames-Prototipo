@@ -1492,7 +1492,7 @@ Contexto del coordinador:
 - [x] JL-266 **OMP-ED-04** Arreglos de interfaz del editor que salen de tu tabla de ED-01. — commit «JL-266: confirmar la interfaz del editor en Electron» — `editorWorldBuilder` 10/10; selección, gizmo, historial y guardado correctos, consola limpia; capturas revisadas en `work/qa/editor-world-builder-gizmo.jpg` y `work/qa/editor-world-builder-movido.jpg`. No hubo cambio de código: los hallazgos ya estaban resueltos por ED-02.
 
 ### C. Extracciones pequeñas con su prueba (una por módulo)
-- [ ] JL-267 `src/ui/map/minimap.ts`: proyección de mundo a píxeles del minimapa y el zum.
+- [x] JL-267 `src/ui/map/minimap.ts`: proyección de mundo a píxeles del minimapa y el zum. — commit «JL-267: aislar el ajuste de zoom del minimapa» — `zoomMinimap()` puro, proyección y escala existentes verificadas; 7 pruebas (`minimapResize.test.ts`), suite 4.909 aprobadas, 1 omitida y 1 `todo`, typecheck limpio.
 - [ ] JL-268 `src/ui/map/worldMap.ts`: el encuadre del mapa grande y el paso de clic a mundo.
 - [ ] JL-269 `src/ui/map/minimapDecor.ts`: qué decoración se dibuja según la escala.
 - [ ] JL-270 `src/ui/map/mapFeed.ts`: qué se manda al mapa y con qué frecuencia.

@@ -17,6 +17,7 @@ import {
     minimapPixelsPerMeter,
     projectToMinimap,
     resizeMinimap,
+    zoomMinimap,
     type MinimapSize,
 } from './mapLogic';
 import {
@@ -168,7 +169,7 @@ export class Minimap {
 
     zoomBy(k: number): void {
         const d = this.state.def.minimap;
-        this.prefs.zoom = Math.min(d.zoomMax, Math.max(d.zoomMin, this.prefs.zoom * k));
+        this.prefs.zoom = zoomMinimap(this.prefs.zoom, k, d.zoomMin, d.zoomMax);
         this.savePrefs();
         this.timer = 0;
     }

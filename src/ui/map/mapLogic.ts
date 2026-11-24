@@ -213,6 +213,10 @@ export function resizeMinimap(
     return clampMinimapSize({ w: edges.w ? start.w + dx / s : start.w, h: edges.h ? start.h + dy / s : start.h }, d);
 }
 
+export function zoomMinimap(zoom: number, factor: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, zoom * factor));
+}
+
 /**
  * Píxeles del lienzo por metro. No depende del tamaño del minimapa: al
  * agrandarlo se ve más terreno a la misma escala (se recorta, nunca se estira).

@@ -11,6 +11,7 @@ import {
     minimapToWorld,
     projectToMinimap,
     resizeMinimap,
+    zoomMinimap,
 } from '../../src/ui/map/mapLogic';
 
 const d = { size: 220, minSize: 140, maxSize: 420, radius: 48 };
@@ -29,6 +30,12 @@ function memStore(): {
 }
 
 describe('minimapa redimensionable', () => {
+    it('aplica el factor del zoom dentro de los límites configurados', () => {
+        expect(zoomMinimap(1, 1.25, 0.5, 2)).toBe(1.25);
+        expect(zoomMinimap(1.9, 1.25, 0.5, 2)).toBe(2);
+        expect(zoomMinimap(0.6, 1 / 1.25, 0.5, 2)).toBe(0.5);
+    });
+
     it('cada lado va por su cuenta: ancho por el borde derecho, alto por el de abajo', () => {
         const start = { w: 220, h: 220 };
         expect(resizeMinimap(start, 100, 999, 1, { w: true, h: false }, d)).toEqual({ w: 320, h: 220 });
