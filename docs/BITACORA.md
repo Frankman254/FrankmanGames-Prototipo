@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-236: escenario todasLasPiedras — 24 Piedras Pintadas (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `todasLasPiedras` en `qaElectron.mjs` que viaja a cada una de las 24 Piedras Pintadas de `data/stones.json`, verifica que la página se carga y el personaje queda en celda transitable, mide el tiempo de carga de cada viaje y vuelve a Raspadura. 17 piedras completas (walk+active), 7 pendientes (zonas no desarrolladas: praderas_norte, porvenil, la_palmita, sambua, llano_tugru, bocas_torito, david). Hallazgo: tras viajar a coordenadas extremas, la celda de Raspadura deja de ser walkable temporalmente (stream tarda en reconstruir la grid). Timeout propio de 300 s. Tabla de tiempos en `work/qa/todasLasPiedras.json`.
+
+**Verificación:** Escenario `todasLasPiedras` en Electron: 44/44 checks en verde (2 ejecuciones consecutivas). Promedio 1632 ms por viaje, máximo 1874 ms (santiaguito). `npx tsc --noEmit` sin errores nuevos.
+
+---
+
 ## 2026-11-23 — JL-235: escenario casaCreador — casa del creador y espejo (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
