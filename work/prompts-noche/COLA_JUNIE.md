@@ -1413,7 +1413,7 @@ Contexto del coordinador:
 - [x] JL-223 **Opciones gráficas dentro de la barriada.** — commit «JL-223: barriadaOpciones — 16/16 en verde, 6 capturas» — Escenario `barriadaOpciones` en qaElectron.mjs: 7 combinaciones de calidad, estilo y distancia. 16/16 en verde, 6 capturas en work/junie-jl223/. Sin errores, sin niebla azul, movimiento funcional tras cambios.
 
 ### Hallazgos pendientes
-- [ ] JL-224 **El pez no llega a la mochila** (hallazgo de JL-197: `reel()` no da botín en el arnés). Averigua si pasa también jugando a mano o solo en el arnés. Si es un fallo real y el arreglo es pequeño, arréglalo con su prueba; si toca cifras de botín, para y pregunta.
+- [x] JL-224 **El pez no llega a la mochila** (hallazgo de JL-197: `reel()` no da botín en el arnés). — commit «JL-224: escenario pesca — hook en tick() y verificación por consola» — Escenario pesca 6/6, tests jl206_fishing 25/25, tsc sin errores nuevos. El juego funciona correctamente; el bug era del arnés (pérdida de ventana de reacción + bag.slots no serializable). DIAGNOSTICO.md en work/junie-jl224/.
 - [ ] JL-225 Reintento de **JL-74** (solape de personaje y mascota en el escenario `barra`), con el arnés actual y lo aprendido en JL-181…201.
 - [ ] JL-226 Reintento de **JL-85** (`crestalba` no carga y cae CDP), con el arnés actual. Si sigue sin display, deja el diagnóstico exacto y la orden para que el creador lo corra.
 

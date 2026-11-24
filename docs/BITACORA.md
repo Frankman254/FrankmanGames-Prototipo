@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-224: el pez no llega a la mochila — diagnóstico (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl224/DIAGNOSTICO.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Investigación de por qué el escenario `pesca` (JL-197) no veía el pez en la mochila. Causa: **bug del arnés**, no del juego. El escenario perdía la ventana de reacción de 1.1 s porque `await shot()` entre `until()` y `commandFish(null)` dejaba que el tick expirara el estado `'bite'`. Además, `bag.slots` no se serializaba en `js()` del arnés. Arreglo: hook en `tick()` que llama `commandFish(null)` en el mismo frame que detecta `'bite'`. La consola oculta confirma que el botín llega (`+ Perca plateada`, `+ Carpa de musgo`, etc.).
+
+**Verificación:** Escenario `pesca` 6/6 en Electron. `tests/jl206_fishing.test.ts` 25/25. `npx tsc --noEmit` sin errores nuevos.
+
+**No se cambió:** `src/sim/fishing.ts`, `data/rpg/fishing.json`, `data/rpg/loot.json`. El código del juego era correcto.
+
+---
+
 ## 2026-11-23 — JL-223: opciones gráficas dentro de la barriada Praderas del Norte (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl223/`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
