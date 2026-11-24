@@ -5076,3 +5076,13 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** `npx vitest run tests/jl229_hostileZones.test.ts` → 4/4 en verde. Suite completa 4385/4385. Typecheck limpio salvo `scripts/balance/balM3.ts` (ajeno).
 
 **Evidencia:** `tests/jl229_hostileZones.test.ts`.
+
+---
+**Fecha:** 2026-11-23
+**Tarea:** JL-232 — Cripta: escaleras de subida y bajada en cada piso
+
+**Qué se hizo:** 402 pruebas que verifican los 100 pisos de la cripta: cada piso tiene escalera de subida (`upStairs`) sobre baldosa caminable; cada piso salvo el último (índice 99) tiene escalera de bajada (`downStairs`) sobre baldosa caminable; el último piso no tiene bajada; subida y bajada no comparten baldosa; los pisos manuales 0-4 tienen las coordenadas de escaleras declaradas en `cripta-tulivieja.json` verificadas.
+
+**Validación:** `npx vitest run tests/jl232_cryptStairs.test.ts` → 402/402 en verde. Typecheck limpio salvo `scripts/balance/balM3.ts` (ajeno).
+
+**Evidencia:** `tests/jl232_cryptStairs.test.ts`.
