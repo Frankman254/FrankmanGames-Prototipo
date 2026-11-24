@@ -1517,7 +1517,7 @@ Contexto del coordinador:
 - [ ] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven.
 - [!] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [!] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código ni pruebas.
-- [ ] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble).
+- [!] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble). — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
 - [ ] JL-294 `src/render/gridView.ts`: qué celdas se pintan.
 - [ ] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon.
