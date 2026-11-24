@@ -1485,7 +1485,7 @@ Contexto del coordinador:
 - [x] JL-261 **Vuelo en la barriada** (JL-219): `world.interior=true` lo bloquea. Escribe en `ACCIONES_CREADOR.md` si se permite volar en las zonas exteriores aparte, con el tope de altura y el borde que propones. No lo cambies. — commit «JL-261: pregunta al creador sobre vuelo en la barriada» — INFORME.md en work/junie-jl261/, pregunta en ACCIONES_CREADOR.md con 4 opciones. Sin código modificado.
 
 ### B. Tareas de programador que eran de OMP (detalle en `COLA_OMP.md`)
-- [ ] JL-262 **UI-04** Vida a la vista.
+- [x] JL-262 **UI-04** Vida a la vista. — commit «JL-262: guardianes y hover muestran números de vida» — 16 pruebas verdes (jl262_enemyHealthText.test.ts), suite 4878/4878, tsc limpio, push OK. hoveredId en EnemyView, syncHealthText() con DynamicTexture reutilizado, showHealthNumbers por e.guardian || hover. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl262/.
 - [ ] JL-263 **VIS-02** Repaso de los efectos de los hechizos, después de JL-262.
 - [ ] JL-264 **OMP-POL-12** Skins del indicador de apuntado, del puntero y de la trayectoria. Si necesita un modelo o una textura nueva de Blender, márcala bloqueada y deja dicho qué falta.
 - [ ] JL-265 **OMP-POL-02b** Tema por profundidad en la cripta.

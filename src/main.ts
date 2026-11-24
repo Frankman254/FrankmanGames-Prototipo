@@ -2330,6 +2330,8 @@ view.engine.runRenderLoop(() => {
         });
         if (resting) session.restEnergy(frameSeconds);
     }
+    // UI-04: enemigo bajo el cursor para mostrar vida al hover.
+    view.enemies.hoveredId = view.pickEnemy(input.x, input.y);
     view.sync(world, alpha, frameSeconds, !simulationPaused);
     resurrectorView.sync(world);
     // MUE-02: detectar la transición a espectral dentro de la cripta para recordar el piso.

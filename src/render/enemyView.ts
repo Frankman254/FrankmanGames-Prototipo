@@ -37,6 +37,8 @@ interface EnemyVisual {
     lastState: EnemyState | null;
     /** Cartel de nombre y nivel (se crea con el primer texto). */
     plate: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; text: string; key: string } | null;
+    /** Texto de vida "HP / maxHP" (UI-04: jefes siempre, hover para el resto). */
+    healthText: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; text: string } | null;
 }
 
 /** Texto y color CSS del cartel de un enemigo, o null para no enseñarlo. */
@@ -57,6 +59,9 @@ interface TelegraphVisual {
 }
 
 const BAR_WIDTH = 1;
+const HEALTH_TEXT_W = 256;
+const HEALTH_TEXT_H = 48;
+const HEALTH_FONT_SIZE = 28;
 const PLATE_W_MIN = 256;
 const PLATE_W_MAX = 2048;
 const PLATE_H = 80;
@@ -116,10 +121,14 @@ export class EnemyView {
     private readonly summonMat: StandardMaterial;
     private readonly barBgMat: StandardMaterial;
     private readonly barFillMat: StandardMaterial;
+    private readonly healthTextMat: StandardMaterial;
 
     /** Eventos de animación del último `sync` (hit, cast, footstep). */
     animEvents: AnimEvent[] = [];
     private readonly proxyMat: StandardMaterial;
+
+    /** ID del enemigo bajo el cursor (UI-04: mostrar vida al hover). */
+    hoveredId: number | null = null;
 
     /** Piso actual de la cripta (null = fuera). Lo usa entryFor para elegir variantes. */
     dungeonFloor: number | null = null;
@@ -134,6 +143,7 @@ export class EnemyView {
         this.summonMat = flatMaterial(scene, 'teleSummon', [0.7, 0.4, 1], 0.45);
         this.barBgMat = flatMaterial(scene, 'barBg', [0.1, 0.1, 0.1], 0.8);
         this.barFillMat = flatMaterial(scene, 'barFill', [0.9, 0.2, 0.2], 1);
+        this.healthTextMat = flatMaterial(scene, 'healthText', [1, 1, 1], 1);
     }
 
     /** Malla pickable → id de enemigo. */
@@ -215,7 +225,7 @@ export class EnemyView {
         barFill.billboardMode = Mesh.BILLBOARDMODE_ALL;
         barFill.material = this.barFillMat;
         barFill.isPickable = false;
-        const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null, plate: null };
+        const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null, plate: null, healthText: null };
         this.visuals.set(e.id, v);
         return v;
     }
@@ -319,6 +329,69 @@ export class EnemyView {
         v.plate = null;
     }
 
+    /** Dibuja (o actualiza) el texto de vida "HP / maxHP" sobre la barra. */
+    private syncHealthText(
+        e: Enemy,
+        v: EnemyVisual,
+        show: boolean,
+        x: number,
+        y: number,
+        z: number,
+    ): void {
+        if (!show) {
+            if (v.healthText) {
+                v.healthText.mesh.setEnabled(false);
+            }
+            return;
+        }
+        const hpText = `${Math.ceil(Math.max(0, e.health))} / ${Math.ceil(e.def.maxHealth)}`;
+        if (!v.healthText || v.healthText.text !== hpText) {
+            this.disposeHealthText(v);
+            const tex = new DynamicTexture(
+                `healthTextTex${e.id}`,
+                { width: HEALTH_TEXT_W, height: HEALTH_TEXT_H },
+                this.scene,
+                true,
+            );
+            tex.hasAlpha = true;
+            const mat = this.healthTextMat.clone(`healthTextMat${e.id}`);
+            mat.diffuseTexture = tex;
+            mat.emissiveColor = Color3.White();
+            mat.useAlphaFromDiffuseTexture = true;
+            const mesh = MeshBuilder.CreatePlane(
+                `healthText${e.id}`,
+                { width: 0.8, height: 0.15 },
+                this.scene,
+            );
+            mesh.material = mat;
+            mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
+            mesh.isPickable = false;
+            v.healthText = { mesh, tex, mat, text: hpText };
+        }
+        const ht = v.healthText;
+        // Redibujar el texto.
+        const ctx = ht.tex.getContext() as CanvasRenderingContext2D;
+        ctx.clearRect(0, 0, HEALTH_TEXT_W, HEALTH_TEXT_H);
+        ctx.textAlign = 'center';
+        ctx.font = `bold ${HEALTH_FONT_SIZE}px "Trebuchet MS", "Segoe UI", sans-serif`;
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+        ctx.strokeText(hpText, HEALTH_TEXT_W / 2, HEALTH_TEXT_H - 12);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(hpText, HEALTH_TEXT_W / 2, HEALTH_TEXT_H - 12);
+        ht.tex.update();
+        ht.mesh.setEnabled(true);
+        ht.mesh.position.set(x, y, z);
+    }
+
+    private disposeHealthText(v: EnemyVisual): void {
+        if (!v.healthText) return;
+        v.healthText.mesh.dispose();
+        v.healthText.mat.dispose();
+        v.healthText.tex.dispose();
+        v.healthText = null;
+    }
+
     sync(list: readonly Enemy[], alpha: number, frameSeconds = 0, label: EnemyLabel | null = null): void {
         this.animEvents = [];
         const seen = new Set<number>();
@@ -386,6 +459,14 @@ export class EnemyView {
                 v.barFill.position.set(x, y + 0.001, z);
                 v.barFill.scaling.x = Math.max(0.001, f);
             }
+            // UI-04: mostrar números de vida para guardianes (siempre) y para el enemigo bajo el cursor.
+            const showHealthNumbers = !dead && (e.guardian || e.id === this.hoveredId);
+            if (showHealthNumbers) {
+                const barY = gy + v.height + 0.45;
+                this.syncHealthText(e, v, true, x, barY + 0.2, z);
+            } else {
+                this.syncHealthText(e, v, false, x, 0, z);
+            }
             this.syncPlate(e, v, dead || !label ? null : label(e), x, gy + v.height + 0.8, z);
             this.syncTelegraph(e);
         }
@@ -401,6 +482,7 @@ export class EnemyView {
         v.barBg.dispose();
         v.barFill.dispose();
         this.disposePlate(v);
+        this.disposeHealthText(v);
         this.visuals.delete(id);
         this.hitFlash.delete(id);
         this.disposeTelegraph(id);

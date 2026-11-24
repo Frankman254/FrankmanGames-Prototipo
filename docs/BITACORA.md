@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-262: Guardianes y hover muestran números de vida (Junie)
+
+**Archivos:** `src/render/enemyView.ts`, `src/main.ts`, `tests/jl262_enemyHealthText.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** UI-04 (era de OMP, pasó a Junie): los guardianes (jefes de piso de cripta) muestran siempre la barra de vida con números "HP / maxHP" sobre el modelo 3D; los demás monstruos muestran la barra con números al pasar el puntero sobre ellos. Se añadió `hoveredId` a `EnemyView` (lo llena `main.ts` con `pickEnemy()` cada frame), `syncHealthText()` que crea/actualiza un DynamicTexture con el texto de vida (reutilizado si el texto no cambia, respetando WIN-01), y `showHealthNumbers` que activa la visualización cuando `e.guardian || e.id === hoveredId`. El texto se posiciona entre la barra y el cartel de nombre.
+
+**Validación:** 16 pruebas verdes en `tests/jl262_enemyHealthText.test.ts` (formato de texto, lógica de guardianes, lógica de hover, consistencia con Enemy.guardian). Suite completa 4878/4878. `npx tsc --noEmit` limpio. Capturas de Electron omitidas (sin display).
+
+**Evidencia:** `work/junie-jl262/`.
+
+---
+
 ## 2026-11-24 — JL-261: Pregunta al creador sobre vuelo en la barriada (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl261/INFORME.md`.
