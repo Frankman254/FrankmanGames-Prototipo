@@ -4946,3 +4946,15 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** `tests/jl215_barriadaSave.test.ts` 6/6 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). Build falla por balM3.ts ajeno (pre-existente).
 
 ---
+## 2026-11-23 — JL-220: fugas al entrar y salir de la barriada y la casa (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl220/`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `fugas` en `qaElectron.mjs` que entra y sale 20 veces de la barriada Praderas del Norte y 20 veces de la casa del creador, contando mallas, materiales, texturas y memoria JS en cada ciclo. El ciclo 1 se descarta como calentamiento (tras la primera salida, el mundo base aún no ha recargado todas sus mallas). Resultado: **sin fugas**. Barriada: 2359 mallas estables (Δ=0), 536 materiales (Δ=0), 232 texturas (Δ=0). Casa: 2422 mallas (Δ=0), 537 materiales (Δ=0), 232 texturas (Δ=0). La memoria JS oscila entre 520–623 MB pero no crece de forma consistente. Informe y datos crudos en `work/junie-jl220/`.
+
+**Cómo se verificó:** Escenario `fugas` en Electron: 8/8 checks en verde (2 ejecuciones limpias). Datos en `work/junie-jl220/jl220-fugas-datos.json` y `work/junie-jl220/jl220-fugas.md`.
+
+**Qué falta:** Nada.
+
+---
+

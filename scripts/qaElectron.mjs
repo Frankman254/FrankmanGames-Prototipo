@@ -8568,6 +8568,130 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('jl219: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+
+    /** JL-220: Fugas al entrar y salir de la barriada y la casa del creador. */
+    async fugas() {
+        await newGame('QA Fugas');
+        await sleep(5000);
+
+        // Función para tomar una instantánea de la escena.
+        const snap = () =>
+            js(`(()=>{ const sc=__game.view.scene; return {mallas:sc.meshes.length, materiales:sc.materials.length, texturas:sc.textures.length, memMB:Math.round(performance.memory.usedJSHeapSize/1048576)}; })()`);
+
+        const ITER = 20;
+        const data = { barriada: [], casa: [] };
+
+        // === Barriada: 20 ciclos de entrar y salir ===
+        for (let i = 0; i < ITER; i++) {
+            // Entrar a la barriada.
+            await js(`__game.travelStone('praderas_norte')`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada ciclo ' + (i + 1));
+            await sleep(3000);
+            const inside = await snap();
+            data.barriada.push({ ciclo: i + 1, estado: 'dentro', ...inside });
+
+            // Salir de la barriada.
+            await js(`__game.houses.leave()`);
+            await until(`!__game.houses.inside`, 15000, 'salir barriada ciclo ' + (i + 1));
+            await sleep(3000);
+            const outside = await snap();
+            data.barriada.push({ ciclo: i + 1, estado: 'fuera', ...outside });
+        }
+
+        // === Casa del creador: 20 ciclos de entrar y salir ===
+        // Posicionar junto a la puerta de la casa del creador (112, 131).
+        await js(`(() => { const p=${W}.player; p.pos.x=112; p.pos.y=131; p.path=[]; })()`);
+        await js('void __game.view.rig.setFraming("default")');
+        await sleep(2000);
+
+        for (let i = 0; i < ITER; i++) {
+            // Entrar en la casa.
+            await clickMesh('house-door');
+            await until('__game.houses.inside', 20000, 'entrar casa ciclo ' + (i + 1));
+            await sleep(1500);
+            const inside = await snap();
+            data.casa.push({ ciclo: i + 1, estado: 'dentro', ...inside });
+
+            // Salir de la casa.
+            await clickMesh('house-exit');
+            await until('!__game.houses.inside', 15000, 'salir casa ciclo ' + (i + 1));
+            await sleep(1500);
+            const outside = await snap();
+            data.casa.push({ ciclo: i + 1, estado: 'fuera', ...outside });
+        }
+
+        // Guardar datos crudos.
+        fs.writeFileSync(path.join(OUT, 'jl220-fugas-datos.json'), JSON.stringify(data, null, 1));
+
+        // Análisis: comparar los primeros 3 ciclos con los últimos 3 (promedio).
+        // Se descarta el ciclo 1 de cada grupo: es calentamiento (carga inicial del mundo base).
+        const avg = (arr, key) => {
+            const warmup = arr.slice(1); // descarta ciclo 1
+            const first3 = warmup.slice(0, 3).reduce((s, r) => s + r[key], 0) / 3;
+            const last3 = warmup.slice(-3).reduce((s, r) => s + r[key], 0) / 3;
+            return { primero: Math.round(first3), ultimo: Math.round(last3), diff: Math.round(last3 - first3) };
+        };
+
+        // Barriada — estado "fuera" (debería ser estable entre ciclos).
+        const bFuera = data.barriada.filter((r) => r.estado === 'fuera');
+        const bMallas = avg(bFuera, 'mallas');
+        const bMateriales = avg(bFuera, 'materiales');
+        const bTexturas = avg(bFuera, 'texturas');
+        const bMem = avg(bFuera, 'memMB');
+
+        // Casa — estado "fuera" (debería ser estable entre ciclos).
+        const cFuera = data.casa.filter((r) => r.estado === 'fuera');
+        const cMallas = avg(cFuera, 'mallas');
+        const cMateriales = avg(cFuera, 'materiales');
+        const cTexturas = avg(cFuera, 'texturas');
+        const cMem = avg(cFuera, 'memMB');
+
+        // Tabla resumen en markdown.
+        const tabla = [
+            '| Recurso | Barriada (1→20) | Casa (1→20) | Δ Barriada | Δ Casa |',
+            '|---|---|---|---|---|',
+            `| Mallas | ${bMallas.primero} → ${bMallas.ultimo} | ${cMallas.primero} → ${cMallas.ultimo} | ${bMallas.diff} | ${cMallas.diff} |`,
+            `| Materiales | ${bMateriales.primero} → ${bMateriales.ultimo} | ${cMateriales.primero} → ${cMateriales.ultimo} | ${bMateriales.diff} | ${cMateriales.diff} |`,
+            `| Texturas | ${bTexturas.primero} → ${bTexturas.ultimo} | ${cTexturas.primero} → ${cTexturas.ultimo} | ${bTexturas.diff} | ${cTexturas.diff} |`,
+            `| Memoria JS (MB) | ${bMem.primero} → ${bMem.ultimo} | ${cMem.primero} → ${cMem.ultimo} | ${bMem.diff} | ${cMem.diff} |`,
+        ].join('\n');
+
+        // Escribir informe.
+        const informe = [
+            '# JL-220: Fugas al entrar y salir',
+            '',
+            `**Fecha:** ${new Date().toISOString()}`,
+            '',
+            '## Resumen (promedio 3 primeros vs 3 últimos ciclos, estado "fuera", ciclo 1 descartado como calentamiento)',
+            '',
+            tabla,
+            '',
+            '## Criterio',
+            '',
+            '- Sin fugas: Δ ≤ 5 para mallas, materiales y texturas.',
+            '- Con fuga: Δ > 5 en algún recurso, creciendo de forma consistente.',
+            '- El ciclo 1 se descarta: tras la primera salida, el mundo base aún no ha recargado todas sus mallas.',
+            '',
+            '## Datos completos',
+            '',
+            'Ver `jl220-fugas-datos.json` en la misma carpeta.',
+        ].join('\n');
+
+        fs.writeFileSync(path.join(OUT, 'jl220-fugas.md'), informe);
+        console.log(informe);
+
+        // Checks: los recursos deben estar estables (±5 entre primer y último promedio).
+        check('fugas: barriada — mallas estables', Math.abs(bMallas.diff) <= 5, `${bMallas.primero} → ${bMallas.ultimo} (Δ ${bMallas.diff})`);
+        check('fugas: barriada — materiales estables', Math.abs(bMateriales.diff) <= 5, `${bMateriales.primero} → ${bMateriales.ultimo} (Δ ${bMateriales.diff})`);
+        check('fugas: barriada — texturas estables', Math.abs(bTexturas.diff) <= 5, `${bTexturas.primero} → ${bTexturas.ultimo} (Δ ${bTexturas.diff})`);
+        check('fugas: casa — mallas estables', Math.abs(cMallas.diff) <= 5, `${cMallas.primero} → ${cMallas.ultimo} (Δ ${cMallas.diff})`);
+        check('fugas: casa — materiales estables', Math.abs(cMateriales.diff) <= 5, `${cMateriales.primero} → ${cMateriales.ultimo} (Δ ${cMateriales.diff})`);
+        check('fugas: casa — texturas estables', Math.abs(cTexturas.diff) <= 5, `${cTexturas.primero} → ${cTexturas.ultimo} (Δ ${cTexturas.diff})`);
+
+        // Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('fugas: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -8586,6 +8710,8 @@ scenarios.jl178_emotes.timeout = 300;
 scenarios.hechizosClases.timeout = 300;
 // JL-219: 8 movimientos a bordes + vuelo + aterrizaje.
 scenarios.barriadaMontura.timeout = 300;
+// JL-220: 40 ciclos de entrar/salir (20 barriada + 20 casa), cada uno con carga.
+scenarios.fugas.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
