@@ -348,6 +348,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-285 | J | Bloqueada | No se inspeccionó ni modificó `src/render/fx/aimGhosts.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl285/INFORME.md` |
 | JL-286 | J | Bloqueada | No se inspeccionó ni modificó `src/render/lootView.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl286/INFORME.md` |
 | JL-290 | J | Bloqueada | No se inspeccionó ni modificó `src/render/weatherView.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl290/INFORME.md` |
+| JL-291 | J | Bloqueada | No se inspeccionaron ni modificaron `src/render/sceneLook.ts`, `linearFog.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl291/INFORME.md` |
 
 ## Bloqueadas
 
