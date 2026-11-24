@@ -7,9 +7,11 @@ describe('JL-168: PROCEDENCIA.md cubre todos los GLB de assets/models/', () => {
   const modelsDir = path.join(root, 'assets', 'models');
   const procedenciaPath = path.join(root, 'PROCEDENCIA.md');
 
-  const diskFiles = fs.readdirSync(modelsDir)
-    .filter((f: string) => f.endsWith('.glb'))
-    .sort();
+  const walk = (dir: string, base = ''): string[] =>
+    fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+      e.isDirectory() ? walk(path.join(dir, e.name), path.posix.join(base, e.name))
+        : e.name.endsWith('.glb') ? [path.posix.join(base, e.name)] : []);
+  const diskFiles = walk(modelsDir).sort();
 
   const procedencia = fs.readFileSync(procedenciaPath, 'utf8');
 
