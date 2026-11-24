@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-225: reintento de JL-74 — ya estaba hecho (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl225/DIAGNOSTICO.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reintento de JL-74 (solape de personaje y mascota en el escenario `barra`) con el arnés actualizado de JL-181…201. El escenario `barra` pasa 6/6 sin problemas. JL-74b (commit `49501d48`) ya corrigió el solape original; las mejoras del arnés no introdujeron regresiones. Sin cambios de código.
+
+**Verificación:** Escenario `barra` en Electron: 6/6 checks en verde (separar, arrastrar por grip, fijar, conservar, unir, sin errores). `npx tsc --noEmit` sin errores nuevos. DIAGNOSTICO.md en `work/junie-jl225/`.
+
+**No se cambió:** Ningún archivo de código. El arreglo ya existía.
+
+---
+
 ## 2026-11-23 — JL-224: el pez no llega a la mochila — diagnóstico (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl224/DIAGNOSTICO.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

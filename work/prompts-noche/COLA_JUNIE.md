@@ -1414,7 +1414,7 @@ Contexto del coordinador:
 
 ### Hallazgos pendientes
 - [x] JL-224 **El pez no llega a la mochila** (hallazgo de JL-197: `reel()` no da botín en el arnés). — commit «JL-224: escenario pesca — hook en tick() y verificación por consola» — Escenario pesca 6/6, tests jl206_fishing 25/25, tsc sin errores nuevos. El juego funciona correctamente; el bug era del arnés (pérdida de ventana de reacción + bag.slots no serializable). DIAGNOSTICO.md en work/junie-jl224/.
-- [ ] JL-225 Reintento de **JL-74** (solape de personaje y mascota en el escenario `barra`), con el arnés actual y lo aprendido en JL-181…201.
+- [x] JL-225 Reintento de **JL-74** (solape de personaje y mascota en el escenario `barra`), con el arnés actual y lo aprendido en JL-181…201. — commit «JL-225: escenario barra ya en verde — sin cambios de código» — Escenario barra 6/6 en Electron. JL-74b (49501d48) ya corrigió el solape; el arnés actualizado no introdujo regresiones. DIAGNOSTICO.md en work/junie-jl225/.
 - [ ] JL-226 Reintento de **JL-85** (`crestalba` no carga y cae CDP), con el arnés actual. Si sigue sin display, deja el diagnóstico exacto y la orden para que el creador lo corra.
 
 ### Datos y contenido
