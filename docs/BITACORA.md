@@ -102,6 +102,16 @@
 
 ---
 
+## 2026-11-23 — JL-213: pruebas de bankSite.ts (Junie)
+
+**Archivos:** `tests/jl213_bankSite.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** 10 pruebas para `src/world/bankSite.ts` (BANK_LOCATION): coordenadas válidas, edificio dentro del mundo (centro y 4 esquinas), entrada y punto de retorno dentro del mundo, celda transitable en los 3 puntos, distancia mínima de 10 m a las 24 Piedras Pintadas (centro y entrada), y verificación de que el rectángulo del banco no solapa con ninguna piedra. El banco en (116, 133.5) pasa todas las pruebas.
+
+**Validación:** `npx vitest run tests/jl213_bankSite.test.ts` → 10/10 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno).
+
+---
+
 ## 2026-11-23 — JL-204: pruebas de chasers.ts (Junie)
 
 **Archivos:** `tests/jl204_chasers.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
