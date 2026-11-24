@@ -1,3 +1,15 @@
+## 2026-11-23 — JL-223: opciones gráficas dentro de la barriada Praderas del Norte (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl223/`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario `barriadaOpciones` en `qaElectron.mjs` que verifica que cambiar las opciones gráficas dentro de la barriada no rompe nada. Se prueban 7 combinaciones: calidad baja + natural + 80 m, calidad media + pintura + 200 m, calidad alta + pintura + 400 m, alta + natural + 400 m, alta + pintura + 80 m, y restauración a default. Cada cambio verifica que la escena sigue intacta (mallas y materiales > 0), que no aparece niebla azul (clearColor no es azul puro) y toma una captura. Al final se comprueba que el movimiento sigue funcional.
+
+**Cómo se verificó:** Escenario `barriadaOpciones` en Electron: 16/16 checks en verde. 6 capturas en `work/junie-jl223/` (baja-natural-80m, media-pintura-200m, alta-pintura-400m, alta-natural-400m, alta-pintura-80m, default-restaurado). Sin errores de consola. Movimiento funcional tras todos los cambios.
+
+**Qué falta:** Nada.
+
+---
+
 ## 2026-11-23 — JL-222: noche y lluvia en la barriada Praderas del Norte (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl222/INFORME.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

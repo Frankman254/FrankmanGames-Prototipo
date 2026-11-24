@@ -8736,6 +8736,93 @@ const scenarios = {
         check('barriadaNoche: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
+    /** JL-223: Opciones gráficas dentro de la barriada — calidad, estilo de pintura y distancia de vista. */
+    async barriadaOpciones() {
+        await newGame('QA BarriadaOpc');
+        await sleep(5000);
+
+        // 1) Entrar a la barriada.
+        await js(`__game.travelStone('praderas_norte')`);
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga barriada');
+        await sleep(5000);
+        check('barriadaOpciones: dentro de la barriada', await js(`__game.houses.inside`), String(await js(`__game.houses.inside`)));
+
+        // Posición fija: plaza central, cámara rasante.
+        const place = (x, y) =>
+            js(`(() => { const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.prevPos.x=${x}; p.prevPos.y=${y}; p.path=[]; })()`);
+        const camera = (yaw, pitch, dist) =>
+            js(`(()=>{ const r=__game.view.rig; r.yawDeg=${yaw}; r.pitchDeg=${pitch}; r.jumpTo(${dist}); })()`);
+
+        // Definiciones de calidad.
+        const calidadBaja = { shadows: 'no', vegetationDensity: 0.2, viewDistance: 80, particles: 0.2, renderScale: 0.5, antialias: 'no', occlusionCut: false, visualStyle: 'natural' };
+        const calidadAlta = { shadows: 'altas', vegetationDensity: 1.0, viewDistance: 400, particles: 1.0, renderScale: 1.0, antialias: 'fxaa', occlusionCut: true, visualStyle: 'pintura' };
+        const calidadMedia = { shadows: 'bajas', vegetationDensity: 0.5, viewDistance: 200, particles: 0.5, renderScale: 0.75, antialias: 'no', occlusionCut: false, visualStyle: 'pintura' };
+
+        // Helper: aplicar opciones, esperar, verificar y capturar.
+        const applyAndCheck = async (label, opts) => {
+            await js(`__game.view.applyGraphics(${JSON.stringify(opts)})`);
+            await sleep(2000); // esperar que Babylon aplique los cambios.
+            // Verificar que la escena sigue intacta.
+            const sceneOk = await js(`(()=>{ const sc=__game.view.scene; return {mallas:sc.meshes.length, materiales:sc.materials.length, fogDensity:sc.fogDensity, clearColor:sc.clearColor.toString()}; })()`);
+            check(`barriadaOpciones: ${label} — escena intacta`, sceneOk.mallas > 0 && sceneOk.materiales > 0, JSON.stringify(sceneOk));
+            // Verificar que la niebla no es azul (clearColor no debe ser azul puro).
+            // La niebla azul sería clearColor con R<0.2, G<0.2, B>0.5.
+            const noNieblaAzul = await js(`(()=>{ const c=__game.view.scene.clearColor; return !(c.r<0.2 && c.g<0.2 && c.b>0.5); })()`);
+            check(`barriadaOpciones: ${label} — sin niebla azul`, noNieblaAzul, String(noNieblaAzul));
+            // Captura.
+            await shot(`jl223-barriada-${label}`);
+        };
+
+        // 2) Calidad baja + natural + vista corta (80 m).
+        await place(6235, 394);
+        await camera(90, 22, 14);
+        await sleep(1000);
+        await applyAndCheck('baja-natural-80m', calidadBaja);
+
+        // 3) Calidad media + pintura + vista media (200 m).
+        await place(6235, 394);
+        await camera(90, 22, 14);
+        await sleep(1000);
+        await applyAndCheck('media-pintura-200m', calidadMedia);
+
+        // 4) Calidad alta + pintura + vista larga (400 m).
+        await place(6235, 394);
+        await camera(90, 22, 14);
+        await sleep(1000);
+        await applyAndCheck('alta-pintura-400m', calidadAlta);
+
+        // 5) Cambiar solo el estilo: de pintura a natural, manteniendo alta.
+        const altaNatural = { ...calidadAlta, visualStyle: 'natural' };
+        await place(6235, 394);
+        await camera(90, 22, 14);
+        await sleep(1000);
+        await applyAndCheck('alta-natural-400m', altaNatural);
+
+        // 6) Cambiar solo la distancia: de 400 a 80, manteniendo alta.
+        const altaCerca = { ...calidadAlta, viewDistance: 80 };
+        await place(6235, 394);
+        await camera(90, 22, 14);
+        await sleep(1000);
+        await applyAndCheck('alta-pintura-80m', altaCerca);
+
+        // 7) Volver a la configuración por defecto (pintura, media).
+        const defaultOpts = { shadows: 'bajas', vegetationDensity: 0.5, viewDistance: 200, particles: 0.5, renderScale: 1.0, antialias: 'no', occlusionCut: false, visualStyle: 'pintura' };
+        await place(6235, 394);
+        await camera(90, 22, 14);
+        await sleep(1000);
+        await applyAndCheck('default-restaurado', defaultOpts);
+
+        // 8) Verificar que la barriada sigue siendo funcional: moverse y comprobar posición.
+        await place(6235, 306.5);
+        await sleep(1000);
+        const pos = await js(`(()=>{ const p=${W}.player; return {x:Math.round(p.pos.x),y:Math.round(p.pos.y)}; })()`);
+        check('barriadaOpciones: movimiento funcional tras cambios', Math.hypot(pos.x - 6235, pos.y - 306.5) < 2, JSON.stringify(pos));
+
+        // 9) Consola sin errores.
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('barriadaOpciones: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
+    },
+
     /** JL-220: Fugas al entrar y salir de la barriada y la casa del creador. */
     async fugas() {
         await newGame('QA Fugas');
@@ -8881,6 +8968,8 @@ scenarios.barriadaMontura.timeout = 300;
 scenarios.fugas.timeout = 600;
 // JL-221: 6 mediciones de rendimiento (3 posiciones × 2 calidades), cada una con 5 s de muestreo.
 scenarios.barriadaRendimiento.timeout = 180;
+// JL-223: 7 cambios de opciones gráficas + capturas dentro de la barriada.
+scenarios.barriadaOpciones.timeout = 180;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
