@@ -1,3 +1,20 @@
+## 2026-11-24 — JL-241: hechizos junto a paredes — diagnóstico (Junie)
+
+**Archivos:** `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl241/DIAGNOSTICO.md`.
+
+**Qué.** El creador pedía verificar si los hechizos de línea y proyectil atraviesan paredes de la cripta y de las casas. Solo diagnóstico, sin cambios de código.
+
+**Resultado.** Los hechizos de **single-target** no atraviesan paredes: `checkCast()` verifica `hasLineOfSight()` contra la grid de navegación. Sin embargo, los hechizos de **área** (línea, cono) **sí alcanzan enemigos detrás de paredes** porque:
+1. `hasLineOfSight()` devuelve `true` sin verificar nada para áreas sin ground-target (línea 989 de world.ts).
+2. `targetsOf()` usa `shapeHitsCircle()` puramente matemático, sin awareness de obstáculos.
+3. Los efectos visuales en `spellFx.ts` tampoco se bloquean al intersectar paredes.
+
+Se verificó con prueba directa de `shapeHitsCircle()`: un enemigo detrás de una pared simulada es alcanzado por línea y cono. Electron funciona en este Mac (previa 9/11, cripta 3/3), pero no se creó escenario dedicado porque la tarea pide solo diagnóstico.
+
+**Evidencia:** `work/junie-jl241/DIAGNOSTICO.md` con análisis completo del código, tabla de comportamiento y propuesta de arreglo (pendiente de autorización del creador).
+
+---
+
 ## 2026-11-24 — JL-240: forma del indicador = forma del daño (Junie)
 
 **Archivos:** `tests/jl240_indicatorShape.test.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
