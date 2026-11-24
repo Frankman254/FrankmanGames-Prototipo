@@ -1509,7 +1509,7 @@ Contexto del coordinador:
 - [!] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa. — BLOQUEADA: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [!] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Evidencia en `work/junie-jl282/INFORME.md`; verificación: `npm test` (380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck` y `npm run docs:check` pasaron.
 - [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
-- [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.
+- [!] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código; línea base: `npx tsc --noEmit` limpio y `npx vitest run` con 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl284/INFORME.md`.
 - [ ] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa.
 - [ ] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza.
 - [ ] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador.
