@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-263: 10 perfiles visuales para hechizos sin perfil (Junie)
+
+**Archivos:** `data/spell-fx.json`, `tests/spellProfile.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl263/INFORME.md`.
+
+**Qué se hizo:** VIS-02 (era de OMP, pasó a Junie): de 108 hechizos, solo 9 tenían perfil visual en `data/spell-fx.json`; los otros 99 usaban el fallback genérico (esfera + partículas del color del elemento). Se añadieron 10 perfiles para los hechizos sin perfil más representativos (nivel bajo, área distintiva): charge (earth/cono de polvo), iron_shout (earth/aura dorada), storm_focus (lightning/chispas estáticas), hunter_arrow (air/proyectil aerodinámico), powder_arrow (fire/explosión con anillo), leaden_gale (frost/cono de escarcha), lightning_step (lightning/anillo eléctrico), reed_cross (earth/proyectil terroso), gale_star (air/remolino estelar), rime_shard (frost/lanza de hielo). De 9 a 19 perfiles; 89 siguen sin perfil. La prueba `spellProfile.test.ts` actualizada (9→19 perfiles, umbral fallback 40→80).
+
+**Validación:** 8 pruebas verdes en `tests/spellProfile.test.ts`. Suite completa 4878/4878. `npx tsc --noEmit` limpio. Capturas de Electron omitidas (sin display).
+
+**Evidencia:** `work/junie-jl263/INFORME.md`.
+
+---
+
 ## 2026-11-24 — JL-262: Guardianes y hover muestran números de vida (Junie)
 
 **Archivos:** `src/render/enemyView.ts`, `src/main.ts`, `tests/jl262_enemyHealthText.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

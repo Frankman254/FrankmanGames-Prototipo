@@ -1486,7 +1486,7 @@ Contexto del coordinador:
 
 ### B. Tareas de programador que eran de OMP (detalle en `COLA_OMP.md`)
 - [x] JL-262 **UI-04** Vida a la vista. — commit «JL-262: guardianes y hover muestran números de vida» — 16 pruebas verdes (jl262_enemyHealthText.test.ts), suite 4878/4878, tsc limpio, push OK. hoveredId en EnemyView, syncHealthText() con DynamicTexture reutilizado, showHealthNumbers por e.guardian || hover. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl262/.
-- [ ] JL-263 **VIS-02** Repaso de los efectos de los hechizos, después de JL-262.
+- [x] JL-263 **VIS-02** Repaso de los efectos de los hechizos, después de JL-263. — commit «JL-263: 10 perfiles visuales para hechizos sin perfil» — 10 perfiles añadidos a spell-fx.json (charge, iron_shout, storm_focus, hunter_arrow, powder_arrow, leaden_gale, lightning_step, reed_cross, gale_star, rime_shard), de 9 a 19 perfiles. 8 pruebas verdes (spellProfile.test.ts), suite 4878/4878, tsc limpio. INFORME.md en work/junie-jl263/. Capturas de Electron omitidas (sin display).
 - [ ] JL-264 **OMP-POL-12** Skins del indicador de apuntado, del puntero y de la trayectoria. Si necesita un modelo o una textura nueva de Blender, márcala bloqueada y deja dicho qué falta.
 - [ ] JL-265 **OMP-POL-02b** Tema por profundidad en la cripta.
 - [ ] JL-266 **OMP-ED-04** Arreglos de interfaz del editor que salen de tu tabla de ED-01.

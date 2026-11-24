@@ -9,8 +9,8 @@ describe('perfiles de hechizo (data/spell-fx.json)', () => {
     const data = loadGameData();
     const spellIds = Object.keys(data.rpg.spells);
 
-    it('carga los 9 perfiles sin errores', () => {
-        expect(Object.keys(profiles).length).toBe(9);
+    it('carga los 19 perfiles sin errores', () => {
+        expect(Object.keys(profiles).length).toBe(19);
     });
 
     it('cada perfil tiene un hechizo existente y el elemento coincide', () => {
@@ -47,14 +47,14 @@ describe('perfiles de hechizo (data/spell-fx.json)', () => {
         expect(registry.get('unknown_spell')).toBeNull();
     });
 
-    it('fallback: los 44 hechizos sin perfil usan el flujo genérico', () => {
+    it('fallback: los 89 hechizos sin perfil usan el flujo genérico', () => {
         const registry = new StaticSpellProfileRegistry(profiles);
         const profiled = Object.keys(profiles);
         let unprofiled = 0;
         for (const id of spellIds) {
             if (!registry.has(id)) unprofiled++;
         }
-        expect(unprofiled, 'hechizos sin perfil (usan fallback)').toBeGreaterThanOrEqual(40);
+        expect(unprofiled, 'hechizos sin perfil (usan fallback)').toBeGreaterThanOrEqual(80);
     });
 
     it('cada perfil tiene las 4 fases definidas', () => {
