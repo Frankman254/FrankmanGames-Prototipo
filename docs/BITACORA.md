@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-217: minimapa de la barriada Praderas del Norte (Junie)
+
+**Archivos:** `src/ui/map/barriadaMap.ts`, `src/ui/map/mapFeed.ts`, `src/ui/map/minimap.ts`, `tests/jl217_barriadaMinimap.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El minimapa dentro de la barriada mostraba una mancha beige sin detalle. Causa: la rejilla de la barriada (~160 K celdas) superaba el umbral de `interiorGrid` en `mapFeed.ts` (1 << 20), pero el código de `minimap.ts` no tenía rama para dibujar la barriada cuando `interiorGrid` era null. Arreglo: (1) bajar el umbral a 1 << 14 (16 K celdas) para que la barriada quede excluida pero las casas y pisos de cripta sigan funcionando; (2) nuevo archivo `barriadaMap.ts` con `drawBarriadaMinimap()` que dibuja calles, aceras y casas desde `barriadaLosas()` y `barriadaCasas()`; (3) método `drawBarriada()` en `minimap.ts` que se activa cuando `f.inside === 'Praderas del Norte'` y `f.interiorGrid` es null.
+
+**Validación:** `npx vitest run` → 4367/4367 en verde (7 pruebas nuevas: barriadaWorldBounds, barriadaStoneWorldPos dentro del rectángulo, barriadaStartWorldPos dentro del rectángulo, casas y losas presentes, drawBarriadaMinimap sin lanzar, drawBarriadaMinimap con giro, umbral 1<<14 excluye barriada pero incluye casas y pisos). `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). `npm run build` sin errores nuevos. Capturas de Electron omitidas (sin display en este entorno).
+
+---
+
 ## 2026-11-23 — JL-216: viajar desde dentro de la barriada (Junie)
 
 **Archivos:** `src/main.ts`, `data/i18n/en.ui.json`, `tests/jl216_travelFromBarriada.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

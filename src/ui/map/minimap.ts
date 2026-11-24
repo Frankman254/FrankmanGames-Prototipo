@@ -10,6 +10,7 @@ import type { KeyValueStore } from '../menus/saveStore';
 import { interiorPixels, type InteriorColors, type InteriorGrid } from './interiorMap';
 import { h } from '../menus/dom';
 import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas, drawQuestArea } from './mapDraw';
+import { drawBarriadaMinimap, barriadaWorldBounds } from './barriadaMap';
 import {
     clampMinimapSize,
     clampToBox,
@@ -256,6 +257,43 @@ export class Minimap {
         this.draw();
     }
 
+    /** JL-217: minimapa de la barriada Praderas del Norte (calles y casas). */
+    private drawBarriada(
+        ctx: CanvasRenderingContext2D,
+        f: MapFrame,
+        px: number,
+        py: number,
+        scale: number,
+    ): void {
+        const yaw = this.prefs.rotate ? f.cameraYaw : 0;
+        // Escala más pequeña para la barriada (zona grande).
+        const k = minimapPixelsPerMeter(this.state.def.minimap, this.prefs.zoom, scale);
+        drawBarriadaMinimap(ctx, px, py, f.player, k, yaw);
+        // Marcadores encima: jugador, enemigos, PNJ, botín.
+        const C = this.state.def.colors;
+        const s = 5 * scale;
+        const P = (p: { x: number; y: number }): { x: number; y: number } =>
+            projectToMinimap(p, f.player, yaw, k, px, py);
+        const inBox = (q: { x: number; y: number }): boolean =>
+            q.x >= -8 && q.y >= -8 && q.x <= px + 8 && q.y <= py + 8;
+        for (const l of f.loot) {
+            const q = P(l);
+            if (inBox(q)) drawMarker(ctx, 'loot', q.x, q.y, s * 0.9, C.loot);
+        }
+        for (const e of f.enemies) {
+            const q = P(e);
+            if (inBox(q)) drawMarker(ctx, 'enemy', q.x, q.y, s, e.color);
+        }
+        for (const n of f.npcs) {
+            const q = P(n);
+            if (inBox(q)) {
+                drawMarker(ctx, n.merchant ? 'merchant' : 'npc', q.x, q.y, s * 0.85, n.merchant ? C.merchant : C.npc);
+                if (n.marker) drawQuestMark(ctx, n.marker, q.x, q.y, s, C.quest);
+            }
+        }
+        drawMarker(ctx, 'player', px / 2, py / 2, s * 1.2, C.player, this.prefs.rotate ? 0 : f.cameraYaw);
+    }
+
     /** F26: lo descubierto del interior, con el jugador en el centro y lo que haya cerca. */
     private drawInside(
         ctx: CanvasRenderingContext2D,
@@ -327,6 +365,12 @@ export class Minimap {
         if (f.inside) {
             this.title.textContent = tr(f.inside);
             if (!f.interiorGrid) {
+                // JL-217: la barriada es "inside" pero sin interiorGrid (grid muy grande).
+                // Dibuja el minimapa de calles y casas.
+                if (f.inside === 'Praderas del Norte') {
+                    this.drawBarriada(ctx, f, px, py, uiScale * dpr);
+                    return;
+                }
                 drawLabel(ctx, 'Sin mapa aquí dentro', px / 2, py / 2, 13 * dpr, '#b4a382');
                 return;
             }
