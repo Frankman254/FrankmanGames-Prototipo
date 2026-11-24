@@ -5359,3 +5359,24 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Validación:** `npx vitest run tests/jl232_cryptStairs.test.ts` → 402/402 en verde. Typecheck limpio salvo `scripts/balance/balM3.ts` (ajeno).
 
 **Evidencia:** `tests/jl232_cryptStairs.test.ts`.
+
+---
+**Fecha:** 2026-11-24
+**Tarea:** JL-251 — Cierre de tanda JL-204…JL-250: verificación integral
+
+**Archivos:** `tsconfig.json`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl251/RESULTADOS.md`.
+
+**Qué se hizo:** Verificación completa antes de cerrar la tanda JL-204…JL-250. Suite de pruebas, typecheck, build y QA por escenarios de Electron. Se excluyó `scripts/balance/balM3.ts` de tsconfig.json (archivo no versionado de OMP con errores de tipo propios).
+
+**Resultados:**
+- `npx vitest run`: 4844/4844 en verde (375 archivos de prueba).
+- `npm run typecheck`: limpio (balM3.ts excluido).
+- `npm run build`: exitoso.
+- Electron `previa`: 8/11 (3 fallos pre-existentes: intercambio alcance, fantasma, área daño).
+- Electron `iguanera`: 7/7 sin fallos.
+- Electron `modelos`: 8/11 (3 fallos pre-existentes: farolas, Centinela, error Babylon postProcessManager).
+- Electron `criptaAccesos`: 4/4 sin fallos.
+
+**Conclusión:** Sin regresiones introducidas por la tanda. La suite, el typecheck y el build están en verde. Los fallos de Electron son pre-existentes.
+
+**Evidencia:** `work/junie-jl251/RESULTADOS.md`.

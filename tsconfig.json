@@ -15,5 +15,6 @@
         "noEmit": true,
         "types": ["vite/client"]
     },
-    "include": ["src", "tests", "scripts", "vite.config.ts"]
+    "include": ["src", "tests", "scripts", "vite.config.ts"],
+    "exclude": ["scripts/balance/balM3.ts"]
 }
