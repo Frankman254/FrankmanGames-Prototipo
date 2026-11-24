@@ -322,6 +322,8 @@ function openStones(): void {
                 stones.progress.known.push(id);
                 saveStones();
             }
+            // JL-216: si viajas desde la barriada, salir primero para restaurar terreno, vegetación y cámara.
+            if (houses?.inBarriada) houses.leave();
             audio?.cue('stone_travel');
             veil({ kicker: tr('Viajando a'), title: z.name, sub: tr('Piedra Pintada') }, () => {
                 teleport(arriveAt(z));

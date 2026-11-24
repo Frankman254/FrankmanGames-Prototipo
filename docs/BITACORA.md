@@ -1,3 +1,13 @@
+## 2026-11-23 — JL-216: viajar desde dentro de la barriada (Junie)
+
+**Archivos:** `src/main.ts`, `data/i18n/en.ui.json`, `tests/jl216_travelFromBarriada.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Cuando el jugador abre el menú de piedras desde dentro de la barriada y viaja a otra piedra, el juego no restauraba el mundo exterior (terreno, vegetación, agua, NPCs ocultos). Causa: el handler de `pickStone` en `main.ts` no llamaba a `houses.leave()` antes de `teleport()`. Arreglo: una línea `if (houses?.inBarriada) houses.leave();` antes del viaje. Además, traducción faltante "Praderas del Norte" → "North Meadows" en `en.ui.json` (fallo pre-existente de i18n).
+
+**Validación:** `npx vitest run` → 4360/4360 en verde. `npx tsc --noEmit` sin errores nuevos (solo balM3.ts ajeno). `npm run build` sin errores nuevos.
+
+---
+
 ## 2026-11-23 — JL-212: pruebas de switchableGround.ts (Junie)
 
 **Archivos:** `tests/jl212_switchableGround.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
