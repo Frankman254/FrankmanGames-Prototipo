@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-305: auditoría de diálogos bloqueada (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-305 no figura como Autorizada en `docs/TAREAS.md` y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. No se inspeccionaron ni modificaron diálogos, datos, código o pruebas.
+
+**Validación:** línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl305/INFORME.md`. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-302: auditoría de arquetipos bloqueada (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -1533,7 +1533,7 @@ Antes de cada una, busca si ya existe.
 - [!] JL-302 Cada arquetipo de `data/assets.json` apunta a un GLB que existe y tiene los clips que pide. — BLOQUEADA: no figura como Autorizada en `docs/TAREAS.md` y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`.
 - [ ] JL-303 Cada tabla de botín apunta a objetos existentes y suma probabilidades válidas, sin cambiar ninguna cifra.
 - [ ] JL-304 Cada hechizo tiene icono, texto en los dos idiomas y efecto visual.
-- [ ] JL-305 Cada PNJ con diálogo tiene sus nodos completos: ningún nodo sin salida ni enlaces rotos.
+- [!] JL-305 Cada PNJ con diálogo tiene sus nodos completos: ningún nodo sin salida ni enlaces rotos. — BLOQUEADA: JL-305 no figura como Autorizada en `docs/TAREAS.md` y falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionaron diálogos, datos, código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl305/INFORME.md`.
 - [ ] JL-306 Ningún texto de la interfaz en inglés supera el ancho de su botón: lista con captura de los que se cortan.
 
 ### E. Escenarios Electron que faltan
