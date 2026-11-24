@@ -350,6 +350,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-290 | J | Bloqueada | No se inspeccionó ni modificó `src/render/weatherView.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl290/INFORME.md` |
 | JL-291 | J | Bloqueada | No se inspeccionaron ni modificaron `src/render/sceneLook.ts`, `linearFog.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl291/INFORME.md` |
 | JL-292 | J | Bloqueada | No se inspeccionó ni modificó `src/render/assetCache.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl292/INFORME.md` |
+| JL-294 | J | Bloqueada | No se inspeccionó ni modificó `src/render/gridView.ts` ni sus pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, requerido antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 
 ## Bloqueadas
 
@@ -363,3 +364,4 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 - JL-281: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
 - JL-280: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
 - JL-290: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base. Evidencia en `work/junie-jl290/INFORME.md`.
+- JL-294: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
