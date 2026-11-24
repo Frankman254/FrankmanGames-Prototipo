@@ -1515,7 +1515,7 @@ Contexto del coordinador:
 - [ ] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador.
 - [ ] JL-288 `src/render/gatherView.ts`: el estado visual de un recurso (lleno, gastado, rebrotando).
 - [ ] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven.
-- [ ] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz.
+- [!] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros.
 - [ ] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble).
 - [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
