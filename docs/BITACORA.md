@@ -1,3 +1,19 @@
+## 2026-11-24 — JL-247: Calle de Los Santos — diagnóstico de enemigos en la urbanización (Junie)
+
+**Archivos:** `tests/jl247_urbanizacion.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué.** Diagnóstico de por qué los enemigos pueden aparecer encima de la calle de Los Santos y dentro de los lotes de la urbanización.
+
+**Hallazgo.** `ZonePopulation.scan()` en `src/sim/zones.ts` no importa ni usa `insideStreet()` ni `insideLot()` de `src/world/urbanizacion.ts`. La zona hostil `sabanas` cubre toda la parcela con un rectángulo global y no es safe. El terreno es walkable. Por lo tanto, los puntos de spawn caen en la calle y los lotes sin filtro. La vegetación sí excluye la urbanización (ambient.ts:274, scatter.ts:357-358), pero los enemigos no.
+
+**Arreglo propuesto.** Añadir en `scan()` un filtro `insideStreet(p.x, p.y, URBANIZACION, 0.5) || insideLot(p.x, p.y, URBANIZACION, 0.5)` → `continue`. Requiere tocar `src/sim/zones.ts` (reparto de enemigos), por lo que necesita autorización del coordinador o creador.
+
+**Validación.** `npx vitest run tests/jl247_urbanizacion.test.ts` — 9/9 verdes. `npx tsc --noEmit` — limpio (solo balM3.ts ajeno).
+
+**Evidencia.** `tests/jl247_urbanizacion.test.ts`, `work/junie-jl247/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-24 — JL-246: PROCEDENCIA.md cubre todos los assets (Junie)
 
 **Archivos:** `tests/jl168_procedencia.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
