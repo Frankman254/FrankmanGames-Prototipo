@@ -4,6 +4,12 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Respuestas del 2026-11-24
+
+| ID | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|
+| GRP | debemos ir preparando escenarios de prueba simulando otros jugadores peleando a mi lado a la vez para testear los enemigos los combates, si los mapas son los suficientemente amplios y estrategicos para pelear en equipo, la experiencia ganada entre el equipo para saber si estamos balanceando bien el juego | Preparar compañeros simulados que juegan como bots a tu lado, una batería sin pantalla con grupos de 1 a 4, la medida de los claros de pelea para un grupo y la comparación de reglas de reparto de XP. Las reglas del grupo (tamaño, reparto de XP, cuánto sube el enemigo) siguen siendo tuyas: se miden variantes `PROPUESTA` y tú eliges | GRP-01…GRP-05 |
+
 ## Respuestas del 2026-11-21
 
 | ID | Palabras del creador | Lo que entendí | Tarea |

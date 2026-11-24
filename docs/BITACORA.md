@@ -1,3 +1,13 @@
+## 2026-11-24 — Pruebas en grupo: tareas GRP-01…GRP-05 (Claude)
+
+**Archivos:** `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`.
+
+**Estado:** registradas las palabras del creador (GRP) y cinco tareas para probar combates en grupo: compañeros simulados en `World`, batería sin pantalla de 1 a 4 bots, variantes de reparto de XP y dureza por tamaño de grupo, claros de pelea para grupo en `audit:density` y escenario de Electron `grupo`. Hoy `World` admite un solo personaje y no hay reparto de XP en grupo. Hallazgo para el creador: JL-185 midió que la cola de hechizos (JUG-06) no guarda ninguna pulsación, porque la ventana de 0,3 s cuenta desde el inicio de la animación y el tiempo de espera global dura entre 0,5 y 0,8 s (`work/junie-jl185/INFORME.md`).
+
+**Validación:** `npm run docs:check`.
+
+---
+
 ## 2026-11-24 — Reabiertas 39 tareas de Junie bloqueadas en falso (Claude)
 
 **Archivos:** `AGENTS.md` (`3cf7bfcb`), `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
