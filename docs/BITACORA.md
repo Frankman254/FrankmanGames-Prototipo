@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-306: revisión de textos en inglés bloqueada (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** JL-306 no figura como Autorizada en `docs/TAREAS.md`; no se inició la revisión de textos ni la inspección visual.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** `work/junie-jl306/INFORME.md`. No se tomó captura porque la tarea quedó bloqueada antes de la revisión visual.
+
+---
+
 ## 2026-11-24 — JL-305: auditoría de diálogos bloqueada (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
