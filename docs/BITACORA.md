@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-277: lista de aspectos disponibles (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de modificar código: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se inició la extracción de `src/ui/menus/mountLooks.ts` ni se cambiaron pruebas.
+
+**Validación:** La comprobación de la ruta requerida devolvió `missing`; `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** Comprobación de existencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md` y salida de línea base. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-275: opciones del menú contextual (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

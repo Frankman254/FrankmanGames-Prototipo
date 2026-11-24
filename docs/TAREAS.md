@@ -340,6 +340,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-269 | J | Bloqueada | No se modificó código: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que no existe en la ruta indicada. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 | JL-271 | J | Bloqueada | No se modificó código: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, necesario antes de escribir código. `npx tsc --noEmit` y `npm run docs:check` limpios; suite completa final: 4.911 aprobadas, 1 omitida y 1 `todo`. Una ejecución intermedia tuvo un fallo transitorio de rendimiento en JL-70 (0,578 ms / 0,5 ms); pasó aislada y en la suite final |
 | JL-272 | J | Bloqueada | No se modificó código ni pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
+| JL-277 | J | Bloqueada | No se modificó código ni pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 
 ## Bloqueadas
 
@@ -347,3 +348,4 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 - D-44, solo si hay choques reales entre agentes.
 - JL-274: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl274/INFORME.md`.
 - JL-275: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl275/INFORME.md`.
+- JL-277: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
