@@ -343,6 +343,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-277 | J | Bloqueada | No se modificó código ni pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 | JL-278 | J | Bloqueada | No se modificó código ni pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 | JL-280 | J | Bloqueada | No se modificó código ni pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
+| JL-281 | J | Bloqueada | No se modificó código ni pruebas: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo` |
 
 ## Bloqueadas
 
@@ -351,4 +352,5 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 - JL-274: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl274/INFORME.md`.
 - JL-275: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl275/INFORME.md`.
 - JL-277: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
+- JL-281: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.
 - JL-280: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; typecheck y suite completa verificados como línea base.

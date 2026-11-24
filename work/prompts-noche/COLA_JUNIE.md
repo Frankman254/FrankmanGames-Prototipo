@@ -1506,7 +1506,7 @@ Contexto del coordinador:
 - [!] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores. — BLOQUEADA: no existe `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa; no se modificó código ni pruebas.
 - [ ] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos.
 - [!] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se inspeccionó ni modificó código o pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
-- [ ] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa.
+- [!] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa. — BLOQUEADA: no está disponible el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes.
 - [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
 - [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.

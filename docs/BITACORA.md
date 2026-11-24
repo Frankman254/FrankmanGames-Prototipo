@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-281: etiquetas emergentes (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Estado:** Bloqueada antes de inspeccionar o modificar código: no está disponible `../FrankmanGames/04_VISION_Y_DECISIONES.md`, documento obligatorio de lectura previa. No se inició el trabajo en `src/ui/hoverLabel.ts` ni se cambiaron pruebas.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
+
+**Evidencia:** La comprobación de la ruta obligatoria confirmó que el documento no existe. No aplica captura Electron porque no hubo cambio de código ni visual.
+
+---
+
 ## 2026-11-24 — JL-280: formato de los números de rendimiento (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
