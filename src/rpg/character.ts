@@ -70,7 +70,7 @@ export interface Body {
 export class Character extends Actor {
     readonly team = 'player';
     readonly classDef: ClassDef;
-    level = 1;
+    override level = 1;
     xp = 0;
     gold = 0;
     unspentStatPoints = 0;

@@ -31,7 +31,7 @@ export class EnemyActor extends Actor {
     readonly info: EnemyInfoDef;
     /** XP y botín ya entregados (una sola vez por muerte). */
     rewarded = false;
-    readonly level: number;
+    override readonly level: number;
     /** XP al morir, ya escalada por nivel. */
     readonly xp: number;
     /** Multiplicador de las monedas y tiradas de objeto de más. */

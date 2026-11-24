@@ -20,6 +20,8 @@ export abstract class Actor extends Entity {
     readonly statuses: StatusSet;
     abstract readonly team: Team;
     abstract readonly name: string;
+    /** Nivel del actor (1 por defecto; Character y EnemyActor lo fijan). */
+    level = 1;
     /** Lo que aporta su clase al daño (ver `src/sim/damage.ts`). */
     mainStat: PrimaryStat | null = null;
     affinity: readonly Element[] = [];

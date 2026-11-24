@@ -1,3 +1,23 @@
+## 2026-11-24 — JL-243: 8 `as any` eliminados en src/sim/ y src/rpg/ (Junie)
+
+**Archivos:** `src/rpg/actor.ts`, `src/rpg/character.ts`, `src/rpg/enemy.ts`, `src/rpg/effects.ts`, `src/rpg/content.ts`, `src/sim/world.ts`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl243/LISTA.md`.
+
+**Qué.** Listar y quitar los `as any` y `as unknown as` en `src/sim/`, `src/world/` y `src/rpg/` que se resuelvan con tipos existentes.
+
+**Cómo.**
+- Añadido `level = 1` a `Actor` (clase base) para que `ctx.caster.level` compile sin `as any` en 4 lugares de `effects.ts`.
+- `Character` y `EnemyActor` ahora declaran `override level`.
+- `stat as any` → `stat as StatId` en 2 lugares de `effects.ts` (importado `StatId`).
+- `(ch as any).level` → `ch.level` en `world.ts` (`ch` ya es `Character`).
+- `{ val: v } as any` → `{ val: v }` en `content.ts` (compatible con `Record<string, unknown>`).
+- 4 casos no resolubles documentados: `barriada.ts`, `dungeon.ts` (Vite JSON import), `pageWorker.ts` (worker self), `appearance.ts` (Vite JSON import).
+
+**Validación:** `npx tsc --noEmit` limpio (solo balM3.ts ajeno), `npx vitest run` 4830/4830 en verde.
+
+**Evidencia:** `work/junie-jl243/LISTA.md`.
+
+---
+
 ## 2026-11-24 — JL-242: catch vacíos — ya estaba hecho (Junie)
 
 **Archivos:** `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl242/INFORME.md`.

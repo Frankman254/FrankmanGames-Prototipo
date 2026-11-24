@@ -1627,7 +1627,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
                 const arr = fr.arr(fo, k);
                 out[k] = arr.map((v, i) => {
                     const r = fr.child(`${k}[${i}]`);
-                    return r.num({ val: v } as any, 'val', { min: 0, max: 1 });
+                    return r.num({ val: v }, 'val', { min: 0, max: 1 });
                 });
             }
             return out;

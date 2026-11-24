@@ -1442,7 +1442,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 ### Calidad del código (solo `src/sim/`, `src/world/` y `src/rpg/`)
 - [x] JL-242 Ningún `.catch()` vacío: cada uno registra el error. Lista y arreglos de una línea.
   — commit «JL-242: catch vacíos — ya estaba hecho» — 0 catch vacíos en src/sim/, src/world/, src/rpg/. El único catch (designedDungeon.ts:108) ya registra el error. INFORME.md en work/junie-jl242/.
-- [ ] JL-243 `as any` y `as unknown as`: lista con archivo y línea, y quita solo los que se resuelvan con un tipo que ya exista. El resto, en la lista con su motivo.
+- [x] JL-243 `as any` y `as unknown as`: lista con archivo y línea, y quita solo los que se resuelvan con un tipo que ya exista. El resto, en la lista con su motivo. — commit «JL-243: 8 as any eliminados en sim/rpg, 4 legítimos documentados» — 8 casos resueltos (world.ts, effects.ts ×6, content.ts), 4 no resolubles (barriada.ts, dungeon.ts, pageWorker.ts, appearance.ts: Vite JSON y worker). Actor.level añadido. Suite 4830/4830, tsc limpio. LISTA.md en work/junie-jl243/.
 - [ ] JL-244 Exportaciones sin uso: lista comprobada con `grep`. **No borres nada**: el coordinador decide.
 
 ### Robustez y arte

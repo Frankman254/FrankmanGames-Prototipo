@@ -9,7 +9,7 @@ import type { HitSpec } from '../sim/damage';
 import type { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
 import type { Actor } from './actor';
-import type { EffectDef, Element, PetDef, StatusDef, StatModifier } from './contracts';
+import type { EffectDef, Element, PetDef, StatusDef, StatId, StatModifier } from './contracts';
 import type { RpgContent } from './content';
 
 /** Id del estado que representa un escudo (requerido en `statuses.json`). */
@@ -97,7 +97,7 @@ export class DamageEffect extends Effect {
         // HZ-04e: perLevel escala el daño con el nivel del lanzador.
         // Fórmula: (rng(min, max) + perLevel × nivel) × power + scaling × int
         const perLevel = d.perLevel ?? 0;
-        const casterLevel = (ctx.caster as any).level ?? 1;
+        const casterLevel = ctx.caster.level;
         const levelBonus = perLevel * casterLevel + (ctx.baseBonus ?? 0);
         ctx.damage(target, {
             min: (d.min + levelBonus) * power,
@@ -124,7 +124,7 @@ export class HealEffect extends Effect {
         const bonusMult = 1 + Math.max(0, healingPower) / 100;
         // HZ-04e: perLevel escala la curación con el nivel del lanzador.
         const perLevel = this.def.perLevel ?? 0;
-        const casterLevel = (ctx.caster as any).level ?? 1;
+        const casterLevel = ctx.caster.level;
         const levelBonus = perLevel * casterLevel;
         const base = (ctx.rng.range(this.def.min, this.def.max) + levelBonus) * power + (this.def.scaling ?? 0) * intellect;
         return Math.floor(base * bonusMult);
@@ -177,7 +177,7 @@ export class ShieldEffect extends Effect {
         const mult = isCrit ? 1.5 : 1;
         // HZ-04b-defensa: perLevel escala el escudo con el nivel del lanzador.
         const perLevel = this.def.perLevel ?? 0;
-        const casterLevel = (ctx.caster as any).level ?? 1;
+        const casterLevel = ctx.caster.level;
         const levelBonus = perLevel * casterLevel;
         const baseAmount = this.def.amount + levelBonus;
         ctx.applyStatus(
@@ -465,7 +465,7 @@ abstract class BuffEffect extends Effect {
             kind: 'buff',
             duration: dur,
             maxStacks: 1,
-            modifiers: [{ stat: stat as any, op: 'flat', value: Math.round(val * power * 10) / 10 }],
+            modifiers: [{ stat: stat as StatId, op: 'flat', value: Math.round(val * power * 10) / 10 }],
         };
         ctx.applyStatus(target, modStatus, dur);
     }
@@ -508,7 +508,7 @@ export class FixedDamageEffect extends BuffEffect {
     override apply(ctx: EffectContext, target: Actor, power: number): void {
         // HZ-04e: perLevel escala el daño fijo con el nivel del lanzador.
         const perLevel = this.def.perLevel ?? 0;
-        const casterLevel = (ctx.caster as any).level ?? 1;
+        const casterLevel = ctx.caster.level;
         const val = this.def.value + perLevel * casterLevel;
         const dur = this.def.duration;
         const stat = this.getStat();
@@ -520,7 +520,7 @@ export class FixedDamageEffect extends BuffEffect {
             kind: 'buff',
             duration: dur,
             maxStacks: 1,
-            modifiers: [{ stat: stat as any, op: 'flat', value: Math.round(val * power * 10) / 10 }],
+            modifiers: [{ stat: stat as StatId, op: 'flat', value: Math.round(val * power * 10) / 10 }],
         };
         ctx.applyStatus(target, modStatus, dur);
     }

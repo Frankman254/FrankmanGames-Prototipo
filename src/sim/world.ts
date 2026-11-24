@@ -1269,7 +1269,7 @@ export class World implements SessionWorld {
                     if (t === target && untraveled > 1e-3 && t.alive && pushDmgEff) {
                         // HZ-04e: perLevel escala el daño de empuje con el nivel del lanzador.
                         const perLevel = pushDmgEff.def.perLevel ?? 0;
-                        const casterLevel = (ch as any).level ?? 1;
+                        const casterLevel = ch.level;
                         const pushValue = pushDmgEff.def.value + perLevel * casterLevel;
                         const dmg = Math.round(pushValue * untraveled * power);
                         if (dmg > 0) {
