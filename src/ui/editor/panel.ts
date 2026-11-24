@@ -80,7 +80,7 @@ function button(text: string, onClick: () => void, cls = 'ed-btn', title?: strin
     return b;
 }
 
-export class EditorPanel {
+class EditorPanel {
     readonly el: HTMLElement;
     private readonly body: HTMLElement;
     private lastHtmlKey = '';

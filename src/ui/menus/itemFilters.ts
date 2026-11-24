@@ -31,7 +31,7 @@ export const ELEMENT_LABEL_RAW: Record<Element, string> = {
 };
 
 /** Etiqueta traducida de un elemento. */
-export function elementLabel(elem: Element): string {
+function elementLabel(elem: Element): string {
     return tr(ELEMENT_LABEL_RAW[elem]);
 }
 

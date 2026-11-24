@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-257: 7 exportaciones sin uso eliminadas (Junie)
+
+**Archivos:** `src/sim/vec2.ts`, `src/ui/editor/panel.ts`, `src/ui/menus/itemFilters.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Continuación de JL-244 (auditoría de exportaciones sin uso). De las 9 candidatas, 2 estaban en uso y se mantuvieron: `LocalMusicPlayer` (import dinámico en `src/audio/director.ts`) y `WATCH_IGNORED_FILES` (usada en `vite.config.ts`). Las 7 restantes se confirmaron sin uso y se quitó la palabra `export`: `vec2`, `dot`, `lerp`, `normalize`, `moveTowards` en `src/sim/vec2.ts` (no se usan dentro del archivo ni se importan desde fuera); `EditorPanel` en `src/ui/editor/panel.ts` (definida y usada solo dentro del mismo archivo); `elementLabel` en `src/ui/menus/itemFilters.ts` (no importada desde otro archivo — `spellbook.ts` tiene su propia versión local).
+
+**Validación:** Suite completa 4854/4854 en verde. `npx tsc --noEmit` limpio.
+
+**Evidencia:** Diffs en `src/sim/vec2.ts`, `src/ui/editor/panel.ts`, `src/ui/menus/itemFilters.ts`.
+
+---
+
 ## 2026-11-24 — JL-256: Pregunta al creador sobre áreas que atraviesan paredes (Junie)
 
 **Archivos:** `tests/jl256_areaLineOfSight.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
