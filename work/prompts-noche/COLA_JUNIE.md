@@ -1451,7 +1451,8 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [x] JL-247 **Calle de Los Santos:** que ningún enemigo de la zona aparezca encima de la calle o dentro de un lote de la urbanización (hoy los enemigos pueden pisar la calle: ver ESTADO_ACTUAL). Solo prueba y diagnóstico; si el arreglo toca el reparto de enemigos, pregunta. — commit «JL-247: diagnóstico de enemigos en la calle de Los Santos» — 9 pruebas verdes (jl247_urbanizacion.test.ts), tsc limpio, push OK. DIAGNOSTICO.md en work/junie-jl247/. Causa: `ZonePopulation.scan()` no usa `insideStreet`/`insideLot`. Arreglo propuesto requiere autorización.
 - [x] JL-248 **Escenario `rendimiento` en tres lugares** (Villa Raspadura, Los Santos junto a la urbanización y la barriada) con la misma cámara. Tabla comparada en `work/junie-jl248/`.
   — commit «JL-248: escenario rendimiento en tres lugares» — 4/4 checks en verde (raspadura 119.2 fps, los_santos 120.0 fps, barriada 119.9 fps), INFORME.md y datos.json en work/junie-jl248/.
-- [ ] JL-249 **Arranque en frío:** tiempo desde abrir Electron hasta poder mover al personaje, tres veces. Solo medir.
+- [x] JL-249 **Arranque en frío:** tiempo desde abrir Electron hasta poder mover al personaje, tres veces. Solo medir.
+  — commit «JL-249: medición de arranque en frío — ~15 s de media» — 3 ejecuciones (14910, 14944, 15130 ms; media 14995 ms ±110 ms). INFORME.md y datos.json en work/junie-jl249/.
 
 ### Cierre de la tanda
 - [ ] JL-250 Consola limpia: todos los escenarios nuevos de esta tanda sin errores nuevos. INFORME en `work/junie-jl250/`.

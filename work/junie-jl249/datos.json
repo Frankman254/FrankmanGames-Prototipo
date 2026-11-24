@@ -1,0 +1,29 @@
+[
+  {
+    "coldStartCDP_ms": 742,
+    "cdpToTitle_ms": 4218,
+    "titleToReady_ms": 9950,
+    "totalColdStart_ms": 14910,
+    "inputActive": false,
+    "hasSpeed": false,
+    "sessionReady": false
+  },
+  {
+    "coldStartCDP_ms": 811,
+    "cdpToTitle_ms": 4016,
+    "titleToReady_ms": 10117,
+    "totalColdStart_ms": 14944,
+    "inputActive": false,
+    "hasSpeed": false,
+    "sessionReady": false
+  },
+  {
+    "coldStartCDP_ms": 804,
+    "cdpToTitle_ms": 4257,
+    "titleToReady_ms": 10069,
+    "totalColdStart_ms": 15130,
+    "inputActive": false,
+    "hasSpeed": false,
+    "sessionReady": false
+  }
+]

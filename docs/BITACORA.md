@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-249: Medición de arranque en frío (Junie)
+
+**Archivos:** `scripts/qa-cold-start.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Script `scripts/qa-cold-start.mjs` que spawnea Electron con perfil limpio, mide los hitos de arranque vía CDP (spawn→CDP→título→escena lista) y crea un personaje para verificar que el juego está listo. Tres ejecuciones independientes.
+
+**Resultados:** Media de 14995 ms total (spawn→CDP: 786 ms, CDP→título: 4164 ms, título→listo: 10045 ms). Desviación ±110 ms entre las 3 mediciones, lo que indica bajo ruido. El hito más largo es la carga de la escena 3D tras crear el personaje (mundo, vegetación, navGrid, etc.).
+
+**Validación:** 3 ejecuciones exitosas de `scripts/qa-cold-start.mjs`. Datos crudos en `work/junie-jl249/datos.json`, resumen en `work/junie-jl249/INFORME.md`.
+
+---
+
 ## 2026-11-24 — JL-248: Escenario rendimiento en tres lugares (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
