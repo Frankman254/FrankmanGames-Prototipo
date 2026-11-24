@@ -1500,7 +1500,7 @@ Contexto del coordinador:
 - [!] JL-272 `src/ui/menus/dialogue.ts`: el avance entre nodos del diálogo. — BLOQUEADA: falta el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`; no se modificó código ni pruebas. `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`.
 - [ ] JL-273 `src/ui/menus/journal.ts` y `questTracker.ts`: el orden y el texto de las misiones.
 - [!] JL-274 `src/ui/menus/drag.ts`: el ajuste de la ventana a los bordes de la pantalla. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl274/INFORME.md`.
-- [ ] JL-275 `src/ui/menus/context.ts`: qué opciones salen según el objetivo.
+- [!] JL-275 `src/ui/menus/context.ts`: qué opciones salen según el objetivo. — BLOQUEADA: no existe el documento obligatorio `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que debe leerse antes de escribir código. No se modificó código ni pruebas. Línea base: `npx tsc --noEmit` limpio; `npx vitest run`, 380 archivos, 4.911 aprobadas, 1 omitida y 1 `todo`. Evidencia: `work/junie-jl275/INFORME.md`.
 - [ ] JL-276 `src/ui/menus/progressBar.ts` y `panel.ts`: el ancho y el texto de la barra.
 - [ ] JL-277 `src/ui/menus/mountLooks.ts`: la lista de aspectos disponibles.
 - [ ] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores.

@@ -346,3 +346,4 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
 - D-44, solo si hay choques reales entre agentes.
 - JL-274: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl274/INFORME.md`.
+- JL-275: bloqueada por la ausencia de `../FrankmanGames/04_VISION_Y_DECISIONES.md`; línea base verificada, evidencia en `work/junie-jl275/INFORME.md`.
