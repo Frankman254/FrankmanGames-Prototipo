@@ -1,3 +1,17 @@
+## 2026-11-24 — JL-246: PROCEDENCIA.md cubre todos los assets (Junie)
+
+**Archivos:** `tests/jl168_procedencia.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué.** Ampliar la prueba de JL-168 (`tests/jl168_procedencia.test.ts`) para cubrir **todos** los archivos de `assets/`, no solo los GLB de `assets/models/`.
+
+**Resultado.** La prueba ahora recorre recursivamente `assets/` (1914 archivos: 1348 icons, 324 textures, 141 models, 86 audio, 8 emotes, 4 dev_dungeon, 2 quaternius, 1 portrait) y verifica que cada uno tiene mención en `PROCEDENCIA.md`. Todos los archivos en disco están registrados. La prueba también filtra correctamente las referencias genéricas de PROCEDENCIA.md (directorios, plantillas con `<...>`, puntos sueltos).
+
+**Validación.** `npx vitest run tests/jl168_procedencia.test.ts` — 3/3 verdes. `npx tsc --noEmit` — limpio (solo balM3.ts ajeno). `npx vitest run` — 4835/4835 en verde.
+
+**Evidencia.** Prueba actualizada en `tests/jl168_procedencia.test.ts`.
+
+---
+
 ## 2026-11-24 — Tanda de OMP: Blender y programador (coordinador)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_OMP.md` (ignorado por Git).

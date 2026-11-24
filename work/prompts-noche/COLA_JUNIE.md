@@ -1447,7 +1447,7 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 
 ### Robustez y arte
 - [x] JL-245 Cada GLB de `assets/models/` tiene su `scripts/blender/validar_<modelo>.py`, o está en una lista de excepciones con su motivo. — commit «JL-245: cobertura de validadores Blender para GLB» — 5 pruebas verdes (jl245_glbValidators.test.ts), 112/135 GLB con validador, 29 excepciones documentadas. INFORME.md en work/junie-jl245/.
-- [ ] JL-246 Cada archivo de `assets/` aparece en `PROCEDENCIA.md`. Si `tests/jl168_procedencia.test.ts` ya lo cubre, «ya estaba hecho»; si no, amplíala. `PROCEDENCIA.md` no se edita.
+- [x] JL-246 Cada archivo de `assets/` aparece en `PROCEDENCIA.md`. — commit «JL-246: PROCEDENCIA.md cubre todos los assets (1914 archivos)» — 3 pruebas verdes (jl168_procedencia.test.ts ampliada), tsc limpio, push OK. Prueba ampliada de solo assets/models/ (141 GLB) a todo assets/ (1914 archivos: icons, textures, audio, emotes, dev_dungeon, quaternius, portraits, models). Todos los archivos en disco tienen mención en PROCEDENCIA.md.
 - [ ] JL-247 **Calle de Los Santos:** que ningún enemigo de la zona aparezca encima de la calle o dentro de un lote de la urbanización (hoy los enemigos pueden pisar la calle: ver ESTADO_ACTUAL). Solo prueba y diagnóstico; si el arreglo toca el reparto de enemigos, pregunta.
 - [ ] JL-248 **Escenario `rendimiento` en tres lugares** (Villa Raspadura, Los Santos junto a la urbanización y la barriada) con la misma cámara. Tabla comparada en `work/junie-jl248/`.
 - [ ] JL-249 **Arranque en frío:** tiempo desde abrir Electron hasta poder mover al personaje, tres veces. Solo medir.
