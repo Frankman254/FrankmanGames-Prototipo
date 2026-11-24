@@ -5524,3 +5524,11 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Conclusión:** Sin regresiones introducidas por la tanda. La suite, el typecheck y el build están en verde. Los fallos de Electron son pre-existentes.
 
 **Evidencia:** `work/junie-jl251/RESULTADOS.md`.
+
+## 2026-11-24 — JL-264: 4 skins del indicador de apuntado (J)
+
+**Archivos:** `src/render/fx/aimSkins.ts`, `src/render/fx/aimGhosts.ts`, `src/render/fx/spellFx.ts`, `src/render/devVisual.ts`, `src/ui/menus/screens/devVisualOptions.ts`, `src/main.ts`, `data/i18n/en.json`, `tests/jl264_aimSkins.test.ts`.
+
+**Qué se hizo:** Sistema de skins para el indicador de apuntado (OMP-POL-12). Cuatro skins puramente geométricas (simple, doble anillo, brillante, diamante) que cambian el marcador del objetivo, la línea de trayectoria y el aro de aterrizaje. Selector en Opciones → Desarrollo. La interfaz `AimSkinDef` permite añadir skins con modelos/texturas de Blender en el futuro sin cambiar el código.
+
+**Validación:** 13 pruebas verdes (jl264_aimSkins.test.ts), suite 4891/4891, tsc limpio, build OK. Capturas de Electron omitidas (sin display).

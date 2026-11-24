@@ -3,6 +3,7 @@
 // (UI-05). Se guardan aparte de las opciones de la partida (`render/devVisual`) y se
 // aplican al momento; la muestra de abajo dibuja el número como saldrá en el juego.
 import {
+    AIM_SKINS,
     DAMAGE_FONTS,
     DAMAGE_STYLES,
     DEV_VISUAL_DEFAULTS,
@@ -26,7 +27,7 @@ export function devVisualOptions(): HTMLElement[] {
         setDevVisual(patch);
         drawSample();
     };
-    const pick = <K extends 'tonemap' | 'damageFont' | 'damageStyle' | 'lightMode'>(
+    const pick = <K extends 'tonemap' | 'damageFont' | 'damageStyle' | 'lightMode' | 'aimSkin'>(
         label: string,
         key: K,
         list: readonly DevVisual[K][],
@@ -103,6 +104,18 @@ export function devVisualOptions(): HTMLElement[] {
         pick('Letra', 'damageFont', fonts, (v) => DAMAGE_FONTS[v].name),
         pick('Acabado', 'damageStyle', DAMAGE_STYLES, (v) => STYLE_NAMES[v]),
         sample,
+        h('h4', { text: 'Indicador de apuntado' }),
+        (() => {
+            const sel = h('select', { 'data-opt': 'dev.aimSkin' });
+            for (const s of AIM_SKINS) sel.appendChild(h('option', { value: s.id, text: s.name }));
+            sel.value = devVisual().aimSkin;
+            sel.addEventListener('change', () => set({ aimSkin: sel.value }));
+            refreshers.push(() => (sel.value = devVisual().aimSkin));
+            return h('label.opt-row.pick', null, h('span', { text: 'Skin' }), sel);
+        })(),
+        h('p.hint', {
+            text: 'Cambia el aspecto del marcador del objetivo, la línea de trayectoria y el aro de aterrizaje mientras se apunta un hechizo. Las skins actuales usan geometría simple; las futuras pueden cargar modelos y texturas de Blender.',
+        }),
         h(
             'div.opt-row.check',
             null,
@@ -112,6 +125,5 @@ export function devVisualOptions(): HTMLElement[] {
                 for (const r of refreshers) r();
             }),
         ),
-        h('p.hint', { text: 'Sólo letras del sistema; si una no está instalada, se ve la de reserva.' }),
     ];
 }

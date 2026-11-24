@@ -13,6 +13,8 @@ import {
     type Scene,
     Vector3,
 } from '@babylonjs/core';
+import { getAimSkin } from './aimSkins';
+import type { AimSkinDef } from './aimSkins';
 import type { HeightField } from '../../world/terrain';
 
 export interface AimGhost {
@@ -39,11 +41,14 @@ export class AimGhosts {
     private readonly mine: StandardMaterial;
     private readonly other: StandardMaterial;
     private readonly hitMat: StandardMaterial;
+    private _skin: AimSkinDef;
 
     constructor(
         private readonly scene: Scene,
         private readonly ground: HeightField,
+        skinId: string = 'simple',
     ) {
+        this._skin = getAimSkin(skinId);
         const mat = (name: string, c: Color3, alpha: number): StandardMaterial => {
             const m = new StandardMaterial(name, scene);
             m.diffuseColor = c;
@@ -56,6 +61,11 @@ export class AimGhosts {
         this.mine = mat('aimGhostMine', new Color3(0.25, 0.85, 0.8), 0.48);
         this.other = mat('aimGhostOther', new Color3(0.95, 0.5, 0.2), 0.42);
         this.hitMat = mat('aimHitRing', new Color3(0.95, 0.28, 0.14), 0.9);
+    }
+
+    /** Cambia la skin activa (se aplica al próximo sync). */
+    setSkin(skinId: string): void {
+        this._skin = getAimSkin(skinId);
     }
 
     /** Aros bajo los alcanzados: posiciones y radio. */
@@ -86,7 +96,8 @@ export class AimGhosts {
         for (const g of list) {
             let v = this.live.get(g.key);
             if (!v) {
-                v = { root: null, source: null, line: null, lineKey: '', ring: this.landingRing(g.mine) };
+                v = { root: null, source: null, line: null, lineKey: '', ring: this._skin.makeLandingRing(this.scene, g.mine) };
+                v.ring.isPickable = false;
                 this.live.set(g.key, v);
             }
             if (!v.root && g.source) {
@@ -104,17 +115,10 @@ export class AimGhosts {
             const lineKey = `${g.from.x.toFixed(2)},${g.from.y.toFixed(2)},${g.to.x.toFixed(2)},${g.to.y.toFixed(2)}`;
             if (lineKey === v.lineKey) continue;
             v.lineKey = lineKey;
-            const points = [
-                new Vector3(g.from.x, this.ground.sample(g.from.x, g.from.y) + 0.12, g.from.y),
-                new Vector3(g.to.x, y + 0.12, g.to.y),
-            ];
+            const from = new Vector3(g.from.x, this.ground.sample(g.from.x, g.from.y) + 0.12, g.from.y);
+            const to = new Vector3(g.to.x, y + 0.12, g.to.y);
             v.line?.dispose();
-            v.line = MeshBuilder.CreateDashedLines(
-                'aimGhostLine',
-                { points, dashNb: 12, dashSize: 3, gapSize: 2 },
-                this.scene,
-            );
-            v.line.color = g.mine ? new Color3(0.4, 1, 0.95) : new Color3(1, 0.65, 0.3);
+            v.line = this._skin.makeTrajectoryLine(this.scene, from, to, g.mine);
             v.line.isPickable = false;
         }
     }
@@ -122,17 +126,6 @@ export class AimGhosts {
     clear(): void {
         this.sync([]);
         this.syncHits([]);
-    }
-
-    private landingRing(mine: boolean): Mesh {
-        const r = MeshBuilder.CreateTorus(
-            'aimLanding',
-            { diameter: 1.15, thickness: 0.06, tessellation: 32 },
-            this.scene,
-        );
-        r.isPickable = false;
-        r.material = mine ? this.mine : this.other;
-        return r;
     }
 
     /** Copia del modelo con el material translúcido; comparte esqueleto, así que respira con el original. */

@@ -22,6 +22,8 @@ import type { Vec2 } from '../../sim/vec2';
 import type { World } from '../../sim/world';
 import type { HeightField } from '../../world/terrain';
 import { shapeMesh } from '../enemyView';
+import { devVisual } from '../devVisual';
+import { getAimSkin } from './aimSkins';
 import { BurstPool, glowMaterial, retire, trail } from './particles';
 import { ProfileFxManager, StaticSpellProfileRegistry } from './spellProfile';
 import type { SpellProfileRegistry } from './spellProfile';
@@ -801,11 +803,8 @@ export class SpellFx {
             mesh.parent = node;
             mesh.renderingGroupId = 1;
         }
-        const marker = MeshBuilder.CreateTorus(
-            'fxAimTarget',
-            { diameter: 1, thickness: 0.05, tessellation: 40 },
-            this.scene,
-        );
+        const skin = getAimSkin(devVisual().aimSkin);
+        const marker = skin.makeTargetMarker(this.scene, ok, bad);
         marker.isPickable = false;
         this.aimFx = { spellId, node, mesh, ok, bad, marker };
     }

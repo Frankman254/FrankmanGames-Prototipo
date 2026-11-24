@@ -3,6 +3,8 @@
 // en localStorage aparte de las opciones y avisan a quien escuche al cambiar.
 // Las cifras por defecto son PROPUESTA de arte; se afinan jugando.
 
+import { AIM_SKIN_DEFAULT, AIM_SKINS, type AimSkinId } from './fx/aimSkins';
+export { AIM_SKINS, type AimSkinId } from './fx/aimSkins';
 import { LIGHT_MODES, type LightMode } from './lightModes';
 
 /** Curva de tono: ACES (filmica, colores vivos), Khronos neutra, o ninguna (como antes). */
@@ -47,6 +49,8 @@ export interface DevVisual {
     lightMode: LightMode;
     /** Luz propia del personaje (LUZ-03). */
     heroLight: boolean;
+    /** Skin del indicador de apuntado (OMP-POL-12): marcador, trayectoria y aro de aterrizaje. */
+    aimSkin: AimSkinId;
 }
 
 export const DEV_VISUAL_DEFAULTS: DevVisual = {
@@ -60,6 +64,7 @@ export const DEV_VISUAL_DEFAULTS: DevVisual = {
     damageStyle: 'bloque',
     lightMode: 'vivo',
     heroLight: true,
+    aimSkin: AIM_SKIN_DEFAULT,
 };
 
 /** Límites de los deslizadores (también acotan lo que se lee del almacenamiento). */
@@ -101,6 +106,7 @@ export function normalizeDevVisual(raw: unknown): DevVisual {
         damageStyle: pick('damageStyle', DAMAGE_STYLES, d.damageStyle),
         lightMode: pick('lightMode', LIGHT_MODES, d.lightMode),
         heroLight: typeof o.heroLight === 'boolean' ? o.heroLight : d.heroLight,
+        aimSkin: pick('aimSkin', AIM_SKINS.map((s) => s.id) as AimSkinId[], d.aimSkin),
     };
 }
 

@@ -33,6 +33,7 @@ import { Telemetry } from './sim/telemetry';
 import { needsAim, World } from './sim/world';
 import { AimCards, aimText, type AimCardData } from './ui/aimCards';
 import { AimGhosts, type AimGhost } from './render/fx/aimGhosts';
+import { devVisual, onDevVisual } from './render/devVisual';
 import type { LockMode } from './sim/lock';
 import { CastInput, CAST_MODES, CAST_MODE_NAMES } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
@@ -542,7 +543,9 @@ function gatherLabel(p: GatherPick | null): { text: string; color: string } | nu
 }
 // Combate v2: daño esperado bajo el cursor mientras se apunta un hechizo.
 const aimCards = new AimCards(document.getElementById('hud')!);
-const aimGhosts = new AimGhosts(view.scene, view.heights);
+const dv = devVisual();
+const aimGhosts = new AimGhosts(view.scene, view.heights, dv.aimSkin);
+onDevVisual((v) => aimGhosts.setSkin(v.aimSkin));
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
