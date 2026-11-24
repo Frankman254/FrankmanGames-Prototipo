@@ -958,6 +958,13 @@ def cargar_acciones():
     return out
 
 
+ESPEJO_S = Matrix.Diagonal((-1.0, 1.0, 1.0, 1.0))
+
+
+def _hueso_espejo(n):
+    return n[:-1] + ('r' if n.endswith('_l') else 'l') if n.endswith(('_l', '_r')) else n
+
+
 def hornear(arm, actos, nombre, destino=None, frames=None, stride=1,
             extra=None):
     """Copia el clip UAL (leyéndolo sobre su rig de origen) a una acción nueva de `arm`.
@@ -1042,34 +1049,78 @@ def renombrar_accion(act):
 
 
 # ------------------------------------------------------------------ emotes
-def emote(arm, nombre, fotogramas, poses):
+def emote(arm, nombre, fotogramas, poses, base=None):
     """Clip propio: `poses` = [(frame, {hueso_UBC: (eje_x_deg, eje_y_deg, eje_z_deg)})].
 
-    Se aplica por rotación euler local sobre el reposo; los huesos no mencionados
-    se quedan donde estaban (se interpola key a key).
+    PJ-02: las rotaciones se componen **sobre el reposo horneado** (`base`, la
+    acción `Reposo`), no sobre la T-pose del armazón. Escrito sobre la T-pose,
+    cualquier hueso no mencionado se quedaba en cruz y el gesto se leía como un
+    avión. Cada fotograma de salida evalúa el reposo en (f mod duración-base),
+    respira con él, y encima se gira lo que pida la pose, interpolada lineal
+    entre claves. Los bucles empiezan y terminan en reposo porque las poses
+    arrancan y cierran con `{}`.
     """
     act = bpy.data.actions.new(nombre)
-    arm.animation_data_create()
-    for sl in act.slots:
-        if sl.target_id_type == 'ARMATURE':
-            arm.animation_data.action_slot = sl
-    arm.animation_data.action = act
+    ad = arm.animation_data
+    prev_action = ad.action
     pb = {b.name: arm.pose.bones[b.name] for b in arm.pose.bones}
     for k in pb:
         # cuaterniones: el horneado UAL los usa y el exportador glTF toma el modo
         # que tienen los huesos al exportar; si quedan en XYZ, los clips horneados
         # salen planos (2 claves constantes).
         pb[k].rotation_mode = 'QUATERNION'
-    for f, ps in poses:
-        for h, (rx, ry, rz) in ps.items():
-            if h not in pb:
-                continue
-            pb[h].rotation_quaternion = Euler((math.radians(rx), math.radians(ry),
-                                               math.radians(rz)), 'XYZ').to_quaternion()
-            pb[h].keyframe_insert('rotation_quaternion', frame=f)
-    for h in pb:
-        pb[h].rotation_quaternion = (1, 0, 0, 0)
-    arm.animation_data.action = None
+    # matriz base por fotograma del reposo (se evalúa una vez y se cachea)
+    bases = {}
+    bf0, bf1 = (1, 1)
+    if base is not None:
+        bf0, bf1 = int(base.frame_range[0]), int(base.frame_range[1])
+        ad.action = base
+        for sl in base.slots:
+            if sl.target_id_type == 'ARMATURE':
+                ad.action_slot = sl
+        for bf in range(bf0, bf1 + 1):
+            bpy.context.scene.frame_set(bf)
+            bpy.context.view_layer.update()
+            bases[bf] = {n: Matrix(p.matrix_basis) for n, p in pb.items()}
+    ad.action = act
+    for f in range(1, fotogramas + 1):
+        # pose euler interpolada entre las claves de `poses`
+        act_e = {}
+        antes = None
+        despues = None
+        for f1, ps1 in poses:
+            if f1 <= f:
+                antes = (f1, ps1)
+            if f1 >= f and despues is None:
+                despues = (f1, ps1)
+        if antes is not None and despues is not None and antes[0] == despues[0]:
+            act_e = dict(antes[1])
+        elif antes is not None and despues is not None and antes[0] != despues[0]:
+            w = (f - antes[0]) / (despues[0] - antes[0])
+            for h in set(antes[1]) | set(despues[1]):
+                a = antes[1].get(h, (0, 0, 0))
+                b = despues[1].get(h, (0, 0, 0))
+                act_e[h] = tuple(a[j] + (b[j] - a[j]) * w for j in range(3))
+        elif antes is not None and f >= poses[-1][0]:
+            act_e = dict(antes[1])
+        if bases:
+            bb = bases[bf0 + (f - 1) % (bf1 - bf0 + 1)]
+        else:
+            bb = {n: Matrix.Identity(4) for n in pb}
+        for n, p in pb.items():
+            m = Matrix(bb[n])
+            if n in act_e:
+                rx, ry, rz = act_e[n]
+                m = m @ Euler((math.radians(rx), math.radians(ry), math.radians(rz)),
+                              'XYZ').to_matrix().to_4x4()
+            p.matrix_basis = m
+            p.keyframe_insert('location', frame=f)
+            p.keyframe_insert('rotation_quaternion', frame=f)
+            p.keyframe_insert('scale', frame=f)
+    bpy.context.view_layer.update()
+    for n, p in pb.items():
+        p.matrix_basis = Matrix.Identity(4)
+    ad.action = prev_action
     act.use_fake_user = True
     return act
 
@@ -1164,43 +1215,67 @@ MAPA_CLIPS = {   # nombre del juego ← clip UAL
 ATAQUE = {'centinela': 'Sword_Regular_A', 'cazador': 'Sword_Attack', 'oraculo': 'Punch_Jab'}
 # emotes sin fuente en UAL: handeados aquí (grados por hueso UBC)
 EMOTES = {
+    # PJ-02: grados euler locales COMPOSTADOS SOBRE EL REPOSO (emote(base=...)).
+    # Señales legibles a 8 m: saludo = brazo en alto y antebrazo abanicando;
+    # carcajada = pecho arqueado y manos al vientre; llanto = manos a la cara y
+    # cabeza hundida; ira = pecho inflado, codos abiertos y puños adelante;
+    # sueno = encogido, brazos cruzados sobre el pecho, cabeza caida.
     'Emote_wave': (40, [
-        (1, {}), (8, {'upperarm_r': (-140, 0, 0), 'lowerarm_r': (0, 0, 35)}),
-        (16, {'upperarm_r': (-150, 0, 10), 'lowerarm_r': (0, 0, 55)}),
-        (24, {'upperarm_r': (-150, 0, -15), 'lowerarm_r': (0, 0, 15)}),
-        (32, {'upperarm_r': (-150, 0, 10), 'lowerarm_r': (0, 0, 55)}),
-        (40, {'upperarm_r': (0, 0, 0), 'lowerarm_r': (0, 0, 0)})]),
+        (1, {}),
+        (8, {'upperarm_r': (12, 20, -115), 'lowerarm_r': (0, 0, -32)}),
+        (14, {'upperarm_r': (12, 20, -125), 'lowerarm_r': (0, 0, 32), 'Head': (-4, 0, 6)}),
+        (20, {'upperarm_r': (12, 20, -125), 'lowerarm_r': (0, 0, -32), 'Head': (-4, 0, -4)}),
+        (26, {'upperarm_r': (12, 20, -125), 'lowerarm_r': (0, 0, 32), 'Head': (-4, 0, 6)}),
+        (32, {'upperarm_r': (12, 18, -110), 'lowerarm_r': (0, 0, -25)}),
+        (40, {})]),
     'Emote_laugh': (36, [
-        (1, {}), (6, {'spine_02': (8, 0, 0), 'spine_03': (6, 0, 0), 'neck_01': (-10, 0, 0), 'Head': (-12, 0, 0)}),
-        (12, {'spine_02': (-4, 0, 0), 'spine_03': (-3, 0, 0), 'Head': (6, 0, 0)}),
-        (18, {'spine_02': (8, 0, 0), 'spine_03': (6, 0, 0), 'Head': (-12, 0, 0)}),
-        (24, {'spine_02': (-4, 0, 0), 'Head': (6, 0, 0)}),
-        (30, {'spine_02': (6, 0, 0), 'Head': (-8, 0, 0)}),
-        (36, {})])
-    , 'Emote_cry': (50, [
-        (1, {}), (10, {'spine_02': (12, 0, 0), 'spine_03': (10, 0, 0), 'neck_01': (10, 0, 0), 'Head': (14, 0, 0),
-                       'upperarm_l': (-25, 0, 20), 'upperarm_r': (-25, 0, -20),
-                       'lowerarm_l': (0, 0, 90), 'lowerarm_r': (0, 0, -90)}),
-        (25, {'spine_02': (14, 0, 0), 'spine_03': (12, 0, 0), 'Head': (16, 0, 0),
-              'upperarm_l': (-27, 0, 20), 'upperarm_r': (-27, 0, -20),
-              'lowerarm_l': (0, 0, 95), 'lowerarm_r': (0, 0, -85)}),
-        (40, {'spine_02': (12, 0, 0), 'Head': (14, 0, 0), 'upperarm_l': (-25, 0, 20), 'upperarm_r': (-25, 0, -20),
-              'lowerarm_l': (0, 0, 90), 'lowerarm_r': (0, 0, -90)}),
-        (50, {})])
-    , 'Emote_angry': (32, [
-        (1, {}), (8, {'spine_02': (-6, 0, 0), 'spine_03': (-5, 0, 0), 'neck_01': (4, 0, 0), 'Head': (6, 0, 0),
-                      'upperarm_l': (0, 0, -30), 'upperarm_r': (0, 0, 30), 'lowerarm_l': (0, 0, -100), 'lowerarm_r': (0, 0, 100)}),
-        (16, {'upperarm_l': (0, 0, -32), 'upperarm_r': (0, 0, 32), 'lowerarm_l': (0, 0, -105), 'lowerarm_r': (0, 0, 105),
-              'spine_02': (-4, 0, 0)}),
-        (24, {'upperarm_l': (0, 0, -30), 'upperarm_r': (0, 0, 30), 'lowerarm_l': (0, 0, -100), 'lowerarm_r': (0, 0, 100), 'spine_02': (-6, 0, 0)}),
-        (32, {})])
-    , 'Emote_sleep': (70, [
-        (1, {}), (16, {'spine_01': (18, 0, 0), 'spine_02': (16, 0, 0), 'spine_03': (12, 0, 0), 'neck_01': (16, 0, 0), 'Head': (20, 0, 0),
-                       'upperarm_l': (10, 0, 8), 'upperarm_r': (10, 0, -8), 'thigh_l': (-30, 0, 0), 'thigh_r': (-30, 0, 0),
-                       'calf_l': (40, 0, 0), 'calf_r': (40, 0, 0), 'pelvis': (0, 0, 0)}),
-        (50, {'spine_01': (20, 0, 0), 'spine_02': (18, 0, 0), 'spine_03': (14, 0, 0), 'neck_01': (18, 0, 0), 'Head': (24, 0, 0),
-              'upperarm_l': (12, 0, 8), 'upperarm_r': (12, 0, -8), 'thigh_l': (-32, 0, 0), 'thigh_r': (-32, 0, 0),
-              'calf_l': (42, 0, 0), 'calf_r': (42, 0, 0)}),
+        (1, {}),
+        (6, {'spine_02': (-12, 0, 0), 'spine_03': (-8, 0, 0), 'neck_01': (12, 0, 0),
+             'Head': (16, 0, 0), 'upperarm_l': (50, 0, 20), 'upperarm_r': (50, 0, -20),
+             'lowerarm_l': (0, -70, 0), 'lowerarm_r': (0, 70, 0)}),
+        (12, {'spine_02': (10, 0, 0), 'spine_03': (8, 0, 0), 'Head': (-12, 0, 0)}),
+        (18, {'spine_02': (-12, 0, 0), 'spine_03': (-8, 0, 0), 'neck_01': (12, 0, 0),
+              'Head': (16, 0, 0), 'upperarm_l': (50, 0, 20), 'upperarm_r': (50, 0, -20),
+              'lowerarm_l': (0, -70, 0), 'lowerarm_r': (0, 70, 0)}),
+        (24, {'spine_02': (8, 0, 0), 'Head': (-10, 0, 0)}),
+        (30, {'spine_02': (-10, 0, 0), 'Head': (14, 0, 0), 'upperarm_l': (45, 0, 18),
+              'upperarm_r': (45, 0, -18), 'lowerarm_l': (0, -60, 0), 'lowerarm_r': (0, 60, 0)}),
+        (36, {})]),
+    'Emote_cry': (50, [
+        (1, {}),
+        (10, {'spine_02': (8, 0, 0), 'spine_03': (6, 0, 0), 'neck_01': (5, 0, 0),
+              'Head': (8, 0, 0), 'upperarm_l': (80, 0, 20), 'upperarm_r': (80, 0, -20),
+              'lowerarm_l': (60, 0, 0), 'lowerarm_r': (60, 0, 0)}),
+        (25, {'spine_02': (12, 0, 0), 'spine_03': (9, 0, 0), 'Head': (12, 0, 0),
+              'upperarm_l': (84, 0, 20), 'upperarm_r': (84, 0, -20),
+              'lowerarm_l': (64, 0, 0), 'lowerarm_r': (64, 0, 0)}),
+        (40, {'spine_02': (8, 0, 0), 'Head': (8, 0, 0), 'upperarm_l': (80, 0, 20),
+              'upperarm_r': (80, 0, -20), 'lowerarm_l': (60, 0, 0), 'lowerarm_r': (60, 0, 0)}),
+        (50, {})]),
+    'Emote_angry': (32, [
+        (1, {}),
+        (8, {'spine_02': (-8, 0, 0), 'spine_03': (-6, 0, 0), 'neck_01': (-6, 0, 0),
+             'Head': (-10, 0, 0), 'upperarm_l': (15, 0, 42), 'upperarm_r': (15, 0, -42),
+             'lowerarm_l': (95, 0, 0), 'lowerarm_r': (95, 0, 0)}),
+        (16, {'upperarm_l': (18, 0, 46), 'upperarm_r': (18, 0, -46),
+              'lowerarm_l': (105, 0, 0), 'lowerarm_r': (105, 0, 0), 'Head': (-12, 0, 0)}),
+        (24, {'spine_02': (-8, 0, 0), 'upperarm_l': (15, 0, 42), 'upperarm_r': (15, 0, -42),
+              'lowerarm_l': (95, 0, 0), 'lowerarm_r': (95, 0, 0)}),
+        (32, {})]),
+    'Emote_sleep': (70, [
+        (1, {}),
+        (16, {'pelvis': (14, 0, 0), 'spine_01': (20, 0, 0), 'spine_02': (22, 0, 0), 'spine_03': (16, 0, 0),
+              'neck_01': (26, 0, 0), 'Head': (34, 0, 0),
+              'upperarm_l': (35, 0, 12), 'upperarm_r': (35, 0, -12),
+              'lowerarm_l': (40, -60, 0), 'lowerarm_r': (40, 60, 0),
+              'thigh_l': (18, 0, 0), 'thigh_r': (18, 0, 0),
+              'calf_l': (-28, 0, 0), 'calf_r': (-28, 0, 0)}),
+        (50, {'pelvis': (16, 0, 0), 'spine_01': (22, 0, 0), 'spine_02': (24, 0, 0), 'spine_03': (18, 0, 0),
+              'neck_01': (30, 0, 0), 'Head': (40, 0, 0),
+              'upperarm_l': (37, 0, 12), 'upperarm_r': (37, 0, -12),
+              'lowerarm_l': (42, -64, 0), 'lowerarm_r': (42, 64, 0),
+              'thigh_l': (20, 0, 0), 'thigh_r': (20, 0, 0),
+              'calf_l': (-30, 0, 0), 'calf_r': (-30, 0, 0)}),
         (70, {})]),
 }
 
@@ -1222,6 +1297,105 @@ def ajustar_loops(act):
                             b.co.y = a.co.y
                             b.handle_left.y = a.handle_left.y
                             b.handle_right.y = a.handle_right.y
+
+
+def extra_lanzar(arm):
+    """PJ-02: `Lanzar` con empuje de la mano derecha.
+
+    El `Spell_Simple_Shoot` de UAL apenas mueve `hand_r` (el proyectil del juego
+    sale de ese hueso), así que se le superpone un empuje FK: anticipación con la
+    mano al cinto (f1–5), empuje hacia delante (f6–9), impacto con el brazo
+    estirado mirando al frente (f10–11) y recuperación (f12–16). Sentido medido:
+    rotación X negativa del brazo lleva la mano hacia +Y (adelante).
+    """
+    def _extra(arm_, frame, total):
+        pb = arm_.pose.bones
+
+        def _eje(nombre, ang):
+            b = pb.get(nombre)
+            if b is None:
+                return
+            b.matrix_basis = Matrix(b.matrix_basis) @ Euler((math.radians(ang), 0, 0), 'XYZ').to_matrix().to_4x4()
+        # sentido medido sobre el rig UBC: X positivo lleva la mano hacia -Y,
+        # que es delante en el juego (los GLB miran a -Y).
+        if frame <= 5:
+            w = frame / 5
+            _eje('upperarm_r', -30 * w)         # anticipación: mano atrás
+            _eje('lowerarm_r', -50 * w)         # codo doblado
+        elif frame <= 9:
+            w = (frame - 5) / 4
+            _eje('upperarm_r', -30 * (1 - w) + 85 * w)
+            _eje('lowerarm_r', -50 * (1 - w) + 5 * w)
+        elif frame <= 11:
+            _eje('upperarm_r', 85)              # impacto: brazo estirado al frente
+            _eje('lowerarm_r', 5)
+        else:
+            w = (frame - 11) / max(total - 11, 1)
+            _eje('upperarm_r', 85 * (1 - w))
+            _eje('lowerarm_r', 5 * (1 - w))
+    return _extra
+
+
+def pico_adelante(arm, act, hueso, metrica='miny'):
+    """Fotograma de impacto del clip: `miny` = mano más adelantada (en este rig
+    delante es -Y); `minz` = mano más baja (tajo de espada)."""
+    ad = arm.animation_data
+    prev = ad.action
+    for t in list(ad.nla_tracks):
+        t.mute = True
+    ad.action = act
+    if act.slots:
+        ad.action_slot = act.slots[0]
+    f0, f1 = int(act.frame_range[0]), int(act.frame_range[1])
+    mejor, extremo = f0, (-9e9 if metrica == 'maxy' else 9e9)
+    for f in range(f0, f1 + 1):
+        bpy.context.scene.frame_set(f)
+        bpy.context.view_layer.update()
+        m = arm.pose.bones[hueso].matrix.translation
+        v = m.y if metrica == 'maxy' else (m.y if metrica == 'miny' else m.z)
+        if (v > extremo) if metrica == 'maxy' else (v < extremo):
+            mejor, extremo = f, v
+    ad.action = prev
+    for t in list(ad.nla_tracks):
+        t.mute = False
+    return mejor
+
+
+def remapear(act, plan):
+    """PJ-02: nueva línea de tiempo. `plan[i]` = fotograma fuente del destino i+1.
+
+    Se re-muestrean todas las fcurves y se reinsertan con interpolación lineal,
+    lo que permite anticipación lenta, pausa de impacto (fotograma repetido) y
+    recuperación en clips que UAL trae demasiado veloces.
+    """
+    for lay in act.layers:
+        for st in lay.strips:
+            for cb in st.channelbags:
+                for fc in cb.fcurves:
+                    vals = [fc.evaluate(s) for s in plan]
+                    fc.keyframe_points.clear()
+                    fc.keyframe_points.add(len(plan))
+                    for i, v in enumerate(vals):
+                        kp = fc.keyframe_points[i]
+                        kp.co = (i + 1, v)
+                        kp.interpolation = 'LINEAR'
+                    fc.update()
+
+
+def plan_golpe(pico, fin, anti=5, golpe=2, recob=6):
+    """Destinos: reposo (1), subida lenta a anti, aceleración al impacto, pausa
+    de `golpe` fotogramas sobre el pico y caída suave de `recob` al final."""
+    plan = [1.0, 1.0]
+    for i in range(anti):
+        w = (i + 1) / (anti + 1)
+        plan.append(1.0 + (max(pico - 2, 2) - 1) * (w * w))       # ease-in
+    plan.append(pico - 1)
+    plan += [pico] * golpe
+    for i in range(recob):
+        w = (i + 1) / (recob + 1)
+        plan.append(pico + (fin - pico) * (1 - (1 - w) ** 2))     # ease-out
+    plan.append(fin)
+    return plan
 
 
 def extra_montar(arm):
@@ -1275,12 +1449,21 @@ def construir(clase, sexo, exportar=True):
     # clips
     tracks = []
     for dest, src in MAPA_CLIPS.items():
-        tracks.append(hornear(arm, actos, src, destino=dest))
+        extra = extra_lanzar(arm) if dest == 'Lanzar' else None
+        tracks.append(hornear(arm, actos, src, destino=dest, extra=extra))
     tracks.append(hornear(arm, actos, ATAQUE[clase], destino='Atacar'))
+    # PJ-02: ataque y disparo con anticipación, pausa de impacto y recuperación;
+    # el pico se mide en el propio clip horneado (mano derecha más adelantada).
+    for dest in ('Atacar', 'Disparar'):
+        a = next(t for t in tracks if t.name == dest)
+        f1 = int(a.frame_range[1])
+        pico = pico_adelante(arm, a, 'hand_r')
+        remapear(a, plan_golpe(pico, f1))
     tracks.append(hornear(arm, actos, 'Sitting_Idle_Loop', destino='Montar', frames=40,
                          extra=extra_montar(arm)))
+    reposo = next(t for t in tracks if t.name == 'Reposo')
     for nombre, (dur, poses) in EMOTES.items():
-        tracks.append(emote(arm, nombre, dur, poses))
+        tracks.append(emote(arm, nombre, dur, poses, base=reposo))
     for a in tracks:
         ajustar_loops(a)
     renombrar_huesos(arm)
