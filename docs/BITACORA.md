@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-253: BOLSA_SIGUIENTE_4.md con 20 propuestas de pruebas (Junie)
+
+**Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_4.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Barrido sistemático de `tests/` contra `src/` para encontrar módulos sin pruebas dedicadas. Se ejecutó `grep -rl "<modulo>" tests/ | wc -l` para cada archivo de `src/sim/`, `src/rpg/`, `src/world/`, `src/render/`, `src/ui/`, `src/scenes/` y `src/editor/`. Resultado: 35 módulos sin pruebas, priorizados en 20 propuestas en BOLSA_SIGUIENTE_4.md. Los 15 restantes (barriadaView, chaserView, interactOutline, modelFiles, mountView, resurrectorView, streetView, terrainView, damageMeterView, inspector, devVisualOptions, hotApply) quedan para BOLSA_SIGUIENTE_5. Lección de BOLSA_3: `weather`, `fields`, `gathering`, `levelRange`, `telemetry` y `frameStats` sí tenían pruebas — no se incluyen.
+
+**Validación:** Sin código que cambiar. Suite 4851/4851 en verde, typecheck limpio.
+
+**Evidencia:** `work/junie-propuestas/BOLSA_SIGUIENTE_4.md`.
+
+---
+
 ## 2026-11-24 — JL-254: Guardar dentro de la casa y la barriada (Junie)
 
 **Archivos:** `src/rpg/contracts.ts`, `src/scenes/houseScene.ts`, `src/main.ts`, `tests/jl254_houseRoomSave.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
