@@ -1,3 +1,13 @@
+## 2026-11-24 — Tanda JL-254…JL-353 para Junie (coordinador)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** OMP se quedó sin inferencia. Sus tareas de programador (UI-04, VIS-02, OMP-POL-12, OMP-POL-02b y OMP-ED-04) pasan a Junie (JL-262…266); las de Blender siguen en la cola de OMP. Se escribieron 100 tareas nuevas a partir de los hallazgos de JL-204…249 y de los módulos de `src/ui/` y `src/render/` sin pruebas. El coordinador se reserva el código de personajes, animaciones y físicas de trajes: Junie solo mide y captura en el bloque F.
+
+**Validación:** `npm run docs:check`.
+
+---
+
 ## 2026-11-24 — JL-249: Medición de arranque en frío (Junie)
 
 **Archivos:** `scripts/qa-cold-start.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

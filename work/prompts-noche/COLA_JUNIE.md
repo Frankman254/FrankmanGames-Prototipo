@@ -1459,3 +1459,135 @@ Antes de escribir cada una, busca con `grep` si ya hay una prueba que lo cubra. 
 - [ ] JL-251 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
 - [ ] JL-252 Reintento obligatorio de lo que haya quedado `[!]` en JL-204…251. Solo queda `[!]` si necesita una decisión del creador, y entonces con la pregunta exacta.
 - [ ] JL-253 Última. Escribe `work/junie-propuestas/BOLSA_SIGUIENTE_4.md` con 20 tareas pequeñas, cada una con su evidencia **comprobada** (el `grep` que lo demuestra). Ojo: en la BOLSA_3, `weather`, `fields`, `gathering`, `levelRange`, `telemetry` y `frameStats` sí tenían pruebas. Son propuestas: no las empieces.
+
+## Tanda del 2026-11-24 (el creador: «ya me quede sin omp haz unas 100 tareas para junie»). JL-254…JL-353, en este orden.
+
+Contexto del coordinador:
+- OMP no está disponible: sus tareas de código (UI-04, VIS-02, OMP-POL-12, OMP-POL-02b y OMP-ED-04) pasan a ti en el bloque B. El detalle de cada una está en `work/prompts-noche/COLA_OMP.md`; las de Blender esperan.
+- **El coordinador trabaja a la vez en personajes, animaciones y físicas de trajes** (cadenas de huesos con retraso): `src/render/characters/`, `src/render/mountView.ts`, `src/render/petView.ts`, `scripts/blender/` y los GLB de héroes y monturas. **No toques esos archivos.** Los escenarios del bloque F solo miden y sacan capturas; si una tarea los necesita, toma lo que haya en `master` en ese momento.
+- **Extracciones pequeñas (bloque C), autorizadas por el coordinador para esta tanda:**
+  - de un módulo de `src/ui/` o `src/render/` se saca a un archivo puro (sin DOM ni Babylon) una función que ya existe, se importa desde el original y se prueba;
+  - el comportamiento no cambia, y nunca más de ~60 líneas movidas por tarea;
+  - si el módulo no tiene nada puro que sacar, «nada que extraer» con dos líneas de motivo y sigue;
+  - no toques `src/ui/editor/` salvo en JL-266.
+- Lo que ya está en una prueba se cierra como «ya estaba hecho» con la ruta. Si una prueba destapa un fallo, no se relaja: informa y, si el arreglo es pequeño y claro, arréglalo con su prueba.
+- Reglas de siempre: no cambiar cifras de balance, no tocar `scripts/balance/balM3.ts`, privacidad de la casa del creador, un commit por tarea con su fila, bitácora y casilla.
+
+### A. Arreglos de lo que encontraste (autorizados por el coordinador)
+- [ ] JL-254 **Guardar dentro de la casa y la barriada** (hallazgo de JL-237): al cargar se pierde la escena interior. Arréglalo para que se cargue dentro de la sala, o junto a su puerta o piedra si la sala no puede restaurarse. Prueba en `tests/` y escenario `guardadoBarriadaCasa` en 14/14.
+- [ ] JL-255 **Enemigos en la calle de Los Santos** (hallazgo de JL-247): que `ZonePopulation.scan()` descarte las celdas de `insideStreet`/`insideLot`. El coordinador lo autoriza: es un fallo, no una regla. No cambia cuántos enemigos hay en la zona, solo dónde no pueden aparecer. Pon a verde las pruebas de `jl247_urbanizacion.test.ts` que lo esperaban.
+- [ ] JL-256 **Áreas que atraviesan paredes** (hallazgo de JL-241). Es una regla de combate, así que **no la cambies**: escribe en `docs/ACCIONES_CREADOR.md` la pregunta exacta, con dos opciones (A: las áreas respetan la línea de visión desde el centro del área; B: se quedan como están) y la captura. Deja una prueba `it.todo` con la opción A.
+- [ ] JL-257 **Exportaciones sin uso** (JL-244): de las 9 candidatas, quita la palabra `export` o el código muerto de las que confirmes sin uso (incluidos imports dinámicos y `window.*`). Si dudas de una, déjala y explica por qué.
+- [ ] JL-258 **Las 7 piedras pendientes** de JL-236: tabla con qué le falta a cada una (zona sin desarrollar, celda no transitable, sin traducción…). Solo diagnóstico.
+- [ ] JL-259 **GLB sin validador** (JL-245): prueba de Node que lea los 141 GLB sin Blender (cabecera, JSON, accesores) y compruebe en cada uno: triángulos por debajo de un tope por familia, materiales con nombre, sin URIs externas, sin texturas de más de 2048 px y caja de tamaño razonable. Topes `PROPUESTA` en la propia prueba.
+- [ ] JL-260 **Calle 2 a 70 FPS con calidad alta** (JL-221): mide qué cuesta, con y sin sombras de las casas y con y sin árboles. Usa `scene.getActiveMeshes`, draw calls y tiempos de las pasadas. Tabla y propuesta en `work/junie-jl260/`; no cambies la vista de la barriada, que es del coordinador.
+- [ ] JL-261 **Vuelo en la barriada** (JL-219): `world.interior=true` lo bloquea. Escribe en `ACCIONES_CREADOR.md` si se permite volar en las zonas exteriores aparte, con el tope de altura y el borde que propones. No lo cambies.
+
+### B. Tareas de programador que eran de OMP (detalle en `COLA_OMP.md`)
+- [ ] JL-262 **UI-04** Vida a la vista.
+- [ ] JL-263 **VIS-02** Repaso de los efectos de los hechizos, después de JL-262.
+- [ ] JL-264 **OMP-POL-12** Skins del indicador de apuntado, del puntero y de la trayectoria. Si necesita un modelo o una textura nueva de Blender, márcala bloqueada y deja dicho qué falta.
+- [ ] JL-265 **OMP-POL-02b** Tema por profundidad en la cripta.
+- [ ] JL-266 **OMP-ED-04** Arreglos de interfaz del editor que salen de tu tabla de ED-01.
+
+### C. Extracciones pequeñas con su prueba (una por módulo)
+- [ ] JL-267 `src/ui/map/minimap.ts`: proyección de mundo a píxeles del minimapa y el zum.
+- [ ] JL-268 `src/ui/map/worldMap.ts`: el encuadre del mapa grande y el paso de clic a mundo.
+- [ ] JL-269 `src/ui/map/minimapDecor.ts`: qué decoración se dibuja según la escala.
+- [ ] JL-270 `src/ui/map/mapFeed.ts`: qué se manda al mapa y con qué frecuencia.
+- [ ] JL-271 `src/ui/menus/chat.ts`: filtro por pestañas, límite de líneas y órdenes con `/`.
+- [ ] JL-272 `src/ui/menus/dialogue.ts`: el avance entre nodos del diálogo.
+- [ ] JL-273 `src/ui/menus/journal.ts` y `questTracker.ts`: el orden y el texto de las misiones.
+- [ ] JL-274 `src/ui/menus/drag.ts`: el ajuste de la ventana a los bordes de la pantalla.
+- [ ] JL-275 `src/ui/menus/context.ts`: qué opciones salen según el objetivo.
+- [ ] JL-276 `src/ui/menus/progressBar.ts` y `panel.ts`: el ancho y el texto de la barra.
+- [ ] JL-277 `src/ui/menus/mountLooks.ts`: la lista de aspectos disponibles.
+- [ ] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores.
+- [ ] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos.
+- [ ] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números.
+- [ ] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa.
+- [ ] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes.
+- [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
+- [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.
+- [ ] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa.
+- [ ] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza.
+- [ ] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador.
+- [ ] JL-288 `src/render/gatherView.ts`: el estado visual de un recurso (lleno, gastado, rebrotando).
+- [ ] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven.
+- [ ] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz.
+- [ ] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros.
+- [ ] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble).
+- [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
+- [ ] JL-294 `src/render/gridView.ts`: qué celdas se pintan.
+- [ ] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon.
+- [ ] JL-296 `src/editor/hotApply.ts`: qué se rehace según el archivo cambiado.
+
+### D. Datos y contenido
+Antes de cada una, busca si ya existe.
+- [ ] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más.
+- [ ] JL-298 Cada objeto tiene icono y el archivo del icono existe.
+- [ ] JL-299 Cada efecto que pide `data/fx.json` existe (partículas y texturas).
+- [ ] JL-300 Cada sonido que piden los datos existe en `assets/audio/`, y ningún archivo de audio sobra.
+- [ ] JL-301 Cada pieza de conjunto de `data/rpg/sets` tiene su malla o queda en una lista de pendientes.
+- [ ] JL-302 Cada arquetipo de `data/assets.json` apunta a un GLB que existe y tiene los clips que pide.
+- [ ] JL-303 Cada tabla de botín apunta a objetos existentes y suma probabilidades válidas, sin cambiar ninguna cifra.
+- [ ] JL-304 Cada hechizo tiene icono, texto en los dos idiomas y efecto visual.
+- [ ] JL-305 Cada PNJ con diálogo tiene sus nodos completos: ningún nodo sin salida ni enlaces rotos.
+- [ ] JL-306 Ningún texto de la interfaz en inglés supera el ancho de su botón: lista con captura de los que se cortan.
+
+### E. Escenarios Electron que faltan
+- [ ] JL-307 `chat`: escribir, cambiar de pestaña, usar una orden con `/` y comprobar el límite de líneas.
+- [ ] JL-308 `dialogo`: hablar con un PNJ y recorrer todas las ramas de su diálogo.
+- [ ] JL-309 `diario`: abrir el diario, seguir una misión y verla en el seguidor.
+- [ ] JL-310 `menuContextual`: clic derecho sobre un enemigo, un PNJ, un objeto del suelo y un compañero.
+- [ ] JL-311 `ventanas`: arrastrar cada ventana al borde, cerrarla y comprobar que la posición se guarda.
+- [ ] JL-312 `pantallaCarga`: que la pantalla de carga sale y se va en cada viaje.
+- [ ] JL-313 `botin`: matar, ver el botín en el suelo, recogerlo y verlo en la mochila.
+- [ ] JL-314 `estados`: aplicar cada estado de desarrollo y capturar su efecto visual.
+- [ ] JL-315 `lluvia`: forzar lluvia y tormenta y comprobar partículas, niebla y sonido.
+- [ ] JL-316 `bordeZona`: andar hacia un borde de zona y ver el aviso.
+- [ ] JL-317 `escaleraCripta`: bajar del piso 1 al 5 por las escaleras y volver a subir.
+- [ ] JL-318 `muerteResurreccion`: morir, ser espectral, resucitar en la piedra y no perder la barra.
+- [ ] JL-319 `mascota`: invocar la mascota, que siga al jugador al correr, al viajar y al entrar a una casa.
+- [ ] JL-320 `inspector`: el inspector de desarrollo abre y lista una entidad sin errores.
+- [ ] JL-321 `medidorDano`: pelear 30 s y ver el medidor con sus porcentajes.
+
+### F. Apoyo a personajes, animaciones y físicas (solo medir y capturar: el código es del coordinador)
+- [ ] JL-322 Escenario `clipsHeroes`: por cada héroe y sexo, una captura por clip (reposo, andar, correr, atacar, lanzar, golpe, morir y montar), de lado y de frente. Lámina en `work/junie-jl322/`.
+- [ ] JL-323 **Pies que patinan:** para cada héroe, la velocidad de movimiento frente a la zancada del clip de andar y de correr (cuánto avanza un pie apoyado por segundo). Tabla con el factor que haría falta. Solo medir.
+- [ ] JL-324 **Saltos entre clips:** grabar cada cambio entre reposo, andar, correr, atacar y reposo a 60 fps, y anotar los que dan salto, con el fotograma.
+- [ ] JL-325 Escenario `jinetes`: captura de cada héroe sobre cada montura, de lado. Lista de los que flotan, se hunden o atraviesan la silla.
+- [ ] JL-326 Escenario `trajes`: captura de cada conjunto de equipo puesto, andando y corriendo, de lado. Lista de piezas que atraviesan el cuerpo (como las piernas con la falda de la Diablica).
+- [ ] JL-327 Escenario `fisicasTrajes`, para cuando el coordinador publique las cadenas de huesos: correr, parar en seco y girar 180°; capas, faldas y pelo se mueven con retraso y vuelven al reposo sin atravesar el cuerpo. Mientras no estén, márcala bloqueada.
+- [ ] JL-328 Las mascotas y las monturas en reposo durante 60 s: que el clip de reposo no se corta ni da saltos al repetirse.
+- [ ] JL-329 Animación de los PNJ: lista de los PNJ que no tienen clip de reposo o se quedan en pose fija.
+- [ ] JL-330 Enemigos: lista de los arquetipos sin clip de `hit` o `die`, o en los que el cuerpo desaparece sin animación.
+- [ ] JL-331 Rendimiento de los personajes: FPS y tiempo de CPU con 1, 10 y 40 héroes animados en la sala de pruebas (`benchCrowd`). Tabla.
+
+### G. Robustez
+- [ ] JL-332 **Sesión larga:** 30 minutos de paseo automático por tres zonas, con memoria y FPS cada minuto. Tabla y gráfico en `work/junie-jl332/`.
+- [ ] JL-333 **Cripta:** bajar 20 pisos seguidos y contar mallas, materiales y texturas en cada piso; que no crezcan sin parar.
+- [ ] JL-334 **Pulsaciones en ráfaga:** 200 clics y 200 teclas de hechizo en 10 s, sin errores de consola y sin que el personaje se quede trabado.
+- [ ] JL-335 **Cambiar el tamaño de la ventana** a 1280×720, 1920×1080, 2560×1440 y ultrapanorámica: el HUD y el minimapa quedan dentro.
+- [ ] JL-336 **Ventana en segundo plano** 2 minutos: al volver, la simulación no hace un salto enorme ni se pierden pulsaciones.
+- [ ] JL-337 **Guardado roto:** cargar un guardado truncado, uno con campos de más y uno de una versión vieja. Sale un aviso claro y el juego no se cuelga. Prueba pura del lector.
+- [ ] JL-338 **Dos guardados seguidos** muy rápido, o guardar mientras se viaja: que nada queda a medias.
+- [ ] JL-339 **Perder el foco a media pelea:** que no quedan teclas «pegadas».
+- [ ] JL-340 **Arranque sin audio** (dispositivo ausente o bloqueado): el juego arranca sin errores.
+- [ ] JL-341 **Arranque con `data/` incompleta:** si falta un archivo opcional, el error es claro, no una pantalla en blanco. Prueba.
+
+### H. Interfaz y accesibilidad
+- [ ] JL-342 Atajos de teclado: lista de los que chocan entre sí o con el sistema. Prueba pura si hay una tabla de atajos.
+- [ ] JL-343 Escalas de interfaz de 80 % a 150 %: capturas del HUD y de las ventanas principales, y lista de lo que se sale.
+- [ ] JL-344 Contraste: los textos del HUD sobre fondo claro y oscuro, de día y de noche. Lista de los que no se leen.
+- [ ] JL-345 Interfaz en inglés completa: recorre todas las ventanas en inglés y lista los textos que se quedan en español.
+- [ ] JL-346 Ratón solo, sin teclado: qué acciones básicas no se pueden hacer. Solo lista.
+- [ ] JL-347 Ayudas de los iconos: cada botón del HUD tiene texto al pasar el puntero.
+
+### I. Cierre de la tanda
+- [ ] JL-348 Consola limpia en todos los escenarios nuevos de esta tanda.
+- [ ] JL-349 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
+- [ ] JL-350 Reintento obligatorio de lo que haya quedado `[!]` o bloqueado en JL-254…349.
+- [ ] JL-351 Actualiza `docs/ESTADO_ACTUAL.md` con lo que cambió de comportamiento en esta tanda (JL-254, 255 y 262…266), con su evidencia.
+- [ ] JL-352 Lista en `work/junie-jl352/PREGUNTAS.md` todas las preguntas al creador que salieron en esta tanda, cada una con su opción recomendada.
+- [ ] JL-353 Última. `work/junie-propuestas/BOLSA_SIGUIENTE_5.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
