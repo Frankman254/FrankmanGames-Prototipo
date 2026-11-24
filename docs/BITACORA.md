@@ -1,3 +1,18 @@
+## 2026-11-23 — OMP-PJ-02: emotes y golpes de los héroes CC0 (OMP)
+
+**Archivos:** `scripts/blender/heroes_cc0.py`, `assets/models/heroes_cc0/*.glb` (6), `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_OMP.md`. Commit 60c7cdb5.
+
+**Qué se hizo:** Tres arreglos pedidos en la cola.
+1. **Causa raíz de los emotes ilegibles**: `emote()` escribía rotaciones euler absolutas sobre la T-pose del armazón — cualquier hueso no mencionado se quedaba con los brazos en cruz y el gesto se leía como un avión. Ahora `emote(…, base=Reposo)` compone cada fotograma como `matriz_reposo(f mod duración) @ Euler(gesto)`: el emote respira con el reposo y solo gira lo que manda la pose; abre y cierra en `{}` (bucle limpio).
+2. **Cinco emotes re-handeados** con ejes medidos por sonda sobre el reposo horneado (el marco local UBC no coincide con UAL: hombro Z− eleva el brazo, codo Z abanica el antebrazo, codo Y es twist): `wave` mano a 1,69 m sobre la cabeza con abanico ±32°; `laugh` pecho arqueado y manos al vientre rebotando 3 veces; `cry` las dos manos a la cara (z 1,43, junto a la boca) con cabeza hundida; `angry` codos abiertos y puños adelantados al esternón; `sleep` cabeza caída hasta verse la nuca y cuerpo hundido, mece entre f16 y f50. `dance/doubt/love` vienen de la UAL y no se tocaron.
+3. **Golpes con lectura de intención**: `Lanzar` con el signo del empuje corregido — `hand_r` cruza por delante (Y +0,5 → −0,07) en los fotogramas 9–10, donde el juego libera el proyectil; `Atacar`/`Disparar` remapeados con `plan_golpe`: anticipación ~35 %, **pausa de impacto de 2–3 fotogramas** (−1,00 a −1,04 sostenido en el disparo; −0,77 en el tajo) y recuperación ~40 %.
+
+**Cómo se verificó:** `validar_heroes_cc0.py` OK (6 héroes, 18 clips, 6 162–6 884 triángulos — sin cambio de malla). Auditoría de los GLB exportados: los 5 emotes handeados salen con 32–70 claves en `upperArmR` (antes, pose fija). 14 tiras de 8 fotogramas (300×500 por cuadro) en `work/omp-pj-02/tiras/`: Lanzar/Disparar/Atacar de las tres clases + los cinco emotes; revisadas una a una en pantalla, no solo medidos números. `npm test` 4 377 verdes y typecheck sin errores en mis rutas (los dos rojos de `scripts/balance/balM3.ts` son ajenos, sin tocar). REPORTE.md en `work/omp-pj-02/`.
+
+**Qué falta:** PJ-03 (`Asiento` en monturas).
+
+---
+
 ## 2026-11-23 — JL-221: rendimiento de la barriada Praderas del Norte (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `work/junie-jl221/MEDICION.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
