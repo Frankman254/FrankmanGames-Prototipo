@@ -109,6 +109,14 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 | Q16 | no he podido revisar eso. pero el fuego esta bug en la cripta aveces no sale la pieza que lo sostiene, el gallote no lo he visto. | Sigue pendiente de revisar. Fallo: en la cripta, a veces el fuego se ve sin la pieza que lo sostiene | BUG-01 |
 | Q18 | si dejalos asi, pero deberia haber un slot y poner la mascota ahi y al tenerla equipada poder ver el menu de la mascota y ver sus caracteristicas y hechizos y poder ponerle hechizos de los nuestros para que los tire el solo (fase desarrollo ya que podriamos incurrir en automatizaciones y que el jugador deje que la mascota mate todo el mob facil) | Los amuletos se quedan como están. Hace falta una ranura de mascota con su menú: características, hechizos y hasta tres hechizos del jugador que lanza sola. Va con cautela, porque no debe matar el grupo por el jugador | T06 |
 
+### JL-256 — Áreas que atraviesan paredes (2026-11-24)
+
+| ID | Pregunta | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|---|
+| JL-256 | Los hechizos de área (cono, línea, cruz, estrella, cuadrado) golpean a **todos** los enemigos dentro de la forma, incluso si hay una pared entre el centro del área y el enemigo. Los de blanco único ya verifican línea de visión. ¿Cómo quieres que funcionen los de área? | | | | Opción **A**: las áreas respetan la línea de visión desde el centro del área hasta cada enemigo (como los de blanco único). Opción **B**: se quedan como están (el área pega a todo lo que está dentro, sin importar las paredes) |
+
+**Detalle técnico** (para contexto): en `src/sim/world.ts`, `hasLineOfSight()` devuelve `true` sin verificar para cualquier hechizo cuyo `area.type` no sea `'single'` (línea 991). Además, `shapeHitsCircle()` en la línea 1387 solo comprueba si el enemigo está dentro de la forma geométrica, sin mirar paredes. Captura en `work/junie-jl256/`.
+
 ## Pendiente de ti
 
 ### Probar en el juego

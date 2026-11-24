@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-256: Pregunta al creador sobre áreas que atraviesan paredes (Junie)
+
+**Archivos:** `tests/jl256_areaLineOfSight.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Hallazgo de JL-241: los hechizos de área (cono, línea, cruz, estrella, cuadrado) golpean a todos los enemigos dentro de la forma geométrica, incluso si hay una pared entre el centro del área y el enemigo. Los de blanco único ya verifican línea de visión. Como es una regla de combate, no se cambia: se escribió la pregunta en `docs/ACCIONES_CREADOR.md` con dos opciones (A: las áreas respetan la línea de visión desde el centro del área; B: se quedan como están). Se dejó una prueba `it.todo` en `tests/jl256_areaLineOfSight.test.ts` que documenta la opción A y el esquema de implementación cuando el creador la elija.
+
+**Validación:** 1 prueba `it.todo` registrada correctamente. Suite completa 4855/4855 (1 todo). `npx tsc --noEmit` limpio.
+
+**Evidencia:** `tests/jl256_areaLineOfSight.test.ts`, `docs/ACCIONES_CREADOR.md` (sección JL-256), `work/junie-jl256/`.
+
+---
+
 ## 2026-11-24 — JL-255: Enemigos no nacen en la calle ni los lotes de Los Santos (Junie)
 
 **Archivos:** `src/sim/zones.ts`, `src/sim/world.ts`, `tests/jl247_urbanizacion.test.ts`, `tests/simPurity.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
