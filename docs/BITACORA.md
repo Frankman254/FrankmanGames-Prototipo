@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-278: extraer el adaptador de opciones visuales (Junie)
+
+**Archivos:** `src/ui/menus/screens/devVisualOptions.ts`, `src/ui/menus/screens/devVisualOptionsLogic.ts`, `tests/ui/devVisualOptionsLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `devVisualOptionPatch()` separa la conversión de controles a valores de `DevVisual`: los deslizadores pasan de `string` a `number`; selectores y casillas conservan su valor. `devVisualOptions.ts` delega el adaptador sin DOM, sin modificar comportamiento ni presentación.
+
+**Validación:** `tests/ui/devVisualOptionsLogic.test.ts`: 2/2; `npm test`: 391 archivos, 4.941 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, `npm run docs:check` y Prettier limpios. Electron `interfaz`: 55/55, cero errores de consola; capturas de 1080p y 768p revisadas en `work/junie-jl278/`. No cambia la presentación.
+
+**Evidencia:** `work/junie-jl278/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-277: extraer selección de aspectos de montura (Junie)
 
 **Archivos:** `src/ui/menus/mountLooks.ts`, `src/ui/menus/mountLooksLogic.ts`, `tests/ui/mountLooksLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -17,6 +17,7 @@ import {
 import { paintText, TEX_H, TEX_W } from '../../../render/fx/floatingText';
 import { LIGHT_MODE_DEFS, LIGHT_MODES } from '../../../render/lightModes';
 import { button, h } from '../dom';
+import { devVisualOptionPatch } from './devVisualOptionsLogic';
 
 const TONEMAP_NAMES = { aces: 'ACES (filmica, viva)', neutra: 'Neutra (Khronos)', ninguna: 'Ninguna (como antes)' };
 const STYLE_NAMES = { plano: 'Plano', relieve: 'Relieve', bloque: 'Bloque 3D' };
@@ -36,7 +37,7 @@ export function devVisualOptions(): HTMLElement[] {
         const sel = h('select', { 'data-opt': `dev.${key}` });
         for (const v of list) sel.appendChild(h('option', { value: v, text: name(v) }));
         sel.value = devVisual()[key];
-        sel.addEventListener('change', () => set({ [key]: sel.value } as Partial<DevVisual>));
+        sel.addEventListener('change', () => set(devVisualOptionPatch(key, sel.value)));
         refreshers.push(() => (sel.value = devVisual()[key]));
         return h('label.opt-row.pick', null, h('span', { text: label }), sel);
     };
@@ -45,7 +46,7 @@ export function devVisualOptions(): HTMLElement[] {
         const out = h('output', { text: fmt(devVisual()[key]) });
         const inp = h('input', { type: 'range', min: L.min, max: L.max, step: L.step, value: devVisual()[key] });
         inp.addEventListener('input', () => {
-            set({ [key]: Number(inp.value) });
+            set(devVisualOptionPatch(key, inp.value));
             out.textContent = fmt(devVisual()[key]);
         });
         refreshers.push(() => {
@@ -56,11 +57,11 @@ export function devVisualOptions(): HTMLElement[] {
     };
     const bloom = h('input', { type: 'checkbox', 'data-opt': 'dev.bloom' });
     bloom.checked = devVisual().bloom;
-    bloom.addEventListener('change', () => set({ bloom: bloom.checked }));
+    bloom.addEventListener('change', () => set(devVisualOptionPatch('bloom', bloom.checked)));
     refreshers.push(() => (bloom.checked = devVisual().bloom));
     const hero = h('input', { type: 'checkbox', 'data-opt': 'dev.heroLight' });
     hero.checked = devVisual().heroLight;
-    hero.addEventListener('change', () => set({ heroLight: hero.checked }));
+    hero.addEventListener('change', () => set(devVisualOptionPatch('heroLight', hero.checked)));
     refreshers.push(() => (hero.checked = devVisual().heroLight));
 
     const sample = h('canvas', { width: TEX_W * 2, height: TEX_H }) as HTMLCanvasElement;
@@ -109,7 +110,7 @@ export function devVisualOptions(): HTMLElement[] {
             const sel = h('select', { 'data-opt': 'dev.aimSkin' });
             for (const s of AIM_SKINS) sel.appendChild(h('option', { value: s.id, text: s.name }));
             sel.value = devVisual().aimSkin;
-            sel.addEventListener('change', () => set({ aimSkin: sel.value }));
+            sel.addEventListener('change', () => set(devVisualOptionPatch('aimSkin', sel.value)));
             refreshers.push(() => (sel.value = devVisual().aimSkin));
             return h('label.opt-row.pick', null, h('span', { text: 'Skin' }), sel);
         })(),
