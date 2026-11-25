@@ -143,7 +143,9 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 ### Probar en el juego
 
 - **Canciones de pueblo (AUD-CTX-07)**: entra en Chitrí, Iguanera muelle, Pedasol, Punta Venada y Cambutal; cada uno suena distinto. Muestras de 30 s en `work/claude-aud-regiones/salida/pueblo_*_muestra30.wav`.
-- **Barra en rojo (HUD-ROJO-02)**: ataca a un enemigo, aléjate y mueve el cursor al suelo; los hechizos ya no deben quedar en rojo.
+- **Barra en rojo (HUD-ROJO-02/03)**: apunta a un enemigo lejano o detrás de una pared; la barra ya no se pone roja, porque el personaje se acerca y lanza.
+- **Ajuar de la Diablica (EQ-10c)**: quítate y ponte piezas andando, montado y con la mochila abierta; nada debe salirse de su sitio.
+- **Regeneración (REGEN-01)**: ya no sale el +1 verde cada segundo.
 - **Creador de personaje (CLA-CR1)**: mueve altura y complexión. La altura ahora se nota en la vista previa y robusto/delgado cambian la masa del cuerpo, no solo el ancho. Si quieres más diferencia de altura, dime el rango: hoy es 0,94–1,06 (Q24).
 - **Jinetes (CLA-MON1)**: monta mula, caballo, tapir y las aves; el jinete debería ir sentado, sin flotar.
 - **Barra de hechizos (CLA-BAR1)**: si tu perfil guardado aún deja el hueco abajo, arrástrala abajo una vez y cierra el candado.
@@ -182,7 +184,7 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 | Q20 | Actualizar: ¿vale que el lanzador traiga los cambios con `git pull` y recompile en cada máquina? | DIST-01 |
 | Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
 | Q22 | ¿Vale poner Vida directa en el equipo en vez de Vitalidad? | Cerrar EQ-07 |
-| GCD-01 | Al lanzar, todos los hechizos esperan 0,5–0,8 s (enfriamiento global) y la cola solo guarda lo pulsado en los primeros 0,3 s. Propuesta: que la cola acepte la pulsación en cualquier momento del enfriamiento y la lance al acabar, sin bajar el GCD | Ritmo de combate |
+| GCD-01 | Pediste hechizos «asíncronos» y poder lanzar 2 a la vez. Se puede: 104 de 108 hechizos ya son instantáneos y sus efectos corren en paralelo; lo único que lo impide es el enfriamiento global (0,5–0,8 s). Opciones: A) hechizos «libres» que ni ponen ni esperan GCD (p. ej. defensas y movimientos); B) GCD más corto para todos; C) sin GCD, solo el enfriamiento de cada hechizo. La cola ya guarda la pulsación cuando falta poco (CLA-COLA) | Ritmo de combate |
 | Q23 | ¿Te convence la reforja que recomendé? | EQ-08 |
 | Q24 | Altura del creador de personaje: ¿se queda el rango 0,94–1,06 o se amplía? | Nada (CLA-CR1 ya hecha) |
 

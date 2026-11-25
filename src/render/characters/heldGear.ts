@@ -118,7 +118,7 @@ export async function attachFitted(
     joints: ReadonlyMap<string, Node>,
     prefix: string,
     fit: Readonly<Record<string, BoneFit>> | undefined,
-    rootInv: Matrix,
+    restRel: ReadonlyMap<string, Matrix>,
 ): Promise<AbstractMesh[]> {
     if (!fit) return [];
     const c = await gearFile(scene);
@@ -131,17 +131,21 @@ export async function attachFitted(
         const bone = part.name.slice(head.length).replace(/_primitive\d+$/, '');
         const joint = joints.get(bone) as TransformNode | undefined;
         const f = fit[bone];
-        if (!joint || !f) continue;
+        if (!joint || !f || !restRel.has(bone)) continue;
         const copy = part.clone(`${prefix}:${part.name}`, joint);
         if (!copy) continue;
         // Malla en el marco del hueso de La Espeja → centro `at` del hueso de este modelo, con su
         // giro y escala, expresado en el hueso (como `wornPlacements`).
-        const rel = joint.computeWorldMatrix(true).multiply(rootInv);
+        // `restRel` se toma con el esqueleto en reposo ANTES de esperar al GLB: medido aquí, el hueso
+        // ya estaría animado (reposo, montura, paso) y el personaje movido, y la pieza quedaba
+        // fuera de su sitio para siempre (creador 2026-11-24: «se rompen las posiciones del set»).
+        const rel = restRel.get(bone);
+        if (!rel) continue;
         const local = BMatrix.Compose(
             new Vector3(f.scale[0], f.scale[1], f.scale[2]),
             new Quaternion(f.rot[0], f.rot[1], f.rot[2], f.rot[3]),
             new Vector3(f.at[0], f.at[1], f.at[2]),
-        ).multiply(rel.invert());
+        ).multiply(rel.clone().invert());
         copy.rotationQuaternion ??= new Quaternion();
         local.decompose(copy.scaling, copy.rotationQuaternion, copy.position);
         copy.setEnabled(true);

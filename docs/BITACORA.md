@@ -15,6 +15,73 @@
 
 ---
 
+## 2026-11-24 — HUD-ROJO-03, REGEN-01 y EQ-10c (Coord)
+
+- **Barra en rojo.** Con `approachToCast` el alcance y la línea de visión no rechazan la pulsación; la barra ya no lo marca. Electron: 7 → 0 huecos rojos con un enemigo a 30 m (`work/claude-hz-0124/qa_barra_resultado.txt`).
+- **Regeneración.** Sin +1 flotante ni chispas para la regeneración natural (`isQuietHeal`).
+- **Ajuar de la Diablica.** La copia del modelo nacía en la pose del original (medido: cabeza a 0,11 m, tumbada) y las piezas se ajustaban contra ella. Ahora se vuelve al reposo antes de medir. Capturas en `work/claude-hz-0124/shots/`.
+- **Dos hechizos a la vez.** Posible sin tocar la simulación de efectos; depende solo del GCD. Pregunta GCD-01 reescrita con opciones.
+
+## 2026-11-24 — JL-275: extraer la búsqueda de objetos por UID (Junie)
+
+**Archivos:** `src/ui/menus/context.ts`, `src/ui/menus/contextLogic.ts`, `tests/ui/contextLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `findItemByUid()` mueve la selección por UID a lógica pura, conservando el orden de búsqueda de mochila y equipo. `findItem()` permanece como adaptador para los consumidores de `context.ts`; el contrato y el comportamiento no cambian.
+
+**Validación:** la prueba nueva falló antes de crear el helper por módulo inexistente; luego `tests/ui/contextLogic.test.ts` pasó 2/2. `npm test`: 386 archivos, 4.924 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. No cambia la presentación; no aplica captura de Electron.
+
+**Evidencia:** `work/junie-jl275/EVIDENCIA.md`.
+
+---
+
+## 2026-11-24 — JL-274: aislar el recorte de ventanas durante el arrastre (Junie)
+
+**Archivos:** `src/ui/menus/windows.ts`, `src/ui/menus/windowDrag.ts`, `tests/ui/dragPosition.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `clampDrag()` se extrae de `windows.ts` a `windowDrag.ts`, un módulo sin DOM. `windows.ts` mantiene su exportación pública y `WindowLayout` usa el helper sin cambiar el comportamiento. La lógica de movimiento de ventanas estaba en `windows.ts`, no en `drag.ts`.
+
+**Validación:** `tests/ui/dragPosition.test.ts` y `tests/ui/windows.test.ts`: 20/20; `npm test`: 385 archivos, 4.922 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/dragPosition.test.ts`, `tests/ui/windows.test.ts` y `work/junie-jl274/EVIDENCIA.md`.
+
+---
+
+## 2026-11-24 — JL-273: extraer el orden y texto de misiones (Junie)
+
+**Archivos:** `src/ui/menus/journal.ts`, `src/ui/menus/questTracker.ts`, `src/ui/menus/questViewLogic.ts`, `tests/ui/questViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `questJournalSections()` conserva el orden recibido al dividir misiones abiertas y completadas. `questJournalText()` y `questTrackerPresentation()` separan del DOM la preparación de textos, objetivos, metadatos, recompensas y avance del seguidor; las vistas consumen los resultados sin cambiar el comportamiento.
+
+**Validación:** la prueba nueva falló antes de implementar porque faltaba el módulo; después `tests/ui/questViewLogic.test.ts` pasó 3/3 y `tests/ui/questFormat.test.ts` 2/2. `npm test`: 385 archivos, 4.922 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. El build solo mostró el aviso habitual de chunks grandes. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl273/EVIDENCIA.md`.
+
+---
+
+## 2026-11-24 — JL-272: extraer el avance entre nodos del diálogo (Junie)
+
+**Archivos:** `src/ui/menus/dialogue.ts`, `src/ui/menus/dialogueLogic.ts`, `tests/ui/dialogueLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `dialogueChoiceIndex()` aísla la validación de la vista y la opción seleccionada antes de llamar a la sesión. `dialogueTransition()` devuelve la vista siguiente o la decisión de cerrar; `DialogueWindow.choose()` consume ambas funciones sin cambiar el comportamiento.
+
+**Validación:** la prueba nueva falló antes de implementar porque faltaba el módulo; después `tests/ui/dialogueLogic.test.ts` pasó 3/3. `npm test`: 384 archivos, 4.919 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/dialogueLogic.test.ts` y `work/junie-jl272/EVIDENCIA.md`.
+
+---
+
+## 2026-11-24 — JL-271: extraer el filtro de visibilidad del chat (Junie)
+
+**Archivos:** `src/ui/menus/chat.ts`, `src/ui/menus/chatLogic.ts`, `tests/ui/chatLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `chatLineMatchesView()` concentra la decisión pura de filtrar una línea por canal y categorías activas. `ChatBox.add()` usa el helper y conserva el comportamiento del registro; no se modificaron la interpretación de comandos ni el límite del historial.
+
+**Validación:** `tests/ui/chatLogic.test.ts` (2/2), `tests/ui/chat.test.ts` (9/9), `npm test`: 383 archivos y 4.916 pruebas aprobados, 1 archivo omitido y 1 `todo`; `npm run typecheck`, `npm run docs:check` y `npm run build` limpios. Vite avisó que algunos chunks superan 500 kB, sin impedir el build. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/chatLogic.test.ts` y `work/junie-jl271/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — JL-270: extraer marcadores de enemigos del feed del mapa (Junie)
 
 **Archivos:** `src/ui/map/mapFeed.ts`, `src/ui/map/mapFeedLogic.ts`, `tests/ui/mapFeedLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

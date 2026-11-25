@@ -89,7 +89,7 @@ export class GltfCharacter implements CharacterModel {
     private pending: { state: AnimState; opts: PlayOptions } | null = null;
     private disposed = false;
     /** Copia del modelo: esqueleto y clips no se van con el nodo y hay que soltarlos aparte. */
-    private inst: { skeletons: Array<{ dispose(): void }>; animationGroups: Array<{ dispose(): void }> } | null = null;
+    private inst: { skeletons: Array<{ dispose(): void; returnToRest(): void }>; animationGroups: Array<{ dispose(): void }> } | null = null;
     private readonly joints = new Map<string, Node>();
     /** Raíz del glTF instanciado: los sitios de `wear` se miden en su espacio. */
     private gltfRoot: Node | null = null;
@@ -219,18 +219,29 @@ export class GltfCharacter implements CharacterModel {
     private async holdGear(scene: Scene, name: string): Promise<void> {
         const look = this.look;
         if (!look || look.weaponItem === undefined) return;
-        // Lo puesto se coloca con la pose de reposo, antes de que la animación mueva los huesos.
+        // Lo puesto se coloca con la pose de reposo. La copia nace con la pose que tuviera el original
+        // (tumbado, agachado…), no en reposo: se devuelve el esqueleto al reposo antes de medir y la
+        // animación lo vuelve a mover en el siguiente fotograma (creador 2026-11-24: el ajuar de la
+        // Diablica se descolocaba al cambiar de equipo).
+        for (const sk of this.inst?.skeletons ?? []) sk.returnToRest();
         const worn = this.wornPlacements(look);
         // Piezas a medida (EQ-10): una malla por hueso, pegadas con la tabla de ajuste de este GLB.
         const fitted = new Set<string>();
         const root = this.gltfRoot as TransformNode | null;
         const fit = FIT[this.entry.file.replace(/^.*\//, '').replace(/\.glb$/, '')];
         if (root && fit) {
-            const rootInv = root.computeWorldMatrix(true).clone().invert();
+            // Reposo de cada hueso de la tabla, medido ya: tras el primer `await` la animación
+            // y el movimiento del personaje cambian los huesos.
+            const rootInv = freshWorld(root).invert();
+            const restRel = new Map<string, Matrix>();
+            for (const bone of Object.keys(fit)) {
+                const j = this.joints.get(bone) as TransformNode | undefined;
+                if (j) restRel.set(bone, freshWorld(j).multiply(rootInv));
+            }
             const items = [look.weaponItem, look.headItem, look.backItem, ...(look.bodyItems ?? [])];
             for (const item of items) {
                 if (!item || fitted.has(item)) continue;
-                const parts = await attachFitted(scene, item, this.joints, name, fit, rootInv);
+                const parts = await attachFitted(scene, item, this.joints, name, fit, restRel);
                 if (this.disposed) return;
                 if (parts.length === 0) continue;
                 fitted.add(item);
@@ -302,14 +313,14 @@ export class GltfCharacter implements CharacterModel {
         const out: Array<{ slot: 'head' | 'back'; item: string; joint: Node; local: Matrix }> = [];
         const root = this.gltfRoot as TransformNode | null;
         if (!root) return out;
-        const rootInv = root.computeWorldMatrix(true).clone().invert();
+        const rootInv = freshWorld(root).invert();
         for (const slot of ['head', 'back'] as const) {
             const item = slot === 'head' ? look.headItem : look.backItem;
             const anchor = this.entry.wear[slot];
             const joint = anchor ? (this.joints.get(anchor.joint) as TransformNode | undefined) : undefined;
             if (!item || !anchor || !joint) continue;
             const place = (slot === 'head' && look.headKind && anchor.kinds[look.headKind]) || anchor;
-            const rel = joint.computeWorldMatrix(true).multiply(rootInv);
+            const rel = freshWorld(joint).multiply(rootInv);
             const local = Matrix.Scaling(place.scale, place.scale, place.scale)
                 .multiply(Matrix.Translation(...place.at))
                 .multiply(rel.invert());
@@ -724,4 +735,17 @@ export function pieceChooser(look?: CharacterLook): (part: string) => boolean {
         firstHair ??= part;
         return part === firstHair;
     };
+}
+
+/**
+ * Matriz de mundo del nodo con toda su cadena de padres recalculada. `computeWorldMatrix(true)`
+ * solo rehace la del propio nodo y usa la que tengan guardada sus padres; en una copia recién
+ * instanciada esas pueden ser viejas o la identidad, y las piezas del ajuar caían lejos del hueso
+ * (creador 2026-11-24, ajuar de la Diablica al cambiar de equipo andando o montado).
+ */
+function freshWorld(node: Node): Matrix {
+    const chain: Node[] = [];
+    for (let n: Node | null = node; n; n = n.parent) chain.push(n);
+    for (let i = chain.length - 1; i >= 0; i--) chain[i]!.computeWorldMatrix(true);
+    return node.getWorldMatrix().clone();
 }

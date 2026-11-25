@@ -73,3 +73,9 @@ export type GameEvent =
     | { type: 'zoneEnter'; zoneId: string | null }
     // HZ-04b: reacciones elementales.
     | { type: 'reaction'; reactionId: string; targetId: number; sourceId: number };
+
+/** La regeneración natural no se anuncia: ni número flotante, ni chispas, ni chat
+ *  (creador 2026-11-24: «el +1 de la regeneración básica … satura el juego de información»). */
+export function isQuietHeal(e: GameEvent): boolean {
+    return e.type === 'heal' && e.source === 'regen';
+}

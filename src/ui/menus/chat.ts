@@ -14,17 +14,11 @@ import {
 import { tr } from '../../i18n';
 import { button, clear, h } from './dom';
 import { artIcon } from './artIcons';
+import { chatLineMatchesView, type ChatFilters } from './chatLogic';
 
 const CHAT_SIZE_KEY = 'frankmangames.chatSize';
 const CHAT_FILTERS_KEY = 'frankmangames.chatFilters';
 const clampChat = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, Math.round(v)));
-
-/** UI-12: filtros de categoría del chat. */
-interface ChatFilters {
-    combat: boolean;
-    loot: boolean;
-    system: boolean;
-}
 
 const DEFAULT_FILTERS: ChatFilters = { combat: true, loot: true, system: true };
 
@@ -307,13 +301,8 @@ export class ChatBox {
 
     private add(line: ChatLine): void {
         this.log.add(line);
-        if (this.tab === ALL || this.tab === line.channel) {
-            // UI-12: respetar filtros
-            const cat = line.category ?? 'system';
-            const visible =
-                cat === 'combat' ? this.filters.combat : cat === 'loot' ? this.filters.loot : this.filters.system;
-            if (visible) this.appendLine(line);
-        }
+        const channel = this.tab === ALL ? null : this.tab;
+        if (chatLineMatchesView(channel, line, this.filters)) this.appendLine(line);
     }
 
     private appendLine(line: ChatLine): void {

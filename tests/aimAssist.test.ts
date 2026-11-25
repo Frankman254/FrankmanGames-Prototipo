@@ -83,6 +83,20 @@ describe('apuntado flexible', () => {
         expect(w.hotbarState()[i]!.inRange).toBe(false);
     });
 
+    // Creador (2026-11-24): «la barra sigue poniéndose roja». En el juego (approachToCast) ni el
+    // alcance ni la línea de visión rechazan la pulsación: el rojo mentía.
+    it('con approachToCast la barra no marca en rojo lo que el personaje irá a lanzar', () => {
+        const w = arena();
+        w.approachToCast = true;
+        const i = w.character.spellbook.hotbar.indexOf('spark');
+        const e = still(w, 10 + w.spell('spark').range + 6, 10);
+        w.aimProvider = () => aim(e.pos.x, e.pos.y, e.id);
+        expect(w.hotbarState().every((h) => h.inRange)).toBe(true);
+        expect(w.hotbarState()[i]!.inRange).toBe(true);
+        // Y la pulsación, en efecto, no se rechaza.
+        expect(w.commandCast('spark', aim(e.pos.x, e.pos.y, e.id))).toBeNull();
+    });
+
     it('fuera de alcance, con approachToCast, se acerca andando y lanza', () => {
         const w = arena();
         w.approachToCast = true;
