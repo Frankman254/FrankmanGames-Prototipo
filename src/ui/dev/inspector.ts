@@ -4,6 +4,7 @@
 // - Capas: cada nodo raíz de la escena con su casilla para ocultarlo; niebla y plano lejano.
 // Solo existe en `npm run dev` o con la marca de pruebas; no cambia nada del juego.
 import type { AbstractMesh, Node, Scene } from '@babylonjs/core';
+import { inspectorEntityText } from './inspectorLogic';
 
 export class SceneInspector {
     readonly el = document.createElement('div');
@@ -96,16 +97,14 @@ export class SceneInspector {
         const p = hit!.pickedPoint;
         const d = cam && p ? cam.position.subtract(p).length() : NaN;
         this.say(
-            [
-                `Malla: ${m.name}`,
-                `Cuelga de: ${chain.slice(1).join(' ← ') || '(raíz)'}`,
-                `Material: ${m.material?.name ?? '—'}`,
-                `Distancia: ${Number.isFinite(d) ? d.toFixed(1) + ' m' : '—'}`,
-                p ? `Punto: ${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}` : '',
-                `Vértices: ${m.getTotalVertices()}`,
-            ]
-                .filter(Boolean)
-                .join('\n'),
+            inspectorEntityText({
+                name: m.name,
+                parentNames: chain.slice(1),
+                materialName: m.material?.name ?? null,
+                distance: d,
+                point: p ? { x: p.x, y: p.y, z: p.z } : null,
+                vertices: m.getTotalVertices(),
+            }),
         );
         this.unoutline();
         m.renderOutline = true;

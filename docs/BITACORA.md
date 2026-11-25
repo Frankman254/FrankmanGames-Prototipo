@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-283: separar el texto de entidad del inspector (Junie)
+
+**Archivos:** `src/ui/dev/inspector.ts`, `src/ui/dev/inspectorLogic.ts`, `tests/ui/inspectorLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `inspectorEntityText()` aísla el formateo del detalle de una malla seleccionada en lógica pura, sin Babylon ni DOM. `SceneInspector.pick()` delega el texto y conserva los valores, el orden, los fallbacks y la presentación existentes.
+
+**Validación:** `tests/ui/inspectorLogic.test.ts`: 2/2; `npm test`: 396 archivos, 4.956 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, Prettier y `npm run docs:check` limpios. Sin cambio visual; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl283/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-282: extraer filas y porcentajes del medidor de daño (Junie)
 
 **Archivos:** `src/ui/dev/damageMeterView.ts`, `src/ui/dev/damageMeterLogic.ts`, `tests/ui/damageMeterLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
