@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-312: mostrar carga al volver de la cripta (Junie)
+
+**Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El evento `dungeonReturn` llamaba directamente a `crypt.leave()` y omitía la pantalla de carga. Ahora el retorno con Ovillo pasa por `CryptScene.veil()`, igual que la salida por escaleras. El escenario Electron `pantallaCarga` recorre partida nueva, viaje por Piedra, Seco del Regreso, entrada y cambio de piso de la cripta, salida por escaleras y Ovillo de regreso; comprueba que la pantalla aparezca y quede oculta al terminar.
+
+**Validación:** Antes del arreglo, la prueba reprodujo 16/18 comprobaciones: las dos fallidas eran la aparición y ocultación al usar el Ovillo. Después: Electron `pantallaCarga` 18/18, consola limpia; `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Capturas finales revisadas.
+
+**Evidencia:** `work/junie-jl312-20261125/resultado.json` y capturas `work/junie-jl312-20261125/jl312-*-carga.jpg`.
+
+---
+
 ## 2026-11-25 — JL-311: verificar arrastre y guardado de ventanas (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

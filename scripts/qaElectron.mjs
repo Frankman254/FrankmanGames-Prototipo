@@ -531,6 +531,148 @@ const uiFaults = () =>
   return out; })()`);
 
 const scenarios = {
+    async pantallaCarga() {
+        await js(`(() => {
+      const state = window.__qaLoading = { events: [] };
+      const sample = () => {
+        const screen = document.querySelector('.carga');
+        if (!screen) return;
+        const event = {
+          at: performance.now(),
+          hidden: screen.hidden,
+          faded: screen.classList.contains('fuera'),
+          visible: !screen.hidden && !screen.classList.contains('fuera'),
+          kicker: screen.querySelector('.carga-kicker')?.textContent ?? '',
+          title: screen.querySelector('.carga-titulo')?.textContent ?? '',
+        };
+        const previous = state.events.at(-1);
+        if (!previous || previous.hidden !== event.hidden || previous.faded !== event.faded || previous.title !== event.title)
+          state.events.push(event);
+      };
+      window.__qaLoadingObserver = new MutationObserver(sample);
+      window.__qaLoadingObserver.observe(document.documentElement, {
+        subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'hidden'],
+      });
+      sample();
+    })()`);
+
+        const eventCount = () => js('window.__qaLoading.events.length');
+        const verifyTrip = async (name, start, ready) => {
+            try {
+                await until(
+                    `window.__qaLoading.events.slice(${start}).some((e) => e.visible)`,
+                    20000,
+                    `${name}: pantalla visible`,
+                );
+            } catch (error) {
+                if (!(error instanceof Error) || !error.message.startsWith('Tiempo agotado esperando:')) throw error;
+                check(`${name}: muestra destino`, false, 'La pantalla no llegó a mostrarse');
+                check(`${name}: se oculta al terminar`, false, 'No se observó la pantalla visible');
+                await until(ready, 20000, `${name}: destino listo`);
+                return;
+            }
+            await shot(`jl312-${name}-carga`);
+            await until(
+                `window.__qaLoading.events.slice(${start}).some((e) => e.hidden)`,
+                30000,
+                `${name}: pantalla oculta`,
+            );
+            const events = await js(`window.__qaLoading.events.slice(${start})`);
+            const shown = events.find((e) => e.visible);
+            const hidden = events.find((e) => e.hidden && shown && e.at > shown.at);
+            check(`${name}: muestra destino`, !!shown && shown.title.length > 0, JSON.stringify(shown));
+            check(`${name}: se oculta al terminar`, !!hidden, JSON.stringify(hidden));
+            await until(ready, 20000, `${name}: destino listo`);
+        };
+
+        const newGameStart = await eventCount();
+        await newGame('QA Carga');
+        const initialEvents = await js(`window.__qaLoading.events.slice(${newGameStart})`);
+        const initialShown = initialEvents.find((e) => e.visible);
+        const initialHidden = initialEvents.find((e) => e.hidden && initialShown && e.at > initialShown.at);
+        check('Partida nueva: muestra pantalla de carga', !!initialShown && initialShown.title.length > 0, JSON.stringify(initialShown));
+        check('Partida nueva: oculta pantalla al entrar', !!initialHidden, JSON.stringify(initialHidden));
+
+        const source = await js(`(() => {
+      const p = __game.world.player.pos;
+      const stones = __game.stones.stones.map((stone) => {
+        const root = __game.view.scene.getTransformNodeByName('stone_' + stone.id);
+        if (!root) return null;
+        const at = root.getAbsolutePosition();
+        return { id: stone.id, x: at.x, y: at.z, distance: Math.hypot(at.x - p.x, at.z - p.y) };
+      }).filter(Boolean).sort((a, b) => a.distance - b.distance)[0];
+      return stones ?? null;
+    })()`);
+        if (!source) throw new Error('No hay Piedra Pintada visible para iniciar el viaje');
+        await js(`(() => {
+      const p = __game.world.player;
+      p.pos = { x: ${source.x}, y: ${source.y} };
+      p.prevPos = { ...p.pos };
+      p.path = [];
+    })()`);
+        await sleep(600);
+        await clickMesh(`stoneCrystal_${source.id}`);
+        await until(`!!document.querySelector('.stone-modal')`, 10000, 'selector de Piedras Pintadas');
+        const target = await js(`(() => {
+      const source = ${JSON.stringify(source.id)};
+      const respawn = __game.stoneBook.progress.respawn;
+      const stone = __game.stones.stones.find((item) => item.id !== source && item.id !== respawn);
+      return stone ? { id: stone.id, name: stone.name } : null;
+    })()`);
+        if (!target) throw new Error('No hay una segunda Piedra Pintada seleccionable');
+        const stoneStart = await eventCount();
+        await button(target.name);
+        await verifyTrip(
+            'piedra',
+            stoneStart,
+            `Math.hypot(${W}.player.pos.x-${source.x}, ${W}.player.pos.y-${source.y}) > 5`,
+        );
+
+        const recallFrom = await js(`({...${W}.player.pos})`);
+        const recallStart = await eventCount();
+        const recallUsed = await js(`(() => {
+      const c = ${S}.character;
+      c.itemCooldowns = {};
+      c.pickUp(c.items.create('seco_del_regreso'), true);
+      const item = c.inventory.slots.find((slot) => slot?.itemId === 'seco_del_regreso');
+      return item ? ${S}.useItem(item.uid).ok : false;
+    })()`);
+        if (!recallUsed) throw new Error('No se pudo usar el Seco del Regreso');
+        await verifyTrip(
+            'recuerdo',
+            recallStart,
+            `Math.hypot(${W}.player.pos.x-${recallFrom.x}, ${W}.player.pos.y-${recallFrom.y}) > 5`,
+        );
+
+        const cryptStart = await eventCount();
+        await js(`__game.crypt.veil('Entrando en', 0, () => __game.crypt.enter(0, 'above'))`);
+        await verifyTrip('cripta-entrada', cryptStart, '__game.crypt.floor === 0');
+
+        const floorStart = await eventCount();
+        await js(`__game.crypt.veil('Bajando a', 1, () => __game.crypt.enter(1, 'above'))`);
+        await verifyTrip('cripta-piso', floorStart, '__game.crypt.floor === 1');
+
+        const stairExitStart = await eventCount();
+        await js(`__game.crypt.veil('Volviendo a', null, () => __game.crypt.leave())`);
+        await verifyTrip('cripta-escalera-salida', stairExitStart, '__game.crypt.floor === null');
+
+        const returnItemEntryStart = await eventCount();
+        await js(`__game.crypt.veil('Entrando en', 0, () => __game.crypt.enter(0, 'above'))`);
+        await verifyTrip('cripta-entrada-ovillo', returnItemEntryStart, '__game.crypt.floor === 0');
+
+        const returnItemStart = await eventCount();
+        const returnItemUsed = await js(`(() => {
+      const c = ${S}.character;
+      c.itemCooldowns = {};
+      c.pickUp(c.items.create('ovillo_de_regreso'), true);
+      const item = c.inventory.slots.find((slot) => slot?.itemId === 'ovillo_de_regreso');
+      return item ? ${S}.useItem(item.uid).ok : false;
+    })()`);
+        if (!returnItemUsed) throw new Error('No se pudo usar el Ovillo de regreso');
+        await verifyTrip('ovillo-regreso', returnItemStart, '__game.crypt.floor === null');
+        await js('window.__qaLoadingObserver.disconnect()');
+        check('Pantalla de carga: consola limpia', consoleErrors.length === 0, consoleErrors.slice(-3).join(' | '));
+    },
     async piedrasLejanas() {
         await newGame('QA Piedras');
         const inspect = `(()=>{ const p=${W}.player.pos, g=${W}.grid, h=__game.view.heights.sample(p.x,p.y); return {x:p.x,y:p.y,h,walk:g.walkable(p),active:__game.view.stream.isActive(p.x,p.y)}; })()`;

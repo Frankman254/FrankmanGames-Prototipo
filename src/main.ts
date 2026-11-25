@@ -1929,7 +1929,10 @@ function recallToStone(): void {
 menus?.onSession((s) => {
     s.on((e) => {
         if (e.type === 'recall') recallToStone();
-        if (e.type === 'dungeonReturn' && crypt?.inside) crypt.leave();
+        if (e.type === 'dungeonReturn' && crypt?.inside) {
+            const dungeon = crypt;
+            dungeon.veil('Volviendo a', null, () => dungeon.leave());
+        }
         if (e.type === 'npcClip') npcView.playGesture(e.npcId, e.clip);
         // DUN-07: recompensa del guardián.
         if (e.type === 'guardianDefeated' && crypt?.inside) crypt.onGuardianDefeated(e.archetype);
