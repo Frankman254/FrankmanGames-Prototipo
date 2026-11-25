@@ -12,6 +12,7 @@ import {
 } from '@babylonjs/core';
 import { goldOutline } from './interactOutline';
 import { staticMesh } from './staticModels';
+import { gatherVisualState } from './gatherVisualLogic';
 import type { GatherNodeDef, ProfessionsDef, StationDef } from '../rpg/professions';
 import type { World } from '../sim/world';
 import type { HeightField } from '../world/terrain';
@@ -108,15 +109,15 @@ export class GatherView {
                 this.nodes.set(n.id, els);
             }
             els.root.setEnabled(true);
-            const depleted = n.respawn > 0;
-            if (els.depleted === depleted) continue;
-            els.depleted = depleted;
             const kind = this.def.nodes[n.kind]!;
-            els.ring.setEnabled(!depleted);
-            els.root.scaling.setAll(depleted ? (kind.shape === 'rock' ? 0.55 : 0.35) : 1);
+            const visual = gatherVisualState(n.respawn, kind.respawnSeconds, kind.shape);
+            if (els.depleted === visual.depleted) continue;
+            els.depleted = visual.depleted;
+            els.ring.setEnabled(visual.ringEnabled);
+            els.root.scaling.setAll(visual.scale);
             els.meshes.forEach((m, i) => {
-                m.isPickable = !depleted;
-                m.material = depleted ? this.spent : this.nodeMaterial(kind, i);
+                m.isPickable = visual.pickable;
+                m.material = visual.depleted ? this.spent : this.nodeMaterial(kind, i);
             });
         }
     }

@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-288: extraer el estado visual de los recursos (Junie)
+
+**Archivos:** `src/render/gatherView.ts`, `src/render/gatherVisualLogic.ts`, `tests/gatherVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `gatherVisualState()` separa el estado lleno, gastado o rebrotando y las propiedades de escala, aro y selección. `GatherView.sync()` delega en el helper; gastado y rebrotando mantienen la misma apariencia gris y reducida que antes.
+
+**Validación:** `tests/gatherVisualLogic.test.ts`: 3/3; `npx vitest run`: 401 archivos, 4.976 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run build` limpios. Sin cambio de presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl288/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-287: extraer modelo y orientación de PNJ (Junie)
 
 **Archivos:** `src/render/npcView.ts`, `src/render/npcVisualLogic.ts`, `tests/npcVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
