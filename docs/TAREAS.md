@@ -387,6 +387,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-307 | J | Hecho (commit «JL-307: cubrir flujo de chat en Electron») | Electron `chat`: 10/10; texto, filtro por pestaña, `/g`, `/ayuda` y límite configurado de 200 líneas. Consola limpia en la ejecución final; captura revisada en `work/junie-jl307/jl307-chat.jpg`. Suite: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck y build limpios. |
 | JL-308 | J | Hecho (commit «JL-308: recorrer todas las ramas del diálogo en Electron») | Escenario Electron `dialogo`: La Espeja, sus 7 nodos y 28/28 opciones recorridos con clics; 60/60 comprobaciones y consola limpia. Capturas revisadas en `work/junie-jl308/`; suite, typecheck, build y docs:check limpios. |
 | JL-309 | J | Hecho (commit «JL-309: seguir misiones desde el diario») | Electron `diario`: 8/8, consola limpia; acepta misión, la desmarca y la sigue desde el diario, y confirma título/objetivos en el HUD. Suite: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck limpio. Capturas revisadas en `work/junie-jl309/`. |
+| JL-310 | J | Bloqueada | No hay menús contextuales para objetivos del mundo ni compañero visible en runtime: el clic derecho está reservado para cámara/cancelación de apuntado y `World.addCompanion()` solo existe en el laboratorio. Requiere definición del creador antes de inventar opciones o sustituir el objetivo. Diagnóstico: `work/junie-jl310/DIAGNOSTICO.md`; Electron `clicDerecho` 3/4, con error de consola Babylon `postProcessManager`. |
 
 ## Bloqueadas
 

@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-310: menú contextual bloqueado (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl310/DIAGNOSTICO.md`.
+
+**Qué se hizo:** Se verificó que el clic derecho del lienzo no tiene menús para enemigos, PNJ, botín del suelo o compañeros; el compañero del código actual solo se admite en el laboratorio de simulación y no tiene representación en el render. No se inventó una interacción. JL-310 queda bloqueada hasta que el creador defina las opciones esperadas y el objetivo compañero visible.
+
+**Validación:** Línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`. Electron `clicDerecho`: 3/4; se comprobó clic derecho sin movimiento (0 m) y movimiento normal (6,32 m y 9,09 m), pero la consola reportó `TypeError: Cannot read properties of null (reading 'postProcessManager')` en `rgbdTextureTools.js`. No se pudo obtener captura de los menús/compañero inexistentes.
+
+**Evidencia:** `work/junie-jl310/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-25 — JL-309: seguir misiones desde el diario (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
