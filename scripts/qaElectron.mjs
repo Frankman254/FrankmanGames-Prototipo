@@ -531,6 +531,67 @@ const uiFaults = () =>
   return out; })()`);
 
 const scenarios = {
+    async estados() {
+        await newGame('QA Estados');
+        await js(`(() => {
+      const rig = __game.view.rig;
+      rig.pitchDeg = 28;
+      rig.distance = 7;
+      rig.yawDeg = 0;
+      const label = document.createElement('div');
+      label.id = 'qa-status-label';
+      Object.assign(label.style, {
+        position: 'fixed', top: '12px', left: '12px', zIndex: '99999',
+        padding: '8px 12px', borderRadius: '6px', color: '#fff', background: 'rgba(0,0,0,.8)',
+        font: '16px sans-serif', pointerEvents: 'none',
+      });
+      document.body.append(label);
+    })()`);
+
+        const statuses = await js(
+            `Object.entries(__game.world.content.statuses).map(([id, def]) => ({ id, name: def.name }))`,
+        );
+        if (!statuses.length) throw new Error('El catálogo de estados está vacío');
+        const playerId = await js('__game.world.player.id');
+        await sleep(900);
+
+        for (const { id, name } of statuses) {
+            const nodeName = `status:${playerId}:${id}`;
+            await js(`(() => {
+        const world = __game.world;
+        world.character.statuses.clear();
+        const def = world.content.statuses[${JSON.stringify(id)}];
+        world.character.statuses.apply(def, { duration: 60, shield: 100 });
+        document.querySelector('#qa-status-label').textContent = ${JSON.stringify(`${name} · ${id}`)};
+      })()`);
+            let renderError = '';
+            try {
+                await until(
+                    `!!__game.view.scene.getTransformNodeByName(${JSON.stringify(nodeName)})`,
+                    5000,
+                    `${id}: efecto visual`,
+                );
+            } catch (error) {
+                renderError = error instanceof Error ? error.message : String(error);
+            }
+            await sleep(650);
+            const state = await js(`(() => {
+        const world = __game.world;
+        const node = __game.view.scene.getTransformNodeByName(${JSON.stringify(nodeName)});
+        const active = world.character.statuses.get(${JSON.stringify(id)});
+        return { applied: !!active && active.remaining > 0, visual: !!node && node.isEnabled(), node: node?.name ?? null };
+      })()`);
+            check(`${id}: estado aplicado y efecto visual creado`, state.applied && state.visual, renderError || JSON.stringify(state));
+            await shot(`jl314-estado-${id}`);
+        }
+
+        check('Catálogo completo de estados recorrido', statuses.length === 39, `${statuses.length} estados`);
+        await js(`(() => {
+      __game.world.character.statuses.clear();
+      document.querySelector('#qa-status-label')?.remove();
+    })()`);
+    },
+
     async pantallaCarga() {
         await js(`(() => {
       const state = window.__qaLoading = { events: [] };

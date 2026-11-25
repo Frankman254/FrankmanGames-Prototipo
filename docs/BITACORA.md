@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-314: capturar efectos visuales de estados (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `estados` inicia una partida de QA y recorre los 39 estados del catálogo: limpia el anterior, aplica el siguiente solo en memoria, verifica el estado activo y el nodo visual habilitado, y guarda una captura etiquetada por ID. Al terminar limpia los estados y la etiqueta; no cambia lógica ni datos productivos.
+
+**Validación:** Electron `estados`: 41/41 comprobaciones y consola limpia. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Revisé capturas representativas; las 39 se conservaron para inspección.
+
+**Evidencia:** `work/junie-jl314/resultado.json` y capturas `work/junie-jl314/jl314-estado-*.jpg`.
+
+---
+
 ## 2026-11-25 — JL-313: verificar botín del suelo hasta la mochila (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
