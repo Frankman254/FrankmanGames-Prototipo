@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-277: extraer selección de aspectos de montura (Junie)
+
+**Archivos:** `src/ui/menus/mountLooks.ts`, `src/ui/menus/mountLooksLogic.ts`, `tests/ui/mountLooksLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `mountLookOptionsFromPalette()` separa la transformación de IDs y paleta a opciones puras. `mountLooks.ts` conserva la carga de las paletas por modelo y usa el helper, sin cambiar el orden, los nombres ni los colores de respaldo.
+
+**Validación:** `tests/ui/mountLooksLogic.test.ts` pasó 4/4 y `tests/ui03_mountLooks.test.ts` 6/6. `npm test`: 390 archivos, 4.939 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y Prettier limpios. Sin cambio visual; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl277/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — GCD-01: hechizos libres del enfriamiento global (Coord)
 
 - El creador eligió la opción A. `offGlobalCooldown` en los datos: el hechizo ni pone ni espera el GCD (`checkCast`, `execute`, barrido de `hotbarState`).
