@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-318: conservar la barra tras morir y resucitar (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió `muerteResurreccion`: prepara hechizos en la barra, provoca una muerte con Pulso 0, comprueba el aviso y la aparición como espectro junto a la Piedra Pintada, guía al Alzador y verifica que el personaje vuelve vivo con la misma barra visible y asignada. No se modificaron reglas ni datos del juego.
+
+**Validación:** Electron `muerteResurreccion`: 9/9 comprobaciones, consola limpia; `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y `node --check scripts/qaElectron.mjs` limpios.
+
+**Evidencia:** `work/junie-jl318/resultado.json` y capturas revisadas `jl318-espectro-piedra.jpg`, `jl318-espectro-alzador.jpg` y `jl318-resucitado.jpg`.
+
+---
+
 ## 2026-11-25 — JL-317: recorrer escaleras entre los pisos 1 y 5 (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

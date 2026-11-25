@@ -1314,6 +1314,61 @@ const scenarios = {
         check('C05: reaparece delante de la puerta', Math.hypot(pos.x - 116, pos.y - 127.5) < 2, JSON.stringify(pos));
     },
 
+    /** JL-318: morir sin Pulso, reaparecer como espectro en la Piedra y llegar al Alzador. */
+    async muerteResurreccion() {
+        await newGame('QA Muerte');
+        const hotbar = () => js(`JSON.stringify(${S}.character.spellbook.hotbar)`);
+        const prepared = await js(`(() => {
+      const c=${S}.character;
+      const spells=Object.values(${S}.content.spells).filter(s=>(s.unlockLevel??1)<=c.level).slice(0,3);
+      for(let i=0;i<spells.length;i++){ const id=spells[i].id; if(c.spellbook.rank(id)===0)c.spellbook.learn(id); c.spellbook.assign(i,id); }
+      c.emit({type:'changed'});
+      return [...c.spellbook.hotbar];
+    })()`);
+        const hotbarBefore = await hotbar();
+        const hotbarCount = prepared.filter(Boolean).length;
+        check('JL-318: la barra de QA empieza con hechizos asignados', hotbarCount > 0, hotbarBefore);
+        if (hotbarCount === 0) throw new Error('No hay hechizos de nivel 1 para preparar la barra');
+
+        const barView = () =>
+            js(`(() => { const e=document.querySelector('.hud-actionbar'); return {visible:!!e&&e.getBoundingClientRect().width>0&&e.getBoundingClientRect().height>0, slots:e?.querySelectorAll('.hot-slot').length??0, occupied:e?.querySelectorAll('.hot-slot:not(.empty)').length??0}; })()`);
+        const checkHotbar = async (label) => {
+            const current = await hotbar();
+            const view = await barView();
+            check(label, current === hotbarBefore && view.visible && view.occupied > 0, JSON.stringify({ view, current }));
+        };
+
+        await js(`${S}.energy.value=0`);
+        await js(`${W}.player.health=0`);
+        await until(deathShown, 10000, 'pantalla de muerte espectral');
+        const deathText = await js(`document.querySelector('.death-modal')?.innerText??''`);
+        check('JL-318: el aviso explica que continúa como espectro junto a la Piedra', deathText.includes('fantasma') && deathText.includes('Piedra Pintada'), deathText);
+        await shot('jl318-muerte');
+        await button('Continuar como espectro');
+        await until(`${W}.character.spectral.active && ${W}.player.alive`, 10000, 'espectro junto a la Piedra');
+        await sleep(700);
+
+        const stoneArrival = await js(`(() => { const id=__game.stoneBook.progress.respawn, stone=__game.stones.stones.find(s=>s.id===id), p=${W}.player.pos; return {id, name:stone?.name, distance:stone?Math.hypot(p.x-stone.x,p.y-stone.y):null}; })()`);
+        check('JL-318: el espectro aparece en la Piedra de regreso', stoneArrival.distance !== null && stoneArrival.distance < 10, JSON.stringify(stoneArrival));
+        check('JL-318: sigue vivo y espectral al reaparecer', await js(`${W}.player.alive && ${W}.character.spectral.active`));
+        await checkHotbar('JL-318: la barra sigue asignada junto a la Piedra');
+        await shot('jl318-espectro-piedra');
+
+        const altar = await js(`(() => { const p=${W}.player.pos; return [...${W}.content.spectral.resurrectors].sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0]; })()`);
+        if (!altar) throw new Error('No hay un Alzador disponible para resucitar');
+        await js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${altar.x}+6,y:${altar.y}+6})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; })()`);
+        await sleep(1200);
+        await shot('jl318-espectro-alzador');
+        await button('Guiar al Alzador');
+        await until(`!${W}.character.spectral.active`, 30000, 'resurrección en el Alzador');
+        await sleep(700);
+        check('JL-318: el Alzador devuelve la forma viva', await js(`${W}.player.alive && !${W}.character.spectral.active`), altar.name);
+        await checkHotbar('JL-318: la barra sigue asignada después de resucitar');
+        await shot('jl318-resucitado');
+        const errors = await js(`window.__consola?.errores(20) || ''`);
+        check('JL-318: sin errores de consola', errors.length === 0, errors);
+    },
+
     async muerte() {
         await newGame('QA Muerte');
         const inv = () => js(`${S}.character.inventory.slots.filter(Boolean).length`);
