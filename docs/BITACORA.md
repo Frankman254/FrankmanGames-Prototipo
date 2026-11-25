@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-295: separar destinos de escalera de la cripta (Junie)
+
+**Archivos:** `src/scenes/cryptScene.ts`, `src/scenes/cryptSceneLogic.ts`, `tests/cryptSceneLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `cryptStairDestination()` concentra en lógica pura el piso destino y el sentido de llegada al subir o bajar; desde el primer piso devuelve la salida a la superficie. `CryptScene.update()` delega en el helper sin cambiar las transiciones ni la presentación.
+
+**Validación:** `tests/cryptSceneLogic.test.ts`: 4/4; `npm test`: 409 archivos, 5.002 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run build`, Prettier y `npm run docs:check` (192 rutas) limpios. No aplica captura Electron porque no cambia la presentación.
+
+**Evidencia:** `work/junie-jl295/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-294: extraer selección de celdas dibujadas (Junie)
 
 **Archivos:** `src/render/gridView.ts`, `src/render/gridViewLogic.ts`, `tests/gridViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -36,6 +36,7 @@ import type { SwitchableHeightField } from '../world/switchableGround';
 
 import type { EnemyState } from '../sim/enemies';
 import type { DungeonSaveState } from '../rpg/contracts';
+import { cryptStairDestination } from './cryptSceneLogic';
 
 /** Estados de enemigo que cuentan como combate activo. */
 const ENGAGED_STATES = new Set<EnemyState>(['pursue', 'telegraph', 'attack', 'recover']);
@@ -364,17 +365,16 @@ export class CryptScene {
                 break;
             }
             case 'down': {
-                const to = this.floor! + 1;
-                this.veil('Bajando a', to, () => this.enter(to, 'above'));
+                const destination = cryptStairDestination(this.floor!, 'down');
+                this.veil('Bajando a', destination.index, () => this.enter(destination.index, destination.from));
                 break;
             }
-            case 'up':
-                if (this.floor === 0) this.veil('Volviendo a', null, () => this.leave());
-                else {
-                    const to = this.floor! - 1;
-                    this.veil('Subiendo a', to, () => this.enter(to, 'below'));
-                }
+            case 'up': {
+                const destination = cryptStairDestination(this.floor!, 'up');
+                if (destination.kind === 'surface') this.veil('Volviendo a', null, () => this.leave());
+                else this.veil('Subiendo a', destination.index, () => this.enter(destination.index, destination.from));
                 break;
+            }
             case 'return': {
                 // No se puede usar en combate.
                 if (this.isInCombat(w)) {

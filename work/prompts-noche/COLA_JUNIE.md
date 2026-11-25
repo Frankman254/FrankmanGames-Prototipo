@@ -1520,7 +1520,7 @@ Contexto del coordinador:
 - [x] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble). — commit «JL-292: deduplicar y reintentar cargas de assets» — 3 pruebas nuevas; suite 406 archivos, 4.992 aprobadas, 1 omitida y 1 `todo`; typecheck, build y `docs:check` limpios. Evidencia: `work/junie-jl292/EVIDENCIA.md`.
 - [x] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle. — commit «JL-293: aislar selección y reconstrucción de trozos de terreno» — `terrainChunkUpdate()` concentra distancia, nivel de detalle, histéresis y presupuesto sin Babylon; `tests/terrainViewLogic.test.ts` 4/4; suite 4.996 aprobadas, 1 omitida y 1 `todo`; typecheck, build y `docs:check` limpios; Electron `piedrasLejanas` 5/5, consola limpia. Evidencia en `work/junie-jl293/EVIDENCIA.md` y las capturas del escenario.
 - [x] JL-294 `src/render/gridView.ts`: qué celdas se pintan. — commit «JL-294: extraer selección de celdas dibujadas» — `tests/gridViewLogic.test.ts` 2/2; suite completa: 4.998 aprobadas, 1 omitida y 1 `todo`; typecheck y build limpios. Sin cambio de presentación; no aplica captura Electron.
-- [ ] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon.
+- [x] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon. — commit «JL-295: separar destinos de escalera de la cripta» — `tests/cryptSceneLogic.test.ts` 4/4; suite 5.002 aprobadas, 1 omitida y 1 `todo`; typecheck, build, Prettier y `docs:check` limpios. No cambia la presentación; evidencia en `work/junie-jl295/EVIDENCIA.md`.
 - [ ] JL-296 `src/editor/hotApply.ts`: qué se rehace según el archivo cambiado.
 
 ### D. Datos y contenido
