@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-286: extraer la lógica visual del botín (Junie)
+
+**Archivos:** `src/render/lootView.ts`, `src/render/lootVisualLogic.ts`, `tests/lootVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `lootVisualState()` separa a lógica pura la clasificación de monedas, bolsas y cofres según el umbral de rareza, y los cálculos de elevación, giro, brillo del suelo, haz y destellos. `LootView` delega conservando fórmulas, colores, frecuencia, umbral y orden del consumo aleatorio; no cambia la presentación.
+
+**Validación:** `tests/lootVisualLogic.test.ts`: 5/5; `npm test`: 399 archivos, 4.966 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Electron `objetos`: 5/5 y consola limpia; captura revisada en `work/qa/objetos-botin.jpg`.
+
+**Evidencia:** `work/junie-jl286/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-285: extraer posición de los fantasmas de apuntado (Junie)
 
 **Archivos:** `src/render/fx/aimGhosts.ts`, `src/render/fx/aimGhostPlacement.ts`, `tests/aimGhostPlacement.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

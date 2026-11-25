@@ -4,12 +4,13 @@
 // rareza y se apoya en el terreno. Una caja invisible recibe el clic.
 import { Color3, Mesh, MeshBuilder, StandardMaterial, TransformNode, Vector3, type Scene } from '@babylonjs/core';
 import type { FxDef } from '../data/fxSchema';
-import { RARITIES, type Rarity } from '../rpg/contracts';
+import type { Rarity } from '../rpg/contracts';
 import type { World } from '../sim/world';
 import type { HeightField } from '../world/terrain';
 import { staticMesh } from './staticModels';
 import { BurstPool, glowMaterial } from './fx/particles';
 import { lootLabelFor, type LootLabel } from './lootLabel';
+import { lootVisualState } from './lootVisualLogic';
 
 interface LootVisual {
     root: TransformNode;
@@ -94,12 +95,18 @@ export class LootView {
         return m;
     }
 
-    private beamFrom(r: Rarity): boolean {
-        return RARITIES.indexOf(r) >= RARITIES.indexOf(this.fx.loot.beamFromRarity);
-    }
-
     private build(id: number, item: boolean, rarity: Rarity): LootVisual {
         const s = this.scene;
+        const visual = lootVisualState({
+            id,
+            item,
+            rarity,
+            beamFromRarity: this.fx.loot.beamFromRarity,
+            time: this.time,
+            frameSeconds: 0,
+            sparkleTimer: 1,
+            glow: this.fx.loot.glow,
+        });
         const root = new TransformNode(`loot${id}`, s);
         const spin = new TransformNode(`lootSpin${id}`, s);
         spin.parent = root;
@@ -110,9 +117,9 @@ export class LootView {
             return m;
         };
         const col = this.rarityColor[rarity];
-        if (!item) {
+        if (visual.kind === 'coins') {
             add(staticMesh(s, 'b_monedas', `coin${id}`), this.gold);
-        } else if (this.beamFrom(rarity)) {
+        } else if (visual.kind === 'chest') {
             // Cofre con herrajes del color de la rareza.
             add(staticMesh(s, 'b_cofre', `chest${id}`), this.wood);
             add(staticMesh(s, 'b_herraje', `chestBand${id}`), this.trim(rarity));
@@ -127,7 +134,7 @@ export class LootView {
         disc.rotation.x = Math.PI / 2;
         disc.position.y = 0.03;
         let beam: StandardMaterial | null = null;
-        if (item && this.beamFrom(rarity)) {
+        if (visual.hasBeam) {
             beam = glowMaterial(s, `lootBeam${id}`, [col.r, col.g, col.b], 0.35);
             const h = this.fx.loot.beamHeight;
             add(
@@ -161,17 +168,25 @@ export class LootView {
                 v = this.build(l.id, l.item !== null, l.rarity);
                 this.items.set(l.id, v);
             }
-            const phase = l.id * 1.7;
+            const visual = lootVisualState({
+                id: l.id,
+                item: l.item !== null,
+                rarity: v.rarity,
+                beamFromRarity: this.fx.loot.beamFromRarity,
+                time: this.time,
+                frameSeconds,
+                sparkleTimer: v.sparkleTimer,
+                glow: this.fx.loot.glow,
+            });
             v.root.position.set(l.x, this.ground.sample(l.x, l.y), l.y);
-            v.spin.position.y = 0.05 + Math.sin(this.time * 3 + phase) * 0.05;
-            v.spin.rotation.y = l.item ? Math.sin(this.time * 0.8 + phase) * 0.5 : this.time * 2.5 + phase;
-            v.glow.alpha = this.fx.loot.glow * (0.6 + 0.4 * Math.sin(this.time * 4 + phase));
-            if (v.beam) v.beam.alpha = 0.25 + 0.12 * Math.sin(this.time * 2 + phase);
+            v.spin.position.y = visual.spinY;
+            v.spin.rotation.y = visual.spinRotationY;
+            v.glow.alpha = visual.glowAlpha;
+            if (v.beam) v.beam.alpha = visual.beamAlpha;
             // Destellos de vez en cuando (más a menudo cuanto más rara).
-            v.sparkleTimer -= frameSeconds * (1 + RARITIES.indexOf(v.rarity));
-            if (v.sparkleTimer <= 0) {
-                v.sparkleTimer = 1.2;
-                const c = l.item ? this.rarityColor[v.rarity] : new Color3(1, 0.85, 0.3);
+            v.sparkleTimer = visual.sparkleTimer;
+            if (visual.sparkle) {
+                const c = visual.sparkleColor === 'rarity' ? this.rarityColor[v.rarity] : new Color3(1, 0.85, 0.3);
                 this.sparkles.burst(at.set(l.x, v.root.position.y + 0.35, l.y), {
                     count: 4,
                     color: [c.r, c.g, c.b],
