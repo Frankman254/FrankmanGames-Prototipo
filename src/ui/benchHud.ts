@@ -7,6 +7,7 @@ import { CAST_BLOCK_TEXT, slotView, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
 import type { RunRecord } from '../sim/telemetry';
 import type { World } from '../sim/world';
+import { formatDecimal, formatInteger } from './perfNumberFormat';
 
 interface SlotEls {
     binding: { id: string; key: string };
@@ -64,7 +65,7 @@ export class BenchHud {
         this.outcome.innerHTML = '';
         el('div', 'hud-outcome-title', this.outcome).textContent = title;
         el('div', 'hud-outcome-body', this.outcome).textContent =
-            `${tr('Tiempo')} ${r.seconds.toFixed(1)} s · ${tr('daño hecho')} ${r.damageDealt} · ${tr('daño recibido')} ${r.damageTaken}\n` +
+            `${tr('Tiempo')} ${formatDecimal(r.seconds, 1)} s · ${tr('daño hecho')} ${r.damageDealt} · ${tr('daño recibido')} ${r.damageTaken}\n` +
             `${tr('Habilidades')}: ${uses}\n` +
             `[F9] ${tr('reiniciar')}   [T] ${tr('guardar telemetría (JSON)')}`;
         this.outcome.style.display = 'block';
@@ -77,9 +78,9 @@ export class BenchHud {
     update(world: World, events: readonly GameEvent[], frameSeconds: number): void {
         const p = world.player;
         this.hpFill.style.width = `${(100 * p.health) / p.maxHealth}%`;
-        this.hpText.textContent = `${Math.ceil(p.health)} / ${p.maxHealth}`;
+        this.hpText.textContent = `${formatInteger(p.health, 'ceil')} / ${p.maxHealth}`;
         this.resFill.style.width = `${(100 * p.resource) / p.maxResource}%`;
-        this.resText.textContent = `${Math.floor(p.resource)} / ${p.maxResource}`;
+        this.resText.textContent = `${formatInteger(p.resource, 'floor')} / ${p.maxResource}`;
         for (const s of this.slots) {
             const id = this.resolve(world, s.binding.id);
             const label = id === null ? '—' : world.labelOf(id);
@@ -101,10 +102,10 @@ export class BenchHud {
                 continue;
             }
             const v = this.view(world, id);
-            const deg = (v.sweep * 360).toFixed(1);
+            const deg = formatDecimal(v.sweep * 360, 1);
             s.sweep.style.background =
                 v.sweep > 0 ? `conic-gradient(rgba(0,0,0,.68) 0deg ${deg}deg, transparent ${deg}deg 360deg)` : 'none';
-            s.time.textContent = v.remaining > 0.05 && v.sweep > 0 ? v.remaining.toFixed(1) : '';
+            s.time.textContent = v.remaining > 0.05 && v.sweep > 0 ? formatDecimal(v.remaining, 1) : '';
             s.root.classList.toggle('poor', v.lacksResource);
             s.root.classList.toggle('ready', v.ready && p.alive);
         }

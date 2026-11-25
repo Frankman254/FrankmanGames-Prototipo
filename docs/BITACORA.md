@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-280: extraer el formato de números de rendimiento (Junie)
+
+**Archivos:** `src/ui/perfNumberFormat.ts`, `src/ui/perfOverlay.ts`, `src/ui/benchHud.ts`, `tests/ui/perfNumberFormat.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `formatDecimal()`, `formatInteger()` y `formatClockTime()` separan el formato numérico puro del DOM. Los dos HUD delegan en estas funciones conservando los decimales, el redondeo de Vida/Recurso y el reloj existentes.
+
+**Validación:** `tests/ui/perfNumberFormat.test.ts`: 4/4; `npm test`: 393 archivos, 4.947 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, Prettier y `npm run docs:check` limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/perfNumberFormat.test.ts`.
+
+---
+
 ## 2026-11-25 — JL-279: extraer progreso y consejos de carga (Junie)
 
 **Archivos:** `src/ui/loadingScreen.ts`, `src/ui/loadingScreenLogic.ts`, `tests/ui/loadingScreenLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
