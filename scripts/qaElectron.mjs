@@ -9334,7 +9334,144 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('Misiones: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+    /** JL-308: recorrer todas las opciones y rutas del diálogo de La Espeja con clics reales. */
+    async dialogo() {
+        await newGame('QA Dialogo');
+        await resize(1920, 1080);
 
+        const npcId = 'la_espeja';
+        const npc = await js(
+            `(()=>{ const n=${S}.content.npcs?.[${JSON.stringify(npcId)}]; return n ? { name:n.name, nodes:n.dialogue.nodes } : null; })()`,
+        );
+        if (!npc) throw new Error(`No existe el diálogo de ${npcId} en la partida`);
+
+        const expectedNodeIds = ['brinco', 'concara', 'espejo', 'giro', 'hello', 'razon', 'sinmascara'];
+        const nodeIds = Object.keys(npc.nodes).sort();
+        const edges = Object.entries(npc.nodes).flatMap(([nodeId, node]) =>
+            node.options.map((option, index) => ({ nodeId, index, option })),
+        );
+        const catalogOk =
+            JSON.stringify(nodeIds) === JSON.stringify(expectedNodeIds) &&
+            edges.length === 28 &&
+            edges.every(({ option }) => (option.conditions ?? []).length === 0);
+        check(
+            'JL-308 diálogo: La Espeja conserva sus siete nodos y 28 opciones accesibles',
+            catalogOk,
+            `${nodeIds.length} nodos, ${edges.length} opciones`,
+        );
+        if (!catalogOk) throw new Error('Cambió el grafo esperado del diálogo de La Espeja');
+
+        const paths = new Map([['hello', []]]);
+        const pending = ['hello'];
+        for (let cursor = 0; cursor < pending.length; cursor++) {
+            const nodeId = pending[cursor];
+            const node = npc.nodes[nodeId];
+            for (const [index, option] of node.options.entries()) {
+                if (option.next === null || paths.has(option.next)) continue;
+                if (!npc.nodes[option.next]) throw new Error(`Destino de diálogo inexistente: ${option.next}`);
+                paths.set(option.next, [...paths.get(nodeId), index]);
+                pending.push(option.next);
+            }
+        }
+        if (paths.size !== expectedNodeIds.length)
+            throw new Error(`Hay nodos de diálogo no alcanzables: ${paths.size}/${expectedNodeIds.length}`);
+
+        const visitedEdges = new Set();
+        const capturedNodes = new Set();
+        const captureNode = async (nodeId) => {
+            if (capturedNodes.has(nodeId)) return;
+            await sleep(250);
+            await shot(`jl308-dialogo-${nodeId}`);
+            capturedNodes.add(nodeId);
+        };
+        const openDialogue = async () => {
+            if (await js(`!!document.querySelector('.dialogue')?.offsetParent`)) await key('Escape', 'Escape');
+            await js(`${W}.commandTalk(${JSON.stringify(npcId)})`);
+            await until(
+                `${S}.dialogue()?.npcId===${JSON.stringify(npcId)}`,
+                20000,
+                `conversación con ${npc.name}`,
+            );
+            await until(`!!document.querySelector('.dialogue')?.offsetParent`, 5000, 'ventana de diálogo');
+            const startOk = await js(
+                `(()=>{ const d=${S}.dialogue(); return d?.npcId===${JSON.stringify(npcId)} && d?.text===${JSON.stringify(npc.nodes.hello.text)} && document.querySelector('.dlg-name')?.textContent.trim()===${JSON.stringify(npc.name)}; })()`,
+            );
+            check('JL-308 diálogo: se abre el diálogo real de La Espeja', startOk);
+            if (!startOk) throw new Error('La ventana no muestra el saludo de La Espeja');
+            await captureNode('hello');
+        };
+        const chooseEdge = async (nodeId, index) => {
+            const node = npc.nodes[nodeId];
+            const option = node.options[index];
+            const visible = await js(
+                `(()=>{ const d=${S}.dialogue(), e=document.querySelectorAll('.dialogue .dlg-opt')[${index}]; return { npcId:d?.npcId, text:d?.options[${index}]?.text, domText:e?.querySelector('.t')?.textContent.trim(), visible:!!e?.offsetParent }; })()`,
+            );
+            if (
+                visible.npcId !== npcId ||
+                visible.text !== option.text ||
+                visible.domText !== option.text ||
+                !visible.visible
+            )
+                throw new Error(`Opción no visible en ${nodeId}[${index}]: ${JSON.stringify(visible)}`);
+            const point = await js(
+                `(()=>{ const e=document.querySelectorAll('.dialogue .dlg-opt')[${index}]; if(!e||!e.offsetParent) return null; const r=e.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`,
+            );
+            if (!point) throw new Error(`No se puede hacer clic en ${nodeId}[${index}]`);
+            await mouse(point.x, point.y);
+            await sleep(150);
+
+            let transitionOk;
+            if (option.next === null) {
+                await until(
+                    `!${S}.dialogue() && !document.querySelector('.dialogue')?.offsetParent`,
+                    5000,
+                    `cierre desde ${nodeId}`,
+                );
+                transitionOk = true;
+            } else {
+                const nextText = npc.nodes[option.next].text;
+                await until(
+                    `${S}.dialogue()?.npcId===${JSON.stringify(npcId)} && ${S}.dialogue()?.text===${JSON.stringify(nextText)}`,
+                    5000,
+                    `nodo ${option.next}`,
+                );
+                transitionOk = await js(
+                    `(()=>{ const d=${S}.dialogue(); return d?.npcId===${JSON.stringify(npcId)} && d?.text===${JSON.stringify(nextText)} && document.querySelector('.dlg-text')?.textContent.trim()===${JSON.stringify(`«${nextText}»`)}; })()`,
+                );
+            }
+
+            const edgeId = `${nodeId}:${index}`;
+            if (!visitedEdges.has(edgeId)) {
+                check(
+                    `JL-308 diálogo: ${nodeId} → ${option.next ?? 'fin'} (${option.text})`,
+                    transitionOk,
+                    option.next ?? 'diálogo cerrado',
+                );
+                visitedEdges.add(edgeId);
+            }
+            if (!transitionOk) throw new Error(`Transición incorrecta desde ${nodeId}[${index}]`);
+            if (option.next !== null) await captureNode(option.next);
+            return option.next;
+        };
+
+        for (const { nodeId, index } of edges) {
+            await openDialogue();
+            let currentNode = 'hello';
+            for (const pathIndex of paths.get(nodeId)) {
+                currentNode = await chooseEdge(currentNode, pathIndex);
+            }
+            if (currentNode !== nodeId) throw new Error(`Ruta incompleta: se esperaba ${nodeId}, se llegó a ${currentNode}`);
+            await chooseEdge(nodeId, index);
+        }
+
+        check(
+            'JL-308 diálogo: se recorrieron todas las opciones y se capturaron todos los nodos',
+            visitedEdges.size === edges.length && capturedNodes.size === expectedNodeIds.length,
+            `${visitedEdges.size}/${edges.length} opciones; ${capturedNodes.size}/${expectedNodeIds.length} nodos`,
+        );
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('JL-308 diálogo: consola limpia', !errors || errors.length < 3, errors.slice(0, 200));
+    },
     /** JL-235: Casa del creador — entrar, recorrer interior, salir; repetir con la casa espejo. */
     async casaCreador() {
         await newGame('QA CasaCreador');

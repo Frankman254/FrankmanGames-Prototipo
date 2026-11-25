@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-308: recorrer todas las ramas del diálogo en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `dialogo` habla con La Espeja y recorre con clics reales sus siete nodos y las 28 opciones, verificando cada transición o cierre. No se modificaron la lógica del juego ni los datos narrativos.
+
+**Validación:** Electron `dialogo`: 60/60 comprobaciones y consola limpia. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Capturas de los siete nodos revisadas.
+
+**Evidencia:** `work/junie-jl308/resultado.json` y capturas `work/junie-jl308/jl308-dialogo-*.jpg`.
+
+---
+
 ## 2026-11-25 — JL-307: cubrir flujo de chat en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

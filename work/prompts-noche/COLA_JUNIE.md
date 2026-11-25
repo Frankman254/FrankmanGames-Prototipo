@@ -1538,7 +1538,7 @@ Antes de cada una, busca si ya existe.
 
 ### E. Escenarios Electron que faltan
 - [x] JL-307 `chat`: escribir, cambiar de pestaña, usar una orden con `/` y comprobar el límite de líneas — commit «JL-307: cubrir flujo de chat en Electron» — evidencia: Electron `chat` 10/10; captura `work/junie-jl307/jl307-chat.jpg`.
-- [ ] JL-308 `dialogo`: hablar con un PNJ y recorrer todas las ramas de su diálogo.
+- [x] JL-308 `dialogo`: hablar con un PNJ y recorrer todas las ramas de su diálogo. — commit «JL-308: recorrer todas las ramas del diálogo en Electron» — Electron `dialogo` 60/60; 28/28 opciones y 7 capturas revisadas en `work/junie-jl308/`; consola limpia.
 - [ ] JL-309 `diario`: abrir el diario, seguir una misión y verla en el seguidor.
 - [ ] JL-310 `menuContextual`: clic derecho sobre un enemigo, un PNJ, un objeto del suelo y un compañero.
 - [ ] JL-311 `ventanas`: arrastrar cada ventana al borde, cerrarla y comprobar que la posición se guarda.
