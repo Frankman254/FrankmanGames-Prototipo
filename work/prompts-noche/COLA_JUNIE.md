@@ -1509,7 +1509,7 @@ Contexto del coordinador:
 - [x] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa. — commit «JL-281: extraer la decisión de etiqueta del botín» — `tests/ui/lootLabel.test.ts` 4/4; `npm test`: 4.951 aprobadas, 1 omitida y 1 `todo`; typecheck, Prettier y `docs:check` limpios. Sin cambio visual. Evidencia: `work/junie-jl281/EVIDENCIA.md`.
 - [x] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes. — commit «JL-282: extraer filas y porcentajes del medidor de daño» — 3 pruebas nuevas; suite 395 archivos, 4.954 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios; evidencia en `work/junie-jl282/EVIDENCIA_2026-11-25.md`. Sin cambio visual; no aplica captura Electron.
 - [x] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad. — commit «JL-283: separar el texto de entidad del inspector» — 2 pruebas verdes (inspectorLogic.test.ts), suite 4.956 aprobadas, typecheck y build limpios. Evidencia en work/junie-jl283/EVIDENCIA.md; no cambia la presentación.
-- [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.
+- [x] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado. — commit «JL-284: extraer selección visual de estados» — `statusVisual.test.ts` 3/3, `npm test`: 397 archivos / 4.959 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, build, docs:check y Prettier limpios. Sin cambio visual; evidencia en work/junie-jl284/EVIDENCIA.md.
 - [ ] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa.
 - [ ] JL-286 `src/render/lootView.ts`: el reparto de los objetos en el suelo y su brillo por rareza.
 - [ ] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador.

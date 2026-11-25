@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-284: extraer selección visual de estados (Junie)
+
+**Archivos:** `src/render/fx/statusFx.ts`, `src/render/fx/statusVisual.ts`, `tests/statusVisual.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `statusVisualFor()` concentra la selección de visual configurado, el aura de respaldo para buffs y la omisión de debuffs sin visual. `StatusFx.sync()` delega en el helper puro; no cambia el efecto mostrado ni sus colores.
+
+**Validación:** `tests/statusVisual.test.ts`: 3/3; `npm test`: 397 archivos, 4.959 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, `npm run docs:check` y Prettier limpios. Sin cambio de presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl284/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-283: separar el texto de entidad del inspector (Junie)
 
 **Archivos:** `src/ui/dev/inspector.ts`, `src/ui/dev/inspectorLogic.ts`, `tests/ui/inspectorLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

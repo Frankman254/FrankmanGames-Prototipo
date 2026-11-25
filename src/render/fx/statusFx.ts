@@ -17,6 +17,7 @@ import type { World } from '../../sim/world';
 import type { Rgb } from '../../world/dayNight';
 import type { HeightField } from '../../world/terrain';
 import { glowMaterial, retire, trail } from './particles';
+import { statusVisualFor } from './statusVisual';
 
 interface Visual {
     node: TransformNode;
@@ -48,12 +49,6 @@ export class StatusFx {
         /** Altura del modelo de cada entidad (para colocar estrellas y burbujas). */
         private readonly heightOf: (id: number) => number,
     ) {}
-
-    private visualOf(def: StatusDef): { visual: StatusVisual; color: Rgb } | null {
-        const v = this.fx.statuses[def.id];
-        if (v) return v;
-        return def.kind === 'buff' ? { visual: 'aura', color: [0.9, 0.9, 0.6] } : null;
-    }
 
     private build(kind: StatusVisual, color: Rgb, h: number, key: string): Visual {
         const node = new TransformNode(`status:${key}`, this.scene);
@@ -213,7 +208,7 @@ export class StatusFx {
         for (const b of this.bearers(world)) {
             const gy = this.ground.sample(b.x, b.z);
             for (const s of b.statuses) {
-                const look = this.visualOf(s.def);
+                const look = statusVisualFor(s.def, this.fx.statuses);
                 if (!look) continue;
                 const key = `${b.id}:${s.def.id}`;
                 seen.add(key);
