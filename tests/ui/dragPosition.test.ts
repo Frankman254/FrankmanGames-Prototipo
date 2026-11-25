@@ -2,8 +2,8 @@
 // agarrado se queda bajo el puntero aunque el elemento vaya centrado con
 // `translateX(-50%)` o escalado con `zoom` (escala de la interfaz y media queries).
 import { describe, expect, it } from 'vitest';
+import { clampDrag } from '../../src/ui/menus/windowDrag';
 import {
-    clampDrag,
     clampWindow,
     dragCorner,
     grabOffset,

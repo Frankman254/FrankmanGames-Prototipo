@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-274: aislar el recorte de ventanas durante el arrastre (Junie)
+
+**Archivos:** `src/ui/menus/windows.ts`, `src/ui/menus/windowDrag.ts`, `tests/ui/dragPosition.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `clampDrag()` se extrae de `windows.ts` a `windowDrag.ts`, un módulo sin DOM. `windows.ts` mantiene su exportación pública y `WindowLayout` usa el helper sin cambiar el comportamiento. La lógica de movimiento de ventanas estaba en `windows.ts`, no en `drag.ts`.
+
+**Validación:** `tests/ui/dragPosition.test.ts` y `tests/ui/windows.test.ts`: 20/20; `npm test`: 385 archivos, 4.922 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/dragPosition.test.ts`, `tests/ui/windows.test.ts` y `work/junie-jl274/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — JL-273: extraer el orden y texto de misiones (Junie)
 
 **Archivos:** `src/ui/menus/journal.ts`, `src/ui/menus/questTracker.ts`, `src/ui/menus/questViewLogic.ts`, `tests/ui/questViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
