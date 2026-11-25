@@ -4,6 +4,18 @@
 - Lista inicial PROPUESTA: 26 movimientos y defensas propias instantáneos. Ninguna cifra de GCD cambia.
 - Pruebas: `tests/hechizosLibres.test.ts`. Electron: dos hechizos en el mismo tick y captura de la barra en `work/claude-gcd01/`.
 
+## 2026-11-24 — JL-276: extraer el estado visual de la barra de progreso (Junie)
+
+**Archivos:** `src/ui/menus/progressBar.ts`, `src/ui/menus/progressBarLogic.ts`, `tests/ui/progressBarLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `progressBarState()` concentra en lógica pura el cálculo del porcentaje acotado y el texto de la barra; `ProgressBar.update()` aplica el resultado al DOM sin cambiar su comportamiento. `panel.ts` solo administra elementos DOM y no contiene una transformación pura apropiada para extraer.
+
+**Validación:** la prueba falló antes de crear el módulo porque no existía `progressBarLogic`; después `tests/ui/progressBarLogic.test.ts` pasó 3/3, `npm test` pasó con 4.935 aprobadas, 1 omitida y 1 `todo`, y `npm run typecheck` y `npm run docs:check` quedaron limpios. No cambia la presentación; no aplica captura de Electron.
+
+**Evidencia:** `work/junie-jl276/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — HUD-ROJO-03, REGEN-01 y EQ-10c (Coord)
 
 - **Barra en rojo.** Con `approachToCast` el alcance y la línea de visión no rechazan la pulsación; la barra ya no lo marca. Electron: 7 → 0 huecos rojos con un enemigo a 30 m (`work/claude-hz-0124/qa_barra_resultado.txt`).
