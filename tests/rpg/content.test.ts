@@ -82,6 +82,38 @@ describe('contenido RPG', () => {
         expect(() => parseRpgContent(rpgRawFiles(), [...archetypes(), 'fantasma'])).toThrow(/fantasma/);
     });
 
+    it('JL-305: cada nodo de diálogo tiene salida y todos sus destinos existen', () => {
+        const npcs = rpgRawFiles().npcs as { npcs: Record<string, any> };
+        for (const [npcId, npc] of Object.entries(npcs.npcs)) {
+            const dialogue = npc.dialogue;
+            const nodes = dialogue.nodes as Record<string, { options: { next: string | null }[] }>;
+
+            expect(dialogue.entry.length, `${npcId}: tiene al menos una entrada`).toBeGreaterThan(0);
+            for (const [index, entry] of dialogue.entry.entries())
+                expect(nodes[entry.node], `${npcId}: entry[${index}] → ${entry.node}`).toBeDefined();
+
+            for (const [nodeId, node] of Object.entries(nodes)) {
+                expect(node.options.length, `${npcId}.${nodeId}: tiene opciones de salida`).toBeGreaterThan(0);
+                for (const [index, option] of node.options.entries()) {
+                    if (option.next !== null)
+                        expect(
+                            nodes[option.next],
+                            `${npcId}.${nodeId}.options[${index}] → ${option.next}`,
+                        ).toBeDefined();
+                }
+            }
+        }
+    });
+
+    it('rechaza nodos de diálogo sin opciones de salida', () => {
+        const raw = clone(rpgRawFiles()) as Record<string, any>;
+        raw['npcs'].npcs.fisher.dialogue.nodes.hello.options = [];
+
+        expect(() => parseRpgContent(raw as never, archetypes())).toThrow(
+            /npcs\.fisher\.dialogue\.nodes\.hello\.options/,
+        );
+    });
+
     it('rechaza números y valores fuera de rango', () => {
         const raw = clone(rpgRawFiles()) as Record<string, any>;
         raw['items'].items.fang.maxStack = 0;

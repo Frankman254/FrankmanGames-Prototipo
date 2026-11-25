@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-305: validar salidas y enlaces de diálogo de PNJ (Junie)
+
+**Archivos:** `src/rpg/content.ts`, `tests/rpg/content.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se auditaron los 10 PNJ y 33 nodos de `data/rpg/npcs.json`: todas las entradas y referencias de destino existen, y cada nodo ofrece al menos una opción de salida. El parser ahora rechaza nodos vacíos. No se cambiaron textos ni datos narrativos; `next: null` sigue siendo un final válido.
+
+**Validación:** La prueba de regresión falló antes del arreglo al aceptar un nodo vacío y pasó después. `tests/rpg/content.test.ts`: 8/8; `npm test`: 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. No cambia la presentación, por lo que no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl305/EVIDENCIA.md` y `tests/rpg/content.test.ts`.
+
+---
+
 ## 2026-11-25 — JL-304: auditar cobertura de hechizos (Junie)
 
 **Archivos:** `tests/jl304_spellCatalog.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

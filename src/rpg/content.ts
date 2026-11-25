@@ -1288,6 +1288,8 @@ function parseDialogue(r: Reader, raw: unknown): DialogueDef {
     });
     if (entry.length === 0) r.fail('entry', 'hace falta al menos una entrada');
     for (const [id, n] of Object.entries(nodes)) {
+        if (n.options.length === 0)
+            r.child(`nodes.${id}`).fail('options', 'el nodo debe tener al menos una opción de salida');
         n.options.forEach((op, i) => {
             if (op.next !== null && !nodes[op.next])
                 r.fail(`nodes.${id}.options[${i}].next`, `nodo desconocido "${op.next}"`);
