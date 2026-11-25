@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-294: extraer selección de celdas dibujadas (Junie)
+
+**Archivos:** `src/render/gridView.ts`, `src/render/gridViewLogic.ts`, `tests/gridViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `gridCellsToDraw()` calcula en lógica pura los límites, la atenuación y el estado caminable de las celdas visibles. `GridView.rebuild()` delega la selección y conserva el orden, las líneas y los colores existentes; no cambia la presentación.
+
+**Validación:** `tests/gridViewLogic.test.ts`: 2/2; `npm test`: 408 archivos, 4.998 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. No aplica captura Electron porque no cambia la presentación.
+
+**Evidencia:** `tests/gridViewLogic.test.ts`.
+
+---
+
 ## 2026-11-25 — JL-293: aislar selección y reconstrucción de trozos de terreno (Junie)
 
 **Archivos:** `src/render/terrainView.ts`, `src/render/terrainViewLogic.ts`, `tests/terrainViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
