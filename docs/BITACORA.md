@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-302: verificar modelos y clips de todos los arquetipos (Junie)
+
+**Archivos:** `tests/jl302_archetypeAssets.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió una prueba que revisa las entradas efectivas `enemy.*` que devuelve `loadWorldData()`, incluida la herencia de plantillas de `data/assets.json`. Los 78 arquetipos son glTF, sus rutas existen y todos sus clips declarados están presentes en el GLB. El test previo JL-145 cubría plantillas, pero no comprobaba por separado las entradas de cada arquetipo. No se modificaron datos ni assets; se retiró la referencia al bloqueo falso de JL-302 del tablero.
+
+**Validación:** `tests/jl302_archetypeAssets.test.ts`: 1/1; `tests/ui/format.test.ts`: 8/8; `npm test`: 411 archivos, 5.011 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. La suite tuvo un timeout transitorio en la primera ejecución completa; la prueba afectada pasó aislada y la segunda suite completa pasó.
+
+**Evidencia:** `work/junie-jl302/EVIDENCIA.md`. No aplica captura Electron porque no cambia la presentación.
+
+---
+
 ## 2026-11-25 — JL-299: verificar recursos de efectos visuales (Junie)
 
 **Archivos:** `tests/fxr01_reactionFx.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

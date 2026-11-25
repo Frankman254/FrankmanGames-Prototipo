@@ -1530,7 +1530,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-299 Cada efecto que pide `data/fx.json` existe (partículas y texturas). — commit «JL-299: verificar recursos de efectos visuales» — `tests/fxr01_reactionFx.test.ts` (11/11), suite 5.010 aprobadas, `npm run typecheck` limpio; evidencia en `work/junie-jl299/EVIDENCIA.md`.
 - [!] JL-300 Cada sonido que piden los datos existe en `assets/audio/`, y ningún archivo de audio sobra. — BLOQUEADA: hay 64 archivos sin referencia de ejecución; borrar o archivar las fuentes originales registradas requiere decisión del creador. Evidencia: `work/junie-jl300/INFORME.md`.
 - [x] JL-301 Cada pieza de conjunto de `data/rpg/sets` tiene su malla o queda en una lista de pendientes. — commit «JL-301: inventario de mallas de conjuntos» — 24 piezas con geometría; lista exhaustiva de 788 pendientes validada contra 137 conjuntos y 812 piezas en `work/junie-jl301/INVENTARIO.md`.
-- [ ] JL-302 Cada arquetipo de `data/assets.json` apunta a un GLB que existe y tiene los clips que pide.
+- [x] JL-302 Cada arquetipo de `data/assets.json` apunta a un GLB que existe y tiene los clips que pide. — commit «JL-302: verificar modelos y clips de todos los arquetipos» — 78/78 entradas efectivas verificadas; test `jl302_archetypeAssets.test.ts` 1/1, suite 5.011 aprobadas, `npm run typecheck` limpio. Evidencia: `work/junie-jl302/EVIDENCIA.md`.
 - [ ] JL-303 Cada tabla de botín apunta a objetos existentes y suma probabilidades válidas, sin cambiar ninguna cifra.
 - [ ] JL-304 Cada hechizo tiene icono, texto en los dos idiomas y efecto visual.
 - [ ] JL-305 Cada PNJ con diálogo tiene sus nodos completos: ningún nodo sin salida ni enlaces rotos.
