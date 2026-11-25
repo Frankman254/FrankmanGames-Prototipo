@@ -10677,6 +10677,72 @@ const scenarios = {
         );
         await shot('jl316-aviso-zona');
     },
+
+    /** JL-321: combate real durante 30 s y revisión del porcentaje del medidor. */
+    async medidorDano() {
+        await newGame('QA Medidor', { classId: 'ember_vanguard' });
+        await resize(1920, 1080);
+
+        const enemyId = await js(`(() => {
+      const w=${W}, p=w.player.pos, g=w.grid;
+      const cell=g.nearestWalkable({x:p.x+2.5,y:p.y});
+      const at=cell<0?{x:p.x+2.5,y:p.y}:g.center(cell);
+      const e=w.spawnEnemy('melee',at,1);
+      e.health=1000000000; e.frozen=true; e.state='stagger'; e.stateTime=-1e9;
+      return e.id;
+    })()`);
+        await sleep(300);
+        await cdp('Input.dispatchKeyEvent', {
+            type: 'rawKeyDown',
+            code: 'End',
+            key: 'End',
+            windowsVirtualKeyCode: 35,
+        });
+        await cdp('Input.dispatchKeyEvent', {
+            type: 'keyUp',
+            code: 'End',
+            key: 'End',
+            windowsVirtualKeyCode: 35,
+        });
+        await until(`!document.querySelector('.dev-meter')?.hidden`, 3000, 'medidor visible');
+        check('JL-321: Fin abre el medidor de daño', await js(`!document.querySelector('.dev-meter')?.hidden`));
+
+        await js(`${W}.commandAttack(${enemyId})`);
+        await until(`${W}.enemies.get(${enemyId})?.health < 1000000000`, 15000, 'primer golpe');
+        await js(`window.__qaMeterAttack=setInterval(()=>{
+      const w=${W}, p=w.player, e=w.enemies.get(${enemyId});
+      if(!e||e.state==='dead'||p.casting||p.attackTarget!==null) return;
+      p.resource=1000000; p.basicCharges=w.data.player.basicAttack.charges; p.basicRecharge=0;
+      w.commandAttack(${enemyId});
+    },250)`);
+        try {
+            await until(
+                `Number(document.querySelector('.dev-meter')?.innerText.match(/^Combate\\s+([\\d.,]+) s$/m)?.[1]?.replace(',','.'))>=30`,
+                45000,
+                '30 segundos de combate medido',
+            );
+        } finally {
+            await js(`clearInterval(window.__qaMeterAttack); delete window.__qaMeterAttack`);
+        }
+
+        const meterText = await js(`document.querySelector('.dev-meter')?.innerText ?? ''`);
+        const seconds = Number(meterText.match(/^Combate\s+([\d.,]+) s$/m)?.[1]?.replace(',', '.') ?? 0);
+        const table = meterText.split('Hechizo                 daño   %  golpes crít  máx')[1]?.split('Desglose por hechizo')[0] ?? '';
+        const percentages = table
+            .split('\n')
+            .map((line) => line.match(/\s(\d{1,3})\s+\d+\s+\d+\s+[\d.]+$/))
+            .filter(Boolean)
+            .map((match) => Number(match[1]));
+        check('JL-321: el medidor acumula al menos 30 s de combate', seconds >= 30, `${seconds} s`);
+        check(
+            'JL-321: la tabla muestra porcentajes de daño válidos',
+            percentages.length > 0 && percentages.every((percentage) => percentage >= 0 && percentage <= 100),
+            JSON.stringify(percentages),
+        );
+        check('JL-321: combate registrado con daño', meterText.includes('Hecho ') && percentages.length > 0);
+        await shot('jl321-medidor-dano');
+        check('JL-321: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -10709,6 +10775,8 @@ scenarios.todasLasPiedras.timeout = 300;
 scenarios.guardadoBarriadaCasa.timeout = 300;
 // JL-248: 3 ubicaciones × (nueva partida + 5 s espera + 5 s muestreo + captura).
 scenarios.jl248_rendimientoTres.timeout = 300;
+// JL-321: partida + 30 s de combate real y comprobación del medidor.
+scenarios.medidorDano.timeout = 90;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

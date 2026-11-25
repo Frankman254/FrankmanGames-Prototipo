@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-321: verificar el medidor de daño en combate (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `medidorDano`: ataca durante al menos 30 s a un enemigo de prueba inmóvil usando la vía normal de combate, abre el panel con `Fin` y verifica la tabla y los porcentajes. Los recursos se reponen solo en la partida de QA; no cambian la simulación ni el balance productivos.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `medidorDano`: 6/6 comprobaciones; 30,1 s, 61 de daño en 43 golpes, porcentaje 100 y consola limpia. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl321/resultado.json` y captura revisada `work/junie-jl321/jl321-medidor-dano.jpg`.
+
+---
+
 ## 2026-11-25 — JL-320: comprobar el inspector de desarrollo en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
