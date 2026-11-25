@@ -1,3 +1,26 @@
+## 2026-11-25 — JL-324: grabar transiciones de animación a 60 fps (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `jl324Transiciones`: graba en vídeo H.264 a 60 fps la secuencia reposo → andar → correr → atacar → reposo en los seis modelos y anota los cambios usando el tiempo de CDP. La captura se reduce a 960×540 para mantener la cadencia; no se modificaron el juego ni los assets.
+
+**Resultado visual:** No se observaron saltos posicionales abruptos en las 24 transiciones revisadas. Los siguientes índices son fotogramas base cero de cada MP4:
+
+| Modelo | Reposo → andar | Andar → correr | Correr → atacar | Atacar → reposo |
+|---|---:|---:|---:|---:|
+| Centinela masculino | 21 | 54 | 88 | 136 |
+| Centinela femenino | 21 | 55 | 88 | 137 |
+| Oráculo masculino | 21 | 54 | 87 | 141 |
+| Oráculo femenino | 22 | 55 | 89 | 142 |
+| Cazador masculino | 22 | 55 | 89 | 154 |
+| Cazador femenino | 20 | 54 | 87 | 153 |
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `jl324Transiciones`: 27/27 comprobaciones, seis vídeos con `r_frame_rate` y `avg_frame_rate` `60/1`, cero errores de consola. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio.
+
+**Evidencia:** `work/junie-jl324/resultado.json`, `work/junie-jl324/marcas.json`, seis `jl324-*.mp4` y seis láminas ampliadas `zoom-*.png`.
+
+---
+
 ## 2026-11-25 — JL-323: medir patinaje en los clips de marcha (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

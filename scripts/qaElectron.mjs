@@ -97,6 +97,7 @@ await new Promise((resolve, reject) => {
 let nextId = 1;
 const waiting = new Map();
 const consoleErrors = [];
+let screencastFrames = null;
 
 /** JL-51: relanzar Electron y reconectar CDP (tras un timeout de escenario). */
 async function restartElectron() {
@@ -148,6 +149,16 @@ ws.on('message', (raw) => {
         consoleErrors.push(m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text);
     } else if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') {
         consoleErrors.push(m.params.args.map((a) => a.value ?? a.description).join(' '));
+    } else if (m.method === 'Page.screencastFrame') {
+        const frame = m.params;
+        screencastFrames?.push({
+            data: frame.data,
+            timestamp: frame.metadata?.timestamp ?? null,
+            receivedAt: Date.now(),
+        });
+        void cdp('Page.screencastFrameAck', { sessionId: frame.sessionId }).catch((error) => {
+            consoleErrors.push(`CDP screencastFrameAck: ${error.message}`);
+        });
     }
 });
 const cdp = (method, params = {}) =>
@@ -368,6 +379,103 @@ async function saveAndLoad() {
 async function shot(name) {
     const { data } = await cdp('Page.captureScreenshot', { format: 'jpeg', quality: 80 });
     fs.writeFileSync(path.join(OUT, `${name}.jpg`), Buffer.from(data, 'base64'));
+}
+async function encodeScreencast(frames, outputPath) {
+    const encoder = spawn(
+        'ffmpeg',
+        [
+            '-hide_banner',
+            '-loglevel',
+            'error',
+            '-y',
+            '-f',
+            'image2pipe',
+            '-vcodec',
+            'mjpeg',
+            '-framerate',
+            '60',
+            '-i',
+            'pipe:0',
+            '-an',
+            '-c:v',
+            'libx264',
+            '-preset',
+            'veryfast',
+            '-crf',
+            '20',
+            '-pix_fmt',
+            'yuv420p',
+            '-r',
+            '60',
+            '-movflags',
+            '+faststart',
+            outputPath,
+        ],
+        { stdio: ['pipe', 'ignore', 'pipe'] },
+    );
+    let stderr = '';
+    encoder.stderr.on('data', (chunk) => (stderr += chunk));
+    const exit = new Promise((resolve, reject) => {
+        encoder.once('error', reject);
+        encoder.once('close', (code) =>
+            code === 0 ? resolve() : reject(new Error(`ffmpeg terminó con código ${code}: ${stderr}`)),
+        );
+    });
+    try {
+        for (const frame of frames) {
+            if (!encoder.stdin.write(Buffer.from(frame.data, 'base64')))
+                await new Promise((resolve, reject) => {
+                    const cleanup = () => {
+                        encoder.stdin.off('drain', onDrain);
+                        encoder.stdin.off('error', onError);
+                    };
+                    const onDrain = () => {
+                        cleanup();
+                        resolve();
+                    };
+                    const onError = (error) => {
+                        cleanup();
+                        reject(error);
+                    };
+                    encoder.stdin.once('drain', onDrain);
+                    encoder.stdin.once('error', onError);
+                });
+        }
+        encoder.stdin.end();
+    } catch (error) {
+        encoder.stdin.destroy();
+        encoder.kill();
+        throw error;
+    }
+    await exit;
+}
+async function probeScreencast(videoPath) {
+    const probe = spawn(
+        'ffprobe',
+        [
+            '-v',
+            'error',
+            '-select_streams',
+            'v:0',
+            '-show_entries',
+            'stream=codec_name,r_frame_rate,avg_frame_rate,width,height,nb_frames',
+            '-of',
+            'json',
+            videoPath,
+        ],
+        { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    let stdout = '';
+    let stderr = '';
+    probe.stdout.setEncoding('utf8').on('data', (chunk) => (stdout += chunk));
+    probe.stderr.setEncoding('utf8').on('data', (chunk) => (stderr += chunk));
+    await new Promise((resolve, reject) => {
+        probe.once('error', reject);
+        probe.once('close', (code) =>
+            code === 0 ? resolve() : reject(new Error(`ffprobe terminó con código ${code}: ${stderr}`)),
+        );
+    });
+    return JSON.parse(stdout).streams?.[0] ?? null;
 }
 /** Busca en pantalla un modelo por nombre con el mismo pick del juego y le hace clic real. */
 async function clickMesh(part) {
@@ -2826,6 +2934,194 @@ const scenarios = {
             path.join(outDir, 'TABLA.md'),
             `# JL-323 — velocidad de apoyo de los héroes\n\nLos pies se muestrearon en los seis modelos (tres héroes × dos sexos), a velocidad de clip 1× durante tres ciclos por marcha, dejando terminar la mezcla de animación. Se considera apoyo la franja de hasta 4,5 cm sobre la altura mínima observada; se conservan también los intervalos con desplazamiento casi nulo. La velocidad de cada pie es la mediana de sus intervalos válidos: desplazamiento horizontal respecto a la raíz, proyectado sobre +X (delante), dividido por el tiempo de apoyo. Se requieren al menos tres muestras y 0,04 s por intervalo. Las posiciones absolutas incluyen la escala del modelo.\n\nLa referencia de andar es 2,5 m/s, la usada por el escenario clipsHeroes; correr usa 6 m/s, DEFAULT_MOVE_SPEED de PlayerAvatar. El factor necesario se presenta por pie y es velocidad de referencia / velocidad mediana de ese pie a 1×. El factor runtime refleja la fórmula actual de GltfCharacter.update() (runSpeed; para andar, runSpeed × duración de correr / duración de andar, con mínimo 0,3), común a ambos pies. La asimetría entre pies se conserva en vez de ocultarla en un promedio; los resultados son mediciones, no una recomendación de cambio.\n\n${rows.join('\n')}\n\nLas muestras por fotograma y los intervalos de apoyo están en [muestras.json](./muestras.json); las capturas individuales son jl323-*.jpg. No se modificaron velocidades, datos ni código productivo.\n`,
         );
+    },
+
+    /** JL-324: graba a 60 fps la secuencia reposo → andar → correr → atacar → reposo. */
+    async jl324Transiciones() {
+        const outDir = OUT;
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const sexes = [
+            { id: 'masculino', label: 'masculino', suffix: '' },
+            { id: 'femenino', label: 'femenino', suffix: '_f' },
+        ];
+        const expectedTransitions = [
+            ['idle', 'walk'],
+            ['walk', 'run'],
+            ['run', 'attack'],
+            ['attack', 'idle'],
+        ];
+        const reports = [];
+
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame(`QA ${hero.label}`, { classId: hero.id });
+                await js(`${S}.character.sex=${JSON.stringify(sex.id)}`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.label}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                const clipInfo = await js(
+                    `(()=>{ const m=__game.view.player.model; const states=['idle','walk','run','attack']; return {file:m.entry.file,clips:Object.fromEntries(states.map(s=>[s,{available:m.hasClip(s),seconds:m.clipSeconds(s)}]))}; })()`,
+                );
+                const clipsAvailable = Object.values(clipInfo.clips).every((clip) => clip.available && clip.seconds > 0);
+                check(
+                    `JL-324 ${hero.label} ${sex.label}: clips requeridos`,
+                    clipInfo.file === expectedFile && clipsAvailable,
+                    JSON.stringify(clipInfo),
+                );
+                if (!clipsAvailable) continue;
+
+                await js(
+                    `(()=>{ const w=${W},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.speed=0; p.facing=0; p.alive=true; v.player.reset(); v.player.visualYaw=0; v.player.model.root.rotation.y=0; v.rig.mode='manual'; v.rig.pitchDeg=14; v.rig.yawDeg=180; v.rig.distance=5; v.rig.jumpTo(5); })()`,
+                );
+                await sleep(400);
+
+                const frames = [];
+                screencastFrames = frames;
+                let recording = false;
+                let sequence;
+                try {
+                    await cdp('Page.startScreencast', {
+                        format: 'jpeg',
+                        quality: 75,
+                        maxWidth: 960,
+                        maxHeight: 540,
+                        everyNthFrame: 1,
+                    });
+                    recording = true;
+                    sequence = await js(`(async()=>{
+                      const v=__game.view, a=v.player, m=a.model, scene=v.scene, marks=[];
+                      let renderFrame=0;
+                      const observer=scene.onAfterRenderObservable.add(()=>renderFrame++);
+                      const originalPlay=m.play.bind(m), originalUpdate=m.update.bind(m);
+                      const expected=new Set(['idle','walk','run','attack']);
+                      m.play=(state,opts)=>{
+                        const from=m.state;
+                        if(from!==state&&expected.has(from)&&expected.has(state)) marks.push({from,to:state,timeEpochMs:performance.timeOrigin+performance.now(),renderFrame:renderFrame+1});
+                        return originalPlay(state,opts);
+                      };
+                      m.update=(dt,speed)=>{
+                        const events=originalUpdate(dt,speed);
+                        for(const state of ['walk','run']){const group=m.groups.get(state);if(group)group.speedRatio=1;}
+                        return events;
+                      };
+                      const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
+                      const wait=async ms=>{const end=performance.now()+ms;while(performance.now()<end)await nextFrame();};
+                      const play=state=>{a.oneShot=state==='idle'?null:state;m.play(state,{restart:true});};
+                      try{
+                        await wait(350);
+                        play('walk');
+                        await wait(550);
+                        play('run');
+                        await wait(550);
+                        play('attack');
+                        const deadline=performance.now()+5000;
+                        while(m.state!=='idle'&&performance.now()<deadline)await nextFrame();
+                        if(m.state!=='idle')throw new Error('El ataque no volvió a reposo en 5 s');
+                        await wait(450);
+                        return {marks,attackSeconds:m.clipSeconds('attack'),state:m.state};
+                      }finally{
+                        m.play=originalPlay;
+                        m.update=originalUpdate;
+                        scene.onAfterRenderObservable.remove(observer);
+                      }
+                    })()`);
+                } finally {
+                    if (recording) await cdp('Page.stopScreencast');
+                    screencastFrames = null;
+                }
+
+                const validFrames = frames.filter((frame) => frame.data);
+                if (validFrames.length < 2)
+                    throw new Error(`Screencast vacío para ${hero.label} ${sex.label}`);
+                const times = validFrames.map((frame) => {
+                    const timestamp = Number(frame.timestamp) * 1000;
+                    return Number.isFinite(timestamp) && Math.abs(timestamp - frame.receivedAt) < 2000
+                        ? timestamp
+                        : frame.receivedAt;
+                });
+                const elapsedMs = times.length > 1 ? times.at(-1) - times[0] : 0;
+                const sourceFps = elapsedMs > 0 ? ((times.length - 1) * 1000) / elapsedMs : 0;
+                const intervals = times.slice(1).map((time, index) => time - times[index]);
+                const maxGapMs = intervals.length > 0 ? Math.max(...intervals) : 0;
+                const sourceRateOk = sourceFps >= 60 && sourceFps <= 125;
+                check(
+                    `JL-324 ${hero.label} ${sex.label}: muestreo fuente suficiente para 60 fps`,
+                    sourceRateOk && validFrames.length >= 100,
+                    `${validFrames.length} fotogramas; ${sourceFps.toFixed(1)} fps; hueco máximo ${maxGapMs.toFixed(1)} ms`,
+                );
+
+                const startTime = times[0] ?? 0;
+                const endTime = times.at(-1) ?? startTime;
+                const outputFrames = [];
+                for (let target = startTime; target <= endTime; target += 1000 / 60) {
+                    let nearest = 0;
+                    for (let i = 1; i < times.length && times[i] <= target + 1000 / 60; i++) {
+                        if (Math.abs(times[i] - target) < Math.abs(times[nearest] - target)) nearest = i;
+                    }
+                    outputFrames.push(validFrames[nearest]);
+                }
+
+                const transitions = sequence.marks.map((mark) => ({
+                    ...mark,
+                    videoFrame: Math.max(0, Math.min(outputFrames.length - 1, Math.round(((mark.timeEpochMs - startTime) * 60) / 1000))),
+                }));
+                const transitionOrderOk =
+                    transitions.length === expectedTransitions.length &&
+                    expectedTransitions.every(([from, to], index) =>
+                        transitions[index]?.from === from && transitions[index]?.to === to,
+                    );
+                check(
+                    `JL-324 ${hero.label} ${sex.label}: secuencia y marcas`,
+                    transitionOrderOk && sequence.state === 'idle',
+                    JSON.stringify(transitions.map(({ from, to, videoFrame }) => ({ from, to, videoFrame }))),
+                );
+
+                const name = `jl324-${hero.model}-${sex.id}`;
+                const videoPath = path.join(outDir, `${name}.mp4`);
+                await encodeScreencast(outputFrames, videoPath);
+                const videoInfo = await probeScreencast(videoPath);
+                const videoRateOk =
+                    videoInfo?.codec_name === 'h264' &&
+                    videoInfo.r_frame_rate === '60/1' &&
+                    videoInfo.avg_frame_rate === '60/1' &&
+                    videoInfo.width === 960 &&
+                    videoInfo.height === 540;
+                check(
+                    `JL-324 ${hero.label} ${sex.label}: MP4 H.264 a 60 fps`,
+                    videoRateOk,
+                    JSON.stringify(videoInfo),
+                );
+                reports.push({
+                    hero: hero.label,
+                    sex: sex.label,
+                    model: clipInfo.file,
+                    video: `${name}.mp4`,
+                    framesCaptured: validFrames.length,
+                    capturedFps: Number(sourceFps.toFixed(2)),
+                    maxGapMs: Number(maxGapMs.toFixed(2)),
+                    videoFps: 60,
+                    videoFrames: outputFrames.length,
+                    videoInfo,
+                    transitions,
+                    clips: clipInfo.clips,
+                });
+            }
+        }
+
+        fs.writeFileSync(path.join(outDir, 'marcas.json'), JSON.stringify(reports, null, 2));
+        check('JL-324: secuencia grabada para los seis modelos', reports.length === 6, `${reports.length}/6 vídeos`);
+        check('JL-324: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
     },
 
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
@@ -11062,6 +11358,8 @@ scenarios.medidorDano.timeout = 90;
 scenarios.clipsHeroes.timeout = 600;
 // JL-323: seis modelos × dos marchas, muestreadas durante tres ciclos.
 scenarios.jl323Zancada.timeout = 600;
+// JL-324: seis modelos × cuatro transiciones grabadas desde Electron.
+scenarios.jl324Transiciones.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
