@@ -1,3 +1,17 @@
+## 2026-11-25 — JL-325: verificar el asiento de todas las monturas (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `jinetes` para recorrer las 14 monturas del catálogo con los tres héroes y ambos sexos. Comprueba el equipo, la malla, la pose `ride`, la visibilidad del jinete y el asiento asentado; captura cada pareja de lado y crea seis láminas. El escenario previo `jinetes` de JL-177 se conserva con el nombre `jinetesJl177`. No se modificaron lógica productiva, datos ni assets.
+
+**Resultado visual:** Se revisaron las seis láminas y las 84 capturas individuales. No se confirmó ningún caso de flotación, hundimiento o intersección con la silla.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `jinetes`: 172/172 comprobaciones, 84/84 asientos asentados y cero errores de consola. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios.
+
+**Evidencia:** `work/junie-jl325/capturas.json`, 84 `jl325-*.jpg` y seis `jl325-lamina-*.jpg`.
+
+---
+
 ## 2026-11-25 — JL-324: grabar transiciones de animación a 60 fps (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

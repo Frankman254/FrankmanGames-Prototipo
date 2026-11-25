@@ -3124,6 +3124,130 @@ const scenarios = {
         check('JL-324: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
     },
 
+    /** JL-325: captura lateral de los seis héroes sobre cada montura declarada. */
+    async jinetes() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl325';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const sexes = [
+            { id: 'masculino', label: 'masculino', suffix: '' },
+            { id: 'femenino', label: 'femenino', suffix: '_f' },
+        ];
+        const catalog = JSON.parse(fs.readFileSync(path.resolve('data/rpg/items.json'), 'utf8')).items;
+        const mounts = Object.entries(catalog)
+            .filter(([, item]) => item.slot === 'mount')
+            .map(([id, item]) => ({ id, label: item.name ?? id }));
+        const captures = [];
+        check('JL-325: catálogo de monturas leído', mounts.length > 0, `${mounts.length} monturas`);
+
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame(`QA ${hero.label}`, { classId: hero.id, devMount: true });
+                await js(`${W}.character.sex=${JSON.stringify(sex.id)}; ${W}.character.level=200`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.label}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                await js(
+                    `(()=>{ const w=${W},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.speed=0; p.facing=0; p.alive=true; v.player.reset(); v.player.visualYaw=0; v.player.model.root.rotation.y=0; v.rig.mode='manual'; v.rig.yawDeg=180; v.rig.pitchDeg=10; v.rig.distance=4.5; v.rig.jumpTo(4.5); })()`,
+                );
+
+                for (const mount of mounts) {
+                    const equipped = await js(`(()=>{
+                      const c=${W}.character;
+                      if(c.equipment.get('mount')) ${S}.unequip('mount');
+                      for(const item of c.inventory.slots) if(item) c.inventory.remove(item.uid,item.quantity);
+                      const left=c.give(${JSON.stringify(mount.id)});
+                      const item=c.inventory.slots.find(s=>s?.itemId===${JSON.stringify(mount.id)});
+                      if(left||!item) return {ok:false,reason:'no se pudo preparar el objeto',left};
+                      const result=${S}.equip(item.uid,'mount');
+                      return {ok:result.ok,reason:result.reason??'',itemId:c.equipment.get('mount')?.itemId};
+                    })()`);
+                    check(
+                        `JL-325 ${hero.label} ${sex.label}: equipar ${mount.label}`,
+                        equipped.ok && equipped.itemId === mount.id,
+                        JSON.stringify(equipped),
+                    );
+                    if (!equipped.ok || equipped.itemId !== mount.id)
+                        throw new Error(`No se pudo equipar ${mount.id} en ${hero.label} ${sex.label}`);
+
+                    await until(
+                        `${W}.character.equipment.get('mount')?.itemId===${JSON.stringify(mount.id)} && __game.view.mountView.meshes().length>0 && __game.view.player.model.pose==='ride'`,
+                        30000,
+                        `montura visible ${hero.label} ${sex.label} ${mount.id}`,
+                    );
+                    await sleep(500);
+                    const observed = await js(`(()=>{
+                      const v=__game.view,m=v.mountView;
+                      return {itemId:${W}.character.equipment.get('mount')?.itemId,builtId:m.built?.id,meshCount:m.meshes().length,ridePose:v.player.model.pose,playerVisible:v.player.model.root.isEnabled(),seatSettled:v.riderSeat.settled,seatCorrection:v.riderSeat.dy};
+                    })()`);
+                    const ready =
+                        observed.itemId === mount.id &&
+                        observed.builtId?.startsWith(`${mount.id}#`) &&
+                        observed.meshCount > 0 &&
+                        observed.ridePose === 'ride' &&
+                        observed.playerVisible &&
+                        observed.seatSettled;
+                    check(
+                        `JL-325 ${hero.label} ${sex.label}: malla, jinete y silla asentados en ${mount.label}`,
+                        ready,
+                        JSON.stringify(observed),
+                    );
+                    if (!ready) throw new Error(`No quedó visible ${mount.id} en ${hero.label} ${sex.label}`);
+
+                    const file = `jl325-${hero.model}-${sex.id}-${mount.id}`;
+                    await shot(file);
+                    captures.push({
+                        hero: hero.label,
+                        sex: sex.label,
+                        mount: mount.id,
+                        mountName: mount.label,
+                        file: `${file}.jpg`,
+                        seatSettled: observed.seatSettled,
+                        seatCorrection: observed.seatCorrection,
+                    });
+                }
+
+                const tiles = captures
+                    .filter((capture) => capture.hero === hero.label && capture.sex === sex.label)
+                    .map((capture) => ({
+                        src: new URL(
+                            `/${path.relative(process.cwd(), path.join(outDir, capture.file)).split(path.sep).join('/')}`,
+                            url,
+                        ).href,
+                        label: capture.mountName,
+                    }));
+                const sheetHtml = `<style>html,body{margin:0;width:100%;height:100%;background:#151515;color:#fff;font:16px Arial,sans-serif}main{width:1920px;height:1800px;display:grid;grid-template-columns:repeat(3,640px);grid-template-rows:repeat(5,360px)}figure{margin:0;min-width:0;min-height:0;display:flex;flex-direction:column;background:#202020;border:1px solid #444}img{width:100%;height:calc(100% - 30px);object-fit:contain;background:#111}figcaption{height:30px;text-align:center;line-height:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}</style><main>${tiles.map((tile) => `<figure><img src="${tile.src}"><figcaption>${tile.label}</figcaption></figure>`).join('')}</main>`;
+                await resize(1920, 1800);
+                await js(`document.body.innerHTML=${JSON.stringify(sheetHtml)}`);
+                await until(
+                    `document.images.length===${tiles.length} && [...document.images].every(i=>i.complete&&i.naturalWidth>0)`,
+                    30000,
+                    `lámina ${hero.model} ${sex.id}`,
+                );
+                await shot(`jl325-lamina-${hero.model}-${sex.id}`);
+                await resize(1920, 1080);
+            }
+        }
+
+        fs.writeFileSync(path.join(outDir, 'capturas.json'), JSON.stringify(captures, null, 2));
+        check(
+            'JL-325: captura todas las parejas héroe/montura',
+            captures.length === classes.length * sexes.length * mounts.length,
+            `${captures.length}/${classes.length * sexes.length * mounts.length}`,
+        );
+        check('JL-325: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -9103,7 +9227,7 @@ const scenarios = {
     /** JL-177: Escenario jinetes — monta al héroe en cada montura, captura de lado con cámara fija,
      * y mide la distancia entre la cadera y la silla con un rayo (como measureSeat de arenaView).
      * Evidencia en work/junie-jl177/. */
-    async jinetes() {
+    async jinetesJl177() {
         const fs = await import('node:fs');
         const pathMod = await import('node:path');
         const outDir = 'work/junie-jl177';
@@ -11360,6 +11484,8 @@ scenarios.clipsHeroes.timeout = 600;
 scenarios.jl323Zancada.timeout = 600;
 // JL-324: seis modelos × cuatro transiciones grabadas desde Electron.
 scenarios.jl324Transiciones.timeout = 600;
+// JL-325: seis héroes × cada montura, con capturas laterales y láminas.
+scenarios.jinetes.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
