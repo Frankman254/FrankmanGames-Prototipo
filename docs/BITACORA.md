@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-270: extraer marcadores de enemigos del feed del mapa (Junie)
+
+**Archivos:** `src/ui/map/mapFeed.ts`, `src/ui/map/mapFeedLogic.ts`, `tests/ui/mapFeedLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `mapEnemyMarkers()` traslada a lógica pura el filtrado de enemigos muertos y la proyección de posiciones con color según diferencia de nivel. `buildMapFrame()` usa el helper. La cadencia queda intacta: `main.ts` envía el marco del mapa en cada fotograma y prepara `MapWorld` una vez.
+
+**Validación:** la prueba dirigida pasa 1/1 y falló antes de implementar porque faltaba el módulo. `npm test` final, ejecutado solo: 382 archivos aprobados, 4.914 pruebas aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Una ejecución paralela tuvo un fallo de temporización en `jl70_secondaryIntegration.test.ts`; pasó aislada (15/15) y la repetición completa pasó. La primera línea base dio 3 fallos en pruebas de combate/cola; una actualización concurrente posterior tocó esos archivos y la suite final quedó verde. Ninguno de esos cambios concurrentes se incluye aquí. No aplica captura Electron: no cambia la presentación.
+
+**Evidencia:** `tests/ui/mapFeedLogic.test.ts` y `work/junie-jl270/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — CLA-COLA: la cola de hechizos ya guarda las pulsaciones (Claude)
 
 **Archivos:** `src/sim/world.ts`, `data/player.json` (solo la descripción), `tests/jug06_commandQueue.test.ts`, `tests/combat.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`.

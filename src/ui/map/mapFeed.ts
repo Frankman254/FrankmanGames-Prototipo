@@ -2,11 +2,12 @@
 // `buildMapWorld` una vez y a `buildMapFrame` cada fotograma.
 import type { ZonesDef } from '../../data/zonesSchema';
 import type { GameSession } from '../../rpg/session';
-import { bandLabel, levelColor } from '../../sim/zones';
+import { bandLabel } from '../../sim/zones';
 import type { World } from '../../sim/world';
 import type { Overworld } from '../../world/overworld';
 import { HeightField } from '../../world/terrain';
 import { MAP_DEF } from './mapData';
+import { mapEnemyMarkers } from './mapFeedLogic';
 import { questTarget } from './mapLogic';
 import { buildMapBackdrop, buildMapImage, type MapImage, type MapBackdrop } from './mapImage';
 import type { DungeonFeature, MapFrame, MapLandmark, MapStone, MapWorld } from './mapState';
@@ -98,9 +99,7 @@ export function buildMapFrame(i: MapFrameInput): MapFrame {
         // DUN-06: piso y puntos de interés de la mazmorra.
         dungeonFloor: i.dungeonFloor ?? null,
         dungeonFeatures: i.dungeonFeatures ?? null,
-        enemies: w.enemies.list
-            .filter((e) => e.state !== 'dead')
-            .map((e) => ({ x: e.pos.x, y: e.pos.y, color: levelColor(e.level - lvl, i.zones.levelColors) })),
+        enemies: mapEnemyMarkers(w.enemies.list, lvl, i.zones.levelColors),
         npcs: w.npcs.map((n) => ({
             id: n.npcId,
             name: i.names[n.npcId]?.name ?? n.npcId,
