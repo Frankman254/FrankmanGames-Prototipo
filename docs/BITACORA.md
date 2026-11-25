@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-316: comprobar el aviso al cruzar una zona (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `bordeZona`: empieza en el borde caminable de Villa Raspadura, cruza con un clic real a Llanos de Azuero y comprueba la zona, el evento `zoneEnter` y el banner con nombre, franja y patrón. No se modificaron reglas, datos ni lógica de juego.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `bordeZona`: 6/6 comprobaciones y consola limpia; desplazamiento de 5,9 m. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl316/resultado.json`, `work/junie-jl316/jl316-aviso-zona.jpg` y `work/junie-jl316/jl316-antes-del-limite.jpg`.
+
+---
+
 ## 2026-11-25 — JL-315: verificar lluvia y clima en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

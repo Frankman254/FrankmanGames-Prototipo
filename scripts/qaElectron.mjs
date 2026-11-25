@@ -10315,6 +10315,71 @@ const scenarios = {
         fs.writeFileSync(pathMod.join(outDir, 'datos.json'), JSON.stringify(datos, null, 2));
         console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
     },
+    /** JL-316: cruzar andando el límite de Villa Raspadura y comprobar el aviso de zona. */
+    async bordeZona() {
+        await newGame('QA Borde');
+        const start = await js(
+            `(() => { const w=${W}, p=w.player, a=w.grid.center(w.grid.nearestWalkable({x:143,y:131}));
+      p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.invulnerable=30;
+      const r=__game.view.rig; r.pitchDeg=45; r.distance=22;
+      return {x:a.x,y:a.y,walk:w.grid.walkable(a),zone:w.zoneMap.zoneAt(a)?.id}; })()`,
+        );
+        check(
+            'JL-316: empieza caminable dentro de Villa Raspadura',
+            start.walk && start.zone === 'raspadura',
+            JSON.stringify(start),
+        );
+        if (!start.walk || start.zone !== 'raspadura')
+            throw new Error(`Inicio fuera de Villa Raspadura: ${JSON.stringify(start)}`);
+        await until(`${W}.currentZone?.id==='raspadura'`, 5000, 'zona segura inicial');
+        await until(`!document.querySelector('.levelup-banner.on')`, 5000, 'aviso inicial oculto');
+
+        const target = await js(
+            `(() => { const w=${W}, p=w.grid.center(w.grid.nearestWalkable({x:151,y:131}));
+      return {x:p.x,y:p.y,walk:w.grid.walkable(p),zone:w.zoneMap.zoneAt(p)?.id}; })()`,
+        );
+        check(
+            'JL-316: destino caminable al otro lado del límite',
+            target.walk && target.zone === 'azuero',
+            JSON.stringify(target),
+        );
+        if (!target.walk || target.zone !== 'azuero')
+            throw new Error(`Destino fuera de Llanos de Azuero: ${JSON.stringify(target)}`);
+
+        await js(`window.__qaZoneEntries=[]; ${W}.character.on(e=>{if(e.type==='zoneEnter') window.__qaZoneEntries.push({...e});});`);
+        await shot('jl316-antes-del-limite');
+        await clickGroundNear(target.x, target.y);
+        await until(
+            `${W}.currentZone?.id==='azuero' && document.querySelector('.levelup-banner.on .big')?.textContent.trim()==='Llanos de Azuero'`,
+            15000,
+            'aviso al entrar en Llanos de Azuero',
+        );
+
+        const crossing = await js(
+            `(() => { const w=${W}, p=w.player, b=document.querySelector('.levelup-banner.on');
+      return {x:p.pos.x,y:p.pos.y,moved:Math.hypot(p.pos.x-${start.x},p.pos.y-${start.y}),
+        currentZone:w.currentZone?.id,mapZone:w.zoneMap.zoneAt(p.pos)?.id,events:window.__qaZoneEntries,
+        banner:{title:b?.querySelector('.big')?.textContent.trim()??'',subtitle:b?.querySelector('.sub')?.textContent.trim()??'',pattern:!!b?.querySelector('.zone-band')}}; })()`,
+        );
+        check(
+            'JL-316: el jugador cruza andando al otro lado del límite',
+            crossing.currentZone === 'azuero' && crossing.mapZone === 'azuero' && crossing.moved > 1,
+            JSON.stringify(crossing),
+        );
+        check(
+            'JL-316: la sesión recibe zoneEnter para Llanos de Azuero',
+            crossing.events.some((event) => event.zoneId === 'azuero' && event.name === 'Llanos de Azuero'),
+            JSON.stringify(crossing.events),
+        );
+        check(
+            'JL-316: el banner muestra nombre, franja y patrón de zona',
+            crossing.banner.title === 'Llanos de Azuero' &&
+                crossing.banner.subtitle.includes('niv. 1–10') &&
+                crossing.banner.pattern,
+            JSON.stringify(crossing.banner),
+        );
+        await shot('jl316-aviso-zona');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
