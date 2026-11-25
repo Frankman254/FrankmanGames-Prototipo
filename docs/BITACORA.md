@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-309: seguir misiones desde el diario (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `diario` acepta `q_wolf_cull`, abre el diario con la tecla configurada (`N`), quita el seguimiento automático y vuelve a pulsar «Seguir» desde la tarjeta. Comprueba que la misión y sus dos objetivos aparezcan en el seguidor del HUD; no se modificaron lógica ni datos del juego.
+
+**Validación:** Electron `diario`: 8/8 comprobaciones y consola limpia. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. Las dos primeras ejecuciones revelaron el atajo real (`N`, no `J`) y el seguimiento automático al aceptar; el escenario se ajustó para ejercitar el botón visible y la ejecución final pasó.
+
+**Evidencia:** `work/junie-jl309/resultado.json`; capturas revisadas `work/junie-jl309/jl309-diario.jpg`, `work/junie-jl309/jl309-seguimiento.jpg` y `work/junie-jl309/jl309-seguidor.jpg`.
+
+---
+
 ## 2026-11-25 — JL-308: recorrer todas las ramas del diálogo en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

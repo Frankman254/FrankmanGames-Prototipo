@@ -9334,6 +9334,81 @@ const scenarios = {
         const errors = await js(`(window.__consola?.errores(20)||'')`);
         check('Misiones: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
+    /** JL-309: seguir una misión desde el diario y verla en el HUD. */
+    async diario() {
+        await newGame('QA Diario');
+        await resize(1920, 1080);
+
+        const questId = 'q_wolf_cull';
+        const questName = 'Satos junto al camino';
+        const initialState = await js(`${S}.questLog.state(${JSON.stringify(questId)})`);
+        check('JL-309 diario: misión disponible al inicio', initialState === 'available', initialState);
+        if (initialState !== 'available') throw new Error(`Estado inicial inesperado de ${questId}: ${initialState}`);
+
+        await js(`${S}.endDialogue()`);
+        await js(`${W}.commandTalk('guard')`);
+        await until(`!!${S}.dialogue()`, 15000, 'diálogo con la sargento');
+        const accepted = await js(
+            `(()=>{ const d=${S}.dialogue(); const offer=d?.options.find(x=>x.kind==='offer'&&x.text.includes(${JSON.stringify(questName)})); if(!offer) return false; ${S}.chooseDialogue(offer.index); const accept=${S}.dialogue()?.options.find(x=>x.kind==='accept'); if(!accept) return false; ${S}.chooseDialogue(accept.index); ${S}.endDialogue(); return true; })()`,
+        );
+        check('JL-309 diario: acepta «Satos junto al camino»', accepted);
+        if (!accepted) throw new Error(`No se pudo aceptar ${questName}`);
+        await until(`${S}.questLog.state(${JSON.stringify(questId)})==='active'`, 5000, 'misión activa');
+
+        await key('KeyN', 'n');
+        await until(`!!document.querySelector('.panel-journal')?.offsetParent`, 5000, 'diario visible');
+        const journal = await js(
+            `(()=>{ const panel=document.querySelector('.panel-journal'); const card=[...panel.querySelectorAll('.journal-quest')].find(e=>e.querySelector('.journal-name')?.textContent.trim()===${JSON.stringify(questName)}); return {visible:!!panel?.offsetParent, hasQuest:!!card, text:card?.innerText??'', buttons:card?[...card.querySelectorAll('button')].map(b=>b.textContent.trim()):[]}; })()`,
+        );
+        const journalReady =
+            journal.visible &&
+            journal.hasQuest &&
+            journal.buttons.some((text) => text === 'Seguir' || text === 'Dejar de seguir');
+        check('JL-309 diario: misión activa y control de seguimiento visibles', journalReady, journal.text);
+        if (!journalReady) throw new Error(`El diario no muestra la misión activa con el control de seguimiento: ${JSON.stringify(journal)}`);
+
+        // Aceptar una misión nueva la sigue automáticamente; desmarcarla primero
+        // permite probar el botón «Seguir» del diario como una acción real.
+        if (journal.buttons.includes('Dejar de seguir')) {
+            await click('.panel-journal .journal-quest button', 'Dejar de seguir');
+            await until(`${S}.trackedQuest()===null`, 5000, 'quitar el seguimiento automático');
+        }
+        await until(
+            `(()=>{ const card=document.querySelector('.panel-journal .journal-quest'); return [...(card?.querySelectorAll('button')??[])].some(b=>b.textContent.trim()==='Seguir'); })()`,
+            5000,
+            'acción «Seguir» en el diario',
+        );
+        check('JL-309 diario: botón «Seguir» listo para la misión', true);
+        await shot('jl309-diario');
+
+        await click('.panel-journal .journal-quest button', 'Seguir');
+        await until(`${S}.trackedQuest()?.id===${JSON.stringify(questId)}`, 5000, 'misión seguida');
+        await until(
+            `(()=>{ const card=document.querySelector('.panel-journal .journal-quest.tracked'); return !!card&&[...card.querySelectorAll('button')].some(b=>b.textContent.trim()==='Dejar de seguir'); })()`,
+            5000,
+            'diario confirma el seguimiento',
+        );
+        check('JL-309 diario: la tarjeta queda marcada como seguida', true);
+
+        await until(
+            `(()=>{ const tracker=document.querySelector('.quest-tracker'); return !!tracker&&!tracker.hidden&&tracker.textContent.includes(${JSON.stringify(questName)})&&tracker.textContent.includes('Satos abatidos'); })()`,
+            5000,
+            'misión y objetivo en el seguidor del HUD',
+        );
+        const tracker = await js(
+            `(()=>{ const e=document.querySelector('.quest-tracker'); return {visible:!!e&&!e.hidden&&!!e.offsetParent, text:e?.innerText??'', bounds:e?.getBoundingClientRect().toJSON()??null}; })()`,
+        );
+        const shownInHud = tracker.visible && tracker.text.includes(questName) && tracker.text.includes('Satos abatidos');
+        check('JL-309 diario: misión y objetivo visibles en el seguidor del HUD', shownInHud, tracker.text);
+        if (!shownInHud) throw new Error(`El seguidor no muestra la misión: ${JSON.stringify(tracker)}`);
+        await shot('jl309-seguimiento');
+
+        await key('Escape', 'Escape');
+        await until(`!document.querySelector('.panel-journal')?.offsetParent`, 5000, 'cerrar diario');
+        await shot('jl309-seguidor');
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('JL-309 diario: consola sin errores', !errors || errors.length < 3, errors.slice(0, 200));
+    },
     /** JL-308: recorrer todas las opciones y rutas del diálogo de La Espeja con clics reales. */
     async dialogo() {
         await newGame('QA Dialogo');
