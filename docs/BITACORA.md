@@ -1,3 +1,13 @@
+## 2026-11-25 — JL-304: auditar cobertura de hechizos (Junie)
+
+**Archivos:** `tests/jl304_spellCatalog.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió cobertura integral para los 108 hechizos: PNG resuelto por la interfaz, nombre y descripción en español/inglés y una malla al lanzarse. Los 19 perfiles y los 89 hechizos que usan el fallback genérico quedaron ejercitados sin cambiar datos, balance ni assets. El escenario `hechizosClases` ofrece salida configurable y capturas inmediatas; en Electron probó los cuatro primeros hechizos de cada clase con 25/25 comprobaciones y consola limpia.
+
+**Validación:** `tests/jl304_spellCatalog.test.ts`: 2/2; `npm test`: 413 archivos, 5.015 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y Prettier para la prueba limpios. Capturas revisadas: `work/junie-jl304/jl304-ember_vanguard-fiery_slash-cast.jpg` y `work/junie-jl304/jl304-ember_vanguard-ember_whirl-cast.jpg`. `scripts/art/validar_spell_icons.py` detecta que `tuna_arrow` excede la caja segura (190 px frente a 180); la procedencia atribuye ese arte al creador y Claude, por lo que se dejó intacto y se documentó en `work/junie-jl304/INFORME.md`.
+
+---
+
 ## 2026-11-25 — JL-303: verificar tablas de botín y probabilidades (Junie)
 
 **Archivos:** `tests/jl303_lootTables.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

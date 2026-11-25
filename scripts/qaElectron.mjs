@@ -15,7 +15,7 @@ import { buildMain } from './buildMain.mjs';
 
 // QA_SESION permite dos recorridos a la vez, cada uno con su puerto, perfil y capturas.
 const SESSION = process.env.QA_SESION ?? '';
-const OUT = `work/qa${SESSION}`;
+const OUT = process.env.QA_EVIDENCE_DIR ?? `work/qa${SESSION}`;
 const PORT = SESSION ? 9340 + (Number(SESSION) || 1) : 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(OUT, { recursive: true });
@@ -7476,7 +7476,7 @@ const scenarios = {
 
         const fs = await import('node:fs');
         const pathMod = await import('node:path');
-        const outDir = 'work/junie-jl188';
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl188';
         fs.mkdirSync(outDir, { recursive: true });
 
         const spellsObj = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells;
@@ -7535,7 +7535,11 @@ const scenarios = {
 
                 /* Lanzar contra el muñeco con commandCastSlot. */
                 await js(`${W}.commandCastSlot(0, { point: ${W}.enemies.get(__qaDummy).pos, targetId: __qaDummy })`);
-                await sleep(1200);
+                if (process.env.QA_CAPTURE_CASTS === '1') {
+                    await sleep(120);
+                    await shot(`jl304-${classId}-${spellId}-cast`);
+                }
+                await sleep(process.env.QA_CAPTURE_CASTS === '1' ? 1080 : 1200);
 
                 const hpAfter = await dummyHp();
                 const statusesAfter = await dummyStatuses();
