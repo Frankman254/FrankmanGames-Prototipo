@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-293: aislar selección y reconstrucción de trozos de terreno (Junie)
+
+**Archivos:** `src/render/terrainView.ts`, `src/render/terrainViewLogic.ts`, `tests/terrainViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `terrainChunkUpdate()` calcula el detalle de cada trozo según la distancia al rectángulo, conserva la histéresis y decide si la malla puede reconstruirse con el presupuesto actual. `TerrainView.update()` delega este cálculo; las páginas activas de `WorldStream` siguen determinando qué trozos se dibujan y no cambia la presentación.
+
+**Validación:** `tests/terrainViewLogic.test.ts`: 4/4; suite: 407 archivos, 4.996 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run build` y `npm run docs:check` limpios. Electron `piedrasLejanas`: 5/5, consola limpia.
+
+**Evidencia:** `work/junie-jl293/EVIDENCIA.md`, `work/junie-jl293/piedra-bocas-torito.jpg` y `work/junie-jl293/piedra-colona-oclusion.jpg`.
+
+---
+
 ## 2026-11-25 — JL-292: deduplicar y reintentar cargas de assets (Junie)
 
 **Archivos:** `src/render/assetCache.ts`, `src/render/assetCacheLogic.ts`, `tests/assetCacheLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -4,11 +4,12 @@
 // rendijas entre trozos de distinto detalle. Texturas de suelo de Blender.
 import { Color3, Constants, Mesh, RawTexture, Texture, TransformNode, VertexData, type Scene } from '@babylonjs/core';
 import { TerrainMaterial } from '@babylonjs/materials/terrain/terrainMaterial';
-import { terrainLevel, type TerrainDetailDef } from '../world/detail';
+import type { TerrainDetailDef } from '../world/detail';
 import { pageKey, type PageData } from '../world/pages';
 import type { WorldStream } from '../world/stream';
 import type { HeightField, TerrainDef } from '../world/terrain';
 import { staticTexture } from './staticModels';
+import { terrainChunkUpdate } from './terrainViewLogic';
 
 const SKIRT = 1.5;
 /** Mallas que se pueden rehacer por fotograma, para que cambiar de detalle no dé tirones. */
@@ -129,14 +130,17 @@ export class TerrainView {
         this.primed = true;
         for (const page of this.pages.values()) {
             for (const c of page.chunks) {
-                const dx = Math.max(c.x0 - px, 0, px - (c.x0 + c.size));
-                const dz = Math.max(c.z0 - pz, 0, pz - (c.z0 + c.size));
-                const level = terrainLevel(this.detail, Math.hypot(dx, dz), c.level);
-                if (level === c.level) continue;
-                // Lo que aún no tiene malla va antes que lo que solo cambia de detalle.
-                if (budget <= 0 && (c.mesh || budget <= -2)) continue;
-                budget--;
-                this.setLevel(page, c, level);
+                const update = terrainChunkUpdate({
+                    detail: this.detail,
+                    chunk: c,
+                    playerX: px,
+                    playerZ: pz,
+                    currentLevel: c.level,
+                    hasMesh: c.mesh !== null,
+                    budget,
+                });
+                budget = update.budget;
+                if (update.build) this.setLevel(page, c, update.level);
             }
         }
     }
