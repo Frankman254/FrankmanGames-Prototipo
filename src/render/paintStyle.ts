@@ -14,7 +14,8 @@ import {
     OCCLUSION_UNIFORM_NAMES,
 } from './occlusion';
 import { devVisual } from './devVisual';
-import { gradeUniforms, PAINT_GRADE_GLSL } from './sceneLook';
+import { gradeUniforms } from './sceneLookLogic';
+import { PAINT_GRADE_GLSL } from './sceneLook';
 
 /** Cifras del estilo (PROPUESTA de arte; se afinan jugando). */
 export interface PaintStyleDef {

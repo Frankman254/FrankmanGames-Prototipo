@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-291: extraer parámetros visuales de SceneLook (Junie)
+
+**Archivos:** `src/render/sceneLook.ts`, `src/render/sceneLookLogic.ts`, `src/render/paintStyle.ts`, `tests/sceneLookLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `sceneLookParameters()` deriva en lógica pura los parámetros de render a partir de `DevVisual`; `gradeUniforms()` también vive en el módulo puro y se comparte con el pase de pintura. Se conservan fórmulas, umbrales y presentación. `linearFog.ts` se revisó y quedó intacto: instala un shader fijo sin opciones gráficas.
+
+**Validación:** `tests/sceneLookLogic.test.ts`: 4/4; `npm test`: 405 archivos, 4.989 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Electron `pintura`: 3/3, alternancia de estilos y consola limpia; `piedrasLejanas`: 5/5, consola limpia.
+
+**Evidencia:** `work/junie-jl291/EVIDENCIA.md`, `work/junie-jl291/pintura.jpg` y `work/junie-jl291/natural.jpg`.
+
+---
+
 ## 2026-11-25 — JL-290: separar el estado visual del clima (Junie)
 
 **Archivos:** `src/render/weatherView.ts`, `src/render/weatherVisualLogic.ts`, `tests/weatherVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

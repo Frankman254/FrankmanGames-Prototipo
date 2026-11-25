@@ -20,6 +20,7 @@ import {
     type Scene,
 } from '@babylonjs/core';
 import { devVisual, onDevVisual, type DevVisual } from './devVisual';
+import { sceneLookParameters } from './sceneLookLogic';
 
 const TONEMAP_TYPE = {
     aces: ImageProcessingConfiguration.TONEMAPPING_ACES,
@@ -44,20 +45,20 @@ export class SceneLook {
 
     apply(v: DevVisual): void {
         const ip = this.scene.imageProcessingConfiguration;
+        const parameters = sceneLookParameters(v, this.inPaint);
         ip.applyByPostProcess = true; // los materiales no lo aplican: lo hace el pase
-        this.setPass(v.tonemap !== 'ninguna' && !this.inPaint);
+        this.setPass(parameters.postProcess);
         // Sin pase propio, los materiales aplican el revelado, como queda al arrancar: Babylon
         // pone `applyByPostProcess = false` al deshacer el pase. Sin esto, el primer cambio en
         // Opciones › Desarrollo dejaba la escena con otro revelado (suelo naranja saturado).
         if (!this.pass) ip.applyByPostProcess = false;
         ip.isEnabled = true;
-        ip.toneMappingEnabled = v.tonemap !== 'ninguna';
+        ip.toneMappingEnabled = parameters.toneMappingEnabled;
         if (v.tonemap !== 'ninguna') ip.toneMappingType = TONEMAP_TYPE[v.tonemap];
-        ip.exposure = v.tonemap === 'ninguna' ? 1 : v.exposure;
-        ip.contrast = v.tonemap === 'ninguna' ? 1 : v.contrast;
-        const curves = v.tonemap !== 'ninguna' && v.vibrance > 0;
-        ip.colorCurvesEnabled = curves;
-        if (curves) {
+        ip.exposure = parameters.exposure;
+        ip.contrast = parameters.contrast;
+        ip.colorCurvesEnabled = parameters.colorCurvesEnabled;
+        if (parameters.colorCurvesEnabled) {
             const c = ip.colorCurves ?? new ColorCurves();
             c.globalSaturation = v.vibrance;
             // Sombras hacia el azul y luces hacia el ámbar: da volumen sin cambiar el tono medio.
@@ -69,8 +70,8 @@ export class SceneLook {
             c.highlightsSaturation = 15;
             ip.colorCurves = c;
         }
-        ip.vignetteEnabled = v.tonemap !== 'ninguna' && v.vignette > 0;
-        ip.vignetteWeight = v.vignette * 3;
+        ip.vignetteEnabled = parameters.vignetteEnabled;
+        ip.vignetteWeight = parameters.vignetteWeight;
         ip.vignetteStretch = 0.4;
         ip.vignetteColor = new Color4(0.04, 0.03, 0.06, 0);
         ip.vignetteBlendMode = ImageProcessingConfiguration.VIGNETTEMODE_MULTIPLY;
@@ -151,15 +152,6 @@ export class SceneLook {
         this.setBloom(false);
         this.setPass(false);
     }
-}
-
-/** Cifras del revelado para el pase de pintura: modo (0 nada, 1 ACES, 2 neutra) y vec4. */
-export function gradeUniforms(v: DevVisual): { mode: number; grade: [number, number, number, number] } {
-    if (v.tonemap === 'ninguna') return { mode: 0, grade: [1, 1, 1, 0] };
-    return {
-        mode: v.tonemap === 'aces' ? 1 : 2,
-        grade: [v.exposure, v.contrast, 1 + v.vibrance / 100, v.vignette],
-    };
 }
 
 /**
