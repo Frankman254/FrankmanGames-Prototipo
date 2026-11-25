@@ -1541,7 +1541,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-308 `dialogo`: hablar con un PNJ y recorrer todas las ramas de su diálogo. — commit «JL-308: recorrer todas las ramas del diálogo en Electron» — Electron `dialogo` 60/60; 28/28 opciones y 7 capturas revisadas en `work/junie-jl308/`; consola limpia.
 - [x] JL-309 `diario`: abrir el diario, seguir una misión y verla en el seguidor — commit «JL-309: seguir misiones desde el diario» — Electron 8/8, consola limpia; evidencia `work/junie-jl309/resultado.json`, capturas `jl309-diario.jpg` y `jl309-seguidor.jpg`.
 - [!] JL-310 `menuContextual`: clic derecho sobre un enemigo, un PNJ, un objeto del suelo y un compañero. — BLOQUEADA: no hay menús contextuales para objetivos del mundo y no existe un compañero visible en runtime; requiere definir las opciones y el objetivo esperado. Evidencia: `work/junie-jl310/DIAGNOSTICO.md`.
-- [ ] JL-311 `ventanas`: arrastrar cada ventana al borde, cerrarla y comprobar que la posición se guarda.
+- [x] JL-311 `ventanas`: arrastrar cada ventana al borde, cerrarla y comprobar que la posición se guarda. — commit «JL-311: verificar arrastre y guardado de ventanas» — Electron 22/22, consola limpia; capturas revisadas en `work/junie-jl311-20261125/`.
 - [ ] JL-312 `pantallaCarga`: que la pantalla de carga sale y se va en cada viaje.
 - [ ] JL-313 `botin`: matar, ver el botín en el suelo, recogerlo y verlo en la mochila.
 - [ ] JL-314 `estados`: aplicar cada estado de desarrollo y capturar su efecto visual.

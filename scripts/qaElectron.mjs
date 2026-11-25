@@ -634,6 +634,78 @@ const scenarios = {
         );
         await shot('siluetas-iguanera');
     },
+    async ventanas() {
+        await resize(1920, 1080);
+        await js(`localStorage.removeItem('frankmangames.windows')`);
+        firstGame = false;
+        await newGame('QA Ventanas');
+
+        const panels = [
+            { id: 'personaje', selector: '.panel-character', layoutKey: 'panel-character', code: 'KeyC', key: 'c' },
+            { id: 'hechizos', selector: '.panel-spellbook', layoutKey: 'panel-spellbook', code: 'KeyV', key: 'v' },
+            { id: 'mochila', selector: '.panel-inventory', layoutKey: 'panel-inventory', code: 'KeyB', key: 'b' },
+            { id: 'diario', selector: '.panel-journal', layoutKey: 'panel-journal', code: 'KeyN', key: 'n' },
+            { id: 'compendio', selector: '.panel-compendium', layoutKey: 'panel-compendium', code: 'Numpad3', key: 'n3' },
+            { id: 'oficios', selector: '.panel-professions', layoutKey: 'panel-professions', code: 'Minus', key: '-' },
+            { id: 'mapa', selector: '.panel-worldmap', layoutKey: 'panel-worldmap', code: 'KeyM', key: 'm' },
+        ];
+        for (const [index, panel] of panels.entries()) {
+            const selector = JSON.stringify(panel.selector);
+            const label = `Ventanas ${panel.id}`;
+            await key(panel.code, panel.key);
+            await until(
+                `!!document.querySelector(${selector}) && !document.querySelector(${selector}).hidden`,
+                5000,
+                `${panel.id} abierta`,
+            );
+            const start = await js(
+                `(()=>{const e=document.querySelector(${selector}),r=e.getBoundingClientRect(),h=e.querySelector('.panel-head').getBoundingClientRect();return {x:h.left+h.width/2,y:h.top+h.height/2,grabX:h.left+h.width/2-r.left,grabY:h.top+h.height/2-r.top,width:r.width,height:r.height};})()`,
+            );
+            const corner = index % 4;
+            const target = await js(
+                `(()=>{const e=document.querySelector(${selector}),r=e.getBoundingClientRect();return {x:${corner % 2 ? 'innerWidth-r.width' : '0'},y:${corner > 1 ? 'Math.max(0,innerHeight-r.height)' : '0'}};})()`,
+            );
+            await dragMouse(start.x, start.y, target.x + start.grabX, target.y + start.grabY);
+            await sleep(150);
+            const moved = await js(
+                `(()=>{const e=document.querySelector(${selector}),r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};})()`,
+            );
+            const atX = corner % 2 ? Math.abs(moved.right - 1920) <= 1 : Math.abs(moved.left) <= 1;
+            const atY = corner > 1 ? Math.abs(moved.bottom - 1080) <= 1 : Math.abs(moved.top) <= 1;
+            check(`${label}: arrastrada al borde`, atX && atY, JSON.stringify(moved));
+            await shot(`jl311-${panel.id}-borde`);
+
+            await click(`${panel.selector} .panel-close`);
+            await until(`document.querySelector(${selector}).hidden`, 5000, `${panel.id} cerrada`);
+            const saved = await js(
+                `(()=>{const p=JSON.parse(localStorage.getItem('frankmangames.windows')||'{}')[${JSON.stringify(panel.layoutKey)}];return p??null;})()`,
+            );
+            const savedAtX = corner % 2 ? Math.abs((saved?.fx ?? -1) - 1) <= 0.001 : Math.abs(saved?.fx ?? -1) <= 0.001;
+            const savedAtY = corner > 1 ? Math.abs((saved?.fy ?? -1) - 1) <= 0.001 : Math.abs(saved?.fy ?? -1) <= 0.001;
+            check(`${label}: posición guardada al cerrar`, !!saved && savedAtX && savedAtY, JSON.stringify(saved));
+            await key(panel.code, panel.key);
+            await until(
+                `!!document.querySelector(${selector}) && !document.querySelector(${selector}).hidden`,
+                5000,
+                `${panel.id} restaurada`,
+            );
+            const restored = await js(
+                `(()=>{const r=document.querySelector(${selector}).getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};})()`,
+            );
+            const restoredAtX = corner % 2 ? Math.abs(restored.right - 1920) <= 1 : Math.abs(restored.left) <= 1;
+            const restoredAtY = corner > 1 ? Math.abs(restored.bottom - 1080) <= 1 : Math.abs(restored.top) <= 1;
+            if (panel.id === 'mapa') {
+                const centered = Math.abs(restored.left - (1920 - moved.width) / 2) <= 1 && Math.abs(restored.top - (1080 - moved.height) / 2) <= 1;
+                const retained = await js(
+                    `(()=>{const p=JSON.parse(localStorage.getItem('frankmangames.windows')||'{}')[${JSON.stringify(panel.layoutKey)}];return !!p&&p.fx===${saved.fx}&&p.fy===${saved.fy};})()`,
+                );
+                check(`${label}: apertura centrada y posición conservada`, centered && retained, JSON.stringify(restored));
+            } else check(`${label}: posición restaurada al reabrir`, restoredAtX && restoredAtY, JSON.stringify(restored));
+            await shot(`jl311-${panel.id}-restaurada`);
+            await click(`${panel.selector} .panel-close`);
+            await until(`document.querySelector(${selector}).hidden`, 5000, `${panel.id} cerrada al terminar`);
+        }
+    },
     // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.
     async interfaz() {
         // Título y creación, a 1080p, antes de entrar.

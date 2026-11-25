@@ -1,3 +1,13 @@
+## 2026-11-25 — JL-311: verificar arrastre y guardado de ventanas (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `ventanas` recorre Personaje, Hechizos, Mochila, Diario, Compendio, Oficios y Mapa: arrastra cada panel a un borde, lo cierra, comprueba sus coordenadas guardadas y verifica la reapertura. El mapa conserva las coordenadas guardadas, aunque `WorldMap.open()` lo centra intencionadamente al abrir; no se modificó lógica del juego.
+
+**Validación:** Electron `ventanas`: 22/22 comprobaciones y consola limpia. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Capturas revisadas: `work/junie-jl311-20261125/jl311-personaje-borde.jpg` y `work/junie-jl311-20261125/jl311-mapa-restaurada.jpg`.
+
+---
+
 ## 2026-11-25 — JL-310: menú contextual bloqueado (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl310/DIAGNOSTICO.md`.
