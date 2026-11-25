@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-290: separar el estado visual del clima (Junie)
+
+**Archivos:** `src/render/weatherView.ts`, `src/render/weatherVisualLogic.ts`, `tests/weatherVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `weatherVisualState()` calcula en lógica pura las tasas y activación de partículas, la atenuación, la niebla y el tinte a partir del clima y su intensidad. `WeatherView.update()` aplica ese estado con Babylon, manteniendo los umbrales y fórmulas existentes.
+
+**Validación:** `tests/weatherVisualLogic.test.ts`: 4/4; `npx vitest run`: 404 archivos, 4.985 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run build` limpios. `npm run docs:check` limpio. Electron `barriadaNoche`: 6/8; clima activo y cuatro capturas, pero el escenario acaba con el error Babylon `Cannot read properties of null (reading 'postProcessManager')`. El arnés no permite forzar lluvia, así que la captura no acredita precipitación.
+
+**Evidencia:** `work/junie-jl290/barriada-mediodia-jl290.jpg` (referencia visual; no muestra lluvia). El informe anterior `work/junie-jl290/INFORME.md` corresponde a un intento bloqueado previo.
+
+---
+
 ## 2026-11-25 — JL-289: extraer lógica visual de piedras y bordes (Junie)
 
 **Archivos:** `src/render/stoneView.ts`, `src/render/stoneVisualLogic.ts`, `src/render/zoneBorderView.ts`, `src/render/zoneBorderLogic.ts`, `tests/stoneVisualLogic.test.ts`, `tests/zoneBorderLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

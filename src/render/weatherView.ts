@@ -5,6 +5,7 @@ import { Color4, DynamicTexture, ParticleSystem, Vector3, type Scene } from '@ba
 import type { WeatherDef } from '../data/weatherSchema';
 import type { WeatherKind } from '../data/zonesSchema';
 import type { Atmosphere } from './atmosphere';
+import { weatherVisualState } from './weatherVisualLogic';
 
 function dotTexture(scene: Scene, name: string, streak: boolean): DynamicTexture {
     const t = new DynamicTexture(name, { width: 32, height: 32 }, scene, false);
@@ -82,17 +83,14 @@ export class WeatherView {
      */
     update(focus: Vector3, kind: WeatherKind | null, intensity: number, atmosphere: Atmosphere): void {
         this.emitter.set(focus.x, focus.y + 16, focus.z);
-        const k = kind ?? 'clear';
-        const v = this.def.visual[k];
-        const i = kind ? intensity : 0;
-        const set = (ps: ParticleSystem, on: boolean): void => {
-            ps.emitRate = on ? v.particles * i : 0;
-            if (on && i > 0.01 && !ps.isStarted()) ps.start();
-            if ((!on || i <= 0.01) && ps.isStarted()) ps.stop();
+        const state = weatherVisualState(this.def.visual, kind, intensity);
+        const set = (ps: ParticleSystem, emitRate: number, active: boolean): void => {
+            ps.emitRate = emitRate;
+            if (active && !ps.isStarted()) ps.start();
+            if (!active && ps.isStarted()) ps.stop();
         };
-        set(this.rain, k === 'rain');
-        set(this.snow, k === 'snow');
-        const mix = (a: number): number => 1 + (a - 1) * i;
-        atmosphere.weather = { dim: v.dim * i, fog: v.fog * i, tint: [mix(v.tint[0]), mix(v.tint[1]), mix(v.tint[2])] };
+        set(this.rain, state.rainEmitRate, state.rainActive);
+        set(this.snow, state.snowEmitRate, state.snowActive);
+        atmosphere.weather = { dim: state.dim, fog: state.fog, tint: state.tint };
     }
 }

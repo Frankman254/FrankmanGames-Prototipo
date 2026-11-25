@@ -1515,7 +1515,7 @@ Contexto del coordinador:
 - [x] JL-287 `src/render/npcView.ts`: la elección de modelo y la orientación hacia el jugador. — commit «JL-287: extraer modelo y orientación de PNJ» — `tests/npcVisualLogic.test.ts` 7/7; suite 4.973 aprobadas; Electron `iguanera` 7/7; evidencia `work/junie-jl287/EVIDENCIA.md` y captura `work/junie-jl287/iguanera-lancha.jpg`.
 - [x] JL-288 `src/render/gatherView.ts`: el estado visual de un recurso (lleno, gastado, rebrotando). — commit «JL-288: extraer el estado visual de los recursos» — `tests/gatherVisualLogic.test.ts` 3/3; suite 401 archivos / 4.976 aprobadas; typecheck y build OK. Evidencia en `work/junie-jl288/EVIDENCIA.md`.
 - [x] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven. — commit «JL-289: extraer lógica visual de piedras y bordes» — pruebas 5/5, suite 4.981 aprobadas (1 omitida, 1 todo), typecheck, build y `docs:check` limpios; Electron `piedrasLejanas` 5/5. Evidencia en `work/junie-jl289/`.
-- [ ] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz.
+- [x] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz. — commit «JL-290: separar el estado visual del clima» — `tests/weatherVisualLogic.test.ts` 4/4; suite 4.985 aprobadas (1 omitida, 1 `todo`); typecheck y build limpios. Electron `barriadaNoche` 6/8 por error Babylon `postProcessManager`; no se puede forzar lluvia. Captura de referencia en `work/junie-jl290/barriada-mediodia-jl290.jpg`.
 - [ ] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros.
 - [ ] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble).
 - [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
