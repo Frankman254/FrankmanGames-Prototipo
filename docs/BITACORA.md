@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-287: extraer modelo y orientación de PNJ (Junie)
+
+**Archivos:** `src/render/npcView.ts`, `src/render/npcVisualLogic.ts`, `tests/npcVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `npcModelAssetId()` separa la selección del asset válido o el modelo genérico; `npcYawTowardPlayer()` calcula el ángulo sin Babylon. `NpcView` delega ambos cálculos conservando la selección de fallback a `player`, el límite de giro y la presentación existentes.
+
+**Validación:** `tests/npcVisualLogic.test.ts`: 7/7; `npm test`: 400 archivos, 4.973 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run build` y `npm run docs:check` limpios. Electron `iguanera`: 7/7, consola limpia; captura revisada en `work/junie-jl287/iguanera-lancha.jpg`.
+
+**Evidencia:** `work/junie-jl287/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-286: extraer la lógica visual del botín (Junie)
 
 **Archivos:** `src/render/lootView.ts`, `src/render/lootVisualLogic.ts`, `tests/lootVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

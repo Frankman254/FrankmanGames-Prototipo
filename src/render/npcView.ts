@@ -18,6 +18,7 @@ import type { AnimationDataDef, AssetManifest } from '../data/worldSchema';
 import type { HeightField } from '../world/terrain';
 import type { AssetCache } from './assetCache';
 import { createCharacter, type CharacterModel } from './characters/characterModel';
+import { npcModelAssetId, npcYawTowardPlayer } from './npcVisualLogic';
 
 interface NpcEls {
     model: CharacterModel;
@@ -118,7 +119,8 @@ export class NpcView {
             const p = world.player.pos;
             const dx = p.x - els.x;
             const dz = p.y - els.z;
-            if (dx * dx + dz * dz < LOOK_RANGE * LOOK_RANGE) m.root.rotation.y = -Math.atan2(dz, dx);
+            if (dx * dx + dz * dz < LOOK_RANGE * LOOK_RANGE)
+                m.root.rotation.y = npcYawTowardPlayer(els.x, els.z, p.x, p.y);
             // Un clip suelto (mascara, saludo) manda: no se le pisa con el reposo.
             if (!m.gesturing && m.state !== 'idle') m.play('idle');
             m.update(dt, 0);
@@ -161,7 +163,7 @@ export class NpcView {
         const def = this.defs[id] ?? { name: id, title: '', look: 'default' };
         // Un PNJ con `model` usa su GLB (clips propios, máscara); los demás, el
         // humanoide procedural con la paleta `npc`.
-        const assetId = def.model && this.chars.assets[def.model] ? def.model : 'npc';
+        const assetId = npcModelAssetId(def.model, this.chars.assets);
         const entry = this.chars.assets[assetId] ?? this.chars.assets['player'];
         if (!entry) throw new Error('[assets] falta la entrada «npc» (o «player»)');
         const model = createCharacter(
