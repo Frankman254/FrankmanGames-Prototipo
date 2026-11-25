@@ -1,6 +1,7 @@
 // Borde en el suelo de la casilla de la cámara estática, pegado al relieve.
 import { Color3, MeshBuilder, StandardMaterial, Vector3, type Mesh, type Scene } from '@babylonjs/core';
 import type { ZoneCell } from '../camera';
+import { zoneBorderPoints } from './zoneBorderLogic';
 
 const WIDTH = 0.28;
 const LIFT = 0.12;
@@ -29,23 +30,15 @@ export class ZoneBorderView {
         this.mesh?.dispose();
         this.mesh = null;
         if (!cell) return;
-        const x0 = cell.x * cell.size,
-            z0 = cell.z * cell.size,
-            s = cell.size;
         const inner: Vector3[] = [],
             outer: Vector3[] = [];
-        const steps = Math.ceil(s);
-        const add = (px: number, pz: number, ox: number, oz: number): void => {
-            const y = this.ground.sample(px, pz) + LIFT;
-            inner.push(new Vector3(px, y, pz));
-            outer.push(new Vector3(px + ox * WIDTH, y, pz + oz * WIDTH));
-        };
-        for (let i = 0; i < steps; i++) add(x0 + (s * i) / steps, z0, i === 0 ? -1 : 0, -1);
-        for (let i = 0; i < steps; i++) add(x0 + s, z0 + (s * i) / steps, 1, i === 0 ? -1 : 0);
-        for (let i = 0; i < steps; i++) add(x0 + s - (s * i) / steps, z0 + s, i === 0 ? 1 : 0, 1);
-        for (let i = 0; i < steps; i++) add(x0, z0 + s - (s * i) / steps, -1, i === 0 ? 1 : 0);
-        inner.push(inner[0]!.clone());
-        outer.push(outer[0]!.clone());
+        for (const point of zoneBorderPoints(cell)) {
+            const y = this.ground.sample(point.x, point.z) + LIFT;
+            inner.push(new Vector3(point.x, y, point.z));
+            outer.push(
+                new Vector3(point.x + point.offsetX * WIDTH, y, point.z + point.offsetZ * WIDTH),
+            );
+        }
         this.mesh = MeshBuilder.CreateRibbon('zoneBorder', { pathArray: [inner, outer] }, this.scene);
         this.mesh.material = this.mat;
         this.mesh.isPickable = false;

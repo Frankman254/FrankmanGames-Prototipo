@@ -3,6 +3,7 @@
 import { Color3, StandardMaterial, TransformNode, type Mesh, type Scene } from '@babylonjs/core';
 import { staticMesh } from './staticModels';
 import type { StoneDef } from '../world/stones';
+import { stoneIdFromMesh, stoneVisualState } from './stoneVisualLogic';
 
 interface StoneEls {
     root: TransformNode;
@@ -34,8 +35,7 @@ export class StoneView {
     }
 
     static stoneIdOf(mesh: { metadata?: unknown } | null | undefined): string | null {
-        const md = mesh?.metadata as { stoneId?: string } | undefined;
-        return typeof md?.stoneId === 'string' ? md.stoneId : null;
+        return stoneIdFromMesh(mesh);
     }
 
     /** Coloca las piedras (posiciones ya ajustadas al suelo caminable). */
@@ -78,14 +78,14 @@ export class StoneView {
     sync(dt: number, known: (id: string) => boolean): void {
         this.time += dt;
         for (const [id, e] of this.els) {
-            const on = known(id);
-            const mat = on ? this.lit : this.dim;
+            const visual = stoneVisualState(known(id));
+            const mat = visual.material === 'lit' ? this.lit : this.dim;
             // El suelo de una página lejana llega después de crear la piedra.
             e.root.position.y = this.ground.sample(e.root.position.x, e.root.position.z);
             e.crystal.material = mat;
             e.ring.material = mat;
-            e.crystal.rotation.y = this.time * (on ? 0.9 : 0.3) + e.phase;
-            e.crystal.position.y = 1.6 + Math.sin(this.time * 1.6 + e.phase) * (on ? 0.12 : 0.04);
+            e.crystal.rotation.y = this.time * visual.rotationSpeed + e.phase;
+            e.crystal.position.y = 1.6 + Math.sin(this.time * 1.6 + e.phase) * visual.bobAmplitude;
         }
     }
 }

@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-289: extraer lógica visual de piedras y bordes (Junie)
+
+**Archivos:** `src/render/stoneView.ts`, `src/render/stoneVisualLogic.ts`, `src/render/zoneBorderView.ts`, `src/render/zoneBorderLogic.ts`, `tests/stoneVisualLogic.test.ts`, `tests/zoneBorderLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `stoneVisualState()` y `stoneIdFromMesh()` aíslan la selección de material, movimiento del cristal y lectura del ID de las piedras. `zoneBorderPoints()` calcula el recorrido cerrado del contorno sin Babylon. Las vistas conservan la geometría, los valores y la presentación existentes.
+
+**Validación:** pruebas dirigidas: 5/5; `npm test`: 403 archivos, 4.981 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run build` y `npm run docs:check` limpios. Electron `piedrasLejanas`: 5/5, consola limpia; capturas revisadas.
+
+**Evidencia:** `work/junie-jl289/EVIDENCIA.md`, `work/junie-jl289/piedra-bocas-torito.jpg` y `work/junie-jl289/piedra-colona-oclusion.jpg`.
+
+---
+
 ## 2026-11-25 — JL-288: extraer el estado visual de los recursos (Junie)
 
 **Archivos:** `src/render/gatherView.ts`, `src/render/gatherVisualLogic.ts`, `tests/gatherVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
