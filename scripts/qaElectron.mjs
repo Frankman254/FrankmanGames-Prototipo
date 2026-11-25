@@ -9373,6 +9373,83 @@ const scenarios = {
         check('barriadaNoche: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
+    /** JL-315: clima forzado en Electron; anota los tipos y sonidos aún no soportados. */
+    async lluvia() {
+        await newGame('QA Lluvia');
+        await resize(1920, 1080);
+        await sleep(1500);
+
+        const setup = await js(`(() => {
+      const w=${W}, zone=w.weatherZone(), weather=w.weather;
+      return { zone, ready:!!weather && !!weather.at(zone), kinds:Object.keys(weather?.def.kinds ?? {}) };
+    })()`);
+        if (!setup.ready) throw new Error(`No hay sistema de clima en la zona del jugador: ${JSON.stringify(setup)}`);
+
+        const zoneId = JSON.stringify(setup.zone);
+        await js(`__game.world.weather.force(${zoneId}, 'clear', 1)`);
+        await sleep(500);
+        const clear = await js(`(() => {
+      const a=__game.view.atmosphere, s=__game.view.scene;
+      return { fog:a.weather.fog, fogDensity:s.fogDensity };
+    })()`);
+        await shot('jl315-despejado');
+
+        await js(`(() => {
+      window.__jl315SoundCalls=[];
+      const audio=window.__audio, original=audio.play.bind(audio);
+      window.__jl315OriginalPlay=original;
+      audio.play=(cue, world)=>{ window.__jl315SoundCalls.push(cue.sound); return original(cue, world); };
+      __game.world.weather.force(${zoneId}, 'rain', 1);
+    })()`);
+        await sleep(1800);
+        const rain = await js(`(() => {
+      const s=__game.view.scene, p=s.particleSystems.find(x=>x.name==='rain'), a=__game.view.atmosphere;
+      const audio=window.__audio, ids=Object.keys(audio.data.sfx.sounds);
+      const relevant=id=>/(rain|weather|thunder)/i.test(id);
+      return {
+        kind:__game.world.weather.at(${zoneId}).kind,
+        intensity:__game.world.weather.at(${zoneId}).intensity,
+        particles:p ? { started:p.isStarted(), emitRate:p.emitRate, active:p.getActiveCount() } : null,
+        fog:a.weather.fog,
+        fogDensity:s.fogDensity,
+        soundIds:ids.filter(relevant),
+        soundCalls:window.__jl315SoundCalls.filter(relevant),
+        ambience:Object.keys(audio.data.ambience),
+      };
+    })()`);
+        check('JL-315: lluvia forzada a intensidad completa', rain.kind === 'rain' && rain.intensity === 1, JSON.stringify(rain));
+        check(
+            'JL-315: emisor de lluvia activo con partículas',
+            rain.particles?.started && rain.particles.emitRate > 0 && rain.particles.active > 0,
+            JSON.stringify(rain.particles),
+        );
+        check('JL-315: niebla de lluvia aplicada', rain.fog > 0 && rain.fogDensity > clear.fogDensity, JSON.stringify({ clear, rain }));
+        await shot('jl315-lluvia');
+
+        const stormAvailable = setup.kinds.includes('storm');
+        check('JL-315: existe un tipo de clima tormenta', stormAvailable, JSON.stringify(setup.kinds));
+        const weatherSoundAvailable = rain.soundIds.length > 0 && rain.soundCalls.length > 0;
+        check(
+            'JL-315: el clima reproduce un sonido propio',
+            weatherSoundAvailable,
+            JSON.stringify({ ids: rain.soundIds, reproducidos: rain.soundCalls, ambience: rain.ambience }),
+        );
+
+        fs.writeFileSync(
+            path.join(OUT, 'jl315-clima.json'),
+            JSON.stringify({ fecha: new Date().toISOString(), zone: setup.zone, kinds: setup.kinds, clear, rain }, null, 2),
+        );
+        await js(`(() => {
+      __game.world.weather.force(${zoneId}, 'clear', 1);
+      if (window.__jl315OriginalPlay) __audio.play=window.__jl315OriginalPlay;
+      delete window.__jl315OriginalPlay;
+    })()`);
+        await sleep(300);
+
+        const errors = await js(`(window.__consola?.errores(20)||'')`);
+        check('JL-315: consola sin errores', !errors || errors.length < 3, errors.slice(0, 200));
+    },
+
     /** JL-223: Opciones gráficas dentro de la barriada — calidad, estilo de pintura y distancia de vista. */
     async barriadaOpciones() {
         await newGame('QA BarriadaOpc');

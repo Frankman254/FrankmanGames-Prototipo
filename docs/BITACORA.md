@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-315: verificar lluvia y clima en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario `lluvia`: captura el estado despejado, fuerza lluvia a intensidad 1, mide partículas y niebla y observa las llamadas e IDs de audio climático. La lluvia sí funciona, pero el juego no define `storm` ni sonido de clima; JL-315 queda bloqueada. No se modificaron reglas, datos ni audio del juego.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `lluvia`: 5/7; emisor activo (1.238 partículas, 1.800 emisiones/s), niebla `0,008` (`fogDensity` `0,01397`, frente a `0,00865` despejado), consola limpia. Fallan las verificaciones de tipo `storm` y sonido climático: solo existen `clear`, `rain`, `sun`, `snow`, sin IDs ni llamadas de audio climático. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio; `npm run docs:check` verifica 194 rutas.
+
+**Evidencia:** `work/junie-jl315/jl315-clima.json`, `work/junie-jl315/jl315-despejado.jpg` y `work/junie-jl315/jl315-lluvia.jpg`.
+
+---
+
 ## 2026-11-25 — JL-314: capturar efectos visuales de estados (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
