@@ -24,6 +24,7 @@ import type { VegetationView } from '../render/vegetationView';
 import type { WaterView } from '../render/waterView';
 import { refreshWorldObstacles, type Overworld } from '../world/overworld';
 import { diffApplied } from './hotDiff';
+import { hotApplyPlan } from './hotApplyPlan';
 import type { GameData } from '../data';
 import type { RectObstacle } from '../sim/navGrid';
 import type { World } from '../sim/world';
@@ -70,12 +71,12 @@ export function applyHotEdits(
 ): string {
     const { data, overworld: ow, world } = host;
     const z = data.zone;
-    const touched = new Set(files);
+    const plan = hotApplyPlan(files);
     const done: string[] = [];
 
     // — Terreno. Se copia EN SITIO sobre `ow.def`: las alturas del editor y el
     // WaterView leen ese mismo objeto; los hilos reciben su copia al invalidar.
-    if (touched.has('terrain')) {
+    if (plan.terrain) {
         Object.assign(ow.def, parseTerrain(json(after['terrain'])));
         // `data.zone` copió al arrancar `paths` y `playerStart`: se vuelven a enlazar.
         z.paths = ow.def.paths;
@@ -86,13 +87,13 @@ export function applyHotEdits(
     // — Vegetación. `ow.vegetation` se rellena EN SITIO (lo comparten el contexto
     // de las páginas y la vista). La dispersión de la parcela (mapa y obstáculos)
     // se rehace con las alturas de las páginas que hay ahora mismo.
-    if (touched.has('vegetation')) {
+    if (plan.vegetation) {
         Object.assign(ow.vegetation, parseVegetation(json(after['vegetation'])));
         done.push('props');
     }
 
     // — Pintado de paso.
-    if (touched.has('navpaint')) {
+    if (plan.navPaint) {
         try {
             ow.navPaint = parseNavPaint(json(after['navpaint']));
             z.navPaint = ow.navPaint;
@@ -104,7 +105,7 @@ export function applyHotEdits(
 
     // — Zonas: niveles y clima. La identidad de `data.zones` (y de su arreglo) se
     // conserva: los menús y la población lo guardaron por referencia.
-    if (touched.has('zones')) {
+    if (plan.zones) {
         const fresh = parseZones(json(after['zones']), data.enemies.archetypes);
         const oldIds = new Set(data.zones.zones.map((s) => s.id));
         const newIds = new Set(fresh.zones.map((s) => s.id));
@@ -122,7 +123,7 @@ export function applyHotEdits(
     // lleva el ESTADO COMPLETO aplicado (no sólo lo sucio): si no, esta
     // reconstrucción leería el JSON compilado y perdería cambios de guardados
     // anteriores que no se repitieron ahora.
-    if (['npcs', 'merchants', 'professions', 'death', 'fishing'].some((f) => touched.has(f as FileId))) {
+    if (plan.rpgContent) {
         const raw = { ...rpgRawFiles() } as RpgRawFiles;
         const read = (file: FileId, key: 'npcs' | 'merchants' | 'professions' | 'spectral' | 'fishing'): void => {
             if (after[file] !== undefined) raw[key] = json(after[file]) as never;
@@ -138,7 +139,7 @@ export function applyHotEdits(
         host.views.gather.setDefs(data.rpg.professions);
         host.views.gather.resetNodes();
         host.views.resurrector.reset();
-        if (touched.has('fishing')) {
+        if (plan.fishing) {
             host.views.water.clearShoalMarks();
             done.push('pesca');
         }
@@ -150,7 +151,7 @@ export function applyHotEdits(
     // no dejarla sin suelo; el resto la piden los hilos en los fotogramas
     // siguientes, tapados por el velo que puso el editor.
     const { rect } = diffApplied(before, after);
-    if (touched.has('vegetation')) {
+    if (plan.vegetation) {
         refreshWorldObstacles(ow, host.extraObstacles());
         host.refreshHouses();
     }
@@ -163,19 +164,19 @@ export function applyHotEdits(
         ow.grid.refreshFixed(ow.obstacles, ow.navPaint, Object.values(world.fishingSpots), EVERYWHERE);
         host.views.water.rebuildPonds();
         done.push('mundo rehecho');
-    } else if (touched.has('fishing')) {
+    } else if (plan.fishing) {
         ow.grid.refreshFixed(ow.obstacles, ow.navPaint, Object.values(world.fishingSpots), EVERYWHERE);
     }
 
     // — Piedras y lanchas: su estado vive en `main.ts` (viaje, regreso, llegadas).
     // Después de la rejilla: sus posiciones se resuelven sobre la nueva.
-    if (touched.has('stones')) {
+    if (plan.stones) {
         host.applyStones(json(after['stones']));
         done.push('piedras');
     }
 
     // — Vistas ligadas a las mallas de vegetación.
-    if (touched.has('vegetation')) {
+    if (plan.vegetation) {
         const props = ow.vegetation.props;
         const landmarks = props.filter((p) => p.kind === 'landmark' && p.model);
         void host.views.landmarks.setDefs([

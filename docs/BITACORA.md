@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-296: aislar el plan de actualización en caliente (Junie)
+
+**Archivos:** `src/editor/hotApply.ts`, `src/editor/hotApplyPlan.ts`, `tests/editor/hotApplyPlan.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `hotApplyPlan()` concentra qué acciones se ejecutan según los archivos cambiados. `applyHotEdits()` usa ese plan para conservar sus mismas ramas y efectos, ahora cubiertos por pruebas puras para cada archivo editable, combinaciones y entrada vacía.
+
+**Validación:** `tests/editor/hotApplyPlan.test.ts` y `tests/editor/hotDiff.test.ts`: 14/14; `npm test`: 410 archivos, 5.005 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, Prettier y `npm run docs:check` limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl296/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-295: separar destinos de escalera de la cripta (Junie)
 
 **Archivos:** `src/scenes/cryptScene.ts`, `src/scenes/cryptSceneLogic.ts`, `tests/cryptSceneLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
