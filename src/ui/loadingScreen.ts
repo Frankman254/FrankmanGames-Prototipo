@@ -5,6 +5,7 @@
 import './styles/carga.css';
 import { tr } from '../i18n';
 import { UI_LAYER_Z } from './menus/windows';
+import { LOADING_TIPS, loadingProgressPercent, nextLoadingTipIndex } from './loadingScreenLogic';
 
 export interface LoadingText {
     /** Línea pequeña de arriba («Bajando a», «Viajando a», «Cargando partida»). */
@@ -24,19 +25,6 @@ export interface LoadingDeps {
     pause(on: boolean): void;
 }
 
-// Consejos sobre lo que ya hace el juego (nada de promesas de contenido).
-const TIPS_RAW = [
-    'Las Piedras Pintadas recuerdan dónde despiertas al caer.',
-    'Mantén pulsado el botón de andar y el personaje sigue al cursor.',
-    'Los monstruos cerca de tu nivel dan más experiencia; los muy débiles, casi nada.',
-    'Con lluvia el fuego pega menos; con sol fuerte, más.',
-    'En Características puedes escribir cuántos puntos gasta cada «+», o gastarlos todos con «Todo».',
-    'Cuanto más hondo bajas en la cripta, mejores son sus cofres.',
-    'En forma espectral no se puede viajar: busca un Alzador.',
-    'Las puertas cerradas de la cripta se abren con un clic al llegar a ellas.',
-    'Los objetos que no caben en la mochila pueden esperar en el banco de El Cruce.',
-];
-
 const nextFrame = (): Promise<void> => new Promise((r) => requestAnimationFrame(() => r()));
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
@@ -53,7 +41,7 @@ export class LoadingScreen {
     private status!: HTMLElement;
     private tip!: HTMLElement;
     private active = false;
-    private tipIndex = Math.floor(Math.random() * TIPS_RAW.length);
+    private tipIndex = Math.floor(Math.random() * LOADING_TIPS.length);
 
     constructor(private readonly deps: LoadingDeps) {}
 
@@ -101,7 +89,14 @@ export class LoadingScreen {
                 if (calm >= 3) break;
                 await nextFrame();
             }
-            if (this.deps.ready) await Promise.race([this.deps.ready().catch((e: unknown) => { console.warn('[carga] deps.ready falló', e); return undefined; }), wait(5000)]);
+            if (this.deps.ready)
+                await Promise.race([
+                    this.deps.ready().catch((e: unknown) => {
+                        console.warn('[carga] deps.ready falló', e);
+                        return undefined;
+                    }),
+                    wait(5000),
+                ]);
             this.progress(1, tr('Listo'));
         } finally {
             this.deps.pause(false);
@@ -142,8 +137,8 @@ export class LoadingScreen {
     private show(text: LoadingText): void {
         this.root ??= this.build();
         this.label(text);
-        this.tipIndex = (this.tipIndex + 1) % TIPS_RAW.length;
-        this.tip.textContent = tr(TIPS_RAW[this.tipIndex]!);
+        this.tipIndex = nextLoadingTipIndex(this.tipIndex);
+        this.tip.textContent = tr(LOADING_TIPS[this.tipIndex]!);
         this.root.classList.remove('fuera');
         this.root.hidden = false;
     }
@@ -157,7 +152,7 @@ export class LoadingScreen {
     }
 
     private progress(f: number, status: string): void {
-        this.bar.style.width = `${Math.round(Math.max(0, Math.min(1, f)) * 100)}%`;
+        this.bar.style.width = `${loadingProgressPercent(f)}%`;
         this.status.textContent = status;
     }
 

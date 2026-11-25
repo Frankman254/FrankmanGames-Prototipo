@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-279: extraer progreso y consejos de carga (Junie)
+
+**Archivos:** `src/ui/loadingScreen.ts`, `src/ui/loadingScreenLogic.ts`, `tests/ui/loadingScreenLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `loadingProgressPercent()` aísla el porcentaje acotado y redondeado; `LOADING_TIPS` y `nextLoadingTipIndex()` mantienen los nueve consejos y su rotación cíclica en lógica pura. `LoadingScreen` usa los helpers sin cambiar el progreso, el orden ni los textos visibles.
+
+**Validación:** `tests/ui/loadingScreenLogic.test.ts`: 2/2; `npx vitest run`: 392 archivos, 4.943 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, Prettier y `npm run docs:check` limpios. La presentación no cambia; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl279/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-278: extraer el adaptador de opciones visuales (Junie)
 
 **Archivos:** `src/ui/menus/screens/devVisualOptions.ts`, `src/ui/menus/screens/devVisualOptionsLogic.ts`, `tests/ui/devVisualOptionsLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

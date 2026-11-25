@@ -1504,7 +1504,7 @@ Contexto del coordinador:
 - [x] JL-276 `src/ui/menus/progressBar.ts` y `panel.ts`: el ancho y el texto de la barra. — commit «JL-276: extraer el estado visual de la barra de progreso» — `tests/ui/progressBarLogic.test.ts` 3/3; `npm test`: 389 archivos, 4.935 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. `panel.ts` no contenía cálculo puro que extraer. Sin cambio visual, no aplica captura Electron. Evidencia en `work/junie-jl276/EVIDENCIA.md`.
 - [x] JL-277 `src/ui/menus/mountLooks.ts`: la lista de aspectos disponibles. — commit «JL-277: extraer selección de aspectos de montura» — 4 pruebas nuevas, 6 de UI-03, suite 4.939 aprobadas, typecheck y docs:check limpios; evidencia en work/junie-jl277/EVIDENCIA.md.
 - [x] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores. — commit «JL-278: extraer el adaptador de opciones visuales» — 2 pruebas verdes; suite 391 archivos, 4.941 aprobadas, 1 omitida y 1 `todo`; typecheck, build, docs:check y Electron interfaz 55/55; capturas revisadas en work/junie-jl278/. Evidencia en work/junie-jl278/EVIDENCIA.md.
-- [ ] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos.
+- [x] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos. — commit «JL-279: extraer progreso y consejos de carga» — 2 pruebas nuevas; suite 392 archivos, 4.943 aprobadas, 1 omitida y 1 `todo`; typecheck, Prettier y docs:check limpios. Sin cambio visual. Evidencia en work/junie-jl279/EVIDENCIA.md.
 - [ ] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números.
 - [ ] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa.
 - [ ] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes.
