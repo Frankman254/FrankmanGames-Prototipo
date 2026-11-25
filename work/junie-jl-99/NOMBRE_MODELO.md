@@ -1,6 +1,6 @@
 # Auditoría: Nombre vs. Modelo de criaturas
 
-Generado: 2026-11-21T20:41:56.158Z por scripts/audit/nombreModelo.ts
+Generado: 2026-11-25T13:55:10.620Z por scripts/audit/nombreModelo.ts
 Fuentes: data/rpg/enemies.json (nombres), data/assets.json (plantillas y modelos)
 
 ## Resumen

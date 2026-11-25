@@ -204,6 +204,30 @@ def to_tracks(obj, actions):
         track.strips.new(act.name, int(act.frame_range[0]), act)
 
 
+def asiento(rig_obj, loc, bone='hips', pose='horcajadas', name='Asiento'):
+    """OMP-POL-13-3: empty `Asiento` en el punto donde va la cadera del jinete.
+
+    Emparentado al hueso del lomo (`bone`) para que siga el balanceo de la
+    animación. Lleva la propiedad de objeto `pose_jinete` (`horcajadas`,
+    `agachado` o `sentado`), que viaja al GLB como `extras` con
+    `export_extras=True`. Devuelve el empty para añadirlo a la selección de exportación.
+    """
+    e = bpy.data.objects.new(name, None)
+    e.empty_display_type = 'PLAIN_AXES'
+    e.empty_display_size = 0.18
+    rig_obj.users_collection[0].objects.link(e)
+    e.parent = rig_obj
+    e.parent_type = 'BONE'
+    e.parent_bone = bone
+    # con parent_type BONE el origen es la cola del hueso: se compensa con la matriz de reposo
+    pb = rig_obj.data.bones[bone]
+    tail_m = Matrix.Translation(pb.tail_local) @ pb.matrix_local.to_3x3().to_4x4()
+    e.matrix_parent_inverse = tail_m.inverted()
+    e.location = loc
+    e['pose_jinete'] = pose
+    return e
+
+
 def export(filename, scene, objects, materials=True, imagenes='AUTO'):
     """`imagenes`: 'AUTO' (PNG) o 'JPEG' para texturas pintadas grandes (pesan un tercio)."""
     scene.frame_set(1)
@@ -213,6 +237,6 @@ def export(filename, scene, objects, materials=True, imagenes='AUTO'):
     bpy.context.view_layer.objects.active = objects[0]
     out = os.path.join(MODELS, filename)
     bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', use_selection=True, export_animations=True, export_animation_mode='NLA_TRACKS', export_apply=False, use_active_scene=True, export_materials='EXPORT' if materials else 'NONE',
-                              export_image_format=imagenes, export_jpeg_quality=88)
+                              export_image_format=imagenes, export_jpeg_quality=88, export_extras=True)
     tris = sum(len(p.vertices) - 2 for o in objects if o.type == 'MESH' for p in o.data.polygons)
     print(f'{filename}: {tris} triangulos, {os.path.getsize(out)} bytes')
