@@ -3,6 +3,7 @@
 import type { DamageMeter, MeterReport } from '../../sim/damageMeter';
 import { BASIC_ATTACK } from '../../sim/damageMeter';
 import type { SpellDamageLine } from '../../sim/damageBreakdown';
+import { damageMeterAbilityRows } from './damageMeterLogic';
 
 const n0 = (v: number): string => Math.round(v).toLocaleString('es-ES');
 const n1 = (v: number): string => v.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -114,10 +115,9 @@ export function meterText(
     for (const k of r.recentKills.slice(0, 4))
         lines.push(`  ${names.enemy(k.archetype).slice(0, 22).padEnd(22)} ${secs(k.seconds)}`);
     lines.push('', 'Hechizo                 daño   %  golpes crít  máx');
-    const total = Math.max(1, r.dealt);
-    for (const l of r.abilities) {
+    for (const l of damageMeterAbilityRows(r.abilities, r.dealt)) {
         lines.push(
-            `${ab(l.ability).slice(0, 20).padEnd(20)} ${n0(l.total).padStart(7)} ${String(Math.round((l.total / total) * 100)).padStart(3)} ${String(l.hits).padStart(6)} ${String(l.crits).padStart(4)} ${n0(l.max).padStart(4)}`,
+            `${ab(l.ability).slice(0, 20).padEnd(20)} ${n0(l.total).padStart(7)} ${String(l.percentage).padStart(3)} ${String(l.hits).padStart(6)} ${String(l.crits).padStart(4)} ${n0(l.max).padStart(4)}`,
         );
     }
     if (r.abilities.length === 0) lines.push('  (aún sin golpes)');
@@ -128,7 +128,8 @@ export function meterText(
         lines.push('Hechizo                 daño   crít  Int  Cld  Flu  Vol  Frc  Agi  Vta  Esp  Pwr');
         for (const l of breakdown) {
             const sc = l.statContribution;
-            const fmt = (v: number | undefined) => (v === undefined ? '—'.padEnd(3) : String(Math.round(v)).padStart(3));
+            const fmt = (v: number | undefined) =>
+                v === undefined ? '—'.padEnd(3) : String(Math.round(v)).padStart(3);
             const critStr = String(Math.round(l.critChance * 100)).padStart(4);
             lines.push(
                 `${l.name.slice(0, 20).padEnd(20)} ${String(Math.round(l.avgDamage)).padStart(5)} ${critStr} ${fmt(sc.intellect)} ${fmt(sc.calm)} ${fmt(sc.flow)} ${fmt(sc.will)} ${fmt(sc.strength)} ${fmt(sc.agility)} ${fmt(sc.vitality)} ${fmt(sc.spirit)} ${String(Math.round(l.powerContribution)).padStart(3)}`,

@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-282: extraer filas y porcentajes del medidor de daño (Junie)
+
+**Archivos:** `src/ui/dev/damageMeterView.ts`, `src/ui/dev/damageMeterLogic.ts`, `tests/ui/damageMeterLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `damageMeterAbilityRows()` separa a lógica pura el cálculo de porcentajes y conserva el orden recibido del informe. `DamageMeterView` delega en el helper con el mismo redondeo y el denominador mínimo de 1; la presentación no cambia.
+
+**Validación:** `tests/ui/damageMeterLogic.test.ts`: 3/3; `npm test`: 395 archivos, 4.954 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y Prettier limpios. La build advierte que algunos chunks superan 500 kB. Sin cambio visual; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl282/EVIDENCIA_2026-11-25.md`.
+
+---
+
 ## 2026-11-25 — JL-281: extraer la decisión de etiqueta del botín (Junie)
 
 **Archivos:** `src/render/lootView.ts`, `src/render/lootLabel.ts`, `tests/ui/lootLabel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -1507,7 +1507,7 @@ Contexto del coordinador:
 - [x] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos. — commit «JL-279: extraer progreso y consejos de carga» — 2 pruebas nuevas; suite 392 archivos, 4.943 aprobadas, 1 omitida y 1 `todo`; typecheck, Prettier y docs:check limpios. Sin cambio visual. Evidencia en work/junie-jl279/EVIDENCIA.md.
 - [x] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números. — commit «JL-280: extraer el formato de números de rendimiento» — `tests/ui/perfNumberFormat.test.ts` 4/4; `npm test`: 4.947 aprobadas, 1 omitida y 1 `todo`; typecheck, build, Prettier y `docs:check` limpios. Sin cambio visual.
 - [x] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa. — commit «JL-281: extraer la decisión de etiqueta del botín» — `tests/ui/lootLabel.test.ts` 4/4; `npm test`: 4.951 aprobadas, 1 omitida y 1 `todo`; typecheck, Prettier y `docs:check` limpios. Sin cambio visual. Evidencia: `work/junie-jl281/EVIDENCIA.md`.
-- [ ] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes.
+- [x] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes. — commit «JL-282: extraer filas y porcentajes del medidor de daño» — 3 pruebas nuevas; suite 395 archivos, 4.954 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios; evidencia en `work/junie-jl282/EVIDENCIA_2026-11-25.md`. Sin cambio visual; no aplica captura Electron.
 - [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
 - [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.
 - [ ] JL-285 `src/render/fx/aimGhosts.ts`: dónde van los fantasmas de la previa.
