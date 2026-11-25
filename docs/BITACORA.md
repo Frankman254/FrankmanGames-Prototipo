@@ -1,3 +1,9 @@
+## 2026-11-24 — GCD-01: hechizos libres del enfriamiento global (Coord)
+
+- El creador eligió la opción A. `offGlobalCooldown` en los datos: el hechizo ni pone ni espera el GCD (`checkCast`, `execute`, barrido de `hotbarState`).
+- Lista inicial PROPUESTA: 26 movimientos y defensas propias instantáneos. Ninguna cifra de GCD cambia.
+- Pruebas: `tests/hechizosLibres.test.ts`. Electron: dos hechizos en el mismo tick y captura de la barra en `work/claude-gcd01/`.
+
 ## 2026-11-24 — HUD-ROJO-03, REGEN-01 y EQ-10c (Coord)
 
 - **Barra en rojo.** Con `approachToCast` el alcance y la línea de visión no rechazan la pulsación; la barra ya no lo marca. Electron: 7 → 0 huecos rojos con un enemigo a 30 m (`work/claude-hz-0124/qa_barra_resultado.txt`).

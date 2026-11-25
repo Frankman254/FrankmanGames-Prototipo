@@ -1023,7 +1023,7 @@ export class World implements SessionWorld {
         // Recurso, cooldown y GCD (orden de castBlock).
         if (p.resource < s.cost) return 'resource';
         if ((p.cooldowns[s.id] ?? 0) > 0) return 'cooldown';
-        if (p.gcd > 0) return 'gcd';
+        if (p.gcd > 0 && !s.def?.offGlobalCooldown) return 'gcd';
         // Alcance: distancia primero, luego línea de visión.
         if (!this.inRange(s, targetId, aim)) return 'range';
         if (!this.hasLineOfSight(s, targetId, aim)) return 'noLineOfSight';
@@ -1240,7 +1240,8 @@ export class World implements SessionWorld {
         }
         const cd = this.cooldownOf(s);
         if (cd > 0) p.cooldowns[s.id] = cd;
-        if (s.globalCooldown > 0) {
+        // GCD-01 opción A: un hechizo libre no deja enfriamiento global.
+        if (s.globalCooldown > 0 && !s.def?.offGlobalCooldown) {
             p.gcd = Math.max(p.gcd, s.globalCooldown);
             p.gcdTotal = p.gcd;
         }
@@ -2405,7 +2406,7 @@ export class World implements SessionWorld {
             const s = this.spell(spellId);
             let remaining = p.cooldowns[s.id] ?? 0;
             let total = s.cooldown;
-            if (p.gcd > remaining && p.gcdTotal > 0) {
+            if (p.gcd > remaining && p.gcdTotal > 0 && !s.def?.offGlobalCooldown) {
                 remaining = p.gcd;
                 total = p.gcdTotal;
             }

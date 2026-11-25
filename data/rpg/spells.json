@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). unlockLevel (por defecto 1) es el nivel requerido para ponerlo en la barra; además, la clase de origen lo aprende sola al alcanzarlo. Un pergamino puede enseñarlo antes, pero no se equipa hasta tener el nivel. Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Combate táctico: trap = trampa invisible en el punto apuntado (círculo atTarget) o a los pies (self); se dispara cuando un rival la pisa y le aplica sus effects (daño, estado, empuje, atracción); maxActive y minSpacing opcionales (si no, data/rpg/tactics.json). reveal = revela las trampas rivales cercanas un rato. Hechizos de desplazamiento (dash, teleport, blink, recoil, swap): no se pueden usar desorientado. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar). V3: cada hechizo declara su probabilidad de crítico propio (critChance, 5–30 %; PROPUESTA: básicos y utilitarios bajos, firmas pesadas hasta 25 %, controles 5 %); el crítico global del personaje (equipo/sets/mascotas/buffs, 0 sin ellos) se suma y la tirada es UNA por lanzamiento compartido entre todas las líneas de daño. `double_monsoon` es un hechizo de prueba multilínea (agua+tormenta) sólo para desarrollo (devOnly).",
+  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). unlockLevel (por defecto 1) es el nivel requerido para ponerlo en la barra; además, la clase de origen lo aprende sola al alcanzarlo. Un pergamino puede enseñarlo antes, pero no se equipa hasta tener el nivel. Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Combate táctico: trap = trampa invisible en el punto apuntado (círculo atTarget) o a los pies (self); se dispara cuando un rival la pisa y le aplica sus effects (daño, estado, empuje, atracción); maxActive y minSpacing opcionales (si no, data/rpg/tactics.json). reveal = revela las trampas rivales cercanas un rato. Hechizos de desplazamiento (dash, teleport, blink, recoil, swap): no se pueden usar desorientado. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar). V3: cada hechizo declara su probabilidad de crítico propio (critChance, 5–30 %; PROPUESTA: básicos y utilitarios bajos, firmas pesadas hasta 25 %, controles 5 %); el crítico global del personaje (equipo/sets/mascotas/buffs, 0 sin ellos) se suma y la tirada es UNA por lanzamiento compartido entre todas las líneas de daño. `double_monsoon` es un hechizo de prueba multilínea (agua+tormenta) sólo para desarrollo (devOnly). offGlobalCooldown: true = hechizo libre, ni pone ni espera el enfriamiento global (GCD-01 opción A, creador 2026-11-24); la lista inicial son las defensas propias y los movimientos instantáneos, PROPUESTA.",
   "spells": {
     "fiery_slash": {
       "name": "Tajo sísmico",
@@ -56,6 +56,7 @@
       "resourceCost": 15,
       "cooldown": 6,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -154,6 +155,7 @@
       "resourceCost": 10,
       "cooldown": 16,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -233,6 +235,7 @@
       "resourceCost": 20,
       "cooldown": 18,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -313,6 +316,7 @@
       "resourceCost": 15,
       "cooldown": 18,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -482,6 +486,7 @@
       "resourceCost": 15,
       "cooldown": 7,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 8,
       "area": {
@@ -630,6 +635,7 @@
       "resourceCost": 18,
       "cooldown": 12,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 9,
       "area": {
@@ -669,6 +675,7 @@
       "resourceCost": 16,
       "cooldown": 10,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -716,6 +723,7 @@
       "resourceCost": 20,
       "cooldown": 20,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -752,6 +760,7 @@
       "resourceCost": 10,
       "cooldown": 16,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -870,6 +879,7 @@
       "resourceCost": 18,
       "cooldown": 25,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -985,6 +995,7 @@
       "resourceCost": 15,
       "cooldown": 30,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -1019,6 +1030,7 @@
       "resourceCost": 25,
       "cooldown": 40,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -1285,6 +1297,7 @@
       "resourceCost": 8,
       "cooldown": 12,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -1411,6 +1424,7 @@
       "resourceCost": 10,
       "cooldown": 16,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -1573,6 +1587,7 @@
       "resourceCost": 10,
       "cooldown": 10,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -1664,6 +1679,7 @@
       "resourceCost": 14,
       "cooldown": 9,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -1711,6 +1727,7 @@
       "resourceCost": 14,
       "cooldown": 18,
       "globalCooldown": 0.5,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -2524,6 +2541,7 @@
       "resourceCost": 22,
       "cooldown": 15,
       "globalCooldown": 0.7,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -2560,6 +2578,7 @@
       "resourceCost": 20,
       "cooldown": 7,
       "globalCooldown": 0.7,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -2697,6 +2716,7 @@
       "resourceCost": 26,
       "cooldown": 18,
       "globalCooldown": 0.7,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -2733,6 +2753,7 @@
       "resourceCost": 28,
       "cooldown": 8,
       "globalCooldown": 0.7,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -3908,6 +3929,7 @@
       "resourceCost": 20,
       "cooldown": 30,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -3944,6 +3966,7 @@
       "resourceCost": 20,
       "cooldown": 30,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -4320,6 +4343,7 @@
       "resourceCost": 20,
       "cooldown": 30,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -4367,6 +4391,7 @@
       "resourceCost": 18,
       "cooldown": 30,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {
@@ -4484,6 +4509,7 @@
       "resourceCost": 24,
       "cooldown": 36,
       "globalCooldown": 0.6,
+      "offGlobalCooldown": true,
       "castTime": 0,
       "range": 0,
       "area": {

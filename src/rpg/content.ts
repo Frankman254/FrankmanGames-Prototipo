@@ -653,6 +653,7 @@ function parseSpell(id: string, o: Obj, r: Reader): SpellDef {
         tags: o['tags'] === undefined ? [] : strList(r, o, 'tags'),
         friendlyFire: flag(r, o, 'friendlyFire'),
         castWhileMoving: flag(r, o, 'castWhileMoving'),
+        ...(flag(r, o, 'offGlobalCooldown') ? { offGlobalCooldown: true } : {}),
         ...(flag(r, o, 'devOnly') ? { devOnly: true } : {}),
     };
 }

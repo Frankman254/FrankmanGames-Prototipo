@@ -513,5 +513,7 @@
  "Ninguna (como antes)": "None (as before)",
  "Plano": "Flat",
  "Relieve": "Relief",
- "Bloque 3D": "3D block"
+ "Bloque 3D": "3D block",
+ "Ritmo": "Pace",
+ "libre: se lanza a la vez que otro": "free: casts alongside another spell"
 }

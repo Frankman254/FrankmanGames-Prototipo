@@ -609,6 +609,8 @@ export function spellTooltip(
     ];
     if (sp.range) lines.push({ kind: 'fact', label: 'Alcance', value: `${trim(sp.range, 1)} m` });
     if (sp.castTime) lines.push({ kind: 'fact', label: 'Lanzamiento', value: `${trim(sp.castTime, 2)} s` });
+    // GCD-01 opción A (creador 2026-11-24): se lanza encima de otro hechizo.
+    if (sp.offGlobalCooldown) lines.push({ kind: 'fact', label: 'Ritmo', value: 'libre: se lanza a la vez que otro' });
     lines.push({ kind: 'fact', label: 'Zona', value: areaText(scaledArea) });
     // --- Descripción narrativa (sin cifras) ---
     lines.push({ kind: 'sep' }, { kind: 'text', text: sp.description });

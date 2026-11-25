@@ -266,6 +266,11 @@ export interface SpellDef {
     friendlyFire?: boolean;
     /** Combate v2: se lanza sin pararse (y, con `castTime`, se carga andando). Por defecto no. */
     castWhileMoving?: boolean;
+    /**
+     * GCD-01 opción A (creador 2026-11-24): ni pone ni espera el enfriamiento global, así que se
+     * lanza encima de otro hechizo. Por defecto no.
+     */
+    offGlobalCooldown?: boolean;
     /** Prueba/QA: no se aprende por clase, ni cae de cofre, ni lo venden; sólo se concede en dev. */
     devOnly?: boolean;
 }

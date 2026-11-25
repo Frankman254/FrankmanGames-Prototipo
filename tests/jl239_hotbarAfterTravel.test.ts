@@ -95,7 +95,9 @@ describe('JL-239: Barra tras cambiar de lugar', () => {
         w.player.gcd = 1.0;
         w.player.gcdTotal = 1.0;
         const state1 = w.hotbarState();
-        const spellId = state1[0]?.spellId;
+        // GCD-01: los hechizos libres no muestran el GCD; se mira el primero que sí lo espera.
+        const spellId = state1.find((s) => s.spellId && !data.rpg.spells[s.spellId]?.offGlobalCooldown)?.spellId;
+        expect(spellId, 'hay un hechizo que espera el GCD en la barra').toBeTruthy();
         if (spellId) {
             expect(state1.find((s) => s.spellId === spellId)?.cooldownRemaining).toBeGreaterThan(0);
         }
