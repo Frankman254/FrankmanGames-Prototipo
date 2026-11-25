@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-275: extraer la búsqueda de objetos por UID (Junie)
+
+**Archivos:** `src/ui/menus/context.ts`, `src/ui/menus/contextLogic.ts`, `tests/ui/contextLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `findItemByUid()` mueve la selección por UID a lógica pura, conservando el orden de búsqueda de mochila y equipo. `findItem()` permanece como adaptador para los consumidores de `context.ts`; el contrato y el comportamiento no cambian.
+
+**Validación:** la prueba nueva falló antes de crear el helper por módulo inexistente; luego `tests/ui/contextLogic.test.ts` pasó 2/2. `npm test`: 386 archivos, 4.924 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. No cambia la presentación; no aplica captura de Electron.
+
+**Evidencia:** `work/junie-jl275/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — JL-274: aislar el recorte de ventanas durante el arrastre (Junie)
 
 **Archivos:** `src/ui/menus/windows.ts`, `src/ui/menus/windowDrag.ts`, `tests/ui/dragPosition.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

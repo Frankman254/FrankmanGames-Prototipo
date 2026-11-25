@@ -2,6 +2,7 @@
 import type { GameSessionApi, ItemInstance } from '../../rpg/contracts';
 import { fitsEquipSlot } from '../../rpg/items';
 import type { ConfirmGate } from './confirmGate';
+import { findItemByUid } from './contextLogic';
 import type { DragController } from './drag';
 import { itemTooltip, sourceLabel, type TipLine } from './format';
 import type { KeyMap } from './keybindings';
@@ -61,9 +62,7 @@ export interface Preview3d {
 
 /** Busca un objeto por uid en la mochila o el equipo. */
 export function findItem(s: GameSessionApi, uid: string): ItemInstance | null {
-    for (const it of s.inventory().slots) if (it?.uid === uid) return it;
-    for (const it of Object.values(s.equipment())) if (it?.uid === uid) return it;
-    return null;
+    return findItemByUid(s.inventory().slots, Object.values(s.equipment()), uid);
 }
 
 export function itemTip(ctx: UiContext, uid: string, equipped: boolean): TipLine[] | null {
