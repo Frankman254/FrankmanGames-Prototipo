@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-273: extraer el orden y texto de misiones (Junie)
+
+**Archivos:** `src/ui/menus/journal.ts`, `src/ui/menus/questTracker.ts`, `src/ui/menus/questViewLogic.ts`, `tests/ui/questViewLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `questJournalSections()` conserva el orden recibido al dividir misiones abiertas y completadas. `questJournalText()` y `questTrackerPresentation()` separan del DOM la preparación de textos, objetivos, metadatos, recompensas y avance del seguidor; las vistas consumen los resultados sin cambiar el comportamiento.
+
+**Validación:** la prueba nueva falló antes de implementar porque faltaba el módulo; después `tests/ui/questViewLogic.test.ts` pasó 3/3 y `tests/ui/questFormat.test.ts` 2/2. `npm test`: 385 archivos, 4.922 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. El build solo mostró el aviso habitual de chunks grandes. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl273/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — JL-272: extraer el avance entre nodos del diálogo (Junie)
 
 **Archivos:** `src/ui/menus/dialogue.ts`, `src/ui/menus/dialogueLogic.ts`, `tests/ui/dialogueLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
