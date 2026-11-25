@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-272: extraer el avance entre nodos del diálogo (Junie)
+
+**Archivos:** `src/ui/menus/dialogue.ts`, `src/ui/menus/dialogueLogic.ts`, `tests/ui/dialogueLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `dialogueChoiceIndex()` aísla la validación de la vista y la opción seleccionada antes de llamar a la sesión. `dialogueTransition()` devuelve la vista siguiente o la decisión de cerrar; `DialogueWindow.choose()` consume ambas funciones sin cambiar el comportamiento.
+
+**Validación:** la prueba nueva falló antes de implementar porque faltaba el módulo; después `tests/ui/dialogueLogic.test.ts` pasó 3/3. `npm test`: 384 archivos, 4.919 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/dialogueLogic.test.ts` y `work/junie-jl272/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — JL-271: extraer el filtro de visibilidad del chat (Junie)
 
 **Archivos:** `src/ui/menus/chat.ts`, `src/ui/menus/chatLogic.ts`, `tests/ui/chatLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

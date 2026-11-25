@@ -5,6 +5,7 @@ import type { DialogueOptionKind, DialogueView } from '../../rpg/contracts';
 import { tr } from '../../i18n';
 import type { UiContext } from './context';
 import { clear, h, retranslate } from './dom';
+import { dialogueChoiceIndex, dialogueTransition } from './dialogueLogic';
 import { objectiveText, rewardText } from './questFormat';
 
 const KIND_MARK: Record<DialogueOptionKind, string> = {
@@ -99,9 +100,10 @@ export class DialogueWindow {
     /** Elige la opción `index` (0 = la primera). */
     choose(index: number): void {
         const s = this.ctx.session();
-        if (!this.view || !this.view.options[index]) return;
-        const next = s.chooseDialogue?.(index) ?? null;
-        if (next) this.open(next);
+        const choiceIndex = dialogueChoiceIndex(this.view, index);
+        if (choiceIndex === null) return;
+        const transition = dialogueTransition(s.chooseDialogue?.(choiceIndex) ?? null);
+        if (transition.type === 'next') this.open(transition.view);
         else {
             this.el.hidden = true;
             this.view = null;
