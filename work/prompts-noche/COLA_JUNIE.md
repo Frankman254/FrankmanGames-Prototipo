@@ -1526,7 +1526,7 @@ Contexto del coordinador:
 ### D. Datos y contenido
 Antes de cada una, busca si ya existe.
 - [x] JL-297 Cada clave de texto en español tiene su versión en inglés, y al revés, sin claves de más. — commit «JL-297: cerrar paridad de traducciones» — evidencia: `tests/i18nContent.test.ts` (8/8), Electron `ingles` (5/5), `work/junie-jl297/ingles-chat-emote.jpg`.
-- [ ] JL-298 Cada objeto tiene icono y el archivo del icono existe.
+- [x] JL-298 Cada objeto tiene icono y el archivo del icono existe. — commit «JL-298: verificar cobertura de iconos de objetos» — ya estaba cubierto; `tests/jl15_itemIcons.test.ts` (2/2), `scripts/art/validar_item_icons.py` (1.100 PNG RGBA únicos), typecheck y suite completa en verde.
 - [ ] JL-299 Cada efecto que pide `data/fx.json` existe (partículas y texturas).
 - [!] JL-300 Cada sonido que piden los datos existe en `assets/audio/`, y ningún archivo de audio sobra. — BLOQUEADA: hay 64 archivos sin referencia de ejecución; borrar o archivar las fuentes originales registradas requiere decisión del creador. Evidencia: `work/junie-jl300/INFORME.md`.
 - [x] JL-301 Cada pieza de conjunto de `data/rpg/sets` tiene su malla o queda en una lista de pendientes. — commit «JL-301: inventario de mallas de conjuntos» — 24 piezas con geometría; lista exhaustiva de 788 pendientes validada contra 137 conjuntos y 812 piezas en `work/junie-jl301/INVENTARIO.md`.

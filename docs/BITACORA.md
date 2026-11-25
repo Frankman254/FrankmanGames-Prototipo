@@ -1,3 +1,13 @@
+## 2026-11-25 — JL-298: verificar cobertura de iconos de objetos (Junie)
+
+**Archivos:** `tests/jl15_itemIcons.test.ts` y `scripts/art/validar_item_icons.py` (verificados, sin cambios), `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** La cobertura ya existía: la prueba exige un PNG por cada ID de objeto y el validador coteja el conjunto completo de archivos con los datos, además de revisar el formato de imagen. No se modificaron código, datos ni assets.
+
+**Validación:** `npx vitest run tests/jl15_itemIcons.test.ts`: 2/2; `python3 scripts/art/validar_item_icons.py`: 1.100 PNG RGBA únicos; línea base `npx tsc --noEmit` limpia y `npx vitest run`: 410 archivos, 5.009 aprobadas, 1 omitida y 1 `todo`.
+
+---
+
 ## 2026-11-25 — JL-297: cerrar paridad de traducciones (Junie)
 
 **Archivos:** `src/i18nTexts.ts`, `src/ui/menus/chat.ts`, `src/ui/menus/worldHud.ts`, `tests/i18nContent.test.ts`, `data/i18n/en.json`, `data/i18n/en.content.json`, `data/i18n/en.ui.json`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
