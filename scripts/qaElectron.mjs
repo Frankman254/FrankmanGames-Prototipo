@@ -2991,6 +2991,135 @@ const scenarios = {
         await js('clearInterval(window.__qaVida)');
     },
 
+    /** JL-319: invocar una mascota y comprobar que acompaña al jugador al correr, viajar y entrar en casa. */
+    async mascota() {
+        await newGame('QA Mascota');
+        const charmUid = await js(`(() => {
+            const c=${S}.character;
+            const item=c.items.create('charm_ash_fox',1);
+            c.pickUp(item,true);
+            return c.inventory.find(item.uid)?.uid ?? null;
+        })()`);
+        check('JL-319: el amuleto de mascota entra en la mochila', !!charmUid, String(charmUid));
+        if (!charmUid) throw new Error('No se pudo preparar el amuleto del zorro de ceniza');
+        check('JL-319: usar el amuleto lo activa', await js(`${S}.useItem(${JSON.stringify(charmUid)}).ok`));
+
+        const petFor = () => `${W}.pets.find(p=>p.itemUid===${JSON.stringify(charmUid)})`;
+        const petMeshCount = () =>
+            `__game.view.scene.meshes.filter(m=>/^pet\\d+:/.test(m.name)&&m.getTotalVertices()>0).length`;
+        const petState = () =>
+            js(
+                `(() => { const p=${W}.player, pet=${petFor()}; return pet ? { player:{x:p.pos.x,y:p.pos.y}, pet:{x:pet.pos.x,y:pet.pos.y}, distance:Math.hypot(p.pos.x-pet.pos.x,p.pos.y-pet.pos.y) } : null; })()`,
+            );
+
+        await until(`${petFor()} != null`, 8000, 'mascota invocada');
+        await until(`${petMeshCount()}>0`, 15000, 'modelo del zorro de ceniza');
+        await sleep(500);
+        check('JL-319: mascota invocada visible', (await js(petMeshCount())) > 0);
+        await shot('jl319-mascota-invocada');
+
+        const beforeRun = await petState();
+        const target = { x: beforeRun.player.x + 12, y: beforeRun.player.y + 4 };
+        await js(`${W}.commandMove({x:${target.x},y:${target.y}})`);
+        await until(
+            `Math.hypot(${W}.player.pos.x-${target.x},${W}.player.pos.y-${target.y})<0.8`,
+            15000,
+            'terminar carrera del jugador',
+        );
+        await until(
+            `${petFor()} && Math.hypot(${W}.player.pos.x-${petFor()}.pos.x,${W}.player.pos.y-${petFor()}.pos.y)<2.6`,
+            10000,
+            'mascota alcanza al jugador',
+        );
+        const afterRun = await petState();
+        check(
+            'JL-319: la mascota sigue al jugador al correr',
+            Math.hypot(afterRun.player.x - beforeRun.player.x, afterRun.player.y - beforeRun.player.y) > 8 &&
+                Math.hypot(afterRun.pet.x - beforeRun.pet.x, afterRun.pet.y - beforeRun.pet.y) > 2 &&
+                afterRun.distance < 2.6,
+            JSON.stringify({
+                playerTravel: Math.hypot(afterRun.player.x - beforeRun.player.x, afterRun.player.y - beforeRun.player.y),
+                petTravel: Math.hypot(afterRun.pet.x - beforeRun.pet.x, afterRun.pet.y - beforeRun.pet.y),
+                distance: afterRun.distance,
+            }),
+        );
+        await shot('jl319-mascota-corriendo');
+
+        await js(`__game.travelStone('cerro_punta')`);
+        await sleep(1200);
+        await until(
+            `${petFor()} && Math.hypot(${W}.player.pos.x-${petFor()}.pos.x,${W}.player.pos.y-${petFor()}.pos.y)<2.6`,
+            10000,
+            'mascota acompaña al viajar a Cerro Punta',
+        );
+        check(
+            'JL-319: conserva la mascota y queda junto al jugador tras viajar',
+            await js(`${S}.character.activePetItemUid===${JSON.stringify(charmUid)} && ${petFor()}!=null && ${petMeshCount()}>0`),
+            JSON.stringify(await petState()),
+        );
+        await shot('jl319-mascota-tras-viaje');
+
+        await js(
+            `(() => { const p=${W}.player; p.pos.x=167; p.pos.y=199.5; p.prevPos.x=p.pos.x; p.prevPos.y=p.pos.y; p.path=[]; })()`,
+        );
+        await sleep(1500);
+        await clickMesh('creator-house-door');
+        await until('__game.houses.inside', 20000, 'entrar en la casa del creador');
+        await until(
+            `${petFor()} && ${petMeshCount()}>0`,
+            15000,
+            'mascota visible dentro de la casa',
+        );
+        await until(
+            `${petFor()} && Math.hypot(${W}.player.pos.x-${petFor()}.pos.x,${W}.player.pos.y-${petFor()}.pos.y)<2.6`,
+            10000,
+            'mascota acompaña al jugador dentro de la casa',
+        );
+        check(
+            'JL-319: la mascota permanece junto al jugador al entrar en casa',
+            await js(
+                `!!__game.houses.inside && ${S}.character.activePetItemUid===${JSON.stringify(charmUid)} && ${petFor()}!=null && ${petMeshCount()}>0`,
+            ),
+            JSON.stringify(await petState()),
+        );
+        await shot('jl319-mascota-casa');
+
+        const beforeInsideRun = await petState();
+        const insideTarget = { x: 5, y: 9 };
+        await js(`${W}.commandMove({x:${insideTarget.x},y:${insideTarget.y}})`);
+        await until(
+            `Math.hypot(${W}.player.pos.x-${insideTarget.x},${W}.player.pos.y-${insideTarget.y})<0.8`,
+            10000,
+            'caminar dentro de la casa',
+        );
+        await until(
+            `${petFor()} && Math.hypot(${W}.player.pos.x-${petFor()}.pos.x,${W}.player.pos.y-${petFor()}.pos.y)<2.6`,
+            10000,
+            'mascota alcanza al jugador dentro de la casa',
+        );
+        const afterInsideRun = await petState();
+        check(
+            'JL-319: la mascota sigue al jugador dentro de la casa',
+            Math.hypot(afterInsideRun.player.x - beforeInsideRun.player.x, afterInsideRun.player.y - beforeInsideRun.player.y) > 3 &&
+                Math.hypot(afterInsideRun.pet.x - beforeInsideRun.pet.x, afterInsideRun.pet.y - beforeInsideRun.pet.y) > 1 &&
+                afterInsideRun.distance < 2.6,
+            JSON.stringify({
+                playerTravel: Math.hypot(
+                    afterInsideRun.player.x - beforeInsideRun.player.x,
+                    afterInsideRun.player.y - beforeInsideRun.player.y,
+                ),
+                petTravel: Math.hypot(
+                    afterInsideRun.pet.x - beforeInsideRun.pet.x,
+                    afterInsideRun.pet.y - beforeInsideRun.pet.y,
+                ),
+                distance: afterInsideRun.distance,
+            }),
+        );
+        await shot('jl319-mascota-casa-interior');
+        const errors = await js(`window.__consola?.errores(20) || ''`);
+        check('JL-319: consola sin errores', errors.length === 0, errors);
+    },
+
     async objetos() {
         await newGame('QA Objetos');
         await js(

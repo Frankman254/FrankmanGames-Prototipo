@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-319: comprobar el seguimiento de la mascota en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `mascota`: invoca el zorro de ceniza con su amuleto y verifica que acompaña al jugador al correr, tras viajar a Cerro Punta y al entrar y moverse por la casa del creador. No se modificaron la lógica ni los datos productivos del juego.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `mascota`: 9/9 comprobaciones, consola limpia; `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl319/resultado.json` y capturas revisadas `jl319-mascota-invocada.jpg`, `jl319-mascota-corriendo.jpg`, `jl319-mascota-tras-viaje.jpg`, `jl319-mascota-casa.jpg` y `jl319-mascota-casa-interior.jpg`.
+
+---
+
 ## 2026-11-25 — JL-318: conservar la barra tras morir y resucitar (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
