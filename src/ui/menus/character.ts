@@ -223,7 +223,7 @@ export class CharacterPanel extends Panel {
             const base = s.content.progression.inventoryMaxWeight ?? s.content.progression.inventorySize;
             const perLevel = s.content.progression.inventoryWeightPerLevel * (p2.level - 1);
             const bonus = Math.max(0, Math.round((inv.maxWeight - base - perLevel) * 100) / 100);
-            const box = h('div.stat-group', null, h('h4', { text: 'Carga' }));
+            const box = h('div.stat-group', null, h('h4', { text: 'Peso' }));
             const row = h(
                 'div.stat-row',
                 null,
