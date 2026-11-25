@@ -7,10 +7,14 @@ import { NullEngine, Scene, Vector3 } from '@babylonjs/core';
 import { describe, expect, it } from 'vitest';
 import reactionsJson from '../data/rpg/reactions.json';
 import fxJson from '../data/fx.json';
+import { loadGameData } from '../src/data';
 import { loadFx } from '../src/data/fxSchema';
 import { BurstPool } from '../src/render/fx/particles';
 import { FloatingText } from '../src/render/fx/floatingText';
 import { REACTION_KINDS, ReactionFx, reactionVisual, reactionVisuals } from '../src/render/fx/reactionFx';
+import { StatusFx } from '../src/render/fx/statusFx';
+import type { World } from '../src/sim/world';
+import type { HeightField } from '../src/world/terrain';
 
 // Polyfill OffscreenCanvas para Babylon.js en Node (DynamicTexture lo necesita).
 if (typeof (globalThis as Record<string, unknown>).OffscreenCanvas === 'undefined') {
@@ -172,5 +176,53 @@ describe('FX-R01: las 15 reacciones se dibujan y se limpian', () => {
         expect(left.map((m) => m.name)).toHaveLength(0);
         scene.dispose();
         engine.dispose();
+    });
+});
+
+describe('efectos solicitados por data/fx.json', () => {
+    it('cada aspecto configurado genera geometría o partículas con su textura procedural', () => {
+        const fx = loadFx();
+        const data = loadGameData();
+        const entries = Object.keys(fx.statuses).map((id) => {
+            const def = data.rpg.statuses[id];
+            expect(def, id).toBeDefined();
+            return { def: def!, stacks: 1 };
+        });
+        const engine = new NullEngine();
+        const scene = new Scene(engine);
+        const ground = { sample: () => 0 } as unknown as HeightField;
+        const world = {
+            player: { alive: true, id: 99, pos: { x: 0, y: 0 } },
+            character: { statuses: { list: entries } },
+            enemies: { list: [] },
+            enemyActors: new Map(),
+            pets: [],
+        } as unknown as World;
+        const view = new StatusFx(scene, fx, ground, () => 2);
+
+        try {
+            view.sync(world, 1 / 60);
+            for (const [id, configured] of Object.entries(fx.statuses)) {
+                const key = `99:${id}`;
+                const node = scene.transformNodes.find((candidate) => candidate.name === `status:${key}`);
+                expect(node, `${id} (${configured.visual}): nodo`).toBeDefined();
+                const meshes = scene.meshes.filter((mesh) => mesh.parent === node);
+                const particles = scene.particleSystems.filter((system) => system.name.endsWith(`:${key}`));
+                expect(meshes.length + particles.length, `${id} (${configured.visual}): geometría o partículas`).toBeGreaterThan(0);
+            }
+
+            expect(scene.particleSystems.length).toBeGreaterThan(0);
+            for (const system of scene.particleSystems) {
+                const texture = system.particleTexture;
+                expect(texture, `${system.name}: textura`).toBeDefined();
+                expect(texture!.name, `${system.name}: textura`).toBe('fxSoftDot');
+                expect(texture!.getScene(), `${system.name}: escena de textura`).toBe(scene);
+                expect(texture!.getSize(), `${system.name}: dimensiones de textura`).toMatchObject({ width: 64, height: 64 });
+            }
+        } finally {
+            view.reset();
+            scene.dispose();
+            engine.dispose();
+        }
     });
 });

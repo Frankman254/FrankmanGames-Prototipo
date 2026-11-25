@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-299: verificar recursos de efectos visuales (Junie)
+
+**Archivos:** `tests/fxr01_reactionFx.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `data/fx.json` no solicita texturas externas; las partículas usan `fxSoftDot`, generada en memoria. Se añadió una prueba con `NullEngine` que instancia todos los estados configurados y confirma que generan mallas o partículas con la textura disponible. La cobertura existente de FX-R01 dibuja y limpia las 15 reacciones. No se modificaron el render, los datos ni los assets.
+
+**Validación:** `tests/fxr01_reactionFx.test.ts`: 11/11; `npm test`: 410 archivos, 5.010 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. No aplica captura Electron: no cambia la presentación y el escenario `estados` corresponde a JL-314.
+
+**Evidencia:** `work/junie-jl299/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-298: verificar cobertura de iconos de objetos (Junie)
 
 **Archivos:** `tests/jl15_itemIcons.test.ts` y `scripts/art/validar_item_icons.py` (verificados, sin cambios), `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
