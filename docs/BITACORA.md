@@ -1,3 +1,20 @@
+## 2026-11-24 — GRP-01: compañeros simulados en el mismo mundo, en rama de revisión (Claude)
+
+**Archivos:** `src/sim/participants.ts` y `src/sim/groupLedger.ts` (nuevos), `src/sim/world.ts`, `src/sim/enemies.ts`, `scripts/balance/grupo.ts` y `grupoRun.ts` (nuevos), `package.json` (`lab:grupo`), `tests/grp01_companions.test.ts`, `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- `World` guarda plazas de participante. La 0 es el jugador; las demás solo existen con `lab.companions`.
+- Cada compañero se simula con el mismo código que el jugador y tiene su sesión y su `PlayerBot`.
+- Los enemigos retienen su objetivo, eligen al participante válido más cercano y golpean en área a todos los que pillan.
+- `GroupLedger` mide daño, curación, tiempo activo, bajas, muertes y participación (con `shares` de `spoils.ts`). No reparte nada.
+- Rama `grp-01`, sin integrar en `master`.
+
+**Validación:** 14 pruebas nuevas en verde y la suite completa sin regresiones. El único fallo, `jl37_checkDocs`, se debe a `balM3.ts`, que no está en el worktree. Typecheck y build correctos. Con 4 jugadores el tick cuesta ~3× el de 1 (≈0,06 ms).
+
+**Evidencia:** `work/claude-grp/grp01/REPORTE.md`, `npm_test.txt`, `rendimiento.txt`, `rendimiento.json`.
+
+---
+
 ## 2026-11-24 — JL-270: extraer marcadores de enemigos del feed del mapa (Junie)
 
 **Archivos:** `src/ui/map/mapFeed.ts`, `src/ui/map/mapFeedLogic.ts`, `tests/ui/mapFeedLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

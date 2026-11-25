@@ -63,6 +63,7 @@ import {
     type HitSpec,
 } from './damage';
 import { EnemySystem, type Enemy, type EnemyContext } from './enemies';
+import { makePlayerBody, makeSlot, type PlayerSlot, type TargetRef } from './participants';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath, type Mover } from './movement';
 import { buildZoneGrid, nearestSpotWithLOS, type NavGrid } from './navGrid';
@@ -248,7 +249,15 @@ export interface WorldOptions {
      * `data/rpg/fishing.json`; sin ellos, un interior no tiene dónde pescar.
      */
     pools?: readonly FishingSpotDef[];
+    /**
+     * GRP-01: laboratorio de combate en grupo. Con `companions`, `addCompanion` puede meter hasta
+     * tres personajes más del bando del jugador en este mundo. Las partidas no lo activan.
+     */
+    lab?: { companions?: boolean };
 }
+
+/** GRP-01: participantes por mundo (el jugador y hasta tres compañeros). */
+export const MAX_PARTICIPANTS = 4;
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
 export type Outcome = 'playing' | 'victory' | 'defeat';
@@ -264,14 +273,25 @@ export class World implements SessionWorld {
     readonly grid: NavGrid;
     readonly pathfinder: Pathfinder;
     readonly rng: Rng;
-    readonly player: Player;
+    /** El jugador, o el compañero que se está simulando ahora (ver `as`). */
+    get player(): Player {
+        return this.slots[this.active]!.player;
+    }
     readonly chasers: ChaserSystem;
     readonly enemies: EnemySystem;
     /** Datos vivos: el modo edición los reemplaza EN SITIO (`applyRpgContent`). */
     readonly content: RpgContent;
     /** Estanques donde se pesca en este mundo (los del atlas fuera; las pozas del piso dentro). */
     fishingSpots: Record<string, FishingSpotDef>;
-    readonly character: Character;
+    /** El personaje del jugador, o el del compañero que se está simulando ahora (ver `as`). */
+    get character(): Character {
+        return this.slots[this.active]!.character;
+    }
+    /** GRP-01: plazas del bando del jugador; la 0 es el jugador. */
+    private readonly slots: PlayerSlot[] = [];
+    private active = 0;
+    private readonly lab: { companions?: boolean };
+    private targetRefs: TargetRef[] | null = null;
     /** Actor RPG de cada enemigo de la simulación, por id. */
     readonly enemyActors = new Map<number, EnemyActor>();
     readonly loot: GroundLoot[] = [];
@@ -288,8 +308,10 @@ export class World implements SessionWorld {
     }
     /** Combate táctico: modo de placaje y bloqueo (Opciones → Juego; ver `src/sim/lock.ts`). */
     lockMode: LockMode = 'free';
-    /** Rivales pegados que ya dieron su placaje (modo libre) en este contacto. */
-    private readonly tackles = new Set<string>();
+    /** Rivales pegados que ya dieron su placaje (modo libre) en este contacto (de la plaza activa). */
+    private get tackles(): Set<string> {
+        return this.slots[this.active]!.tackles;
+    }
     private readonly enemyTrapEffects = new Map<EnemyAttackDef, Effect[]>();
     /** Zonas con franja de niveles (siempre: también sirven para preguntar en qué zona cae un punto). */
     readonly zoneMap: ZoneMap;
@@ -324,12 +346,22 @@ export class World implements SessionWorld {
     private readonly petWorld: PetWorld;
     private events: GameEvent[] = [];
     private nextId = 1;
-    private attackRepath = 0;
+    private get attackRepath(): number {
+        return this.slots[this.active]!.attackRepath;
+    }
+    private set attackRepath(v: number) {
+        this.slots[this.active]!.attackRepath = v;
+    }
     /**
      * Hechizo pedido fuera de alcance o sin visión: el jugador anda hasta poder lanzarlo
      * (solo con `approachToCast`). Cualquier otra orden lo cancela.
      */
-    private pendingCast: { spellId: string; targetId: number | null; point: Vec2 } | null = null;
+    private get pendingCast(): PlayerSlot['pendingCast'] {
+        return this.slots[this.active]!.pendingCast;
+    }
+    private set pendingCast(v: PlayerSlot['pendingCast']) {
+        this.slots[this.active]!.pendingCast = v;
+    }
     /** Acercarse andando para lanzar en vez de rechazar por alcance (el juego lo activa; las pruebas no). */
     approachToCast = false;
     /** HZ-04b: reacciones elementales (activadas por devReactions). */
@@ -337,12 +369,19 @@ export class World implements SessionWorld {
     private reactionByPair: Map<string, ElementalReaction> | null = null;
     devReactions = false;
     /** Acumulador de regeneración: solo emite evento heal cuando alcanza ≥ 1. */
-    private _regenAccum = 0;
+    private get _regenAccum(): number {
+        return this.slots[this.active]!.regenAccum;
+    }
+    private set _regenAccum(v: number) {
+        this.slots[this.active]!.regenAccum = v;
+    }
     /**
      * JUG-06 / CLA-COLA: cola de órdenes. Guarda una sola orden: la última pulsación hecha
      * cuando faltan `commandQueueWindow` segundos o menos para quedar libre.
      */
-    private _castQueue: { spellId: string; aim: Aim }[] = [];
+    private get _castQueue(): PlayerSlot['castQueue'] {
+        return this.slots[this.active]!.castQueue;
+    }
 
     constructor(
         readonly data: GameData,
@@ -401,55 +440,16 @@ export class World implements SessionWorld {
                 'Aventurero',
                 new Rng((opts.seed ?? data.loadTest.seed) ^ 0x5eed),
             );
-        this.character = ch;
+        this.lab = opts.lab ?? {};
         // Arena nueva: vida y recurso llenos, sin estados de la anterior.
         ch.statuses.clear();
         ch.restore();
         const startCell = this.grid.walkable(z.playerStart) ? -2 : this.grid.nearestWalkable(z.playerStart);
         // -1: la página del inicio aún no existe (mundo por páginas); se confía en el sitio pedido.
         const start = startCell < 0 ? copy(z.playerStart) : this.grid.center(startCell);
-        this.player = {
-            id: this.nextId++,
-            pos: start,
-            prevPos: copy(start),
-            radius: z.playerRadius,
-            speed: ch.stats.get('moveSpeed'),
-            facing: 0,
-            path: [],
-            moveTarget: null,
-            get health() {
-                return ch.health;
-            },
-            set health(v: number) {
-                ch.health = v;
-            },
-            get maxHealth() {
-                return ch.maxHealth;
-            },
-            alive: true,
-            get spectral() {
-                return ch.spectral.active;
-            },
-            invulnerable: 0,
-            get resource() {
-                return ch.resource;
-            },
-            set resource(v: number) {
-                ch.resource = v;
-            },
-            get maxResource() {
-                return ch.maxResource;
-            },
-            cooldowns: {},
-            gcd: 0,
-            gcdTotal: 0,
-            basicCharges: data.player.basicAttack.charges,
-            basicRecharge: 0,
-            casting: null,
-            attackTarget: null,
-            lastTarget: null,
-            pickupTarget: null,
-        };
+        this.slots.push(
+            makeSlot(makePlayerBody(ch, this.nextId++, start, z.playerRadius, data.player.basicAttack.charges), ch),
+        );
         ch.id = this.player.id;
         ch.body = this.player;
         // Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio.
@@ -473,11 +473,14 @@ export class World implements SessionWorld {
                 },
                 // F21: volando alto no te ven.
                 get hidden() {
-                    return (world.player.flight?.altitude ?? 0) >= FLIGHT.stealthAltitude;
+                    return (world.slots[0]!.player.flight?.altitude ?? 0) >= FLIGHT.stealthAltitude;
                 },
             },
-            hitPlayer: (src, at) => this.hitPlayer(src, at),
-            launchHoming: (src, at) => this.launchHoming(src, at),
+            get players() {
+                return world.targetRefs ?? undefined;
+            },
+            hitPlayer: (src, at, targetId) => this.hitPlayer(src, at, targetId),
+            launchHoming: (src, at, targetId) => this.launchHoming(src, at, targetId),
             castStart: (src) => this.dazeCheck(this.enemyActor(src)),
             canPlaceTrap: (src, at, pos) =>
                 this.trapSpot(this.enemyActor(src).team, pos, at.trap?.minSpacing ?? null) !== null,
@@ -543,6 +546,91 @@ export class World implements SessionWorld {
         const { byPair } = loadReactions();
         this.reactionByPair = byPair;
         this.reactionTracker = new ElementalMarkTracker();
+    }
+
+    // ─── GRP-01: participantes del bando del jugador ─────────────────────────
+
+    /**
+     * Mete un compañero en este mundo (solo con `WorldOptions.lab.companions`). Usa las mismas
+     * reglas que el jugador: su barra, sus estadísticas, su vida y su recurso. Devuelve su id.
+     */
+    addCompanion(ch: Character, at: Vec2): number {
+        if (!this.lab.companions) throw new Error('addCompanion: solo en el laboratorio (WorldOptions.lab.companions)');
+        if (this.slots.length >= MAX_PARTICIPANTS) throw new Error(`addCompanion: máximo ${MAX_PARTICIPANTS} participantes`);
+        if (this.slots.some((s) => s.character === ch)) throw new Error('addCompanion: ese personaje ya está en el mundo');
+        ch.statuses.clear();
+        ch.restore();
+        const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
+        const start = cell < 0 ? copy(at) : this.grid.center(cell);
+        const body = makePlayerBody(ch, this.nextId++, start, this.data.zone.playerRadius, this.data.player.basicAttack.charges);
+        ch.id = body.id;
+        ch.body = body;
+        this.slots.push(makeSlot(body, ch));
+        this.refreshTargetRefs();
+        return body.id;
+    }
+
+    /** Ids de los participantes (el jugador primero). */
+    participantIds(): number[] {
+        return this.slots.map((s) => s.player.id);
+    }
+
+    /** Cuerpo y personaje de un participante, o undefined. */
+    participant(id: number): { player: Player; character: Character } | undefined {
+        const s = this.slots.find((x) => x.player.id === id);
+        return s ? { player: s.player, character: s.character } : undefined;
+    }
+
+    /**
+     * Ejecuta `fn` como el participante `id`: dentro, `player`, `character` y las órdenes
+     * (`commandMove`, `commandCast`, `commandAttack`…) son las suyas. Así un bot maneja a su
+     * compañero con las mismas órdenes que el ratón y el teclado.
+     */
+    as<T>(id: number, fn: () => T): T {
+        const k = this.slots.findIndex((x) => x.player.id === id);
+        if (k < 0) throw new Error(`as: no hay participante ${id}`);
+        return this.inSlot(k, fn);
+    }
+
+    private inSlot<T>(k: number, fn: () => T): T {
+        const prev = this.active;
+        this.active = k;
+        try {
+            return fn();
+        } finally {
+            this.active = prev;
+        }
+    }
+
+    /** Plaza de un actor si es un participante (no una mascota ni un enemigo). */
+    private slotIndexOf(a: Actor): number {
+        if (this.slots.length === 1) return a === this.slots[0]!.character ? 0 : -1;
+        return this.slots.findIndex((x) => x.character === a);
+    }
+
+    /** Con compañeros, lo que ven los enemigos de cada participante; sin ellos, null (como antes). */
+    private refreshTargetRefs(): void {
+        if (this.slots.length <= 1) {
+            this.targetRefs = null;
+            return;
+        }
+        const main = this.enemyCtx.player;
+        this.targetRefs = this.slots.map((sl, k) => {
+            if (k === 0) return main;
+            const ch = sl.character;
+            return {
+                get id() {
+                    return ch.id;
+                },
+                get pos() {
+                    return sl.player.pos;
+                },
+                radius: sl.player.radius,
+                get alive() {
+                    return sl.player.alive && ch.alive && !ch.spectral.active;
+                },
+            };
+        });
     }
 
     /** Recoge los sucesos acumulados desde la última llamada. */
@@ -678,7 +766,9 @@ export class World implements SessionWorld {
     private levelOf(a: Actor): number | null {
         if (a === this.character) return this.character.level;
         if (a instanceof EnemyActor) return a.level;
-        if (a instanceof Pet) return this.character.level;
+        if (a instanceof Pet) return this.slots[0]!.character.level;
+        const k = this.slotIndexOf(a);
+        if (k >= 0) return this.slots[k]!.character.level;
         return null;
     }
 
@@ -1397,7 +1487,14 @@ export class World implements SessionWorld {
 
     /** Mascotas y aliados vivos dentro de una forma (fuego amigo). */
     private alliesIn(shape: PlacedShape): Actor[] {
-        return this.pets.filter((pet) => pet.alive && shapeHitsCircle(shape, pet.pos, pet.radius));
+        const out: Actor[] = this.pets.filter((pet) => pet.alive && shapeHitsCircle(shape, pet.pos, pet.radius));
+        // GRP-01: los demás participantes también (nunca el lanzador, que es la plaza activa).
+        for (let k = 0; k < this.slots.length; k++) {
+            const sl = this.slots[k]!;
+            if (k === this.active || !sl.player.alive) continue;
+            if (shapeHitsCircle(shape, sl.player.pos, sl.player.radius)) out.push(sl.character);
+        }
+        return out;
     }
 
     // ─── Efectos ─────────────────────────────────────────────────────────────
@@ -1718,6 +1815,8 @@ export class World implements SessionWorld {
     private radiusOf(a: Actor): number {
         if (a === this.character) return this.player.radius;
         if (a instanceof EnemyActor) return this.enemies.get(a.id)?.radius ?? 0.5;
+        const k = this.slotIndexOf(a);
+        if (k >= 0) return this.slots[k]!.player.radius;
         if (a instanceof Pet) return a.radius;
         return 0.5;
     }
@@ -1756,7 +1855,7 @@ export class World implements SessionWorld {
             return;
         }
         // Los del jugador ya los dibuja el render al lanzar; el resto se avisa.
-        if (from !== this.character)
+        if (from !== this.slots[0]!.character)
             this.events.push({ type: 'homing', sourceId: from.id, targetId: to.id, ability, speed });
         this.missiles.push({ id: this.nextId++, pos: copy(from.pos), target: to, speed, onHit });
     }
@@ -1801,6 +1900,8 @@ export class World implements SessionWorld {
     private bodyOf(a: Actor): { pos: Vec2; path: Vec2[] } | null {
         if (a === this.character) return this.player;
         if (a instanceof EnemyActor) return this.enemies.get(a.id) ?? null;
+        const k = this.slotIndexOf(a);
+        if (k >= 0) return this.slots[k]!.player;
         if (a instanceof Pet) return a;
         return null;
     }
@@ -2088,6 +2189,50 @@ export class World implements SessionWorld {
         this.applyLock('free', rival, mover);
     }
 
+    /** Placaje de los enemigos que se separan andando del participante activo. */
+    private enemyTackles(contacts: Map<Enemy, Vec2>): void {
+        const p = this.player;
+        for (const [e, before] of contacts) {
+            if (e.state === 'dead' || (e.pos.x === before.x && e.pos.y === before.y)) continue;
+            this.lockStep(this.enemyActor(e), e.radius, before, e.pos, this.character, p.pos, p.radius, `e:${e.id}`);
+        }
+    }
+
+    /**
+     * GRP-01: dos participantes vivos no se quedan uno encima del otro: cada par que se solapa
+     * se aparta a partes iguales, sin entrar en paredes (si un lado no puede, no se mueve).
+     */
+    private separateParticipants(): void {
+        const live = this.slots.filter((s) => s.player.alive).map((s) => s.player);
+        for (let i = 0; i < live.length; i++)
+            for (let j = i + 1; j < live.length; j++) {
+                const a = live[i]!;
+                const b = live[j]!;
+                const need = a.radius + b.radius;
+                let dx = b.pos.x - a.pos.x;
+                let dy = b.pos.y - a.pos.y;
+                let d = Math.hypot(dx, dy);
+                if (d >= need) continue;
+                if (d < 1e-6) {
+                    // Exactamente encima: se separan por el eje x (determinista).
+                    dx = 1;
+                    dy = 0;
+                    d = 1;
+                    const half = need / 2;
+                    const na = slide(this.grid, a.pos, { x: a.pos.x - half, y: a.pos.y });
+                    const nb = slide(this.grid, b.pos, { x: b.pos.x + half, y: b.pos.y });
+                    a.pos = na;
+                    b.pos = nb;
+                    continue;
+                }
+                const push = (need - d) / 2;
+                const ux = dx / d;
+                const uy = dy / d;
+                a.pos = slide(this.grid, a.pos, { x: a.pos.x - ux * push, y: a.pos.y - uy * push });
+                b.pos = slide(this.grid, b.pos, { x: b.pos.x + ux * push, y: b.pos.y + uy * push });
+            }
+    }
+
     /** Olvida los contactos de placaje que ya se separaron. */
     private forgetTackles(): void {
         const reach = this.content.tactics.lock.adjacentReach;
@@ -2099,7 +2244,12 @@ export class World implements SessionWorld {
     }
 
     /** Cuántos segundos sin avanzar antes de re-planificar (evita atascamiento). */
-    private stuckTime = 0;
+    private get stuckTime(): number {
+        return this.slots[this.active]!.stuckTime;
+    }
+    private set stuckTime(v: number) {
+        this.slots[this.active]!.stuckTime = v;
+    }
     private readonly STUCK_THRESHOLD = 0.5;
 
     /** El jugador anda por su camino; usa slide contra la grid para no entrar en paredes.
@@ -2175,13 +2325,20 @@ export class World implements SessionWorld {
 
     // ─── Golpes enemigos ─────────────────────────────────────────────────────
 
-    private hitPlayer(src: Enemy, at: EnemyAttackDef): void {
-        if (!this.player.alive) return;
-        this.enemyStrike(src, at, this.character);
+    private hitPlayer(src: Enemy, at: EnemyAttackDef, targetId?: number): void {
+        const k = targetId === undefined ? 0 : this.slots.findIndex((x) => x.player.id === targetId);
+        if (k < 0) return;
+        this.inSlot(k, () => {
+            if (!this.player.alive) return;
+            this.enemyStrike(src, at, this.character);
+        });
     }
 
     /** Golpe de un ataque enemigo contra `target` (el jugador, o el propio enemigo si se lo reenvían). */
     private enemyStrike(src: Enemy, at: EnemyAttackDef, target: Actor): void {
+        // GRP-01: contra un compañero, se resuelve como si fuera el jugador (invulnerable, avisos…).
+        const k = this.slotIndexOf(target);
+        if (k > 0 && k !== this.active) return this.inSlot(k, () => this.enemyStrike(src, at, target));
         const actor = this.enemyActor(src);
         const hit: HitSpec = {
             min: at.damageMin,
@@ -2199,11 +2356,13 @@ export class World implements SessionWorld {
     }
 
     /** Flecha rastreadora y demás ataques enemigos teledirigidos (se pueden reenviar). */
-    private launchHoming(src: Enemy, at: EnemyAttackDef): void {
+    private launchHoming(src: Enemy, at: EnemyAttackDef, targetId?: number): void {
         const actor = this.enemyActor(src);
+        const k = targetId === undefined ? 0 : this.slots.findIndex((x) => x.player.id === targetId);
+        if (k < 0) return;
         this.deliverSingle(
             actor,
-            this.character,
+            this.slots[k]!.character,
             this.data.player.homingSpeed,
             true,
             (t) => this.enemyStrike(src, at, t),
@@ -3053,6 +3212,19 @@ export class World implements SessionWorld {
 
     /** Muerte del jugador → derrota; ningún enemigo vivo → victoria. Una sola vez. */
     private checkOutcome(): void {
+        // GRP-01: un compañero que cae se queda caído; la partida solo se pierde si cae el jugador.
+        for (let k = 1; k < this.slots.length; k++) {
+            const q = this.slots[k]!;
+            if (!q.player.alive || q.player.health > 0) continue;
+            q.player.alive = false;
+            q.player.path = [];
+            q.player.moveTarget = null;
+            q.player.casting = null;
+            q.player.attackTarget = null;
+            q.player.pickupTarget = null;
+            q.castQueue.length = 0;
+            q.pendingCast = null;
+        }
         const p = this.player;
         if (p.alive && p.health <= 0) {
             p.alive = false;
@@ -3284,6 +3456,14 @@ export class World implements SessionWorld {
         const p = this.player;
         p.prevPos = copy(p.pos);
         this.tickPlayer(dt);
+        // GRP-01: cada compañero, con el mismo código que el jugador.
+        for (let k = 1; k < this.slots.length; k++)
+            this.inSlot(k, () => {
+                const q = this.player;
+                q.prevPos = copy(q.pos);
+                this.tickPlayer(dt);
+                if (q.path.length === 0) q.moveTarget = null;
+            });
         if (!this.interior && this.character.spectral.active && p.alive) {
             for (const altar of this.content.spectral.resurrectors) {
                 if (!this.character.spectral.resurrectAt(altar.id, p.pos)) continue;
@@ -3301,29 +3481,22 @@ export class World implements SessionWorld {
 
         if (this.enemies.list.length > 0) {
             this.tickEnemyActors(dt);
-            const contacts = this.enemyContacts();
+            const contacts = this.slots.map((_, k) => this.inSlot(k, () => this.enemyContacts()));
             this.enemies.tick(dt, this.enemyCtx);
-            // Placaje de los enemigos que se separan andando del jugador.
-            for (const [e, before] of contacts) {
-                if (e.state === 'dead' || (e.pos.x === before.x && e.pos.y === before.y)) continue;
-                this.lockStep(
-                    this.enemyActor(e),
-                    e.radius,
-                    before,
-                    e.pos,
-                    this.character,
-                    p.pos,
-                    p.radius,
-                    `e:${e.id}`,
-                );
-            }
+            // Placaje de los enemigos que se separan andando del jugador (y de cada compañero).
+            for (let k = 0; k < this.slots.length; k++) this.inSlot(k, () => this.enemyTackles(contacts[k]!));
             const alive = this.enemies.list.filter((e) => e.state !== 'dead');
             if (!this.character.spectral.active)
                 separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
+            for (let k = 1; k < this.slots.length; k++) {
+                const q = this.slots[k]!.player;
+                if (q.alive) separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), q);
+            }
         }
         this.tickPets(dt);
         if (this.lockMode === 'body' && !this.character.spectral.active) this.blockBodies();
-        this.forgetTackles();
+        if (this.slots.length > 1) this.separateParticipants();
+        for (let k = 0; k < this.slots.length; k++) this.inSlot(k, () => this.forgetTackles());
         this.tickTraps(dt);
         this.tickRewinds();
         // HZ-04b: avanzar marcas y cooldowns de reacciones.
