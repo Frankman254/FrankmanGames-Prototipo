@@ -1537,7 +1537,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-306 Ningún texto de la interfaz en inglés supera el ancho de su botón: lista con captura de los que se cortan. — commit «JL-306: corregir recortes de texto en inglés» — encontrados y corregidos `Any element`, `Any focus` (mochila) y `Crowd-control resistance` (personaje); Electron `ingles` 8/8, sin desbordes en 1920×1080 ni 1366×768. Suite: 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck, build, Prettier para `ventanas.css` y docs:check limpios. Capturas antes/después en `work/junie-jl306/qa/`, `qa-final/` y `qa-final2/`.
 
 ### E. Escenarios Electron que faltan
-- [ ] JL-307 `chat`: escribir, cambiar de pestaña, usar una orden con `/` y comprobar el límite de líneas.
+- [x] JL-307 `chat`: escribir, cambiar de pestaña, usar una orden con `/` y comprobar el límite de líneas — commit «JL-307: cubrir flujo de chat en Electron» — evidencia: Electron `chat` 10/10; captura `work/junie-jl307/jl307-chat.jpg`.
 - [ ] JL-308 `dialogo`: hablar con un PNJ y recorrer todas las ramas de su diálogo.
 - [ ] JL-309 `diario`: abrir el diario, seguir una misión y verla en el seguidor.
 - [ ] JL-310 `menuContextual`: clic derecho sobre un enemigo, un PNJ, un objeto del suelo y un compañero.

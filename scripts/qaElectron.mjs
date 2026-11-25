@@ -1823,6 +1823,62 @@ const scenarios = {
                 `(()=>{const b=document.querySelector('.chat-bubble');return !b.hidden&&b.classList.contains('emote-only')&&getComputedStyle(b).backgroundColor==='rgba(0, 0, 0, 0)';})()`,
             ),
         );
+        await js(`document.querySelector('.chat-emotes-open').click()`);
+
+        const sendChat = async (text) => {
+            await js(
+                `(()=>{const i=document.querySelector('.chat-input');i.value=${JSON.stringify(text)};})()`,
+            );
+            await button('Enviar');
+        };
+        await sendChat('Mensaje inicial JL-307');
+        check(
+            'JL-307: el mensaje escrito aparece en el chat',
+            await js(
+                `[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('Mensaje inicial JL-307'))`,
+            ),
+        );
+
+        await js(
+            `(()=>{const b=[...document.querySelectorAll('.chat-tabs button')].find(x=>x.textContent.trim()==='Grupo');if(!b)throw new Error('No existe la pestaña Grupo');b.click();})()`,
+        );
+        check(
+            'JL-307: cambiar a Grupo filtra los mensajes de General',
+            await js(
+                `(()=>{const b=[...document.querySelectorAll('.chat-tabs button')].find(x=>x.textContent.trim()==='Grupo');return !!b?.classList.contains('on')&&![...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('Mensaje inicial JL-307'));})()`,
+            ),
+        );
+        await sendChat('/g Mensaje grupo JL-307');
+        check(
+            'JL-307: /g publica en el canal Grupo',
+            await js(
+                `(()=>{const b=[...document.querySelectorAll('.chat-tabs button')].find(x=>x.textContent.trim()==='Grupo');return !!b?.classList.contains('on')&&[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('Mensaje grupo JL-307'));})()`,
+            ),
+        );
+
+        await js(
+            `(()=>{const b=[...document.querySelectorAll('.chat-tabs button')].find(x=>x.textContent.trim()==='Todo');if(!b)throw new Error('No existe la pestaña Todo');b.click();})()`,
+        );
+        await sendChat('/ayuda');
+        check(
+            'JL-307: /ayuda muestra las órdenes disponibles',
+            await js(
+                `[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('Canales: /g Grupo'))`,
+            ),
+        );
+
+        const maxChatLines = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).maxLines;
+        const overflow = await js(
+            `(()=>{const i=document.querySelector('.chat-input');const send=[...document.querySelectorAll('.chat-row button')].find(b=>b.textContent.trim()==='Enviar');if(!i||!send)throw new Error('No está disponible el envío del chat');for(let n=0;n<${maxChatLines + 1};n++){i.value='JL-307 línea '+n;send.click();}const lines=[...document.querySelectorAll('.chat-line')].map(l=>l.textContent??'');return {count:lines.length,first:lines[0]??'',last:lines.at(-1)??''};})()`,
+        );
+        check(
+            'JL-307: el historial respeta el máximo y descarta la línea más antigua',
+            overflow.count === maxChatLines &&
+                overflow.first.includes('JL-307 línea 1') &&
+                overflow.last.includes(`JL-307 línea ${maxChatLines}`),
+            JSON.stringify({ ...overflow, maxChatLines }),
+        );
+        await shot('jl307-chat');
     },
 
     /** Poción de recuerdo: del campo y de un interior a la última Piedra Pintada. */

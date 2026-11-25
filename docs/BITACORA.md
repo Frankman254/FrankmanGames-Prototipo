@@ -1,3 +1,13 @@
+## 2026-11-25 — JL-307: cubrir flujo de chat en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `chat` comprueba el envío de texto, el cambio y filtrado de pestaña, las órdenes `/g` y `/ayuda`, y que el historial respete `maxLines` de `data/ui/chat.json` (200 líneas, descartando la más antigua). Se cierra el selector de gestos antes de las comprobaciones para que no tape el registro en la captura; no se modificó la lógica del juego.
+
+**Validación:** Electron `chat`: 10/10 y consola limpia en la ejecución final. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Una ejecución intermedia registró un `TypeError` de Babylon (`postProcessManager` nulo), que no se reprodujo en la siguiente ejecución, pasada 10/10. Capturas revisadas: `work/junie-jl307/b06-emote.jpg` y `work/junie-jl307/jl307-chat.jpg`.
+
+---
+
 ## 2026-11-25 — JL-306: corregir recortes de texto en inglés (Junie)
 
 **Archivos:** `src/ui/styles/ventanas.css`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
