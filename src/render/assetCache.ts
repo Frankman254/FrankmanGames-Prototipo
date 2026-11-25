@@ -3,6 +3,7 @@
 import '@babylonjs/loaders/glTF';
 import { LoadAssetContainerAsync, type AssetContainer, type InstantiatedEntries, type Scene } from '@babylonjs/core';
 import type { AssetManifest } from '../data/worldSchema';
+import { getOrCreateAssetPromise } from './assetCacheLogic';
 
 // Vite copia (con hash) todo lo que hay en assets/ y nos da su URL final; así
 // funciona igual con el servidor de desarrollo y con file:// empaquetado.
@@ -46,20 +47,17 @@ export class AssetCache {
 
     /** Contenedor cargado (una sola descarga por id, aunque se pida a la vez). */
     load(id: string): Promise<AssetContainer> {
-        let p = this.containers.get(id);
-        if (!p) {
+        return getOrCreateAssetPromise(this.containers, id, () => {
             const url = this.url(id);
             const ext = url.slice(url.lastIndexOf('.')).toLowerCase();
-            p = track(
+            const p = track(
                 LoadAssetContainerAsync(url, this.scene, { pluginExtension: ext === '.gltf' ? '.gltf' : '.glb' }),
             );
             p.catch((e: unknown) => {
                 console.warn('[assets] no se pudo cargar', id, e);
-                this.containers.delete(id); // permite reintentar
             });
-            this.containers.set(id, p);
-        }
-        return p;
+            return p;
+        });
     }
 
     /** Copia nueva del modelo en la escena, con sus esqueletos, animaciones y materiales clonados. */

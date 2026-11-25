@@ -1517,7 +1517,7 @@ Contexto del coordinador:
 - [x] JL-289 `src/render/stoneView.ts` y `zoneBorderView.ts`: qué piedras y bordes se ven. — commit «JL-289: extraer lógica visual de piedras y bordes» — pruebas 5/5, suite 4.981 aprobadas (1 omitida, 1 todo), typecheck, build y `docs:check` limpios; Electron `piedrasLejanas` 5/5. Evidencia en `work/junie-jl289/`.
 - [x] JL-290 `src/render/weatherView.ts`: de la intensidad del clima a partículas, niebla y luz. — commit «JL-290: separar el estado visual del clima» — `tests/weatherVisualLogic.test.ts` 4/4; suite 4.985 aprobadas (1 omitida, 1 `todo`); typecheck y build limpios. Electron `barriadaNoche` 6/8 por error Babylon `postProcessManager`; no se puede forzar lluvia. Captura de referencia en `work/junie-jl290/barriada-mediodia-jl290.jpg`.
 - [x] JL-291 `src/render/sceneLook.ts` y `linearFog.ts`: de las opciones gráficas a parámetros. — commit «JL-291: extraer parámetros visuales de SceneLook» — pruebas 4/4; suite 4.989 aprobadas (1 omitida, 1 `todo`); typecheck y build limpios; Electron `pintura` 3/3 y `piedrasLejanas` 5/5. Evidencia: `work/junie-jl291/EVIDENCIA.md`.
-- [ ] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble).
+- [x] JL-292 `src/render/assetCache.ts`: la caché (aciertos, desalojo, carga doble). — commit «JL-292: deduplicar y reintentar cargas de assets» — 3 pruebas nuevas; suite 406 archivos, 4.992 aprobadas, 1 omitida y 1 `todo`; typecheck, build y `docs:check` limpios. Evidencia: `work/junie-jl292/EVIDENCIA.md`.
 - [ ] JL-293 `src/render/terrainView.ts`: qué trozos se ven y su detalle.
 - [ ] JL-294 `src/render/gridView.ts`: qué celdas se pintan.
 - [ ] JL-295 `src/scenes/cryptScene.ts`: la entrada y la salida de piso, sin Babylon.

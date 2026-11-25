@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-292: deduplicar y reintentar cargas de assets (Junie)
+
+**Archivos:** `src/render/assetCache.ts`, `src/render/assetCacheLogic.ts`, `tests/assetCacheLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `getOrCreateAssetPromise()` aísla la caché en lógica pura: una carga por clave, reutilización en aciertos y solicitudes simultáneas, y desalojo de una promesa rechazada para permitir reintentar. `AssetCache.load()` delega el almacenamiento conservando la carga, registro y comportamiento existentes.
+
+**Validación:** `tests/assetCacheLogic.test.ts`: 3/3; `npm test`: 406 archivos, 4.992 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, Prettier y `npm run docs:check` (192 rutas) limpios. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl292/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-291: extraer parámetros visuales de SceneLook (Junie)
 
 **Archivos:** `src/render/sceneLook.ts`, `src/render/sceneLookLogic.ts`, `src/render/paintStyle.ts`, `tests/sceneLookLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
