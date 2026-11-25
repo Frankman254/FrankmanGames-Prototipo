@@ -1,3 +1,10 @@
+## 2026-11-24 — HUD-ROJO-03, REGEN-01 y EQ-10c (Coord)
+
+- **Barra en rojo.** Con `approachToCast` el alcance y la línea de visión no rechazan la pulsación; la barra ya no lo marca. Electron: 7 → 0 huecos rojos con un enemigo a 30 m (`work/claude-hz-0124/qa_barra_resultado.txt`).
+- **Regeneración.** Sin +1 flotante ni chispas para la regeneración natural (`isQuietHeal`).
+- **Ajuar de la Diablica.** La copia del modelo nacía en la pose del original (medido: cabeza a 0,11 m, tumbada) y las piezas se ajustaban contra ella. Ahora se vuelve al reposo antes de medir. Capturas en `work/claude-hz-0124/shots/`.
+- **Dos hechizos a la vez.** Posible sin tocar la simulación de efectos; depende solo del GCD. Pregunta GCD-01 reescrita con opciones.
+
 ## 2026-11-24 — JL-275: extraer la búsqueda de objetos por UID (Junie)
 
 **Archivos:** `src/ui/menus/context.ts`, `src/ui/menus/contextLogic.ts`, `tests/ui/contextLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

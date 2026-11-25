@@ -14,7 +14,7 @@ import {
     type Mesh,
 } from '@babylonjs/core';
 import type { GameData } from '../data';
-import type { GameEvent } from '../sim/events';
+import { isQuietHeal, type GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
 import type { Overworld } from '../world/overworld';
 import { terrainHeight, type HeightField } from '../world/terrain';
@@ -424,6 +424,7 @@ export class ArenaView {
                     this.floating.damage(e.amount, e.crit, e.toPlayer, at);
             } else if (
                 e.type === 'heal' &&
+                !isQuietHeal(e) &&
                 this.showDamageNumbers &&
                 e.amount >= 1 &&
                 this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)

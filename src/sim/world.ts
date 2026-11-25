@@ -2413,8 +2413,12 @@ export class World implements SessionWorld {
             // (un hechizo de un blanco sin enemigo cerca del cursor) no se marca: no hay a quién
             // estar lejos (creador 2026-11-20: «estan marcados en rojo cuando no deberia»). El último
             // atacado tampoco cuenta: marcaba en rojo hasta lanzar a otro blanco (creador 2026-11-23).
+            // Con `approachToCast` (el juego) ni el alcance ni la línea de visión rechazan la
+            // pulsación: el personaje se acerca y lanza. El rojo solo avisaría de algo que no pasa
+            // (creador 2026-11-24: «la barra sigue poniéndose roja»).
             const targetId = this.aimedTarget(s, aim);
             const inRange =
+                this.approachToCast ||
                 (s.area.type === 'single' && !this.enemyById(targetId)) ||
                 (this.inRange(s, targetId, aim.point) && this.hasLineOfSight(s, targetId, aim.point));
             return {

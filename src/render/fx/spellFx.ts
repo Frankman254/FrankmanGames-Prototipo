@@ -17,7 +17,7 @@ import { TransformNode as Node } from '@babylonjs/core';
 import type { ShapeDef } from '../../data/schema';
 import type { FxDef } from '../../data/fxSchema';
 import type { Element } from '../../rpg/contracts';
-import type { GameEvent } from '../../sim/events';
+import { isQuietHeal, type GameEvent } from '../../sim/events';
 import type { Vec2 } from '../../sim/vec2';
 import type { World } from '../../sim/world';
 import type { HeightField } from '../../world/terrain';
@@ -211,7 +211,7 @@ export class SpellFx {
                     });
                 }
             } else if (e.type === 'damage') this.onImpact(world, e.targetId, e.ability, e.crit, e.toPlayer);
-            else if (e.type === 'heal') {
+            else if (e.type === 'heal' && !isQuietHeal(e)) {
                 if (this.entityPos(world, e.targetId, this.tmp, 0.2))
                     this.bursts.burst(this.tmp, {
                         count: 14,
