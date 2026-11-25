@@ -134,8 +134,13 @@ export class WorldInfo {
         if (key === this.key) return;
         this.key = key;
         this.coordsEl.textContent = trf('[{x}, {y}]', { x: v.coords[0], y: v.coords[1] });
+        const bandLabel = v.band ?? '';
+        const bandRange = /^niv\. (\d+)–(\d+)$/.exec(bandLabel);
+        const band = bandRange
+            ? trf('niv. {min}–{max}', { min: bandRange[1]!, max: bandRange[2]! })
+            : tr(bandLabel);
         this.zoneEl.textContent = v.zone
-            ? tr(v.zone) + (v.band ? trf(' · {band}', { band: v.band }) : '')
+            ? tr(v.zone) + (v.band ? trf(' · {band}', { band }) : '')
             : tr('Tierras salvajes');
         this.el.classList.toggle('danger', v.danger >= 5);
         this.skyEl.hidden = !v.sky;

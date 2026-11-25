@@ -270,7 +270,7 @@ export class ChatBox {
             this.add({
                 channel: this.speakIn,
                 author: null,
-                text: `${this.author()} ${cmd.emote.action}`,
+                text: `${this.author()} ${tr(cmd.emote.action)}`,
             });
             this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds, cmd.emote);
             // F27-INT: notificar al render para que reproduzca el clip del emote.
@@ -361,7 +361,8 @@ export class ChatBox {
                 },
                 'small chip chat-filter',
             );
-            b.innerHTML = `${artIcon('ui', item.icon) ?? ''}<span>${item.label}</span>`;
+            b.innerHTML = artIcon('ui', item.icon) ?? '';
+            b.appendChild(h('span', { text: item.label }));
             b.classList.toggle('on', this.filters[item.key]);
             b.classList.toggle('off', !this.filters[item.key]);
             this.filtersBar.appendChild(b);

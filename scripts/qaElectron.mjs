@@ -4024,6 +4024,15 @@ const scenarios = {
         await key('Escape', 'Escape');
         await sleep(200);
         await key('Escape', 'Escape');
+        const emote = await js(
+            `(()=>{ const i=document.querySelector('.chat-input'); if(!i) return false; i.value='/saludar'; i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true})); return document.querySelector('.chat-log')?.innerText.includes('waves') ?? false; })()`,
+        );
+        await sleep(250);
+        const chat = await js(`document.querySelector('.chat-log')?.innerText ?? ''`);
+        check('F07: los emotes del chat también salen en inglés', emote, chat);
+        const filters = await js(`document.querySelector('.chat-filters')?.innerText ?? ''`);
+        check('F07: el filtro de botín del chat pasa a inglés', filters.includes('Loot') && !filters.includes('Botín'), filters);
+        await shot('ingles-chat-emote');
         await sleep(600);
         await key('KeyB', 'b');
         await sleep(500);

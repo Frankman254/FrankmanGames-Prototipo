@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-297: cerrar paridad de traducciones (Junie)
+
+**Archivos:** `src/i18nTexts.ts`, `src/ui/menus/chat.ts`, `src/ui/menus/worldHud.ts`, `tests/i18nContent.test.ts`, `data/i18n/en.json`, `data/i18n/en.content.json`, `data/i18n/en.ui.json`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** La cobertura de contenido ahora incluye enemigos, Alzadores, aspecto, chat y etiquetas derivadas de clase, además de claves dinámicas comprobadas por otras pruebas. Se añadieron las traducciones que faltaban, se retiraron las claves sin fuente ni consumidor y se unificaron las traducciones contradictorias entre catálogos. El chat traduce las acciones de emote antes de añadir el nombre del jugador y mantiene sus filtros traducibles; el HUD traduce las bandas de nivel y las zonas seguras.
+
+**Validación:** `tests/i18nContent.test.ts`: 8/8; `npm test`: 410 archivos, 5.009 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run build` limpios. Electron `ingles`: 5/5, consola limpia; captura revisada.
+
+**Evidencia:** `work/junie-jl297/ingles-chat-emote.jpg`.
+
+---
+
 ## 2026-11-25 — JL-296: aislar el plan de actualización en caliente (Junie)
 
 **Archivos:** `src/editor/hotApply.ts`, `src/editor/hotApplyPlan.ts`, `tests/editor/hotApplyPlan.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
