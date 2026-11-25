@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-322: capturar clips de héroes de frente y lado (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `clipsHeroes`, que carga los seis modelos de clase/sexo y recorre reposo, andar, correr, atacar, lanzar, golpe, morir y montar. Guarda una captura frontal y otra lateral por estado (96 originales) y seis láminas JPEG. La muerte se reproduce como clip sin activar el diálogo del juego; la montura se encuadra para mostrar al jinete. Solo se modifica la partida de prueba en memoria; no cambia el runtime productivo ni los assets.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `clipsHeroes`: 145/145 comprobaciones, siete clips cargados por modelo y comprobación de la pose de jinete; consola limpia. Revisión visual de las seis láminas. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl322/resultado.json`, `work/junie-jl322/LAMINA.md`, seis `lamina-*.jpg` y 96 capturas individuales.
+
+---
+
 ## 2026-11-25 — JL-321: verificar el medidor de daño en combate (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

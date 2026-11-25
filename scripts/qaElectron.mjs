@@ -2547,6 +2547,157 @@ const scenarios = {
         await shot('modelos-trapiche');
     },
 
+    /** JL-322: captura los ocho clips de cada clase y sexo desde el frente y el lado. */
+    async clipsHeroes() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl322';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const sexes = [
+            { id: 'masculino', label: 'masculino', suffix: '' },
+            { id: 'femenino', label: 'femenino', suffix: '_f' },
+        ];
+        const poses = [
+            { id: 'idle', label: 'reposo', state: 'idle' },
+            { id: 'walk', label: 'andar', state: 'walk' },
+            { id: 'run', label: 'correr', state: 'run' },
+            { id: 'attack', label: 'atacar', state: 'attack' },
+            { id: 'cast', label: 'lanzar', state: 'cast' },
+            { id: 'hit', label: 'golpe', state: 'hit' },
+            { id: 'death', label: 'morir', state: 'death' },
+            { id: 'mount', label: 'montar', state: 'idle' },
+        ];
+        const views = [
+            { id: 'frente', yaw: 270 },
+            { id: 'lado', yaw: 180 },
+        ];
+        const files = [];
+
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame(`QA ${hero.label}`, { classId: hero.id, devMount: true });
+                await js(`(()=>{ if(${W}.character.equipment.get('mount')) ${S}.unequip('mount'); })()`);
+                await js(`${S}.character.sex=${JSON.stringify(sex.id)}`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.label}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                await js(`(()=>{ const w=${W},v=__game.view; const p=w.player; const g=w.grid; const a=g.center(g.nearestWalkable({x:127,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.speed=0; p.facing=0; p.alive=true; v.rig.mode='manual'; v.rig.pitchDeg=14; v.rig.distance=5; })()`);
+                await sleep(500);
+
+                const clipStates = poses.filter((pose) => pose.id !== 'mount');
+                for (const pose of clipStates) {
+                    const hasClip = await js(`__game.view.player.model.hasClip(${JSON.stringify(pose.state)})`);
+                    check(
+                        `JL-322 ${hero.label} ${sex.label}: clip ${pose.label}`,
+                        hasClip,
+                        `${expectedFile} · ${pose.state}`,
+                    );
+                }
+
+                for (const pose of poses) {
+                    if (pose.id === 'mount') {
+                        const mount = await js(
+                            `(()=>{ const c=${W}.character; if(c.equipment.slots.mount) ${S}.unequip('mount'); c.give('mount_dev_crestalba'); const item=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba'); return item ? ${S}.equip(item.uid,'mount') : {ok:false,reason:'montura de prueba ausente'}; })()`,
+                        );
+                        check(`JL-322 ${hero.label} ${sex.label}: montar disponible`, mount.ok, mount.reason ?? 'equipada');
+                        await until(
+                            `__game.view.scene.meshes.some(m=>m.name.startsWith('mount:')) && ${W}.character.equipment.get('mount')?.itemId==='mount_dev_crestalba'`,
+                            20000,
+                            `montura ${hero.label} ${sex.label}`,
+                        );
+                    }
+                    for (const view of views) {
+                        await js(`(()=>{ const p=${W}.player; p.alive=true; p.path=[]; p.speed=0; p.facing=0; __game.view.player.reset(); })()`);
+
+                        if (pose.id === 'walk') {
+                            await js(`${W}.commandMove({x:${W}.player.pos.x+8,y:${W}.player.pos.y})`);
+                            await js(`${W}.player.speed=2.5`);
+                        } else if (pose.id === 'run') {
+                            await js(`(()=>{ const v=__game.view.player; v.oneShot='run'; v.model.play('run',{restart:true}); })()`);
+                        } else if (pose.id === 'attack') {
+                            await js(`__game.view.player.onGameEvent({type:'cast',ability:'basic'})`);
+                        } else if (pose.id === 'cast') {
+                            await js(`__game.view.player.onGameEvent({type:'cast',ability:'spell'})`);
+                        } else if (pose.id === 'hit') {
+                            await js(`__game.view.player.onGameEvent({type:'damage',toPlayer:true})`);
+                        } else if (pose.id === 'death') {
+                            await js(`(()=>{ const v=__game.view.player; v.oneShot='death'; v.model.play('death',{restart:true}); })()`);
+                        }
+
+                        const mounted = pose.id === 'mount';
+                        const expectedState = pose.state;
+                        await until(
+                            mounted
+                                ? `${W}.character.equipment.get('mount')?.itemId==='mount_dev_crestalba' && __game.view.player.model.state==='idle'`
+                                : `__game.view.player.model.state===${JSON.stringify(expectedState)}`,
+                            8000,
+                            `${hero.label} ${sex.label} ${pose.label}`,
+                        );
+                        const yaw = mounted && view.id === 'frente' ? 240 : view.yaw;
+                        const pitch = mounted ? 17 : 14;
+                        const distance = mounted ? 6 : 5;
+                        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=${yaw}; r.pitchDeg=${pitch}; r.distance=${distance}; r.jumpTo(${distance}); })()`);
+                        await sleep(80);
+
+                        const observed = await js(
+                            `(()=>({state:__game.view.player.model.state, file:__game.view.player.model.entry.file, mounted:${W}.character.equipment.get('mount')?.itemId==='mount_dev_crestalba', riderRoot:__game.view.scene.transformNodes.some(n=>n.name.endsWith('rider_root')), ridePose:__game.view.player.model.pose==='ride', playerVisible:__game.view.player.model.root.isEnabled()}))()`,
+                        );
+                        const ok = mounted
+                            ? observed.mounted && observed.riderRoot && observed.ridePose && observed.playerVisible && observed.state === 'idle'
+                            : observed.state === expectedState;
+                        check(
+                            `JL-322 ${hero.label} ${sex.label}: ${pose.label} ${view.id}`,
+                            ok,
+                            JSON.stringify(observed),
+                        );
+
+                        const file = `jl322-${hero.model}-${sex.id}-${pose.id}-${view.id}`;
+                        await shot(file);
+                        files.push({ file: `${file}.jpg`, label: `${pose.label} · ${view.id}` });
+                    }
+                }
+
+                const tiles = files.slice(-poses.length * views.length).map(({ file, label }) => ({
+                    src: new URL(`work/junie-jl322/${file}`, url).href,
+                    label,
+                }));
+                const sheetHtml = `<style>html,body{margin:0;width:100%;height:100%;background:#151515;color:#fff;font:18px Arial,sans-serif}main{width:100vw;height:100vh;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr)}figure{margin:0;min-width:0;min-height:0;display:flex;flex-direction:column;background:#202020;border:1px solid #444}img{width:100%;height:calc(100% - 32px);object-fit:contain;background:#111}figcaption{height:32px;text-align:center;line-height:32px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}</style><main>${tiles.map((tile) => `<figure><img src="${tile.src}"><figcaption>${tile.label}</figcaption></figure>`).join('')}</main>`;
+                await js(`(()=>{document.body.innerHTML=${JSON.stringify(sheetHtml)};return true})()`);
+                await until(
+                    `document.images.length===${tiles.length} && [...document.images].every(i=>i.complete&&i.naturalWidth>0)`,
+                    20000,
+                    `lámina ${hero.model} ${sex.id}`,
+                );
+                await shot(`lamina-${hero.model}-${sex.id}`);
+            }
+        }
+
+        const table = ['| Héroe | Sexo | Capturas | Lámina |', '|---|---|---:|---|'];
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const prefix = `jl322-${hero.model}-${sex.id}-`;
+                const captures = files.filter(({ file }) => file.startsWith(prefix));
+                table.push(
+                    `| ${hero.label} | ${sex.label} | ${captures.length} | [lamina-${hero.model}-${sex.id}.jpg](lamina-${hero.model}-${sex.id}.jpg) |`,
+                );
+            }
+        }
+        const imageList = files.map(({ file, label }) => `- [${label}](./${file})`).join('\n');
+        fs.writeFileSync(
+            path.join(outDir, 'LAMINA.md'),
+            `# JL-322 — clips de héroes\n\nSe recorrieron los ocho estados en los seis modelos del juego, con una captura frontal y otra lateral por estado. Las láminas JPEG resumen cada héroe/sexo; los 96 fotogramas originales están enlazados abajo.\n\n${table.join('\n')}\n\n## Capturas individuales\n\n${imageList}\n`,
+        );
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -10777,6 +10928,8 @@ scenarios.guardadoBarriadaCasa.timeout = 300;
 scenarios.jl248_rendimientoTres.timeout = 300;
 // JL-321: partida + 30 s de combate real y comprobación del medidor.
 scenarios.medidorDano.timeout = 90;
+// JL-322: seis modelos × ocho poses × dos ángulos y sus láminas de capturas.
+scenarios.clipsHeroes.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

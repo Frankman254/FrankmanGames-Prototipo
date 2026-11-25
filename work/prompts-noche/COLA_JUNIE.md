@@ -1554,7 +1554,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-321 `medidorDano`: pelear 30 s y ver el medidor con sus porcentajes. — commit «JL-321: verificar medidor de daño durante combate» — Electron 6/6: 30,1 s, 61 de daño, 43 golpes, 100 % y consola limpia; suite 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl321/resultado.json` y `work/junie-jl321/jl321-medidor-dano.jpg`.
 
 ### F. Apoyo a personajes, animaciones y físicas (solo medir y capturar: el código es del coordinador)
-- [ ] JL-322 Escenario `clipsHeroes`: por cada héroe y sexo, una captura por clip (reposo, andar, correr, atacar, lanzar, golpe, morir y montar), de lado y de frente. Lámina en `work/junie-jl322/`.
+- [x] JL-322 Escenario `clipsHeroes`: por cada héroe y sexo, una captura por clip (reposo, andar, correr, atacar, lanzar, golpe, morir y montar), de lado y de frente. Lámina en `work/junie-jl322/` — commit «JL-322: capturar clips de héroes de frente y lado» — `work/junie-jl322/LAMINA.md` (96 capturas individuales, seis láminas; Electron 145/145).
 - [ ] JL-323 **Pies que patinan:** para cada héroe, la velocidad de movimiento frente a la zancada del clip de andar y de correr (cuánto avanza un pie apoyado por segundo). Tabla con el factor que haría falta. Solo medir.
 - [ ] JL-324 **Saltos entre clips:** grabar cada cambio entre reposo, andar, correr, atacar y reposo a 60 fps, y anotar los que dan salto, con el fotograma.
 - [ ] JL-325 Escenario `jinetes`: captura de cada héroe sobre cada montura, de lado. Lista de los que flotan, se hunden o atraviesan la silla.
