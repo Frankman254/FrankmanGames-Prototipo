@@ -9,6 +9,7 @@ import type { World } from '../sim/world';
 import type { HeightField } from '../world/terrain';
 import { staticMesh } from './staticModels';
 import { BurstPool, glowMaterial } from './fx/particles';
+import { lootLabelFor, type LootLabel } from './lootLabel';
 
 interface LootVisual {
     root: TransformNode;
@@ -18,11 +19,6 @@ interface LootVisual {
     beam: StandardMaterial | null;
     sparkleTimer: number;
     rarity: Rarity;
-}
-
-export interface LootLabel {
-    text: string;
-    color: string;
 }
 
 export class LootView {
@@ -83,10 +79,8 @@ export class LootView {
     /** Texto y color de la etiqueta de un botín (nombre del objeto o monedas). */
     label(world: World, lootId: number): LootLabel | null {
         const l = world.lootView().find((x) => x.id === lootId);
-        if (!l) return null;
-        if (!l.item) return { text: `${l.gold} monedas`, color: '#ffd45a' };
-        const name = world.content.items[l.item.itemId]?.name ?? l.item.itemId;
-        return { text: name, color: this.rarityHex[l.rarity] };
+        const name = l?.item ? world.content.items[l.item.itemId]?.name : undefined;
+        return lootLabelFor(l, name, this.rarityHex);
     }
 
     private trim(r: Rarity): StandardMaterial {

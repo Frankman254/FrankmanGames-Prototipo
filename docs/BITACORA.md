@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-281: extraer la decisión de etiqueta del botín (Junie)
+
+**Archivos:** `src/render/lootView.ts`, `src/render/lootLabel.ts`, `tests/ui/lootLabel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `lootLabelFor()` separa la conversión de datos del botín a texto/color sin DOM ni Babylon. `LootView.label()` conserva la búsqueda en el mundo y delega el resultado; monedas, nombre del objeto, fallback al ID y color de rareza mantienen el comportamiento existente. `HoverLabel` sigue siendo solo el presentador DOM.
+
+**Validación:** `tests/ui/lootLabel.test.ts`: 4/4; `npm test`: 394 archivos, 4.951 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, Prettier y `npm run docs:check` limpios. Sin cambio visual; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl281/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-280: extraer el formato de números de rendimiento (Junie)
 
 **Archivos:** `src/ui/perfNumberFormat.ts`, `src/ui/perfOverlay.ts`, `src/ui/benchHud.ts`, `tests/ui/perfNumberFormat.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

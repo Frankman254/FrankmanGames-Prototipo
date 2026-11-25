@@ -1506,7 +1506,7 @@ Contexto del coordinador:
 - [x] JL-278 `src/ui/menus/screens/devVisualOptions.ts`: el paso de las opciones a valores. — commit «JL-278: extraer el adaptador de opciones visuales» — 2 pruebas verdes; suite 391 archivos, 4.941 aprobadas, 1 omitida y 1 `todo`; typecheck, build, docs:check y Electron interfaz 55/55; capturas revisadas en work/junie-jl278/. Evidencia en work/junie-jl278/EVIDENCIA.md.
 - [x] JL-279 `src/ui/loadingScreen.ts`: el progreso y los consejos. — commit «JL-279: extraer progreso y consejos de carga» — 2 pruebas nuevas; suite 392 archivos, 4.943 aprobadas, 1 omitida y 1 `todo`; typecheck, Prettier y docs:check limpios. Sin cambio visual. Evidencia en work/junie-jl279/EVIDENCIA.md.
 - [x] JL-280 `src/ui/perfOverlay.ts` y `benchHud.ts`: el formato de los números. — commit «JL-280: extraer el formato de números de rendimiento» — `tests/ui/perfNumberFormat.test.ts` 4/4; `npm test`: 4.947 aprobadas, 1 omitida y 1 `todo`; typecheck, build, Prettier y `docs:check` limpios. Sin cambio visual.
-- [ ] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa.
+- [x] JL-281 `src/ui/hoverLabel.ts`: qué etiqueta sale para cada cosa. — commit «JL-281: extraer la decisión de etiqueta del botín» — `tests/ui/lootLabel.test.ts` 4/4; `npm test`: 4.951 aprobadas, 1 omitida y 1 `todo`; typecheck, Prettier y `docs:check` limpios. Sin cambio visual. Evidencia: `work/junie-jl281/EVIDENCIA.md`.
 - [ ] JL-282 `src/ui/dev/damageMeterView.ts`: el orden y los porcentajes.
 - [ ] JL-283 `src/ui/dev/inspector.ts`: lo que se lista de una entidad.
 - [ ] JL-284 `src/render/fx/statusFx.ts`: qué efecto corresponde a cada estado.
