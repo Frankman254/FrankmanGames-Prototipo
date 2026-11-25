@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-285: extraer posición de los fantasmas de apuntado (Junie)
+
+**Archivos:** `src/render/fx/aimGhosts.ts`, `src/render/fx/aimGhostPlacement.ts`, `tests/aimGhostPlacement.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `aimGhostPlacement()` separa la conversión de destino a X/Z y las alturas del fantasma, el aro y la línea en una función pura. `AimGhosts.sync()` delega manteniendo los offsets y el muestreo del terreno; no cambia el render.
+
+**Validación:** `tests/aimGhostPlacement.test.ts`: 2/2; `npx vitest run`: 398 archivos, 4.961 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run build`, `npm run docs:check` y Prettier limpios. Sin cambio de presentación; no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl285/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-284: extraer selección visual de estados (Junie)
 
 **Archivos:** `src/render/fx/statusFx.ts`, `src/render/fx/statusVisual.ts`, `tests/statusVisual.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

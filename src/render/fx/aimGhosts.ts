@@ -15,6 +15,7 @@ import {
 } from '@babylonjs/core';
 import { getAimSkin } from './aimSkins';
 import type { AimSkinDef } from './aimSkins';
+import { aimGhostPlacement } from './aimGhostPlacement';
 import type { HeightField } from '../../world/terrain';
 
 export interface AimGhost {
@@ -96,7 +97,13 @@ export class AimGhosts {
         for (const g of list) {
             let v = this.live.get(g.key);
             if (!v) {
-                v = { root: null, source: null, line: null, lineKey: '', ring: this._skin.makeLandingRing(this.scene, g.mine) };
+                v = {
+                    root: null,
+                    source: null,
+                    line: null,
+                    lineKey: '',
+                    ring: this._skin.makeLandingRing(this.scene, g.mine),
+                };
                 v.ring.isPickable = false;
                 this.live.set(g.key, v);
             }
@@ -104,19 +111,19 @@ export class AimGhosts {
                 v.root = this.copyOf(g.source, g.mine);
                 v.source = g.source;
             }
-            const y = this.ground.sample(g.to.x, g.to.y);
+            const landing = aimGhostPlacement(g.to, this.ground.sample(g.to.x, g.to.y));
             if (v.root) {
-                v.root.position.set(g.to.x, y, g.to.y);
+                v.root.position.set(landing.x, landing.groundY, landing.z);
                 v.root.rotation.copyFrom(g.source?.rotation ?? v.root.rotation);
                 v.root.rotationQuaternion = null;
                 v.root.rotation.y = -g.facing;
             }
-            v.ring.position.set(g.to.x, y + 0.07, g.to.y);
+            v.ring.position.set(landing.x, landing.ringY, landing.z);
             const lineKey = `${g.from.x.toFixed(2)},${g.from.y.toFixed(2)},${g.to.x.toFixed(2)},${g.to.y.toFixed(2)}`;
             if (lineKey === v.lineKey) continue;
             v.lineKey = lineKey;
             const from = new Vector3(g.from.x, this.ground.sample(g.from.x, g.from.y) + 0.12, g.from.y);
-            const to = new Vector3(g.to.x, y + 0.12, g.to.y);
+            const to = new Vector3(landing.x, landing.lineY, landing.z);
             v.line?.dispose();
             v.line = this._skin.makeTrajectoryLine(this.scene, from, to, g.mine);
             v.line.isPickable = false;
