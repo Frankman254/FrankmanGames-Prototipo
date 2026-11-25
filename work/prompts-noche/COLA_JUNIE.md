@@ -1543,7 +1543,7 @@ Antes de cada una, busca si ya existe.
 - [!] JL-310 `menuContextual`: clic derecho sobre un enemigo, un PNJ, un objeto del suelo y un compañero. — BLOQUEADA: no hay menús contextuales para objetivos del mundo y no existe un compañero visible en runtime; requiere definir las opciones y el objetivo esperado. Evidencia: `work/junie-jl310/DIAGNOSTICO.md`.
 - [x] JL-311 `ventanas`: arrastrar cada ventana al borde, cerrarla y comprobar que la posición se guarda. — commit «JL-311: verificar arrastre y guardado de ventanas» — Electron 22/22, consola limpia; capturas revisadas en `work/junie-jl311-20261125/`.
 - [x] JL-312 `pantallaCarga`: que la pantalla de carga sale y se va en cada viaje. — commit «JL-312: mostrar carga al volver de la cripta» — Electron 18/18, consola limpia; capturas revisadas en `work/junie-jl312-20261125/`; suite 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck, build y `docs:check` limpios.
-- [ ] JL-313 `botin`: matar, ver el botín en el suelo, recogerlo y verlo en la mochila.
+- [x] JL-313 `botin`: matar, ver el botín en el suelo, recogerlo y verlo en la mochila. — commit «JL-313: verificar botín del suelo hasta la mochila» — Electron 9/9, consola limpia; `npm test` 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios; capturas revisadas en `work/junie-jl313/after/`.
 - [ ] JL-314 `estados`: aplicar cada estado de desarrollo y capturar su efecto visual.
 - [ ] JL-315 `lluvia`: forzar lluvia y tormenta y comprobar partículas, niebla y sonido.
 - [ ] JL-316 `bordeZona`: andar hacia un borde de zona y ver el aviso.

@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-313: verificar botín del suelo hasta la mochila (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `botin` ahora derrota un enemigo con ataque básico, muestra un objeto generado en el suelo, lo recoge con un clic real y comprueba su presencia en la mochila. `lootMode='ground'` se activa solo en memoria durante el escenario; no se modifican los datos ni el modo productivo `window`. Se conserva el recorrido previo de botín pendiente, muerte y resurrección.
+
+**Validación:** Electron `botin`: 9/9 comprobaciones, consola limpia. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Capturas revisadas.
+
+**Evidencia:** `work/junie-jl313/after/resultado.json`, `work/junie-jl313/after/jl313-botin-suelo.jpg` y `work/junie-jl313/after/jl313-botin-mochila.jpg`.
+
+---
+
 ## 2026-11-25 — JL-312: mostrar carga al volver de la cripta (Junie)
 
 **Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

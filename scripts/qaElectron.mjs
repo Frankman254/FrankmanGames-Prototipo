@@ -1628,6 +1628,56 @@ const scenarios = {
 
     async botin() {
         await newGame('QA Botin');
+        // El modo productivo actual entrega botín en ventana; este escenario activa el
+        // modo suelo solo en memoria para comprobar el recorrido de recogida existente.
+        await js(`${W}.content.spoils.lootMode='ground'`);
+        const bagCount = (id) =>
+            js(
+                `(() => { const c=${S}.character; return c.inventory.slots.filter(s=>s&&s.itemId===${JSON.stringify(id)}).reduce((n,s)=>n+s.quantity,0); })()`,
+            );
+        let enemyId = null;
+        let groundItem = null;
+        for (let attempt = 0; attempt < 12; attempt++) {
+            enemyId = await js(
+                `(() => { const w=${W}, p=w.player.pos, g=w.grid; const cell=g.nearestWalkable({x:p.x+7,y:p.y+1}); const at=cell<0?{x:p.x+7,y:p.y+1}:g.center(cell); const e=w.spawnEnemy('melee',at,1); e.health=1; e.frozen=true; e.state='stagger'; e.stateTime=-1e9; w.player.basicCharges=w.data.player.basicAttack.charges; w.player.basicRecharge=0; w.player.cooldowns={}; w.player.gcd=0; w.commandAttack(e.id); return e.id; })()`,
+            );
+            await until(`${W}.enemies.get(${enemyId})?.state==='dead'`, 10000, 'enemigo muerto');
+            await until(`${W}.enemyActors.get(${enemyId})?.rewarded===true`, 5000, 'recompensa del enemigo');
+            groundItem = await js(
+                `(() => { const w=${W}, l=w.loot.find(x=>x.item); return l?{id:l.id,itemId:l.item.itemId,quantity:l.item.quantity,name:w.content.items[l.item.itemId]?.name}:null; })()`,
+            );
+            if (groundItem) break;
+        }
+        if (!groundItem || enemyId === null) throw new Error('12 enemigos abatidos sin dejar un objeto en el suelo');
+        check(
+            'Botín: el enemigo muere por ataque básico',
+            await js(`${W}.enemies.get(${enemyId})?.state==='dead' && ${W}.enemyActors.get(${enemyId})?.rewarded===true`),
+            `enemigo ${enemyId}`,
+        );
+        await until(`!!__game.view.scene.getTransformNodeByName('loot'+${groundItem.id})?.isEnabled()`, 5000, 'objeto visible en el suelo');
+        check(
+            'Botín: el objeto permanece visible en el suelo',
+            await js(`${W}.loot.some(l=>l.id===${groundItem.id} && l.item?.itemId===${JSON.stringify(groundItem.itemId)})`),
+            `${groundItem.name} ×${groundItem.quantity}`,
+        );
+        await shot('jl313-botin-suelo');
+        const beforePickup = await bagCount(groundItem.itemId);
+        await clickMesh(`lootHit${groundItem.id}`);
+        await until(`!${W}.loot.some(l=>l.id===${groundItem.id})`, 15000, 'objeto recogido');
+        const afterPickup = await bagCount(groundItem.itemId);
+        check(
+            'Botín: recoger el objeto lo añade a la mochila',
+            afterPickup === beforePickup + groundItem.quantity,
+            `${groundItem.name}: ${beforePickup} → ${afterPickup}`,
+        );
+        await key('KeyB', 'b');
+        await until(`!!document.querySelector('.panel-inventory')?.offsetParent`, 5000, 'mochila abierta');
+        const visibleInBag = await js(
+            `([...document.querySelectorAll('.panel-inventory .inv-grid .cell.filled')].some(c=>c.getAttribute('aria-label')===${JSON.stringify(groundItem.name)}))`,
+        );
+        check('Botín: el objeto recogido se ve en la mochila', visibleInBag, groundItem.name);
+        await shot('jl313-botin-mochila');
+        await key('KeyB', 'b');
         await js(`${S}.energy.value=20`);
         const count = (id) =>
             js(
