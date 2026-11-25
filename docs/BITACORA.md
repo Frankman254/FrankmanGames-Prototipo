@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-303: verificar tablas de botín y probabilidades (Junie)
+
+**Archivos:** `tests/jl303_lootTables.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió una prueba de solo lectura para todas las tablas de botín: comprueba que cada entrada apunta a un objeto existente, valida los rangos de probabilidad y calcula las probabilidades de selección con el peso efectivo (`entry.weight × item.dropWeight`) que usa el juego. Cada tirada suma 1 al incluir la posibilidad de no obtener objeto. No se modificaron datos ni cifras de balance.
+
+**Validación:** `tests/jl303_lootTables.test.ts`: 2/2; `npm test`: 412 archivos, 5.013 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. No cambia la presentación, por lo que no aplica captura Electron.
+
+**Evidencia:** `work/junie-jl303/INFORME.md` y `tests/jl303_lootTables.test.ts`.
+
+---
+
 ## 2026-11-25 — JL-302: verificar modelos y clips de todos los arquetipos (Junie)
 
 **Archivos:** `tests/jl302_archetypeAssets.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
