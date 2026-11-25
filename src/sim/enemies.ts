@@ -6,6 +6,7 @@
 // enfriamiento: en Pursue usa el primero que esté listo y a su alcance.
 // Con zonas cada enemigo tiene nivel: sus cifras escalan con él y los hechizos
 // con `minLevel` sólo los usa a partir de ese nivel.
+import type { TargetRef } from './participants';
 import type { ArchetypeDef, EnemiesDef, EnemyAttackDef } from '../data/schema';
 import type { LevelScalingDef } from '../data/zonesSchema';
 import type { GameEvent } from './events';
@@ -63,6 +64,8 @@ export interface Enemy {
     disoriented: boolean;
     /** Segundos de más del aviso en curso (embotamiento). */
     telegraphExtra: number;
+    /** GRP-01: participante al que persigue cuando hay varios (ver `EnemySystem.targetOf`). */
+    targetId?: number | null;
 }
 
 /** Lo que los enemigos necesitan del mundo. */
@@ -71,11 +74,16 @@ export interface EnemyContext {
     pathfinder: Pathfinder;
     rng: Rng;
     /** `hidden`: vuela tan alto que no lo ven (no lo detectan y quien lo perseguía lo pierde). */
-    player: { id: number; pos: Vec2; radius: number; alive: boolean; hidden?: boolean };
-    /** Resuelve un golpe enemigo contra el jugador (la tirada la hace el mundo). */
-    hitPlayer(source: Enemy, attack: EnemyAttackDef): void;
-    /** Combate v2: lanza un proyectil teledirigido al jugador (llega aunque se mueva). */
-    launchHoming(source: Enemy, attack: EnemyAttackDef): void;
+    player: TargetRef;
+    /**
+     * GRP-01: todos los participantes del bando del jugador (el jugador primero) cuando hay
+     * compañeros; sin ellos, undefined y los enemigos solo miran a `player`, como siempre.
+     */
+    readonly players?: readonly TargetRef[];
+    /** Resuelve un golpe enemigo contra el jugador, o contra el participante `targetId`. */
+    hitPlayer(source: Enemy, attack: EnemyAttackDef, targetId?: number): void;
+    /** Combate v2: proyectil teledirigido al jugador, o al participante `targetId`. */
+    launchHoming(source: Enemy, attack: EnemyAttackDef, targetId?: number): void;
     /**
      * Combate táctico: al empezar un aviso. Devuelve los segundos de más que
      * tarda (embotamiento) o null si el lanzamiento falla. Sin él, 0.
@@ -243,9 +251,44 @@ export class EnemySystem {
         }
     }
 
+    /**
+     * GRP-01: a quién mira el enemigo. Sin compañeros, al jugador (como siempre). Con ellos, una
+     * regla sencilla y determinista: sigue con su objetivo mientras esté vivo y visible; si lo
+     * pierde, elige el participante vivo y visible más cercano (en reposo, solo si lo ve dentro de
+     * su alcance de vista; ya en pelea, aunque no lo vea). Empate: el primero de la lista (el
+     * jugador). Sin nadie válido devuelve un objetivo muerto y el enemigo vuelve a casa.
+     */
+    targetOf(e: Enemy, ctx: EnemyContext): TargetRef {
+        const list = ctx.players;
+        if (!list) return ctx.player;
+        const valid = (r: TargetRef): boolean => r.alive && !r.hidden;
+        if (e.targetId != null) {
+            const cur = list.find((r) => r.id === e.targetId);
+            if (cur && valid(cur)) return cur;
+        }
+        const engaged = e.state !== 'idle';
+        let best: TargetRef | null = null;
+        let bd = Infinity;
+        for (const r of list) {
+            if (!valid(r)) continue;
+            const d = dist(e.pos, r.pos);
+            if (!engaged && (d > e.def.sightRange || !ctx.grid.lineOfSight(e.pos, r.pos))) continue;
+            if (d < bd) {
+                bd = d;
+                best = r;
+            }
+        }
+        if (best) {
+            e.targetId = best.id;
+            return best;
+        }
+        e.targetId = null;
+        return { id: -1, pos: e.pos, radius: 0, alive: false };
+    }
+
     private think(e: Enemy, dt: number, ctx: EnemyContext, useRepath: () => boolean): void {
         const a = e.def;
-        const pl = ctx.player;
+        const pl = this.targetOf(e, ctx);
         switch (e.state) {
             case 'idle': {
                 if (e.returning) {
@@ -293,7 +336,7 @@ export class EnemySystem {
 
     private pursue(e: Enemy, dt: number, ctx: EnemyContext, useRepath: () => boolean): void {
         const a = e.def;
-        const pl = ctx.player;
+        const pl = this.targetOf(e, ctx);
         if (!pl.alive || pl.hidden || dist(e.pos, e.home) > a.leashRange) {
             // Soltar la correa: vuelve a casa sin mirar al jugador.
             enter(e, 'idle');
@@ -382,7 +425,8 @@ export class EnemySystem {
     }
 
     private startTelegraph(e: Enemy, ctx: EnemyContext, at: EnemyAttackDef): void {
-        face(e, ctx.player.pos);
+        const pl = this.targetOf(e, ctx);
+        face(e, pl.pos);
         e.path.length = 0;
         e.current = at;
         // Embotado: el aviso tarda más, o el lanzamiento falla y se pierde.
@@ -396,10 +440,10 @@ export class EnemySystem {
         let origin = copy(e.pos);
         if (at.placement === 'target') {
             // Área a los pies del jugador: queda fijada aquí, así que moverse la esquiva.
-            origin = copy(ctx.player.pos);
+            origin = copy(pl.pos);
         } else if (at.summon) {
             // Punto de invocación entre el invocador y el jugador, en suelo caminable.
-            const d = Math.min(at.summon.distance, Math.max(0, dist(e.pos, ctx.player.pos) - ctx.player.radius - 1));
+            const d = Math.min(at.summon.distance, Math.max(0, dist(e.pos, pl.pos) - pl.radius - 1));
             const p = { x: e.pos.x + Math.cos(e.facing) * d, y: e.pos.y + Math.sin(e.facing) * d };
             origin = ctx.grid.walkable(p) && ctx.grid.lineOfSight(e.pos, p) ? p : copy(e.pos);
         }
@@ -419,11 +463,21 @@ export class EnemySystem {
             return;
         }
         if (at.effect === 'damage') {
-            if (at.homing) {
-                if (ctx.player.alive) ctx.launchHoming(e, at);
+            if (!ctx.players) {
+                if (at.homing) {
+                    if (ctx.player.alive) ctx.launchHoming(e, at);
+                    return;
+                }
+                if (ctx.player.alive && shapeHitsCircle(t, ctx.player.pos, ctx.player.radius)) ctx.hitPlayer(e, at);
                 return;
             }
-            if (ctx.player.alive && shapeHitsCircle(t, ctx.player.pos, ctx.player.radius)) ctx.hitPlayer(e, at);
+            // GRP-01: el teledirigido sigue a su objetivo; el área alcanza a todos los que pilla.
+            if (at.homing) {
+                const pl = this.targetOf(e, ctx);
+                if (pl.alive) ctx.launchHoming(e, at, pl.id);
+                return;
+            }
+            for (const r of ctx.players) if (r.alive && shapeHitsCircle(t, r.pos, r.radius)) ctx.hitPlayer(e, at, r.id);
             return;
         }
         const s = at.summon!;

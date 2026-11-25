@@ -324,6 +324,23 @@
 
 ---
 
+## 2026-11-24 — GRP-01: compañeros simulados en el mismo mundo, en rama de revisión (Claude)
+
+**Archivos:** `src/sim/participants.ts` y `src/sim/groupLedger.ts` (nuevos), `src/sim/world.ts`, `src/sim/enemies.ts`, `scripts/balance/grupo.ts` y `grupoRun.ts` (nuevos), `package.json` (`lab:grupo`), `tests/grp01_companions.test.ts`, `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- `World` guarda plazas de participante. La 0 es el jugador; las demás solo existen con `lab.companions`.
+- Cada compañero se simula con el mismo código que el jugador y tiene su sesión y su `PlayerBot`.
+- Los enemigos retienen su objetivo, eligen al participante válido más cercano y golpean en área a todos los que pillan.
+- `GroupLedger` mide daño, curación, tiempo activo, bajas, muertes y participación (con `shares` de `spoils.ts`). No reparte nada.
+- Hecho en la rama `grp-01`; integrado en `master` el 2026-11-25 por orden del creador (una sola rama) y rama borrada.
+
+**Validación:** 14 pruebas nuevas en verde y la suite completa sin regresiones. En el worktree fallaba `jl37_checkDocs` porque faltaba `balM3.ts`; ya está en `master`. Al integrar, la prueba 3/12 falló: con GCD-01 el combate duraba ~2 s y solo un aliado recibía golpes. Se subieron los enemigos de esa prueba a nivel 8 sin tocar la aserción; 14/14 en verde (`work/claude-grp/integracion/`). Typecheck y build correctos. Con 4 jugadores el tick cuesta ~3× el de 1 (≈0,06 ms).
+
+**Evidencia:** `work/claude-grp/grp01/REPORTE.md`, `npm_test.txt`, `rendimiento.txt`, `rendimiento.json`.
+
+---
+
 ## 2026-11-24 — HUD-ROJO-03, REGEN-01 y EQ-10c (Coord)
 
 - **Barra en rojo.** Con `approachToCast` el alcance y la línea de visión no rechazan la pulsación; la barra ya no lo marca. Electron: 7 → 0 huecos rojos con un enemigo a 30 m (`work/claude-hz-0124/qa_barra_resultado.txt`).
