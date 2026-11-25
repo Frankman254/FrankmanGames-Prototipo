@@ -1,3 +1,15 @@
+## 2026-11-24 — JL-271: extraer el filtro de visibilidad del chat (Junie)
+
+**Archivos:** `src/ui/menus/chat.ts`, `src/ui/menus/chatLogic.ts`, `tests/ui/chatLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `chatLineMatchesView()` concentra la decisión pura de filtrar una línea por canal y categorías activas. `ChatBox.add()` usa el helper y conserva el comportamiento del registro; no se modificaron la interpretación de comandos ni el límite del historial.
+
+**Validación:** `tests/ui/chatLogic.test.ts` (2/2), `tests/ui/chat.test.ts` (9/9), `npm test`: 383 archivos y 4.916 pruebas aprobados, 1 archivo omitido y 1 `todo`; `npm run typecheck`, `npm run docs:check` y `npm run build` limpios. Vite avisó que algunos chunks superan 500 kB, sin impedir el build. No cambia la presentación; no aplica captura Electron.
+
+**Evidencia:** `tests/ui/chatLogic.test.ts` y `work/junie-jl271/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-24 — JL-270: extraer marcadores de enemigos del feed del mapa (Junie)
 
 **Archivos:** `src/ui/map/mapFeed.ts`, `src/ui/map/mapFeedLogic.ts`, `tests/ui/mapFeedLogic.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
