@@ -1,3 +1,13 @@
+## 2026-11-25 — JL-306: corregir recortes de texto en inglés (Junie)
+
+**Archivos:** `src/ui/styles/ventanas.css`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** En mochila se recortaban «Any element» y «Any focus» porque los seis filtros compartían una fila sin ajuste; ahora pueden envolver a una segunda fila con ancho base suficiente. En la hoja del personaje, «Crowd-control resistance» terminaba en puntos suspensivos; la etiqueta ahora se ajusta a varias líneas. No se cambiaron traducciones ni contenido.
+
+**Validación:** Electron `ingles`: 8/8, consola limpia; los seis filtros pasan la medición de anchura a 1920×1080 y 1366×768, y las etiquetas de estadísticas no desbordan. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, Prettier para `ventanas.css` y `npm run docs:check` limpios. Capturas antes/después: `work/junie-jl306/qa/ingles-mochila.jpg`, `work/junie-jl306/qa-final/ingles-personaje.jpg`, `work/junie-jl306/qa-final2/ingles-mochila.jpg`, `work/junie-jl306/qa-final2/ingles-mochila-1366.jpg` y `work/junie-jl306/qa-final2/ingles-personaje.jpg`.
+
+---
+
 ## 2026-11-25 — JL-305: validar salidas y enlaces de diálogo de PNJ (Junie)
 
 **Archivos:** `src/rpg/content.ts`, `tests/rpg/content.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

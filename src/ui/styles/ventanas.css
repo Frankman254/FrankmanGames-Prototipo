@@ -989,11 +989,6 @@ input[type='search'] {
     font-size: var(--fs-11);
     min-height: 18px;
 }
-.stat-row .n {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
 .stat-row.primary {
     padding: 1px 4px;
 }
@@ -1357,10 +1352,10 @@ input[type='search'] {
 .bag-tools {
     gap: 3px;
     margin-bottom: 5px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
 .bag-select {
-    flex: 1 1 60px;
+    flex: 1 1 96px;
     max-width: none;
     padding: 2px 3px;
     font-size: var(--fs-11);

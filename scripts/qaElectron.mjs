@@ -4021,6 +4021,7 @@ const scenarios = {
             `(()=>{ const s=document.querySelector('[data-opt="language"]'); const el = s?.tagName==='SELECT' ? s : s?.querySelector('select'); if(!el) return false; el.value='en'; el.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`,
         );
         await sleep(500);
+        await shot('ingles-opciones');
         await key('Escape', 'Escape');
         await sleep(200);
         await key('Escape', 'Escape');
@@ -4037,6 +4038,27 @@ const scenarios = {
         await key('KeyB', 'b');
         await sleep(500);
         await shot('ingles-mochila');
+        const measureFilterLayout = () =>
+            js(
+                `(()=>{ const selects=[...document.querySelectorAll('.bag-tools .bag-select')].filter(s=>s.getBoundingClientRect().width>0); const ctx=document.createElement('canvas').getContext('2d'); const clipped=selects.flatMap(s=>{ const style=getComputedStyle(s); ctx.font=style.font; const text=s.selectedOptions[0]?.textContent ?? ''; const required=ctx.measureText(text).width+parseFloat(style.paddingLeft)+parseFloat(style.paddingRight)+18; return required>s.getBoundingClientRect().width ? [{title:s.title,text,required:+required.toFixed(1),width:+s.getBoundingClientRect().width.toFixed(1)}] : []; }); return {count:selects.length,clipped}; })()`,
+            );
+        const filterLayout = await measureFilterLayout();
+        check(
+            'F07: todos los filtros de la mochila caben en inglés',
+            filterLayout.count === 6 && filterLayout.clipped.length === 0,
+            JSON.stringify(filterLayout),
+        );
+        await resize(1366, 768);
+        await sleep(250);
+        await shot('ingles-mochila-1366');
+        const narrowFilterLayout = await measureFilterLayout();
+        check(
+            'F07: los filtros caben en inglés a 1366x768',
+            narrowFilterLayout.count === 6 && narrowFilterLayout.clipped.length === 0,
+            JSON.stringify(narrowFilterLayout),
+        );
+        await resize(1920, 1080);
+        await sleep(250);
         const text = await js(`document.body.innerText`);
         await key('KeyB', 'b');
         await key('KeyN', 'n');
@@ -4067,16 +4089,27 @@ const scenarios = {
                 if (/[áéíóúñ¿¡]|\b(de|del|con|para|los|las|Clic)\b/.test(line) && line.length < 160)
                     leftovers.add(line.trim());
         };
-        for (const [code, ch] of [
-            ['KeyC', 'c'],
-            ['KeyV', 'v'],
-            ['Numpad3', 'n3'],
-            ['Minus', '-'],
-            ['KeyM', 'm'],
+        for (const [code, ch, name] of [
+            ['KeyC', 'c', 'personaje'],
+            ['KeyV', 'v', 'hechizos'],
+            ['Numpad3', 'n3', 'compendio'],
+            ['Minus', '-', 'oficios'],
+            ['KeyM', 'm', 'mapa'],
         ]) {
             await key(code, ch);
             await sleep(500);
             await sweep();
+            await shot(`ingles-${name}`);
+            if (name === 'personaje') {
+                const overflowingLabels = await js(
+                    `(()=>[...document.querySelectorAll('.panel-character .stat-row .n')].filter(e=>e.getClientRects().length).filter(e=>e.scrollWidth>e.clientWidth+1||e.scrollHeight>e.clientHeight+1).map(e=>({label:e.textContent.trim(),clientWidth:e.clientWidth,scrollWidth:e.scrollWidth,clientHeight:e.clientHeight,scrollHeight:e.scrollHeight})))()`,
+                );
+                check(
+                    'F07: las etiquetas de atributos no se recortan en inglés',
+                    overflowingLabels.length === 0,
+                    JSON.stringify(overflowingLabels),
+                );
+            }
             await key(code, ch);
         }
         await key('Escape', 'Escape');
