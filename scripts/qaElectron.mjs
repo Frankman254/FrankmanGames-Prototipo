@@ -2698,6 +2698,136 @@ const scenarios = {
         );
     },
 
+    /** JL-323: velocidad de apoyo en los clips de caminar y correr. */
+    async jl323Zancada() {
+        const outDir = OUT;
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const sexes = [
+            { id: 'masculino', label: 'masculino', suffix: '' },
+            { id: 'femenino', label: 'femenino', suffix: '_f' },
+        ];
+        // Son las referencias que usa el QA de JL-322 para andar y el movimiento base del juego para correr.
+        const targetSpeeds = { walk: 2.5, run: 6 };
+        const measurements = [];
+        const median = (values) => {
+            const sorted = [...values].sort((a, b) => a - b);
+            const middle = Math.floor(sorted.length / 2);
+            return sorted.length === 0 ? null : sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+        };
+        const contacts = (samples, foot) => {
+            const floor = Math.min(...samples.map((sample) => sample[foot].y));
+            const threshold = floor + 0.045;
+            const intervals = [];
+            let start = -1;
+            const save = (end) => {
+                if (start < 0) return;
+                const first = samples[start];
+                const last = samples[end];
+                const seconds = (last.ms - first.ms) / 1000;
+                const distance = Math.abs(last[foot].forward - first[foot].forward);
+                if (end - start >= 2 && seconds >= 0.04) {
+                    intervals.push({ seconds, distance, speed: distance / seconds, phaseStart: first.phase, phaseEnd: last.phase });
+                }
+                start = -1;
+            };
+            for (let i = 0; i < samples.length; i++) {
+                const planted = samples[i][foot].y <= threshold;
+                if (planted && start < 0) start = i;
+                if (!planted) save(i - 1);
+            }
+            save(samples.length - 1);
+            return { floor, threshold, intervals, medianSpeed: median(intervals.map((interval) => interval.speed)) };
+        };
+
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame(`QA ${hero.label}`, { classId: hero.id });
+                await js(`${S}.character.sex=${JSON.stringify(sex.id)}`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.label}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                await js(
+                    `(()=>{ const w=${W},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.speed=0; p.facing=0; p.alive=true; v.player.reset(); v.player.visualYaw=0; v.player.model.root.rotation.y=0; v.rig.mode='manual'; v.rig.pitchDeg=14; v.rig.yawDeg=180; v.rig.distance=5; v.rig.jumpTo(5); })()`,
+                );
+                const info = await js(
+                    `(()=>{ const m=__game.view.player.model; return {file:m.entry.file,runSpeed:m.entry.runSpeed,walkSeconds:m.clipSeconds('walk'),runSeconds:m.clipSeconds('run'),hasWalk:m.hasClip('walk'),hasRun:m.hasClip('run'),hasFeet:['footL','footR'].every(n=>m.joints.has(n))}; })()`,
+                );
+                check(
+                    `JL-323 ${hero.label} ${sex.label}: modelo, clips y pies`,
+                    info.file === expectedFile && info.runSpeed > 0 && info.hasWalk && info.hasRun && info.hasFeet && info.walkSeconds > 0 && info.runSeconds > 0,
+                    JSON.stringify(info),
+                );
+
+                for (const gait of ['walk', 'run']) {
+                    const measured = await js(
+                        `(async()=>{ const a=__game.view.player,m=a.model,g=m.groups.get(${JSON.stringify(gait)}),scene=__game.view.scene,left=m.joints.get('footL'),right=m.joints.get('footR'),duration=m.clipSeconds(${JSON.stringify(gait)}); if(!g||!left||!right) throw new Error('clip o huesos de pie ausentes'); a.oneShot=${JSON.stringify(gait)}; m.play(${JSON.stringify(gait)},{restart:true}); const update=m.update.bind(m); m.update=(dt,speed)=>{const events=update(dt,speed);g.speedRatio=1;return events;}; g.speedRatio=1; await new Promise(resolve=>setTimeout(resolve,300)); if(!g.animatables[0]) throw new Error('clip sin animatable'); const samples=[],start=performance.now(); await new Promise((resolve,reject)=>{ const observer=scene.onAfterRenderObservable.add(()=>{ try { const anim=g.animatables[0]; if(!anim) throw new Error('clip detenido durante la medida'); g.speedRatio=1; const root=m.root.getAbsolutePosition(),take=node=>{const p=node.getAbsolutePosition();return {forward:p.x-root.x,y:p.y-root.y};},ms=performance.now()-start; samples.push({ms,phase:(anim.masterFrame-g.from)/(g.to-g.from),left:take(left),right:take(right)}); if(ms>=duration*3000){scene.onAfterRenderObservable.remove(observer);resolve();} } catch(error) { scene.onAfterRenderObservable.remove(observer); reject(error); } }); }); return {duration,runSpeed:m.entry.runSpeed,samples}; })()`,
+                    );
+                    const left = contacts(measured.samples, 'left');
+                    const right = contacts(measured.samples, 'right');
+                    const targetSpeed = targetSpeeds[gait];
+                    const configuredNatural = gait === 'walk'
+                        ? measured.runSpeed * (info.runSeconds / info.walkSeconds)
+                        : measured.runSpeed;
+                    const leftRequiredFactor = left.medianSpeed > 0 ? targetSpeed / left.medianSpeed : null;
+                    const rightRequiredFactor = right.medianSpeed > 0 ? targetSpeed / right.medianSpeed : null;
+                    const currentFactor = Math.max(0.3, targetSpeed / configuredNatural);
+                    measurements.push({
+                        hero: hero.label,
+                        sex: sex.label,
+                        model: info.file,
+                        gait,
+                        targetSpeed,
+                        clipSeconds: measured.duration,
+                        configuredNatural,
+                        leftRequiredFactor,
+                        rightRequiredFactor,
+                        currentFactor,
+                        leftFootSpeed: left.medianSpeed,
+                        rightFootSpeed: right.medianSpeed,
+                        samples: measured.samples.length,
+                        feet: { left, right },
+                        rawSamples: measured.samples,
+                    });
+                    check(
+                        `JL-323 ${hero.label} ${sex.label} ${gait}: apoyos y muestras`,
+                        measured.samples.length >= 30 && left.intervals.length >= 2 && right.intervals.length >= 2 && Number.isFinite(left.medianSpeed) && Number.isFinite(right.medianSpeed),
+                        JSON.stringify({ samples: measured.samples.length, left: left.intervals.length, right: right.intervals.length, leftSpeed: left.medianSpeed, rightSpeed: right.medianSpeed }),
+                    );
+                    await js(
+                        `(()=>{ const a=__game.view.player,m=a.model,g=m.groups.get(${JSON.stringify(gait)}); a.oneShot=${JSON.stringify(gait)}; m.play(${JSON.stringify(gait)},{restart:true}); g.speedRatio=1; })()`,
+                    );
+                    await sleep(250);
+                    await shot(`jl323-${hero.model}-${sex.id}-${gait}`);
+                }
+            }
+        }
+
+        const fmt = (value) => Number.isFinite(value) ? value.toFixed(3) : 'n/d';
+        const rows = [
+            '| Héroe | Sexo | Clip | Velocidad ref. (m/s) | Apoyos L/R | Pie izq. a 1× (m/s) | Pie der. a 1× (m/s) | Factor necesario L/R | Factor runtime |',
+            '|---|---|---|---:|---:|---:|---:|---:|---:|',
+        ];
+        for (const item of measurements) {
+            rows.push(`| ${item.hero} | ${item.sex} | ${item.gait} | ${fmt(item.targetSpeed)} | ${item.feet.left.intervals.length}/${item.feet.right.intervals.length} | ${fmt(item.leftFootSpeed)} | ${fmt(item.rightFootSpeed)} | ${fmt(item.leftRequiredFactor)} / ${fmt(item.rightRequiredFactor)} | ${fmt(item.currentFactor)} |`);
+        }
+        fs.writeFileSync(path.join(outDir, 'muestras.json'), JSON.stringify(measurements, null, 2));
+        fs.writeFileSync(
+            path.join(outDir, 'TABLA.md'),
+            `# JL-323 — velocidad de apoyo de los héroes\n\nLos pies se muestrearon en los seis modelos (tres héroes × dos sexos), a velocidad de clip 1× durante tres ciclos por marcha, dejando terminar la mezcla de animación. Se considera apoyo la franja de hasta 4,5 cm sobre la altura mínima observada; se conservan también los intervalos con desplazamiento casi nulo. La velocidad de cada pie es la mediana de sus intervalos válidos: desplazamiento horizontal respecto a la raíz, proyectado sobre +X (delante), dividido por el tiempo de apoyo. Se requieren al menos tres muestras y 0,04 s por intervalo. Las posiciones absolutas incluyen la escala del modelo.\n\nLa referencia de andar es 2,5 m/s, la usada por el escenario clipsHeroes; correr usa 6 m/s, DEFAULT_MOVE_SPEED de PlayerAvatar. El factor necesario se presenta por pie y es velocidad de referencia / velocidad mediana de ese pie a 1×. El factor runtime refleja la fórmula actual de GltfCharacter.update() (runSpeed; para andar, runSpeed × duración de correr / duración de andar, con mínimo 0,3), común a ambos pies. La asimetría entre pies se conserva en vez de ocultarla en un promedio; los resultados son mediciones, no una recomendación de cambio.\n\n${rows.join('\n')}\n\nLas muestras por fotograma y los intervalos de apoyo están en [muestras.json](./muestras.json); las capturas individuales son jl323-*.jpg. No se modificaron velocidades, datos ni código productivo.\n`,
+        );
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -10930,6 +11060,8 @@ scenarios.jl248_rendimientoTres.timeout = 300;
 scenarios.medidorDano.timeout = 90;
 // JL-322: seis modelos × ocho poses × dos ángulos y sus láminas de capturas.
 scenarios.clipsHeroes.timeout = 600;
+// JL-323: seis modelos × dos marchas, muestreadas durante tres ciclos.
+scenarios.jl323Zancada.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

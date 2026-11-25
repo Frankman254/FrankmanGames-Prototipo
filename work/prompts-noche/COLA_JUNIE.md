@@ -1555,7 +1555,7 @@ Antes de cada una, busca si ya existe.
 
 ### F. Apoyo a personajes, animaciones y físicas (solo medir y capturar: el código es del coordinador)
 - [x] JL-322 Escenario `clipsHeroes`: por cada héroe y sexo, una captura por clip (reposo, andar, correr, atacar, lanzar, golpe, morir y montar), de lado y de frente. Lámina en `work/junie-jl322/` — commit «JL-322: capturar clips de héroes de frente y lado» — `work/junie-jl322/LAMINA.md` (96 capturas individuales, seis láminas; Electron 145/145).
-- [ ] JL-323 **Pies que patinan:** para cada héroe, la velocidad de movimiento frente a la zancada del clip de andar y de correr (cuánto avanza un pie apoyado por segundo). Tabla con el factor que haría falta. Solo medir.
+- [x] JL-323 **Pies que patinan:** para cada héroe, la velocidad de movimiento frente a la zancada del clip de andar y de correr (cuánto avanza un pie apoyado por segundo). Tabla con el factor que haría falta. Solo medir. — commit «JL-323: medir patinaje en los clips de marcha» — Electron 19/19, consola limpia; tabla, muestras y 12 capturas en `work/junie-jl323/revision-3/TABLA.md` y `work/junie-jl323/revision-3/`.
 - [ ] JL-324 **Saltos entre clips:** grabar cada cambio entre reposo, andar, correr, atacar y reposo a 60 fps, y anotar los que dan salto, con el fotograma.
 - [ ] JL-325 Escenario `jinetes`: captura de cada héroe sobre cada montura, de lado. Lista de los que flotan, se hunden o atraviesan la silla.
 - [ ] JL-326 Escenario `trajes`: captura de cada conjunto de equipo puesto, andando y corriendo, de lado. Lista de piezas que atraviesan el cuerpo (como las piernas con la falda de la Diablica).

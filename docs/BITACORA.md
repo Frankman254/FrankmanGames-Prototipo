@@ -1,3 +1,17 @@
+## 2026-11-25 — JL-323: medir patinaje en los clips de marcha (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `jl323Zancada`: mide los clips de andar y correr a 1× durante tres ciclos en los seis modelos (tres héroes × dos sexos). Registra por separado el desplazamiento del pie izquierdo y derecho durante el apoyo, el factor necesario para 2,5 m/s al andar y 6 m/s al correr, y el factor que calcula el runtime. Se conservan incluso los apoyos con desplazamiento casi nulo; no se modificaron lógica productiva, datos ni cifras.
+
+**Resultado medido:** Pie izquierdo: 0,259–0,392 m/s; derecho: 0,005–0,041 m/s. Los factores necesarios abarcan 7,739–20,832 (izquierdo) y 112,495–522,393 (derecho), frente a los factores runtime 3,054 al andar y 4,615 al correr. Son mediciones, no una recomendación de cambio.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `jl323Zancada`: 19/19 comprobaciones, ambos pies con al menos dos intervalos válidos y consola limpia; revisadas capturas representativas de Centinela masculino andando y corriendo, con las 12 guardadas. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl323/revision-3/TABLA.md`, `work/junie-jl323/revision-3/muestras.json` y 12 capturas `work/junie-jl323/revision-3/jl323-*.jpg`.
+
+---
+
 ## 2026-11-25 — JL-322: capturar clips de héroes de frente y lado (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
