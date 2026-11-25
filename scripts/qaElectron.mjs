@@ -3120,6 +3120,64 @@ const scenarios = {
         check('JL-319: consola sin errores', errors.length === 0, errors);
     },
 
+    /** JL-320: el inspector de desarrollo abre, enumera capas y muestra una malla seleccionada. */
+    async inspector() {
+        await newGame('QA Inspector');
+        const panel = '.dev-inspector';
+        check('JL-320: inspector de desarrollo disponible', await js(`!!document.querySelector('${panel}')`));
+
+        await cdp('Input.dispatchKeyEvent', {
+            type: 'rawKeyDown',
+            code: 'Backquote',
+            key: '`',
+            windowsVirtualKeyCode: 192,
+        });
+        await cdp('Input.dispatchKeyEvent', {
+            type: 'keyUp',
+            code: 'Backquote',
+            key: '`',
+            windowsVirtualKeyCode: 192,
+        });
+        await until(`document.querySelector('${panel}')?.hidden===false`, 3000, 'abrir inspector');
+
+        const layers = await js(`(() => {
+            const el=document.querySelector('${panel}'), list=el?.lastElementChild;
+            const title=list?.firstElementChild?.textContent ?? '';
+            return {title, rows:list?.querySelectorAll('input[type="checkbox"]').length ?? 0};
+        })()`);
+        check(
+            'JL-320: inspector abre y enumera capas',
+            /Capas \(\d+ nodos raíz\)/.test(layers.title) && layers.rows > 1,
+            JSON.stringify(layers),
+        );
+
+        const target = await js(`(() => {
+            const canvas=document.querySelector('canvas'), rect=canvas.getBoundingClientRect(), scene=__game.view.scene;
+            for(let y=Math.round(rect.height*.2);y<rect.height*.8;y+=12) {
+                for(let x=Math.round(rect.width*.38);x<rect.width*.92;x+=12) {
+                    if(document.elementFromPoint(rect.x+x,rect.y+y)!==canvas) continue;
+                    const mesh=scene.pick(x,y,m=>m.isEnabled()&&m.isVisible)?.pickedMesh;
+                    if(mesh?.getTotalVertices()>0&&!/^(terrain|ground|water|sea)/i.test(mesh.name))
+                        return {x:rect.x+x,y:rect.y+y,name:mesh.name};
+                }
+            }
+            return null;
+        })()`);
+        if (!target) throw new Error('No se encontró una malla visible para seleccionar con el inspector');
+        await mouse(target.x, target.y, { modifiers: 1 });
+        await until(`document.querySelector('${panel} pre')?.textContent.includes('Malla:')`, 3000, 'mostrar malla seleccionada');
+        const entity = await js(`document.querySelector('${panel} pre').textContent`);
+        check(
+            'JL-320: Alt + clic muestra la entidad seleccionada',
+            entity.includes(`Malla: ${target.name}`) && entity.includes('Vértices:'),
+            entity,
+        );
+        await shot('jl320-inspector-entidad');
+
+        const errors = await js(`window.__consola?.errores(20) || ''`);
+        check('JL-320: consola sin errores', errors.length === 0, errors);
+    },
+
     async objetos() {
         await newGame('QA Objetos');
         await js(

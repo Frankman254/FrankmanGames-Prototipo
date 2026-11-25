@@ -1550,7 +1550,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-317 `escaleraCripta`: bajar del piso 1 al 5 por las escaleras y volver a subir. — commit «JL-317: recorrer escaleras entre los pisos 1 y 5» — Electron 20/20, ocho transiciones reales y consola limpia; suite 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck limpio. Evidencia y nueve capturas en `work/junie-jl317/`.
 - [x] JL-318 `muerteResurreccion`: morir, ser espectral, resucitar en la piedra y no perder la barra. — commit «JL-318: conservar la barra tras morir y resucitar» — Electron 9/9, consola limpia; `npm test` 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl318/resultado.json` y capturas revisadas `jl318-espectro-piedra.jpg`, `jl318-espectro-alzador.jpg`, `jl318-resucitado.jpg`.
 - [x] JL-319 `mascota`: invocar la mascota, que siga al jugador al correr, al viajar y al entrar a una casa. — commit «JL-319: comprobar el seguimiento de la mascota en Electron» — Electron 9/9, consola limpia; suite 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl319/resultado.json` y cinco capturas revisadas.
-- [ ] JL-320 `inspector`: el inspector de desarrollo abre y lista una entidad sin errores.
+- [x] JL-320 `inspector`: el inspector de desarrollo abre y lista una entidad sin errores — commit «JL-320: comprobar el inspector en Electron» — 5/5 comprobaciones, consola limpia; captura y resultado en `work/junie-jl320/`.
 - [ ] JL-321 `medidorDano`: pelear 30 s y ver el medidor con sus porcentajes.
 
 ### F. Apoyo a personajes, animaciones y físicas (solo medir y capturar: el código es del coordinador)

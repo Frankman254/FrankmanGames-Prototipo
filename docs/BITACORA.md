@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-320: comprobar el inspector de desarrollo en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `inspector`: abre el inspector con `Backquote`, comprueba que enumera las capas y selecciona una malla visible de la casa con Alt + clic. Verifica que aparecen nombre, padres, material, distancia y vértices; no cambia el runtime.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `inspector`: 5/5 comprobaciones, consola limpia; `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio.
+
+**Evidencia:** `work/junie-jl320/resultado.json` y captura revisada `work/junie-jl320/jl320-inspector-entidad.jpg`.
+
+---
+
 ## 2026-11-25 — JL-319: comprobar el seguimiento de la mascota en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
