@@ -5004,6 +5004,61 @@ const scenarios = {
         }
     },
 
+    /** JL-317: bajar y volver a subir por las escaleras entre los pisos 1 y 5. */
+    async escaleraCripta() {
+        await newGame('QA Escaleras');
+        await js(`${S}.energy.value=100`);
+        await js(`window.__qaVida=setInterval(()=>{const w=__game.world;if(w?.player)w.player.health=w.player.maxHealth;},50)`);
+
+        try {
+            await js(`__game.crypt.enter(0,'above')`);
+            await until(`__game.crypt.floor===0`, 15000, 'piso 1 de la cripta');
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso 1 listo');
+            await sleep(1000);
+            check('JL-317: comienza en el piso 1', await js(`__game.crypt.floor===0`), 'índice 0');
+            await shot('jl317-piso-01-inicio');
+
+            const useStair = async (direction, expectedFloor, label) => {
+                const stairKey = direction === 'down' ? 'downStairs' : 'upStairs';
+                const mesh = direction === 'down' ? 'dDownFrame' : 'dUpStairs';
+                const stair = await js(
+                    `(()=>{const s=__game.crypt.floorData?.${stairKey};return s?{x:s.x,y:s.y}:null})()`,
+                );
+                check(`JL-317: ${label} existe`, !!stair, JSON.stringify(stair));
+                if (!stair) throw new Error(`No hay escalera ${direction} en el piso ${await js('__game.crypt.floor') + 1}`);
+
+                const approach = await js(
+                    `(()=>{const s=__game.crypt.floorData.${stairKey},g=${W}.grid;return g.center(g.nearestWalkable({x:s.x+0.5,y:s.y+0.5}))})()`,
+                );
+                await js(`${W}.commandMove({x:${approach.x},y:${approach.y}})`);
+                await until(
+                    `Math.hypot(${W}.player.pos.x-${approach.x},${W}.player.pos.y-${approach.y})<0.75`,
+                    30000,
+                    `llegar a escalera ${direction} del piso ${await js('__game.crypt.floor') + 1}`,
+                );
+                await js(`(()=>{const r=__game.view.rig;r.pitchDeg=38;r.distance=9})()`);
+                await sleep(700);
+                await clickMesh(mesh);
+                await until(`__game.crypt.floor===${expectedFloor}`, 30000, `${label} al piso ${expectedFloor + 1}`);
+                await until(`!document.querySelector('.carga:not([hidden])')`, 20000, `piso ${expectedFloor + 1} listo`);
+                await sleep(1000);
+                const floor = await js(`__game.crypt.floor`);
+                check(`JL-317: ${label} llega al piso ${expectedFloor + 1}`, floor === expectedFloor, `índice ${floor}`);
+                await shot(`jl317-piso-${String(expectedFloor + 1).padStart(2, '0')}-${direction}`);
+            };
+
+            for (let floor = 1; floor <= 4; floor++) await useStair('down', floor, 'baja');
+            for (let floor = 3; floor >= 0; floor--) await useStair('up', floor, 'sube');
+
+            check('JL-317: vuelve al piso 1', await js(`__game.crypt.floor===0`), 'índice 0');
+            const errors = await js(`window.__consola ? window.__consola.errores(20) : ''`);
+            const errorText = Array.isArray(errors) ? errors.join('\n') : String(errors ?? '');
+            check('JL-317: consola sin errores', !errorText.trim(), errorText.slice(0, 500));
+        } finally {
+            await js(`clearInterval(window.__qaVida)`);
+        }
+    },
+
     async criptaAislada() {
         await newGame('QA Cripta');
         await until(

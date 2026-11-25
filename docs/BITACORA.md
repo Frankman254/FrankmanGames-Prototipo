@@ -1,3 +1,15 @@
+## 2026-11-25 — JL-317: recorrer escaleras entre los pisos 1 y 5 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `escaleraCripta`: el personaje acciona las escaleras con clic real, baja del piso 1 al 5 y vuelve por ellas al piso 1. Se repone vida solo durante el recorrido para aislar la transición; no se modificaron la lógica del juego ni los datos.
+
+**Validación:** Electron `escaleraCripta`: 20/20 comprobaciones, incluidas las ocho transiciones, el destino tras cada clic y la consola limpia. `tests/cryptSceneLogic.test.ts` y `tests/jl232_cryptStairs.test.ts`: 406/406; `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. `node --check scripts/qaElectron.mjs` limpio.
+
+**Evidencia:** `work/junie-jl317/resultado.json` y nueve capturas, incluidas las revisadas `work/junie-jl317/jl317-piso-05-down.jpg` y `work/junie-jl317/jl317-piso-01-up.jpg`.
+
+---
+
 ## 2026-11-25 — JL-316: comprobar el aviso al cruzar una zona (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

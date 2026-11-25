@@ -1547,7 +1547,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-314 `estados`: aplicar cada estado de desarrollo y capturar su efecto visual. — commit «JL-314: capturar efectos visuales de estados» — Electron `estados` 41/41, consola limpia; 39 capturas en `work/junie-jl314/`.
 - [!] JL-315 `lluvia`: forzar lluvia y tormenta y comprobar partículas, niebla y sonido. — BLOQUEADA: el juego solo define `clear`, `rain`, `sun` y `snow`; no existe `storm` ni sonido de clima. Lluvia verificada en Electron (partículas y niebla); faltan ambas capacidades para completar la comprobación. Evidencia: `work/junie-jl315/jl315-clima.json` y capturas `jl315-despejado.jpg`, `jl315-lluvia.jpg`.
 - [x] JL-316 `bordeZona`: andar hacia un borde de zona y ver el aviso. — commit «JL-316: mostrar el aviso al cruzar el borde de zona» — Electron 6/6, consola limpia; `npm test` 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck limpio. Evidencia en `work/junie-jl316/resultado.json` y capturas revisadas `jl316-aviso-zona.jpg`, `jl316-antes-del-limite.jpg`.
-- [ ] JL-317 `escaleraCripta`: bajar del piso 1 al 5 por las escaleras y volver a subir.
+- [x] JL-317 `escaleraCripta`: bajar del piso 1 al 5 por las escaleras y volver a subir. — commit «JL-317: recorrer escaleras entre los pisos 1 y 5» — Electron 20/20, ocho transiciones reales y consola limpia; suite 5.034 aprobadas, 1 omitida y 1 `todo`; typecheck limpio. Evidencia y nueve capturas en `work/junie-jl317/`.
 - [ ] JL-318 `muerteResurreccion`: morir, ser espectral, resucitar en la piedra y no perder la barra.
 - [ ] JL-319 `mascota`: invocar la mascota, que siga al jugador al correr, al viajar y al entrar a una casa.
 - [ ] JL-320 `inspector`: el inspector de desarrollo abre y lista una entidad sin errores.
