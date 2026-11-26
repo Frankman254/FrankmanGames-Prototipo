@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-328: continuidad de los clips de reposo (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `jl328Reposo`: observa los cuatro modelos de mascota y cinco modelos únicos de montura mientras cada clip `idle` se repite durante 60 s. El control mide el estado de cada grupo y cuenta los reinicios del fotograma; no modifica el runtime, los datos ni los assets.
+
+**Resultado visual:** Revisé muestras ampliadas de los seis vídeos (cuatro mascotas en una toma y una por modelo de montura), con varios ciclos por clip; no observé cortes ni saltos evidentes. En la observación continua hubo 18–29 vueltas por mascota y 14–24 por montura, con cero fotogramas fuera de `idle`.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `jl328Reposo`: 26/26 comprobaciones, seis vídeos H.264 960×540 a 30 fps y cero errores de consola. `npm test`: 419 archivos, 5.053 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl328/observaciones.json`, seis `jl328-*.mp4`, capturas de inicio/fin y muestras visuales ampliadas.
+
+---
+
 ## 2026-11-26 — CLA-CRIPTA2: buhonero, guía de vuelta y estanques con lóbulos (Claude)
 
 **Archivos:** `src/rpg/{contracts,content,quests,session}.ts`, `src/sim/{world,navGrid,fishing}.ts`, `src/world/dungeon.ts`, `src/render/dungeonView.ts`, `src/scenes/cryptScene.ts`, `src/main.ts`, `data/rpg/{merchants,npcs}.json`, `data/i18n/en.{content,ui}.json`, `tests/cla_cripta2.test.ts`; las pruebas de «PNJ en el pueblo» (`zones`, `rpg/quests`) exceptúan los PNJ `crypt` citando al creador.

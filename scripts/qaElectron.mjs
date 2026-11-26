@@ -380,7 +380,7 @@ async function shot(name) {
     const { data } = await cdp('Page.captureScreenshot', { format: 'jpeg', quality: 80 });
     fs.writeFileSync(path.join(OUT, `${name}.jpg`), Buffer.from(data, 'base64'));
 }
-async function encodeScreencast(frames, outputPath) {
+async function encodeScreencast(frames, outputPath, frameRate = 60) {
     const encoder = spawn(
         'ffmpeg',
         [
@@ -393,7 +393,7 @@ async function encodeScreencast(frames, outputPath) {
             '-vcodec',
             'mjpeg',
             '-framerate',
-            '60',
+            String(frameRate),
             '-i',
             'pipe:0',
             '-an',
@@ -406,7 +406,7 @@ async function encodeScreencast(frames, outputPath) {
             '-pix_fmt',
             'yuv420p',
             '-r',
-            '60',
+            String(frameRate),
             '-movflags',
             '+faststart',
             outputPath,
@@ -3990,6 +3990,173 @@ const scenarios = {
         await shot('jl319-mascota-casa-interior');
         const errors = await js(`window.__consola?.errores(20) || ''`);
         check('JL-319: consola sin errores', errors.length === 0, errors);
+    },
+
+    /** JL-328: observa durante 60 s los bucles de reposo de mascotas y monturas. */
+    async jl328Reposo() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl328';
+        const durationMs = 60000;
+        const frameRate = 30;
+        const captures = [];
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1280, 720);
+
+        const { items } = JSON.parse(fs.readFileSync(path.resolve('data/rpg/items.json'), 'utf8'));
+        const seenModels = new Set();
+        const mounts = Object.entries(items)
+            .filter(([, item]) => item.slot === 'mount')
+            .filter(([, item]) => {
+                const model = item.mount?.model ?? 'montura';
+                if (seenModels.has(model)) return false;
+                seenModels.add(model);
+                return true;
+            })
+            .map(([id, item]) => ({ id, model: item.mount?.model ?? 'montura', label: item.name ?? id }));
+        check('JL-328: cada modelo de montura tiene una prueba', mounts.length === 5, `${mounts.length}: ${mounts.map((m) => m.model).join(', ')}`);
+
+        await newGame('QA Reposo', { classId: 'ember_vanguard', devMount: true });
+        await js(`(()=>{
+          const w=${W},c=w.character,p=w.player,v=__game.view;
+          c.level=200;
+          if(c.equipment.get('mount')) ${S}.unequip('mount');
+          for(const item of [...c.inventory.slots]) if(item) c.inventory.remove(item.uid,item.quantity);
+          w.pets.splice(0,w.pets.length);
+          for(const id of ['ash_fox','archivist_owl','moss_turtle','spirit_wolf']) w.spawnPet(w.content.pets[id],null,120);
+          const a=w.grid.center(w.grid.nearestWalkable({x:127,y:130}));
+          p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.flight=null;
+          v.rig.mode='manual';v.rig.yawDeg=180;v.rig.pitchDeg=14;v.rig.distance=7;v.rig.jumpTo(7);
+        })()`);
+        await until(`${W}.pets.length===4 && __game.view.pets.visuals.size===4 && __game.view.scene.meshes.filter(m=>/^pet\\d+:/.test(m.name)&&m.getTotalVertices()>0).length>=4`, 20000, 'cuatro mascotas cargadas');
+        await js(`(()=>{const w=${W},v=__game.view,c=w.player.pos;w.pets.forEach((p,i)=>{const a=i*Math.PI/2+0.5;p.pos.x=c.x+Math.cos(a)*2.4;p.pos.y=c.y+Math.sin(a)*2.4;p.prevPos.x=p.pos.x;p.prevPos.y=p.pos.y;p.path=[];});})()`);
+        await sleep(500);
+
+        const recordRest = async (name, sourceExpression, expectedCount) => {
+            const start = await js(`(()=>{
+              const v=__game.view,scene=v.scene,sources=${sourceExpression};
+              const tracks=sources.map(s=>({id:s.id,group:s.group,state:s.state,lastFrame:null,loops:0,activeFrames:0,invalidFrames:0,
+                clipSeconds:s.group?((s.group.to-s.group.from)/(s.group.targetedAnimations[0]?.animation.framePerSecond??60)):0}));
+              let renderFrames=0;
+              const observer=scene.onAfterRenderObservable.add(()=>{
+                renderFrames++;
+                for(const t of tracks){
+                  if(t.group?.isPlaying&&t.state()==='idle')t.activeFrames++;else t.invalidFrames++;
+                  const f=t.group?.animatables?.[0]?.masterFrame;
+                  if(Number.isFinite(f)){if(t.lastFrame!==null&&f<t.lastFrame-1)t.loops++;t.lastFrame=f;}
+                }
+              });
+              window.__jl328FinishMonitor=()=>{scene.onAfterRenderObservable.remove(observer);return {renderFrames,tracks:tracks.map(({group,state,lastFrame,...t})=>({...t,playing:!!group?.isPlaying,state:state(),frame:lastFrame}))};};
+              return {tracks:tracks.map(t=>({id:t.id,hasClip:!!t.group,clipSeconds:t.clipSeconds,playing:!!t.group?.isPlaying,state:t.state()}))};
+            })()`);
+            check(`JL-328 ${name}: clip de reposo disponible`, start.tracks.length === expectedCount && start.tracks.every((track) => track.hasClip && track.playing && track.state === 'idle' && track.clipSeconds > 0), JSON.stringify(start));
+            if (start.tracks.length !== expectedCount || start.tracks.some((track) => !track.hasClip || !track.playing || track.state !== 'idle' || track.clipSeconds <= 0))
+                throw new Error(`No están listos los clips de reposo de ${name}: ${JSON.stringify(start)}`);
+
+            const frames = [];
+            screencastFrames = frames;
+            let recording = false;
+            let observed;
+            let elapsedMs = 0;
+            try {
+                await cdp('Page.startScreencast', {
+                    format: 'jpeg',
+                    quality: 65,
+                    maxWidth: 960,
+                    maxHeight: 540,
+                    everyNthFrame: 2,
+                });
+                recording = true;
+                await shot(`${name}-inicio`);
+                const startedAt = Date.now();
+                await sleep(durationMs);
+                elapsedMs = Date.now() - startedAt;
+                observed = await js('window.__jl328FinishMonitor()');
+                await shot(`${name}-fin`);
+            } finally {
+                if (recording) await cdp('Page.stopScreencast');
+                screencastFrames = null;
+            }
+
+            const validFrames = frames.filter((frame) => frame.data);
+            const times = validFrames.map((frame) => {
+                const timestamp = Number(frame.timestamp) * 1000;
+                return Number.isFinite(timestamp) && Math.abs(timestamp - frame.receivedAt) < 2000
+                    ? timestamp
+                    : frame.receivedAt;
+            });
+            const sourceDurationMs = times.length > 1 ? times.at(-1) - times[0] : 0;
+            const sourceFps = sourceDurationMs > 0 ? ((times.length - 1) * 1000) / sourceDurationMs : 0;
+            const outputFrames = [];
+            if (validFrames.length > 0) {
+                let nearest = 0;
+                for (let target = times[0]; target <= times.at(-1); target += 1000 / frameRate) {
+                    while (
+                        nearest + 1 < times.length &&
+                        Math.abs(times[nearest + 1] - target) < Math.abs(times[nearest] - target)
+                    ) nearest++;
+                    outputFrames.push(validFrames[nearest]);
+                }
+            }
+            const videoPath = path.join(outDir, `${name}.mp4`);
+            if (outputFrames.length > 1) await encodeScreencast(outputFrames, videoPath, frameRate);
+            const videoInfo = outputFrames.length > 1 ? await probeScreencast(videoPath) : null;
+            const report = {
+                name,
+                elapsedSeconds: Number((elapsedMs / 1000).toFixed(2)),
+                renderFrames: observed.renderFrames,
+                tracks: observed.tracks.map((track) => ({
+                    id: track.id,
+                    loops: track.loops,
+                    activeFrames: track.activeFrames,
+                    invalidFrames: track.invalidFrames,
+                    clipSeconds: Number(track.clipSeconds.toFixed(3)),
+                    playingAtEnd: track.playing,
+                    stateAtEnd: track.state,
+                })),
+                video: path.basename(videoPath),
+                videoFrames: outputFrames.length,
+                sourceFps: Number(sourceFps.toFixed(2)),
+                videoInfo,
+            };
+            captures.push(report);
+            check(`JL-328 ${name}: reposo continuo durante 60 s`, report.elapsedSeconds >= 60 && report.tracks.every((track) => track.activeFrames > 0 && track.invalidFrames === 0 && track.loops > 0 && track.playingAtEnd && track.stateAtEnd === 'idle'), JSON.stringify(report.tracks));
+            check(`JL-328 ${name}: vídeo de revisión con muestreo suficiente`, report.videoFrames >= frameRate * 55 && sourceFps >= 20 && videoInfo?.r_frame_rate === `${frameRate}/1`, `${report.videoFrames} frames, ${sourceFps.toFixed(1)} fps de origen`);
+        };
+
+        await recordRest(
+            'jl328-mascotas',
+            `Array.from(v.pets.visuals.entries()).map(([id,visual])=>({id:String(id),group:visual.model.groups.get('idle'),state:()=>visual.model.state}))`,
+            4,
+        );
+        await js(`__game.view.pets.visuals.forEach(visual=>{visual.model.root.isVisible=false;})`);
+
+        const observations = [];
+        for (const mount of mounts) {
+            const equipped = await js(`(()=>{
+              const c=${W}.character;
+              if(c.equipment.get('mount')) ${S}.unequip('mount');
+              for(const item of [...c.inventory.slots]) if(item) c.inventory.remove(item.uid,item.quantity);
+              const remaining=c.give(${JSON.stringify(mount.id)});
+              const item=c.inventory.slots.find(s=>s?.itemId===${JSON.stringify(mount.id)});
+              if(remaining||!item)return {ok:false,reason:'no se pudo preparar el objeto',remaining};
+              const result=${S}.equip(item.uid,'mount');
+              return {ok:result.ok,reason:result.reason??'',itemId:c.equipment.get('mount')?.itemId};
+            })()`);
+            check(`JL-328: equipar ${mount.label}`, equipped.ok && equipped.itemId === mount.id, JSON.stringify(equipped));
+            if (!equipped.ok) throw new Error(`No se pudo equipar ${mount.id}: ${JSON.stringify(equipped)}`);
+            await until(`__game.view.mountView.built?.id?.startsWith(${JSON.stringify(mount.id + '#')}) && __game.view.mountView.meshes().length>0 && __game.view.mountView.built.clips.idle?.isPlaying`, 30000, `montura en reposo ${mount.model}`);
+            await sleep(400);
+            const name = `jl328-montura-${mount.model}`;
+            await recordRest(
+                name,
+                `(()=>{const m=v.mountView.built;return m?[{id:${JSON.stringify(mount.model)},group:m.clips.idle,state:()=>m.current===m.clips.idle?'idle':'other'}]:[]})()`,
+                1,
+            );
+            observations.push({ id: mount.id, label: mount.label, model: mount.model, evidence: name });
+        }
+
+        fs.writeFileSync(path.join(outDir, 'observaciones.json'), JSON.stringify({ durationSeconds: 60, pets: captures[0], mounts: observations, recordings: captures }, null, 2));
+        const errors = await js('window.__consola?.errores(20) || \'\'');
+        check('JL-328: consola sin errores nuevos', errors.length === 0, errors);
     },
 
     /** JL-320: el inspector de desarrollo abre, enumera capas y muestra una malla seleccionada. */
@@ -11657,6 +11824,8 @@ scenarios.jl323Zancada.timeout = 600;
 scenarios.jl324Transiciones.timeout = 600;
 // JL-325: seis héroes × cada montura, con capturas laterales y láminas.
 scenarios.jinetes.timeout = 600;
+// JL-328: seis clips de reposo observados durante 60 s cada uno.
+scenarios.jl328Reposo.timeout = 600;
 // JL-326: 137 conjuntos × seis modelos/sexos × dos poses.
 scenarios.trajes.timeout = 600;
 
