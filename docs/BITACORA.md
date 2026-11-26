@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-351: actualizar el estado de la tanda (Junie)
+
+**Archivos:** `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se registró el comportamiento comprobado de JL-255 y JL-262…JL-266, separando las pruebas puras de las verificaciones en Electron y las capturas. El reintento de `guardadoBarriadaCasa` para JL-254 pasó 9/14: la carga integrada desde casa y barriada sigue reapareciendo fuera; la prueba pura solo acredita que `houseRoom` se serializa y llega a `RpgSessionFactory.load()`. No se modificaron código ni cifras.
+
+**Validación:** `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en tres proyectos; `npm run docs:check`: 214 rutas correctas. Electron: `previa` 11/11, `hechizosClases` 25/25, `mazmorraHonda` 3/3; `guardadoBarriadaCasa` 9/14, consola limpia. `editorWorldBuilder` 10/10 según su resultado y capturas revisadas.
+
+**Evidencia:** `work/junie-jl351/electron/`, incluida la captura en vuelo `hechizos-en-vuelo/jl304-ember_vanguard-charge-cast.jpg`, las capturas de cripta `cripta-verificada-2/` y la previa `previa-verificada-2/`; capturas de editor `work/qa/editor-world-builder-gizmo.jpg` y `editor-world-builder-movido.jpg`.
+
+---
+
 ## 2026-11-26 — JL-350: reintentar bloqueos de la tanda (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

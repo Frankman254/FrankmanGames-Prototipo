@@ -15,13 +15,25 @@ Revisión: 2026-11-26, sobre HEAD. Aquí solo hay hechos comprobados con código
 | `npm run format:check` | Prettier con `tabWidth: 4` (espacios). Código de juego/scripts formateado; `data/` y `docs/` fuera |
 | `npm run lint` | ESLint plano + `eslint-config-prettier`. Sin errores; avisos de variables no usadas preexistentes |
 
+## Comportamiento actualizado en la tanda JL-254, JL-255 y JL-262…JL-266 (2026-11-26)
+
+| Tarea | Estado comprobado y límite | Evidencia |
+|---|---|---|
+| JL-254 · guardado en casa/barriada | `SavePlace.houseRoom` se conserva en serialización y en `RpgSessionFactory.load()`, pero eso no acredita la restauración integrada. El recorrido Electron `guardadoBarriadaCasa` repitió **9/14**: al cargar desde la casa reapareció fuera (`165.3, 214.2`) y al cargar desde la barriada volvió a Piedra de casa (`1015, 1773`). No se corrigió aquí; la restauración en juego sigue fallando. | `tests/jl254_houseRoomSave.test.ts`; Electron y registros en `work/junie-jl351/electron/guardado-verificada-2/` |
+| JL-255 · spawns en Los Santos | `ZonePopulation.scan()` descarta puntos dentro de las calles y los lotes de la urbanización; no cambia el número total ni el movimiento de enemigos fuera de esas áreas. | `src/sim/zones.ts`, `src/sim/world.ts`, `tests/jl247_urbanizacion.test.ts` (12) |
+| JL-262 · vida de enemigos | Los guardianes muestran vida actual/máxima; al apuntar, el hover muestra esos valores para enemigos. La comprobación de código no implica que todos los modelos se hayan revisado visualmente. | `src/render/enemyView.ts`, `src/main.ts`, `tests/jl262_enemyHealthText.test.ts` (16); captura de previa en `work/junie-jl351/electron/previa-verificada-2/previa-area.jpg` |
+| JL-263 · perfiles de hechizos | `data/spell-fx.json` completa 19 perfiles; 89 hechizos conservan el perfil genérico. Electron `hechizosClases` comprobó 12 hechizos (incluidos seis perfiles añadidos) y consola limpia: 25/25. La captura en vuelo de `charge` muestra el cono geométrico; no es una revisión visual de los 19 perfiles. | `data/spell-fx.json`, `tests/spellProfile.test.ts`; `work/junie-jl351/electron/hechizos-en-vuelo/` |
+| JL-264 · skins de apuntado | Hay cuatro skins geométricas seleccionables; `previa` confirma el apuntado, pero la captura no recorre las cuatro skins por separado. | `src/render/fx/aimSkins.ts`, `src/ui/menus/screens/devVisualOptions.ts`, `tests/jl264_aimSkins.test.ts` (13); `work/junie-jl351/electron/previa-verificada-2/previa-area.jpg` |
+| JL-265 · temas por profundidad | La cripta asigna temas por tramo; `mazmorraHonda` pasó 3/3. Las capturas revisadas de los pisos 50 y 100 muestran apariencias distintas; no son una revisión de los 100 pisos. | `src/data/dungeonSchema.ts`, `src/render/dungeonView.ts`, `data/dungeon.json`, `tests/jl265_dungeonTheme.test.ts` (17); `work/junie-jl351/electron/cripta-verificada-2/` |
+| JL-266 · gizmo del editor | Fue una verificación, no un cambio de código: el gizmo ya estaba resuelto por ED-02. El escenario `editorWorldBuilder` pasó 10/10. | Capturas revisadas `work/qa/editor-world-builder-gizmo.jpg` y `work/qa/editor-world-builder-movido.jpg` |
+
 ## Agentes y herramientas
 
 | Agente | Estado comprobado | Evidencia |
 |---|---|---|
 | OMP | Tres modos: programador (sin MCP), Blender (catálogo MCP completo, unas 240 herramientas) y Audio (2026-11-19: perfil `audio` con el MCP de ACE-Step Studio por túnel SSH; configurado pero **sin probar** contra el estudio, que aún no está instalado: AUD-IA-01). Todos los roles en `skynet-qwen/Qwen3.8-Flash-Next`, sin fallback local. Contexto **configurado** de 180 224 tokens con salida de 16 384. **Medido**: Skynet aceptó peticiones reales de hasta 152 569 tokens; una de 300K agotó el tiempo, así que el límite real sigue sin medir. El «8K» del 2026-11-16 fue un diagnóstico erróneo: los rechazos `n_ctx=8192` venían de LM Studio local (gemma), no de Skynet | `scripts/mac/omp_{programador,blender}.sh`, [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md), bitácora del 2026-11-17 |
 | Blender MCP | `blender-mcp-ultra==3.2.0` sobre Blender 5.2.3, puerto 9876. Claude y Codex usan el catálogo completo; Junie Free, el gateway lite de 26 herramientas | [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md) |
-| Junie | Última entrega integrada: JL-341 (2026-11-26). Suite: 423 archivos, 5.071 aprobadas, 1 omitida y 1 `todo`; Electron `jl341DatosIncompletos` 5/5, con el fallo de datos inducido comprobado; typecheck y build limpios | `src/boot.ts`, `src/ui/startupError.ts`, `scripts/qaElectron.mjs`; captura revisada en `work/junie-jl341/final/` |
+| Junie | Último cambio de código integrado: JL-341 (2026-11-26); revisión documental JL-351. Suite en esta revisión: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `typecheck` limpio en tres proyectos. Electron `jl341DatosIncompletos` 5/5 y build limpios en JL-341 | `src/boot.ts`, `src/ui/startupError.ts`, `scripts/qaElectron.mjs`; captura revisada en `work/junie-jl341/final/`; estado actual en esta revisión |
 | Codex | Última entrega integrada: Blender MCP 3.2, Crestalba v2, moneda de 1915 y consolidación de agentes (`b03210c`) | `git show b03210c` |
 
 ## RPG: hechos recientes comprobados en código
