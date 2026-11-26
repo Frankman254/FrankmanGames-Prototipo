@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-345: listar textos sin traducir en la interfaz inglesa (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se amplió el escenario Electron `ingles` para guardar el texto visible y las etiquetas `title`/`aria-label`/`placeholder` de las ventanas y pestañas revisadas. Se recorrieron HUD, chat, mochila, diario, personaje, hechizos, compendio, oficios, mapa, pausa, guardado/carga, partidas de prueba, las ocho pestañas de Opciones, atajos, banco, tienda, diálogo, título y las cuatro pestañas de creación. La interfaz productiva no se modificó.
+
+**Hallazgos:** Permanecen cadenas en español en la pantalla de título, la ayuda de cámara, los modos de lanzamiento, Opciones → Desarrollo, los tooltips de atributos y controles, el contador del banco, el mapa y algunos resúmenes de partidas de prueba. El inventario con ejemplos completos y la distinción de etiquetas frente a nombres/datos de contenido está en `work/junie-jl345/IDIOMA_INGLES.md`.
+
+**Validación:** Electron `ingles`: 11/11 comprobaciones, cero errores de consola; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio; `npm run docs:check` limpio.
+
+**Evidencia:** `work/junie-jl345/ingles-completo-2026-11-26-rev3/resultado.json`, `jl345-textos-visibles.json` y capturas revisadas.
+
+---
+
 ## 2026-11-26 — JL-344: revisar el contraste del HUD de día y noche (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

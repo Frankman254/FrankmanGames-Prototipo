@@ -6047,6 +6047,20 @@ const scenarios = {
     async ingles() {
         // F07: con el inglés cambia también lo de data/ (zonas, objetos, misiones).
         await newGame('QA English');
+        const visibleScreens = [];
+        const captureText = async (name) => {
+            const sample = await js(`(() => {
+                const root = document.querySelector('.menus-root') ?? document.body;
+                const labels = [...root.querySelectorAll('input,button,select,[aria-label],[title]')]
+                    .filter((e) => e.getClientRects().length)
+                    .flatMap((e) => ['placeholder', 'aria-label', 'title']
+                        .map((key) => e.getAttribute(key))
+                        .filter(Boolean));
+                return { text: root.innerText.trim(), labels };
+            })()`);
+            visibleScreens.push({ name, ...sample });
+            return sample.text;
+        };
         await key('F10', 'F10');
         await button('Opciones');
         await sleep(300);
@@ -6059,6 +6073,7 @@ const scenarios = {
             `(()=>{ const s=document.querySelector('[data-opt="language"]'); const el = s?.tagName==='SELECT' ? s : s?.querySelector('select'); if(!el) return false; el.value='en'; el.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`,
         );
         await sleep(500);
+        await captureText('opciones-graficos');
         await shot('ingles-opciones');
         await key('Escape', 'Escape');
         await sleep(200);
@@ -6071,10 +6086,12 @@ const scenarios = {
         check('F07: los emotes del chat también salen en inglés', emote, chat);
         const filters = await js(`document.querySelector('.chat-filters')?.innerText ?? ''`);
         check('F07: el filtro de botín del chat pasa a inglés', filters.includes('Loot') && !filters.includes('Botín'), filters);
+        await captureText('chat');
         await shot('ingles-chat-emote');
         await sleep(600);
         await key('KeyB', 'b');
         await sleep(500);
+        await captureText('mochila');
         await shot('ingles-mochila');
         const measureFilterLayout = () =>
             js(
@@ -6101,6 +6118,7 @@ const scenarios = {
         await key('KeyB', 'b');
         await key('KeyN', 'n');
         await sleep(500);
+        await captureText('diario');
         await shot('ingles-diario');
         const journal = await js(`document.body.innerText`);
         await key('KeyN', 'n');
@@ -6119,12 +6137,10 @@ const scenarios = {
         );
         // Barrido de las demás ventanas: lista (sin fallar) las líneas que aún parecen español.
         const leftovers = new Set();
-        const sweep = async () => {
-            const t = await js(
-                `[...document.querySelectorAll('.menus-root, .menus-root *')].length ? (document.querySelector('.menus-root')?.innerText ?? document.body.innerText) : document.body.innerText`,
-            );
+        const sweep = async (name) => {
+            const t = await captureText(name);
             for (const line of t.split('\n'))
-                if (/[áéíóúñ¿¡]|\b(de|del|con|para|los|las|Clic)\b/.test(line) && line.length < 160)
+                if (/[áéíóúñ¿¡]|\/ayuda|\b(de|del|con|para|los|las|clic|vigor|pulso|explorado)\b|zona segura|\bniv\./i.test(line) && line.length < 160)
                     leftovers.add(line.trim());
         };
         for (const [code, ch, name] of [
@@ -6136,7 +6152,7 @@ const scenarios = {
         ]) {
             await key(code, ch);
             await sleep(500);
-            await sweep();
+            await sweep(name);
             await shot(`ingles-${name}`);
             if (name === 'personaje') {
                 const overflowingLabels = await js(
@@ -6152,8 +6168,158 @@ const scenarios = {
         }
         await key('Escape', 'Escape');
         await sleep(300);
-        await sweep();
+        await sweep('juego');
         await key('Escape', 'Escape');
+
+        // JL-345: completar la revisión de las ventanas y subventanas en inglés.
+        await key('F10', 'F10');
+        await until(`!!document.querySelector('.pause-modal')?.offsetParent`, 5000, 'pausa en inglés');
+        await captureText('pausa');
+        await shot('jl345-ingles-pausa');
+        const pauseButtons = await js(
+            `[...document.querySelectorAll('.pause-modal .modal-menu button')].filter((e)=>e.offsetParent!==null).map((e)=>e.textContent.trim())`,
+        );
+        const pauseAction = (pattern, label) => {
+            const found = pauseButtons.find((text) => pattern.test(text));
+            if (!found) throw new Error(`No se encontró la acción inglesa ${label}: ${JSON.stringify(pauseButtons)}`);
+            return found;
+        };
+        const testGamesButton = pauseAction(/test games/i, 'test games');
+        const saveButton = pauseAction(/save/i, 'save');
+        const loadButton = pauseAction(/load/i, 'load');
+        const optionsButton = pauseAction(/options/i, 'options');
+
+        await button(testGamesButton);
+        await until(`!!document.querySelector('.presets-modal')?.offsetParent`, 5000, 'partidas de prueba en inglés');
+        await captureText('partidas-prueba');
+        await shot('jl345-ingles-partidas-prueba');
+        await key('Escape', 'Escape');
+        await until(`!!document.querySelector('.pause-modal')?.offsetParent`, 5000, 'pausa tras partidas de prueba');
+
+        await button(saveButton);
+        await until(`!!document.querySelector('.slots-modal')?.offsetParent`, 5000, 'ranuras de guardado en inglés');
+        await captureText('guardar');
+        await shot('jl345-ingles-guardar');
+        await key('Escape', 'Escape');
+        await until(`!!document.querySelector('.pause-modal')?.offsetParent`, 5000, 'pausa tras guardar');
+
+        await button(loadButton);
+        await until(`!!document.querySelector('.slots-modal')?.offsetParent`, 5000, 'ranuras de carga en inglés');
+        await captureText('cargar');
+        await shot('jl345-ingles-cargar');
+        await key('Escape', 'Escape');
+        await until(`!!document.querySelector('.pause-modal')?.offsetParent`, 5000, 'pausa tras cargar');
+
+        await button(optionsButton);
+        await until(`!!document.querySelector('.opt-tab')`, 5000, 'opciones en inglés');
+        const optionTabs = await js(
+            `[...document.querySelectorAll('.opt-tab')].filter((e)=>e.offsetParent!==null).map((e)=>e.textContent.trim())`,
+        );
+        check('JL-345: se recorren las pestañas disponibles de Opciones', optionTabs.length >= 7, JSON.stringify(optionTabs));
+        for (const tab of optionTabs) {
+            await click('.opt-tab', tab);
+            await sleep(200);
+            const slug = tab.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            await captureText(`opciones-${slug}`);
+            await shot(`jl345-ingles-opciones-${slug}`);
+        }
+        const controlsTab = optionTabs.find((tab) => /control/i.test(tab));
+        if (controlsTab) {
+            await click('.opt-tab', controlsTab);
+            const configure = await js(
+                `[...document.querySelectorAll('.opt-row button')].find((e)=>e.offsetParent!==null)?.textContent.trim() ?? null`,
+            );
+            if (configure) {
+                await button(configure);
+                await until(`!!document.querySelector('.keybinds-modal')?.offsetParent`, 5000, 'atajos en inglés');
+                await captureText('atajos');
+                await shot('jl345-ingles-atajos');
+                await key('Escape', 'Escape');
+            }
+        }
+        await key('Escape', 'Escape');
+        for (let i = 0; i < 5; i++) {
+            const pauseVisible = await js(
+                `[...document.querySelectorAll('.pause-modal')].some((e)=>e.offsetParent!==null)`,
+            );
+            if (!pauseVisible) break;
+            await key('Escape', 'Escape');
+        }
+        await until(
+            `![...document.querySelectorAll('.pause-modal')].some((e)=>e.offsetParent!==null)`,
+            5000,
+            'cierre del menú de pausa',
+        );
+
+        await js(`(() => { const p=${W}.player; p.pos.x=116; p.pos.y=126; p.path=[]; })()`);
+        await sleep(600);
+        await js('__game.bank.enter()');
+        await until('__game.bank.inside', 15000, 'entrada al banco');
+        await js(`${S}.setBankAccess(true); __game.menus?.showBank()`);
+        await until(panelBankOpen, 15000, 'ventana del banco en inglés');
+        check(
+            'JL-345: la ventana del banco queda libre del menú de pausa',
+            !(await js(`[...document.querySelectorAll('.pause-modal')].some((e)=>e.offsetParent!==null)`)),
+        );
+        await captureText('banco');
+        await shot('jl345-ingles-banco');
+        await key('Escape', 'Escape');
+        await js('__game.bank.leave()');
+        await until('!__game.bank.inside', 15000, 'salida del banco');
+
+        const merchantId = await js(`(() => {
+            const s=${S}, w=${W}, npc=w.npcs.find((x)=>x.merchantId);
+            if (!npc) return null;
+            w.player.pos.x=npc.pos.x+1; w.player.pos.y=npc.pos.y; w.player.path=[];
+            s.character.emit({type:'openMerchant',merchantId:npc.merchantId});
+            return npc.merchantId;
+        })()`);
+        if (!merchantId) throw new Error('No hay mercader para revisar la ventana inglesa');
+        await until(`!!document.querySelector('.panel-shop')?.offsetParent`, 5000, 'tienda en inglés');
+        await captureText('tienda');
+        await shot('jl345-ingles-tienda');
+        for (let i = 0; i < 3 && (await js(`!!document.querySelector('.panel-shop')?.offsetParent || !!document.querySelector('.panel-inventory-trade')?.offsetParent`)); i++)
+            await key('Escape', 'Escape');
+
+        await js(`${S}.character.emit({type:'talkNpc',npcId:${W}.npcs.find((x)=>x.npcId).npcId})`);
+        await until(`!!document.querySelector('.dialogue')?.offsetParent`, 5000, 'diálogo en inglés');
+        await captureText('dialogo');
+        await shot('jl345-ingles-dialogo');
+        await key('Escape', 'Escape');
+
+        await cdp('Page.navigate', { url });
+        await until(`!!document.querySelector('[data-testid="new-game"]')?.offsetParent`, 30000, 'título en inglés');
+        await sleep(500);
+        await captureText('titulo');
+        await shot('jl345-ingles-titulo');
+        const titleOptionsButton = await js(
+            `[...document.querySelectorAll('.title-menu button')].find((e)=>/options|opciones/i.test(e.textContent))?.textContent.trim() ?? null`,
+        );
+        if (!titleOptionsButton) throw new Error('No se encontró Opciones en la pantalla de título');
+        await button(titleOptionsButton);
+        await until(`!!document.querySelector('.options-modal')?.offsetParent`, 5000, 'opciones desde el título');
+        await captureText('opciones-titulo');
+        await shot('jl345-ingles-opciones-titulo');
+        await key('Escape', 'Escape');
+        await until(`!!document.querySelector('.title-screen')?.offsetParent`, 5000, 'título tras cerrar opciones');
+        await click('[data-testid="new-game"]');
+        await until(`!!document.querySelector('.name-input')?.offsetParent`, 10000, 'creación de personaje en inglés');
+        await sleep(500);
+        await captureText('creacion');
+        await shot('jl345-ingles-creacion');
+        const creationTabs = await js(
+            `[...document.querySelectorAll('.cr-tab')].filter((e)=>e.offsetParent!==null).map((e)=>e.textContent.trim())`,
+        );
+        check('JL-345: se recorren las pestañas de creación', creationTabs.length === 4, JSON.stringify(creationTabs));
+        for (const tab of creationTabs) {
+            await click('.cr-tab', tab);
+            await sleep(250);
+            const slug = tab.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            await captureText(`creacion-${slug}`);
+            await shot(`jl345-ingles-creacion-${slug}`);
+        }
+
+        fs.writeFileSync(path.join(OUT, 'jl345-textos-visibles.json'), JSON.stringify(visibleScreens, null, 2));
         console.log('     restos', JSON.stringify([...leftovers].slice(0, 80)));
     },
 
