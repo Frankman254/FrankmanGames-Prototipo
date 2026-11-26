@@ -1587,7 +1587,7 @@ Antes de cada una, busca si ya existe.
 
 ### I. Cierre de la tanda
 - [x] JL-348 Consola limpia en todos los escenarios nuevos de esta tanda. — commit «JL-348: verificar consola de escenarios nuevos» — 33 escenarios; 31 recorridos actuales completos, JL-341 solo con error inducido y JL-315 bloqueada sin errores inesperados; JL-326 840/840 y JL-336 7/7 completos. Evidencia: `work/junie-jl348/`, `work/junie-jl326/`, `work/junie-jl336/`.
-- [ ] JL-349 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
+- [x] JL-349 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones. — commit «JL-349: cierre de tanda de pruebas» — `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; typecheck/build limpios; Electron `previa` 10/11, `iguanera` 6/7 (repetido; solo Babylon `postProcessManager`), `modelos` 8/11 (fallos ya documentados), `criptaAccesos` 4/4; resultados y capturas revisadas en `work/junie-jl349/`.
 - [ ] JL-350 Reintento obligatorio de lo que haya quedado `[!]` o bloqueado en JL-254…349.
 - [ ] JL-351 Actualiza `docs/ESTADO_ACTUAL.md` con lo que cambió de comportamiento en esta tanda (JL-254, 255 y 262…266), con su evidencia.
 - [ ] JL-352 Lista en `work/junie-jl352/PREGUNTAS.md` todas las preguntas al creador que salieron en esta tanda, cada una con su opción recomendada.

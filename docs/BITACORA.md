@@ -6679,3 +6679,16 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Cómo se verificó:** Electron, tres vueltas de 20 pisos: 186/186, consola limpia; delta cero entre vueltas 2 y 3. `npm test`: 420 archivos, 5.056 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios.
 
 **Evidencia:** `work/junie-jl333/JL333_RECURSOS.md`, `jl333-recursos.json`, `jl333-cripta-piso-01.jpg` y `jl333-cripta-piso-20.jpg`.
+
+## 2026-11-26 — JL-349: cierre de tanda de pruebas (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Verificación integral de la suite, TypeScript, build y recorridos de regresión aislados en Electron; no se modificó código del juego.
+
+**Validación:**
+- `npm test`: 423 archivos; 5.072 pruebas aprobadas, 1 omitida y 1 `todo`.
+- `npm run typecheck`: limpio en TypeScript principal, Electron y servidor. `npm run build`: Vite, `buildMain` y `checkPublishable` correctos.
+- Electron: `previa` 10/11, `iguanera` 6/7 (repetido, solo falla el chequeo de consola), `modelos` 8/11 y `criptaAccesos` 4/4. Las comprobaciones funcionales de `previa` e `iguanera` pasaron; `modelos` repite las tres incidencias ya documentadas en JL-251. En `previa`, `iguanera` y `modelos` se reprodujo el `TypeError: Cannot read properties of null (reading 'postProcessManager')` de Babylon (`rgbdTextureTools.js:68`), previamente observado en otros recorridos; no se ocultó ni se alteró el QA.
+
+**Evidencia:** logs, resultados JSON y capturas revisadas en `work/junie-jl349/`.
