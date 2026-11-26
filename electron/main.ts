@@ -13,7 +13,7 @@ function isAllowedUrl(url: string): boolean {
 }
 
 /** Tamaños que el juego puede pedir (Opciones → Pantalla); cualquier otro se ignora. */
-const WINDOW_SIZES = new Set(['1920x1080', '3440x1440', '3840x2160']);
+const WINDOW_SIZES = new Set(['1280x720', '1920x1080', '2560x1440', '3440x1440', '3840x2160']);
 
 /** Ajusta el área de dibujo sin salirse del monitor en que está la ventana. */
 function fitContentSize(win: BrowserWindow, width: number, height: number): void {

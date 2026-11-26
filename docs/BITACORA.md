@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-335: tamaños de ventana y HUD dentro (Junie)
+
+**Archivos:** `electron/main.ts`, `src/ui/menus/saveStore.ts`, `src/ui/menus/screens/modals.ts`, `data/i18n/en.ui.json`, `scripts/qaElectron.mjs`, `tests/jl60_aspectDefaults.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadieron 1280×720 y 2560×1440 a las opciones de ventana, sus nombres en inglés y la lista segura del puente de Electron. El escenario `ventana` comprueba el redimensionado nativo y emula las cuatro resoluciones objetivo para verificar los límites del HUD visible y del minimapa; las tablas de posición existentes no necesitaron cambios.
+
+**Resultado:** El puente acepta 1280×720 exactamente y limita 2560×1440 al monitor disponible (1800×1102). En los viewports exactos 1280×720, 1920×1080, 2560×1440 y 3440×1440, todos los elementos medidos y el minimapa quedan dentro. Las cuatro capturas se revisaron visualmente; no hubo errores de consola.
+
+**Validación:** Electron `ventana`: 14/14; `npm test`: 420 archivos, 5.062 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios; `npm run build` pasó con aviso de Vite por bundles >500 kB. La prueba JL-335 de `tests/jl60_aspectDefaults.test.ts`: 6/6.
+
+**Evidencia:** `work/junie-jl335/jl335-1280x720.jpg`, `jl335-1920x1080.jpg`, `jl335-2560x1440.jpg` y `jl335-3440x1440.jpg`.
+
+---
+
 ## 2026-11-26 — JL-334: pulsaciones en ráfaga (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

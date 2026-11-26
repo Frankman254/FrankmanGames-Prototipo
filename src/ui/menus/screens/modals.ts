@@ -180,7 +180,9 @@ const LOCK_MODE_NAMES: Record<LockMode, string> = {
 };
 
 const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
+    '1280x720': '1280 × 720 (720p)',
     '1920x1080': '1920 × 1080 (1080p)',
+    '2560x1440': '2560 × 1440 (1440p)',
     '3440x1440': '3440 × 1440 (ultrapanorámica)',
     '3840x2160': '3840 × 2160 (4K)',
 };

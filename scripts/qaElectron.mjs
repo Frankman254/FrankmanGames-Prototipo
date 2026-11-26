@@ -2093,6 +2093,22 @@ const scenarios = {
             start.w >= Math.min(1920, start.sw - 40) && start.h >= Math.min(1080, start.sh - 80),
             JSON.stringify(start),
         );
+        await js('frankmanDesktop.setWindowSize(1280,720)');
+        await sleep(600);
+        const small = await size();
+        check(
+            'Ventana: permite 1280×720 o lo que quepa',
+            small.w > 0 && small.h > 0 && small.w <= 1280 && small.h <= 720,
+            JSON.stringify(small),
+        );
+        await js('frankmanDesktop.setWindowSize(2560,1440)');
+        await sleep(600);
+        const medium = await size();
+        check(
+            'Ventana: permite 2560×1440 o lo que quepa',
+            medium.w >= small.w && medium.h >= small.h && medium.w <= 2560 && medium.h <= 1440,
+            JSON.stringify(medium),
+        );
         await js('frankmanDesktop.setWindowSize(3440,1440)');
         await sleep(600);
         const wide = await size();
@@ -2100,6 +2116,37 @@ const scenarios = {
         await js('frankmanDesktop.setWindowSize(1234,567)');
         await sleep(400);
         check('Ventana: rechaza tamaños fuera de la lista', (await size()).w === wide.w);
+        await js('frankmanDesktop.setWindowSize(1920,1080)');
+        await sleep(600);
+
+        const viewports = [
+            { id: '1280x720', width: 1280, height: 720 },
+            { id: '1920x1080', width: 1920, height: 1080 },
+            { id: '2560x1440', width: 2560, height: 1440 },
+            { id: '3440x1440', width: 3440, height: 1440 },
+        ];
+        for (const { id, width, height } of viewports) {
+            await resize(width, height);
+            const viewport = await size();
+            check(
+                `JL-335: viewport ${id}`,
+                viewport.w === width && viewport.h === height,
+                JSON.stringify(viewport),
+            );
+            const hud = await js(`(() => {
+              const selectors = '.hud-editable, .hud-actionbar, .hud-above, .hud-slots, .hud-bar-centre, .hud-itembar, .hud-log, .minimap, .chat';
+              return [...document.querySelectorAll(selectors)].filter(e => getComputedStyle(e).display !== 'none' && e.getClientRects().length)
+                .map(e => { const r=e.getBoundingClientRect(); return {name:e.className.split(' ')[0],left:r.left,top:r.top,right:r.right,bottom:r.bottom}; });
+            })()`);
+            const outside = hud.filter((el) => el.left < -1 || el.top < -1 || el.right > width + 1 || el.bottom > height + 1);
+            check(
+                `JL-335: HUD y minimapa dentro en ${id}`,
+                hud.some((el) => el.name === 'minimap') && outside.length === 0,
+                JSON.stringify(outside),
+            );
+            await shot(`jl335-${id}`);
+        }
+        await cdp('Emulation.clearDeviceMetricsOverride');
         await js('frankmanDesktop.setWindowSize(1920,1080)');
         await sleep(600);
     },

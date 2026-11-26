@@ -455,7 +455,7 @@ export type EnemyBarMode = (typeof ENEMY_BAR_MODES)[number];
  * los enemigos. Lo demás es propio (ver docs/propuestas/OPCIONES_E_INTERFAZ.md).
  */
 /** Tamaños de ventana de escritorio (área de dibujo, en píxeles). */
-export const WINDOW_SIZES = ['1920x1080', '3440x1440', '3840x2160'] as const;
+export const WINDOW_SIZES = ['1280x720', '1920x1080', '2560x1440', '3440x1440', '3840x2160'] as const;
 export type WindowSizeId = (typeof WINDOW_SIZES)[number];
 
 export const DEV_PROGRESSION_PROFILES = ['productivo', 'anterior-5-5-5', 'historico-5-20-30', 'personalizado'] as const;

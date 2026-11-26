@@ -7,6 +7,7 @@ import {
     checkDefaultPositionsOverlap,
     checkDefaultPositionsFit,
 } from '../src/ui/map/hudProfiles';
+import { WINDOW_SIZES } from '../src/ui/menus/saveStore';
 
 describe('JL-60: clases de proporción', () => {
     it('1920x1080 → 16:9', () => {
@@ -107,6 +108,26 @@ describe('JL-60: posiciones por defecto — caben en el viewport', () => {
         it(`${label}: todos los elementos caben dentro del viewport`, () => {
             const outside = checkDefaultPositionsFit(w, h);
             expect(outside, `Elementos fuera en ${label}`).toHaveLength(0);
+        });
+    }
+});
+
+describe('JL-335: tamaños de ventana', () => {
+    it('ofrece 720p, 1080p, 1440p y ultrapanorámica', () => {
+        expect(WINDOW_SIZES).toEqual(['1280x720', '1920x1080', '2560x1440', '3440x1440', '3840x2160']);
+    });
+
+    const resolutions: Array<{ label: string; w: number; h: number }> = [
+        { label: '1280x720', w: 1280, h: 720 },
+        { label: '1920x1080', w: 1920, h: 1080 },
+        { label: '2560x1440', w: 2560, h: 1440 },
+        { label: '3440x1440', w: 3440, h: 1440 },
+        { label: '3840x2160', w: 3840, h: 2160 },
+    ];
+
+    for (const { label, w, h } of resolutions) {
+        it(`${label}: todos los elementos caben dentro del viewport`, () => {
+            expect(checkDefaultPositionsFit(w, h)).toEqual([]);
         });
     }
 });
