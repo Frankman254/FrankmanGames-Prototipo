@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-337: avisar al encontrar guardados ilegibles (Junie)
+
+**Archivos:** `src/ui/menus/saveStore.ts`, `src/ui/menus/index.ts`, `src/ui/menus/screens/title.ts`, `src/ui/menus/screens/modals.ts`, `data/i18n/en.ui.json`, `data/i18n/en.json`, `scripts/qaElectron.mjs`, `tests/jl337_saveReader.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `SaveStore.readResult()` distingue guardado vacío, ilegible, cargado y migrado. La interfaz mantiene habilitada la opción de cargar si solo hay una ranura ilegible, la marca con un aviso claro y deshabilita su carga; al migrar una partida v1/v2 muestra la confirmación correspondiente. Los campos adicionales de una partida v3 no invalidan la lectura. Los avisos nuevos tienen traducción inglesa.
+
+**Validación:** `tests/jl337_saveReader.test.ts`: 3/3; `npm test`: 421 archivos, 5.066 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Vite conserva su aviso por bundles mayores de 500 kB. Electron `jl337GuardadoRoto`: 2/2, consola limpia. `git diff --check` limpio. `npm run format:check` sigue fallando en 220 archivos; el test nuevo pasa el chequeo focalizado y los cuatro archivos existentes examinados ya fallaban en `HEAD`.
+
+**Evidencia:** `work/junie-jl337/resultado.json` y captura revisada `work/junie-jl337/jl337-guardado-ilegible.jpg`.
+
+---
+
 ## 2026-11-26 — JL-336: ventana en segundo plano (Junie)
 
 **Archivos:** `electron/main.ts`, `electron/preload.ts`, `scripts/qaElectron.mjs`, `tests/loop.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -53,6 +53,40 @@ export interface SlotSummary {
     playSeconds: number;
 }
 
+export type SaveReadResult =
+    | { kind: 'empty' }
+    | { kind: 'invalid' }
+    | { kind: 'loaded'; data: SaveData }
+    | { kind: 'migrated'; data: SaveData; sourceVersion: 1 | 2 };
+
+export interface SaveReadNotice {
+    template: string;
+    vars: Readonly<Record<string, string | number>>;
+    tone: 'info' | 'warn';
+}
+
+export function saveReadNotice(
+    result: SaveReadResult,
+    slot: number,
+): SaveReadNotice {
+    const vars = { slot: slot + 1 };
+    if (result.kind === 'empty') return { template: 'La ranura {slot} está vacía.', vars, tone: 'warn' };
+    if (result.kind === 'invalid')
+        return {
+            template:
+                'No se puede leer el guardado de la ranura {slot}. Puede estar dañado o usar una versión no compatible.',
+            vars,
+            tone: 'warn',
+        };
+    if (result.kind === 'migrated')
+        return {
+            template: 'Guardado antiguo (versión {version}) actualizado y cargado en la ranura {slot}.',
+            vars: { ...vars, version: result.sourceVersion },
+            tone: 'info',
+        };
+    return { template: 'Cargada la ranura {slot}.', vars, tone: 'info' };
+}
+
 /** Comprobación de forma: protege de guardados rotos o de otra versión. */
 export function isSaveData(x: unknown): x is SaveData {
     if (!x || typeof x !== 'object') return false;
@@ -291,6 +325,8 @@ function readLegacyStones(
 }
 
 export class SaveStore {
+    private readonly pendingMigrationNotices = new Map<number, 1 | 2>();
+
     constructor(private readonly store: KeyValueStore) {}
 
     private key(slot: number): string {
@@ -298,18 +334,26 @@ export class SaveStore {
         return SAVE_PREFIX + slot;
     }
 
-    /** El guardado de la ranura ya migrado a la forma actual, o null. */
-    read(slot: number): SaveData | null {
-        const raw = this.store.getItem(this.key(slot));
-        if (!raw) return null;
+    /** Lee y clasifica la ranura; los datos antiguos se migran y respaldan antes de devolverlos. */
+    readResult(slot: number): SaveReadResult {
+        const key = this.key(slot);
         try {
+            const raw = this.store.getItem(key);
+            if (raw === null) {
+                this.pendingMigrationNotices.delete(slot);
+                return { kind: 'empty' };
+            }
             const parsed: unknown = JSON.parse(raw);
             const migrated = migrateSave(parsed, this.store);
-            if (!migrated) return null;
-            if (isLegacySaveDataV1(parsed) || isLegacySaveDataV2(parsed)) {
+            if (!migrated) {
+                this.pendingMigrationNotices.delete(slot);
+                return { kind: 'invalid' };
+            }
+            const sourceVersion = isLegacySaveDataV1(parsed) ? 1 : isLegacySaveDataV2(parsed) ? 2 : null;
+            if (sourceVersion !== null) {
                 // Respaldo de la versión antigua antes de reescribir: el contrato de
                 // guardado promete no destruir partidas al migrar.
-                const backupKey = (isLegacySaveDataV1(parsed) ? V1_BACKUP_PREFIX : V2_BACKUP_PREFIX) + slot;
+                const backupKey = (sourceVersion === 1 ? V1_BACKUP_PREFIX : V2_BACKUP_PREFIX) + slot;
                 if (this.store.getItem(backupKey) === null) this.store.setItem(backupKey, raw);
                 try {
                     this.store.setItem(this.key(slot), JSON.stringify(migrated));
@@ -319,15 +363,33 @@ export class SaveStore {
                     this.store.setItem(this.key(slot), raw);
                     throw error;
                 }
+                this.pendingMigrationNotices.set(slot, sourceVersion);
+                return { kind: 'migrated', data: migrated, sourceVersion };
             }
-            return migrated;
+            const pendingVersion = this.pendingMigrationNotices.get(slot);
+            if (pendingVersion !== undefined && migrated.migration?.sourceVersion === pendingVersion)
+                return { kind: 'migrated', data: migrated, sourceVersion: pendingVersion };
+            this.pendingMigrationNotices.delete(slot);
+            return { kind: 'loaded', data: migrated };
         } catch {
-            return null;
+            this.pendingMigrationNotices.delete(slot);
+            return { kind: 'invalid' };
         }
+    }
+
+    acknowledgeMigration(slot: number): void {
+        this.pendingMigrationNotices.delete(slot);
+    }
+
+    /** El guardado de la ranura ya migrado a la forma actual, o null. */
+    read(slot: number): SaveData | null {
+        const result = this.readResult(slot);
+        return result.kind === 'loaded' || result.kind === 'migrated' ? result.data : null;
     }
 
     write(slot: number, data: SaveData): void {
         this.store.setItem(this.key(slot), JSON.stringify(data));
+        this.pendingMigrationNotices.delete(slot);
     }
 
     /**
@@ -357,6 +419,7 @@ export class SaveStore {
 
     remove(slot: number): void {
         this.store.removeItem(this.key(slot));
+        this.pendingMigrationNotices.delete(slot);
     }
 
     /** Cambia el nombre de la ranura (vacío = vuelve al del personaje). false si está vacía. */
@@ -377,6 +440,12 @@ export class SaveStore {
             const d = this.read(slot);
             return d ? summarize(slot, d) : null;
         });
+    }
+
+    unreadableSlots(): number[] {
+        return Array.from({ length: SLOT_COUNT }, (_, slot) => slot).filter(
+            (slot) => this.readResult(slot).kind === 'invalid',
+        );
     }
 
     /** La ranura guardada más reciente (para «Continuar»). */

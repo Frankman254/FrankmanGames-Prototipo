@@ -25,6 +25,7 @@ export function titleScreen(
     latest: SlotSummary | null,
     className: (id: string) => string,
     a: TitleActions,
+    hasUnreadable = false,
 ): HTMLElement {
     const menuButton = (label: string, icon: string, action: () => void, cls = ''): HTMLButtonElement => {
         const b = button(label, action, cls);
@@ -35,7 +36,7 @@ export function titleScreen(
     const cont = menuButton('Continuar', 'continue', a.continueLatest, 'primary');
     if (!latest) cont.disabled = true;
     const load = menuButton('Cargar partida', 'load_game', a.load);
-    if (!latest) load.disabled = true;
+    if (!latest && !hasUnreadable) load.disabled = true;
 
     // PRE-01: "Continuar" muestra claramente qué partida es.
     const continueInfo = latest
@@ -72,7 +73,7 @@ export function titleScreen(
                     b.setAttribute('data-testid', 'new-game');
                     return b;
                 })(),
-                latest ? load : null,
+                latest || hasUnreadable ? load : null,
                 a.presets ? menuButton('Partidas de prueba', 'test_game', a.presets) : null,
                 menuButton('Opciones', 'options', a.options),
                 menuButton('Salir', 'quit', a.quit),

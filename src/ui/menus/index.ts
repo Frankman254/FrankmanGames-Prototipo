@@ -70,6 +70,7 @@ import {
     SaveStore,
     devProgressionGains,
     loadOptions,
+    saveReadNotice,
     saveOptions,
     MemoryStore,
     type GameOptions,
@@ -613,6 +614,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         document.body.classList.toggle('in-game', s === 'game');
         if (s === 'title') {
             const latest = saves.latest();
+            const hasUnreadable = saves.unreadableSlots().length > 0;
             screenLayer.appendChild(
                 titleScreen(latest !== null ? saves.list()[latest]! : null, className, {
                     newGame: () => showScreen('creation'),
@@ -624,7 +626,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                     options: openOptions,
                     quit: () => (opts.quit ?? (() => window.close()))(),
                     ...(opts.devPresets ? { presets: openPresets } : {}),
-                }),
+                }, hasUnreadable),
             );
         } else if (s === 'creation') {
             screenLayer.appendChild(
@@ -650,15 +652,18 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
     function loadSlot(slot: number): void {
         flushAutosave();
-        const data = saves.read(slot);
-        if (!data) {
-            toast('Ese guardado no se puede leer', 'warn');
+        const result = saves.readResult(slot);
+        const readNotice = saveReadNotice(result, slot);
+        const notice = trf(readNotice.template, readNotice.vars);
+        if (result.kind === 'empty' || result.kind === 'invalid') {
+            toast(notice, 'warn');
             return;
         }
         closeModals();
-        setSession(factory.load(data, seed()));
+        setSession(factory.load(result.data, seed()));
         currentSlot = slot;
-        toast(`Cargada la ranura ${slot + 1}`, 'info');
+        if (result.kind === 'migrated') saves.acknowledgeMigration(slot);
+        toast(notice, readNotice.tone);
     }
 
     function saveTo(slot: number, quiet = false): void {
@@ -1150,8 +1155,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             popModal();
             openSlots(mode);
         };
+        const slots = saves.list();
+        const unreadableSlots = mode === 'load' ? saves.unreadableSlots() : [];
         pushModal(
-            slotsModal(mode, saves.list(), currentSlot, className, {
+            slotsModal(mode, slots, currentSlot, className, {
                 pick: (slot) => {
                     if (mode === 'load') {
                         const go = (): void => loadSlot(slot);
@@ -1197,7 +1204,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                     if (!session) showScreen('title');
                 },
                 back: popModal,
-            }),
+            }, unreadableSlots),
         );
     }
 

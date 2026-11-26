@@ -1,7 +1,7 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../../perfOverlay';
-import { LANGUAGE_NAMES, LANGUAGES, tr } from '../../../i18n';
+import { LANGUAGE_NAMES, LANGUAGES, tr, trf } from '../../../i18n';
 import { button, h } from '../dom';
 import { devVisualOptions } from './devVisualOptions';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
@@ -22,6 +22,7 @@ import {
     applyGraphicsPreset,
     graphicsPresetOf,
     WINDOW_SIZES,
+    saveReadNotice,
     type WindowSizeId,
     type AntialiasMode,
     type EnemyBarMode,
@@ -558,17 +559,22 @@ export function slotsModal(
         rename(slot: number, label: string): void;
         back(): void;
     },
+    unreadableSlots: readonly number[] = [],
 ): HTMLElement {
     // Lista con desplazamiento: 12 ranuras no caben a la vez en pantallas pequeñas.
     const list = h('div.slot-list.slot-list-scroll');
     for (let i = 0; i < SLOT_COUNT; i++) {
         const s = slots[i] ?? null;
+        const unreadable = !s && unreadableSlots.includes(i);
+        const unreadableNotice = unreadable ? saveReadNotice({ kind: 'invalid' }, i) : null;
         const when = s ? new Date(s.savedAt) : null;
-        const nameEl = h('div.slot-name', { text: s ? s.label : 'Ranura vacía' });
+        const nameEl = h('div.slot-name', { text: s ? s.label : unreadable ? tr('Guardado ilegible') : 'Ranura vacía' });
         // Línea 1: personaje; línea 2: sitio, fecha y tiempo jugado.
         const who = s
             ? `${s.label !== s.name ? `${s.name} · ` : ''}${className(s.classId)} · nivel ${s.level}${i === current ? ' · partida actual' : ''}`
-            : '—';
+            : unreadableNotice
+              ? trf(unreadableNotice.template, unreadableNotice.vars)
+              : '—';
         const where = s
             ? [
                   s.place ? `${s.scene === 'dungeon' ? '⛫ ' : ''}${s.place}` : null,

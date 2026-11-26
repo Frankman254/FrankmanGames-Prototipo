@@ -12778,6 +12778,34 @@ Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
         };
         fs.writeFileSync(path.join(OUT, 'jl336-segundo-plano.json'), JSON.stringify(report, null, 2));
     },
+
+    /** JL-337: una ranura corrupta se identifica y no bloquea la pantalla de título. */
+    async jl337GuardadoRoto() {
+        await js(`(()=>{
+      for (let i=0;i<12;i++) localStorage.removeItem('frankmangames.save.'+i);
+      localStorage.setItem('frankmangames.save.0', ${JSON.stringify('{"version":3,"name":"Aldara"')});
+    })()`);
+        await cdp('Page.reload', { ignoreCache: true });
+        await until(`!!document.querySelector('[data-testid="new-game"]')`, 30000, 'título tras guardar dato truncado');
+        await until(
+            `[...document.querySelectorAll('.title-menu button')].some(b=>b.textContent.trim()==='Cargar partida'&&!b.disabled)`,
+            5000,
+            'opción de carga para guardado ilegible',
+        );
+        await button('Cargar partida');
+        await until(`!!document.querySelector('.slots-modal')`, 5000, 'lista de guardados');
+        const row = await js(`(()=>{
+      const e=[...document.querySelectorAll('.slot-row')].find(r=>r.textContent.includes('Guardado ilegible'));
+      const load=[...e?.querySelectorAll('button')??[]].find(b=>b.textContent.trim()==='Cargar');
+      return {text:e?.textContent??'', disabled:load?.disabled??false, found:!!e};
+    })()`);
+        check(
+            'JL-337: una ranura truncada muestra el aviso y no permite cargar datos ilegibles',
+            row.found && row.disabled && row.text.includes('No se puede leer') && row.text.includes('dañado'),
+            JSON.stringify(row),
+        );
+        await shot('jl337-guardado-ilegible');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
