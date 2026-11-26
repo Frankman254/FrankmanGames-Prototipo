@@ -667,7 +667,7 @@ async function newGame(name, { island = false, crossed = false, devMount = false
 /** Paneles a la vista que se salen de la pantalla o tienen scroll horizontal. */
 const uiFaults = () =>
     js(`(() => { const out=[];
-  for (const e of document.querySelectorAll('.panel, .hud-actionbar, .minimap, .chat')) { if(!e.offsetParent) continue;
+  for (const e of document.querySelectorAll('.panel, .hud-actionbar, .minimap, .chat, .dialogue')) { if(!e.offsetParent) continue;
     const r=e.getBoundingClientRect(), n=e.className.split(' ').slice(0,2).join('.');
     if (r.left<-1||r.top<-1||r.right>innerWidth+1||r.bottom>innerHeight+1) out.push(n+' fuera');
     for (const c of [e,...e.querySelectorAll('.panel-body,.opt-pages,.inv-grid,.spell-list')]) if (c.scrollWidth>c.clientWidth+1&&getComputedStyle(c).overflowX!=='visible') out.push(n+' scroll horizontal ('+c.className+')');
@@ -1086,6 +1086,134 @@ const scenarios = {
             await until(`document.querySelector(${selector}).hidden`, 5000, `${panel.id} cerrada al terminar`);
         }
     },
+    // JL-343: escala manual entre 80 % y 150 %, con capturas y medida de desbordamientos.
+    async jl343Escalas() {
+        await newGame('QA Escalas');
+        await resize(1920, 1080);
+
+        const scales = Array.from({ length: 15 }, (_, i) => 80 + i * 5);
+        const captureScales = new Set([80, 100, 125, 150]);
+        const measurements = [];
+
+        const openInterfaceOptions = async () => {
+            await key('F10', 'F10');
+            await button('Opciones');
+            await until(`!!document.querySelector('.opt-tab')`, 5000, 'opciones');
+            await click('.opt-tab', 'Interfaz');
+            await until(`!!document.querySelector('[data-opt="uiScale"]')`, 5000, 'escala manual');
+        };
+
+        const setScale = (percent) =>
+            js(`(() => {
+                const automatic = document.querySelector('[data-opt="uiScaleAuto"]');
+                const slider = document.querySelector('[data-opt="uiScale"]');
+                if (!automatic || !slider) return null;
+                if (automatic.checked) {
+                    automatic.checked = false;
+                    automatic.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                slider.value = String(${percent / 100});
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                const saved = JSON.parse(localStorage.getItem('frankmangames.options') || 'null');
+                return {
+                    value: Number(slider.value),
+                    automatic: automatic.checked,
+                    applied: Number(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')),
+                    saved: saved ? saved.uiScale : null,
+                    savedAuto: saved ? saved.uiScaleAuto : null,
+                };
+            })()`);
+
+        const record = async (percent, view, file) => {
+            await sleep(250);
+            const state = await js(`({width:innerWidth,height:innerHeight,scale:Number(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))})`);
+            const faults = await uiFaults();
+            measurements.push({ percent, view, faults });
+            check(
+                `JL-343 ${percent}% ${view}: viewport y escala aplicados`,
+                state.width === 1920 && state.height === 1080 && Math.abs(state.scale - percent / 100) < 0.001,
+                `${state.width}×${state.height}; escala ${state.scale}; hallazgos ${faults.length}`,
+            );
+            await shot(file);
+        };
+
+        const captureWindow = async (percent, code, name, selector, label) => {
+            await key(code, name);
+            await until(`!!document.querySelector(${JSON.stringify(selector)})?.offsetParent`, 5000, label);
+            await record(percent, label, `jl343-${percent}-${label}`);
+            await key(code, name);
+            await sleep(200);
+        };
+
+        const captureWindows = async (percent) => {
+            await record(percent, 'hud', `jl343-${percent}-hud`);
+            for (const [code, name, selector, label] of [
+                ['KeyC', 'c', '.panel-character', 'personaje'],
+                ['KeyV', 'v', '.panel-spellbook', 'hechizos'],
+                ['KeyB', 'b', '.panel-inventory', 'mochila'],
+                ['KeyN', 'n', '.panel-journal', 'diario'],
+                ['Numpad3', 'n3', '.panel-compendium', 'compendio'],
+                ['Minus', '-', '.panel-professions', 'oficios'],
+                ['KeyM', 'm', '.panel-worldmap', 'mapa'],
+            ]) {
+                await captureWindow(percent, code, name, selector, label);
+            }
+
+            await js(`(() => {
+                const s=${S}, w=${W}, p=w.player.pos, npc=w.npcs.find((x) => x.merchantId);
+                if (!npc) throw new Error('No hay mercader para abrir la tienda');
+                p.x=npc.pos.x+1; p.y=npc.pos.y; p.path=[];
+                s.character.emit({type:'openMerchant',merchantId:npc.merchantId});
+            })()`);
+            await until(`!!document.querySelector('.panel-shop')?.offsetParent`, 5000, 'tienda');
+            await record(percent, 'tienda', `jl343-${percent}-tienda`);
+            for (
+                let i = 0;
+                i < 3 &&
+                (await js(`!!document.querySelector('.panel-shop')?.offsetParent || !!document.querySelector('.panel-inventory')?.offsetParent`));
+                i++
+            ) {
+                await key('Escape', 'Escape');
+                await sleep(250);
+            }
+
+            await js(`${S}.character.emit({type:'talkNpc',npcId:${W}.npcs.find((x) => x.npcId).npcId})`);
+            await until(`!!document.querySelector('.dialogue')?.offsetParent`, 5000, 'diálogo');
+            await record(percent, 'dialogo', `jl343-${percent}-dialogo`);
+            await key('Escape', 'Escape');
+            await sleep(250);
+        };
+
+        await openInterfaceOptions();
+        for (const percent of scales) {
+            const state = await setScale(percent);
+            await sleep(150);
+            const faults = await uiFaults();
+            measurements.push({ percent, view: 'opciones-interfaz', faults });
+            check(
+                `JL-343: escala manual ${percent}% aplicada`,
+                state?.value === percent / 100 &&
+                    state.applied === percent / 100 &&
+                    state.saved === percent / 100 &&
+                    state.automatic === false &&
+                    state.savedAuto === false,
+                JSON.stringify(state),
+            );
+
+            if (!captureScales.has(percent)) continue;
+            await shot(`jl343-${percent}-opciones`);
+            await button('Volver');
+            await sleep(250);
+            await record(percent, 'pausa', `jl343-${percent}-pausa`);
+            await key('Escape', 'Escape');
+            await sleep(250);
+            await captureWindows(percent);
+            if (percent !== 150) await openInterfaceOptions();
+        }
+
+        fs.writeFileSync(path.join(OUT, 'jl343-mediciones.json'), JSON.stringify(measurements, null, 2));
+    },
+
     // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.
     async interfaz() {
         // Título y creación, a 1080p, antes de entrar.

@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-343: capturar escalas de interfaz y registrar solapes (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario `jl343Escalas`, que aplica los 15 valores de escala manual de 80 % a 150 % en pasos de 5 % y captura HUD, nueve ventanas principales, Opciones y pausa a 80 %, 100 %, 125 % y 150 %, en 1920×1080. No se modificó el comportamiento productivo.
+
+**Hallazgos:** Ninguna ventana medida se sale del viewport ni presenta scroll horizontal. El chat se solapa con la barra de acción inferior desde 135 %: 36×10 px a 135 %, 73×10 a 140 %, 109×9 a 145 % y 151×13 a 150 %; en pausa, el solape a 150 % alcanza 151×22 px. En las escalas representativas 80 %, 100 % y 125 % no se detectó ese cruce.
+
+**Validación:** Electron `jl343Escalas`: 60/60 comprobaciones, sin errores de consola; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** 48 capturas; revisión visual por muestreo en los cuatro tamaños. `work/junie-jl343/2026-11-26/` incluye `jl343-mediciones.json` y `resultado.json`.
+
+---
+
 ## 2026-11-26 — JL-342: listar los choques de atajos (Junie)
 
 **Archivos:** `tests/ui/keybindings.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl342/ATAJOS.md`.

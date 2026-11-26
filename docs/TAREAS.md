@@ -428,6 +428,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | ID | Quién | Estado | Evidencia |
 |---|---|---|---|
 | JL-342 | J | Hecho (commit «JL-342: listar los choques de atajos») | La tabla predeterminada no repite códigos; cruces fuera de ella con WASD durante el vuelo, F4–F6 en desarrollo y F8 con la consola oculta. Choques de sistema dependientes de plataforma documentados sin afirmar prioridad no medida. `tests/ui/keybindings.test.ts`: 8/8; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Informe en `work/junie-jl342/ATAJOS.md`. |
+| JL-343 | J | Hecho (commit «JL-343: capturar escalas de interfaz y registrar solapes») | Electron `jl343Escalas`: 60/60 comprobaciones y consola limpia; aplicados los 15 valores de 80–150 % en pasos de 5 % a 1920×1080. 48 capturas del HUD, nueve ventanas, Opciones y pausa en 80/100/125/150 %, con muestras revisadas en los cuatro tamaños. Ninguna ventana fuera del viewport ni scroll horizontal; el chat invade la barra inferior desde 135 %: 36×10 px (135 %), 73×10 (140 %), 109×9 (145 %) y 151×13 (150 %), que crece a 151×22 px durante pausa. Suite: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia en `work/junie-jl343/2026-11-26/`. |
 
 ## Bloqueadas
 

@@ -1579,7 +1579,7 @@ Antes de cada una, busca si ya existe.
 
 ### H. Interfaz y accesibilidad
 - [x] JL-342 Atajos de teclado: lista de los que chocan entre sí o con el sistema. Prueba pura si hay una tabla de atajos. — commit «JL-342: listar los choques de atajos» — `tests/ui/keybindings.test.ts` 8/8; suite 5.072 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl342/ATAJOS.md`.
-- [ ] JL-343 Escalas de interfaz de 80 % a 150 %: capturas del HUD y de las ventanas principales, y lista de lo que se sale.
+- [x] JL-343 Escalas de interfaz de 80 % a 150 %: capturas del HUD y de las ventanas principales, y lista de lo que se sale. — commit «JL-343: capturar escalas de interfaz y registrar solapes» — Electron `jl343Escalas`: 60/60, consola limpia; 48 capturas del HUD y nueve ventanas en 80/100/125/150 %, más Opciones y pausa; mediciones de 80–150 % en pasos de 5 %. Solape chat–barra desde 135 % (36×10 px) hasta 151×13 px a 150 %, 151×22 px en pausa; ninguna ventana fuera del viewport ni scroll horizontal. Evidencia: `work/junie-jl343/2026-11-26/`.
 - [ ] JL-344 Contraste: los textos del HUD sobre fondo claro y oscuro, de día y de noche. Lista de los que no se leen.
 - [ ] JL-345 Interfaz en inglés completa: recorre todas las ventanas en inglés y lista los textos que se quedan en español.
 - [ ] JL-346 Ratón solo, sin teclado: qué acciones básicas no se pueden hacer. Solo lista.
