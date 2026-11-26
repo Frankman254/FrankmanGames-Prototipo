@@ -5,6 +5,7 @@
 import type { Rng } from './rng';
 import type { Vec2 } from './vec2';
 import { distSq } from './vec2';
+import { waterCircles, waterDistance } from './navGrid';
 import type { GameEvent } from './events';
 import type { Player } from './world';
 import type { Character } from '../rpg/character';
@@ -62,29 +63,28 @@ export class FishingManager {
     /** Estanque que contiene ese punto (agua), o null. */
     spotAt(point: Vec2): FishingSpotDef | null {
         for (const s of Object.values(this.host.spots)) {
-            if (Math.hypot(point.x - s.x, point.y - s.y) <= s.radius) return s;
+            if (waterDistance(s, point) <= 0) return s;
         }
         return null;
     }
 
     /** Distancia del jugador a la orilla de un estanque (0 o menos = dentro). */
     private shoreDistance(s: FishingSpotDef): number {
-        const p = this.host.player.pos;
-        return Math.hypot(p.x - s.x, p.y - s.y) - s.radius;
+        return waterDistance(s, this.host.player.pos);
     }
 
     /** Puntos pisables alrededor del agua desde los que se llega a lanzar, del más cercano al jugador al más lejano. */
     private approaches(spot: FishingSpotDef): Vec2[] {
         const range = this.host.content.fishing.rules.castRange;
         const out: Vec2[] = [];
-        for (const off of [1, 2, Math.max(2.5, range - 1)]) {
-            for (let i = 0; i < 24; i++) {
-                const a = (i / 24) * Math.PI * 2;
-                const q = {
-                    x: spot.x + Math.cos(a) * (spot.radius + off),
-                    y: spot.y + Math.sin(a) * (spot.radius + off),
-                };
-                if (this.host.grid.walkable(q)) out.push(q);
+        for (const c of waterCircles(spot)) {
+            for (const off of [1, 2, Math.max(2.5, range - 1)]) {
+                for (let i = 0; i < 24; i++) {
+                    const a = (i / 24) * Math.PI * 2;
+                    const q = { x: c.x + Math.cos(a) * (c.radius + off), y: c.y + Math.sin(a) * (c.radius + off) };
+                    // Con lóbulos, un punto junto a un círculo puede caer en el agua de otro.
+                    if (waterDistance(spot, q) >= Math.min(1, off) - 1e-9 && this.host.grid.walkable(q)) out.push(q);
+                }
             }
         }
         const p = this.host.player.pos;

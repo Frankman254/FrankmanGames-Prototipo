@@ -710,7 +710,9 @@ export type SessionEvent =
     /** MUE-02: al entrar en la cripta, hay un piso pendiente de retomar. La interfaz pregunta. */
     | { type: 'dungeonFloorChoice'; floor: number }
     /** DUN-03: el portero de la cripta pide entrar en un piso concreto. */
-    | { type: 'enterDungeon'; floor: number | null };
+    | { type: 'enterDungeon'; floor: number | null }
+    /** CLA-CRIPTA2: el guía de la cripta devuelve al pueblo sin pociones. */
+    | { type: 'leaveDungeon' };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
@@ -983,6 +985,11 @@ export interface MerchantDef {
     maxLevelOffset?: number;
     /** Solo visible en `npm run dev` o con la marca de pruebas. */
     devOnly?: boolean;
+    /**
+     * CLA-CRIPTA2 (creador 2026-11-25: «dentro de la mazmorra deberia haber un Npc para poder
+     * comerciar»): vive en cada piso de la cripta, junto a la llegada; no sale en el mundo abierto.
+     */
+    crypt?: boolean;
     /** Si está, anula la fórmula de precio: cada unidad cuesta este valor fijo. */
     fixedPrice?: number;
 }
@@ -1130,7 +1137,9 @@ export type DialogueAction =
      * Entra en la cripta en el piso indicado (0-indexado). null = piso 1.
      * La llave se verifica y consume en el momento de entrar (DUN-03).
      */
-    | { type: 'enterDungeon'; floor: number | null };
+    | { type: 'enterDungeon'; floor: number | null }
+    /** CLA-CRIPTA2: sale de la cripta y vuelve al pueblo (el guía de la cripta). */
+    | { type: 'leaveDungeon' };
 
 export interface DialogueOptionDef {
     text: string;
@@ -1166,6 +1175,8 @@ export interface NpcDef {
     model?: string;
     merchantId: string | null;
     dialogue: DialogueDef;
+    /** CLA-CRIPTA2: vive dentro de la cripta (ver `MerchantDef.crypt`). */
+    crypt?: boolean;
 }
 
 export type NpcMarker = 'available' | 'ready';

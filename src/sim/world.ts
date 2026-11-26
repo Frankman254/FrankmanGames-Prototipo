@@ -656,8 +656,24 @@ export class World implements SessionWorld {
         };
         // Los mercaderes de pruebas (`devOnly`) no salen solos: solo `main.ts` los pone en desarrollo
         // con `placeDevNpc` (antes salían también en la versión empaquetada, y dos veces en desarrollo).
-        for (const m of Object.values(this.content.merchants)) if (!m.devOnly) place(m.id, m.id, m.position);
-        for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);
+        // CLA-CRIPTA2: los de la cripta (`crypt`) los pone la escena de la cripta en cada piso.
+        for (const m of Object.values(this.content.merchants))
+            if (!m.devOnly && !m.crypt) place(m.id, m.id, m.position);
+        for (const n of Object.values(this.content.npcs))
+            if (n.merchantId === null && !n.crypt) place(n.id, null, n.position);
+    }
+
+    /**
+     * CLA-CRIPTA2: coloca un PNJ en un interior (la cripta), en la celda libre más cercana a `at`.
+     * Fuera de un interior no hace nada. Devuelve dónde quedó, o null.
+     */
+    placeInteriorNpc(npcId: string, merchantId: string | null, at: Vec2): Vec2 | null {
+        if (!this.interior) return null;
+        const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
+        if (cell === -1) return null;
+        const pos = cell < 0 ? copy(at) : this.grid.center(cell);
+        this.npcs.push({ npcId, merchantId, pos });
+        return pos;
     }
 
     /**

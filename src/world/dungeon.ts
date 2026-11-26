@@ -10,7 +10,7 @@ import { loadDungeonFloorMap, type DungeonFloorMapDef } from '../data/dungeonFlo
 import type { DungeonDef, DungeonFloorDef, DungeonThemeDef } from '../data/dungeonSchema';
 import type { LootTableDef } from '../rpg/contracts';
 import type { FishingSpotDef } from '../rpg/content';
-import type { NavGrid, RectObstacle } from '../sim/navGrid';
+import { waterDistance, type NavGrid, type RectObstacle } from '../sim/navGrid';
 import { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
 import designedDungeonJson from '../../data/dungeons/cripta-tulivieja.json';
@@ -149,6 +149,33 @@ export interface DungeonFloor {
 }
 
 const FLOOR_SEED_STEP = 7919;
+
+/**
+ * Agua no redonda (creador, 2026-11-25) dentro de una caja de semiancho `halfW`×`halfH` (m)
+ * centrada en (x, y): un círculo principal y de 2 a 3 lóbulos solapados, todos dentro de la caja.
+ */
+function irregularWater(
+    x: number,
+    y: number,
+    halfW: number,
+    halfH: number,
+    rng: Rng,
+): { radius: number; lobes: Array<{ x: number; y: number; radius: number }> } {
+    const radius = Math.min(halfW, halfH) * 0.62;
+    const lobes: Array<{ x: number; y: number; radius: number }> = [];
+    const n = rng.int(2, 3);
+    const a0 = rng.next() * Math.PI * 2;
+    for (let k = 0; k < n; k++) {
+        const a = a0 + (k * 2 * Math.PI) / n + rng.range(-0.5, 0.5);
+        const d = radius * rng.range(0.6, 0.85);
+        const lx = x + Math.cos(a) * d;
+        const ly = y + Math.sin(a) * d;
+        const r = Math.min(radius * rng.range(0.55, 0.85), halfW - Math.abs(lx - x), halfH - Math.abs(ly - y));
+        // Solapa con el principal (d < radius) y no sale de la caja; si queda muy chico, no va.
+        if (r >= 0.6) lobes.push({ x: lx, y: ly, radius: r });
+    }
+    return { radius, lobes };
+}
 /** Lado mínimo (baldosas) de una sala con estanque, y margen seco (m) alrededor del agua. */
 const POOL_MIN_ROOM = 8;
 const POOL_MARGIN = 1.2;
@@ -772,21 +799,25 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
     const poolRooms = rooms
         .map((_, i) => i)
         .filter((i) => i !== startRoom && i !== exitRoom && Math.min(rooms[i]!.w, rooms[i]!.h) >= POOL_MIN_ROOM);
+    // Los lóbulos usan su propia semilla: así no cambian los monstruos, cofres ni jarras del piso.
+    const lobeRng = new Rng(floorSeed(def, index) ^ 0x5eed);
     for (let k = 0; k < fd.pools && poolRooms.length > 0; k++) {
         const ri = poolRooms.splice(rng.int(0, poolRooms.length - 1), 1)[0]!;
         const rm = rooms[ri]!;
+        const x = (rm.x0 + rm.w / 2) * ts;
+        const y = (rm.y0 + rm.h / 2) * ts;
         pools.push({
             id: `pool:${index}:${ri}`,
             name: 'Estanque de la cripta',
-            x: (rm.x0 + rm.w / 2) * ts,
-            y: (rm.y0 + rm.h / 2) * ts,
-            radius: ((Math.min(rm.w, rm.h) - 4) * ts) / 2,
+            x,
+            y,
+            ...irregularWater(x, y, ((rm.w - 4) * ts) / 2, ((rm.h - 4) * ts) / 2, lobeRng),
             lootTable: fd.poolLootTable,
             nightLootTable: fd.poolNightLootTable,
         });
     }
     /** Lejos del agua (con margen para el cuerpo del monstruo o el objeto). */
-    const dry = (p: Vec2): boolean => pools.every((o) => Math.hypot(p.x - o.x, p.y - o.y) > o.radius + POOL_MARGIN);
+    const dry = (p: Vec2): boolean => pools.every((o) => waterDistance(o, p) > POOL_MARGIN);
 
     // Monstruos: por sala (no en la de llegada), lejos del borde de la sala y del agua.
     const spawns: DungeonSpawn[] = [];
@@ -1265,15 +1296,42 @@ export function chestLootTable(base: LootTableDef, index: number, chest: Dungeon
 }
 
 /**
- * Punto del mundo abierto donde aparece el jugador al salir de la cripta:
- * delante de la boca, a `reach` + 1 m en la dirección a la que mira.
- */
-/**
- * Creador (2026-11-25): a la cripta solo se entra hablando con Berto Candado, el portero, que
- * está delante de la reja. Un clic en la reja lleva a hablar con él.
+ * Creador (2026-11-25): a la cripta solo se entra hablando con Berto Candado, el portero («berto
+ * debe estar en la propia puerta de la mazmorra»). Un clic en la reja lleva a hablar con él.
  */
 export const CRYPT_WARDEN_NPC = 'crypt_warden';
 
+/**
+ * CLA-CRIPTA2: sitios para los `n` PNJ de la cripta (`crypt: true`) junto a `arrival`, a 2,5 m a
+ * lado y lado, en suelo caminable y sin pisarse entre ellos. Si no hay hueco, repite la llegada
+ * (`World.placeInteriorNpc` lo lleva a la celda libre más cercana).
+ */
+export function cryptStaffSpots(arrival: Vec2, n: number, walkable: (p: Vec2) => boolean): Vec2[] {
+    const d = 2.5;
+    const tries = [
+        [d, 0],
+        [-d, 0],
+        [0, d],
+        [0, -d],
+        [d, d],
+        [-d, -d],
+        [d, -d],
+        [-d, d],
+    ];
+    const out: Vec2[] = [];
+    for (const [dx, dy] of tries) {
+        if (out.length >= n) break;
+        const p = { x: arrival.x + dx!, y: arrival.y + dy! };
+        if (walkable(p) && out.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1.5)) out.push(p);
+    }
+    while (out.length < n) out.push({ ...arrival });
+    return out;
+}
+
+/**
+ * Punto del mundo abierto donde aparece el jugador al salir de la cripta:
+ * delante de la boca, a `reach` + 1 m en la dirección a la que mira.
+ */
 export function entranceExit(def: DungeonDef): Vec2 {
     const a = (def.entrance.facingDeg * Math.PI) / 180;
     const d = def.entrance.reach + 1;

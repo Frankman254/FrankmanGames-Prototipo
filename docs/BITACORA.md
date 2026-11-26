@@ -1,3 +1,24 @@
+## 2026-11-26 — CLA-CRIPTA2: buhonero, guía de vuelta y estanques con lóbulos (Claude)
+
+**Archivos:** `src/rpg/{contracts,content,quests,session}.ts`, `src/sim/{world,navGrid,fishing}.ts`, `src/world/dungeon.ts`, `src/render/dungeonView.ts`, `src/scenes/cryptScene.ts`, `src/main.ts`, `data/rpg/{merchants,npcs}.json`, `data/i18n/en.{content,ui}.json`, `tests/cla_cripta2.test.ts`; las pruebas de «PNJ en el pueblo» (`zones`, `rpg/quests`) exceptúan los PNJ `crypt` citando al creador.
+
+**Qué se hizo (PROPUESTA):**
+- **PNJ de la cripta.** En cada piso, junto a la llegada desde arriba, aparecen Chalo Farol (buhonero) y Nina Ovillo (guía). Se marcan con `crypt: true`; el mundo abierto no los pone y la escena de la cripta los coloca con `World.placeInteriorNpc` y los retira al salir.
+- **Buhonero.** Vende seis consumibles del boticario con el mismo multiplicador, así que ningún precio cambia.
+- **Guía.** Su opción emite la acción nueva `leaveDungeon`, y `main` reutiliza la vuelta de la poción de recuerdo hacia la Piedra de casa. En pelea se niega.
+- **Estanques.** Los de los pisos generados llevan de dos a tres lóbulos (`FishingSpotDef.lobes`). La rejilla, la pesca y el dibujo usan `waterDistance`. Los lóbulos salen de otra semilla, así que el resto del piso no se mueve.
+
+**Validación:** `npx tsc --noEmit`, `npm test`, `npm run build` y `npm run docs:check`. En el navegador comprobé lo siguiente:
+- En el piso 5 se ven los dos PNJ con su cartel.
+- «Llévame al pueblo.» deja al jugador en Villa Raspadura, sin los PNJ de la cripta en el mundo abierto.
+- En el piso 6 el estanque de tres lóbulos tiene borde irregular, y la caña lanzada a un lóbulo pesca.
+
+Registro de pruebas en `work/claude-mapa/cripta2_npm_test.log`.
+
+**Pendiente del creador:** en qué pisos van (hoy en todos), qué vende el buhonero, sus nombres, y si «el pueblo» es la Piedra de casa o la última Piedra elegida.
+
+---
+
 ## 2026-11-25 — CLA-CRIPTA: mapa, entrada por Berto, escalera y estrella (Claude)
 
 **Archivos:** `src/rpg/content.ts`, `src/ui/map/{mapFeed,minimap,dungeonFloorMap}.ts`, `src/ui/menus/index.ts`, `src/main.ts`, `src/scenes/cryptScene.ts`, `src/world/dungeon.ts`, `data/rpg/npcs.json`, `scripts/mac/junie_continuo.sh`, tres pruebas `tests/cla_*.test.ts`.

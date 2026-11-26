@@ -81,7 +81,8 @@ describe('zonas: datos', () => {
         }
         // Creador (2026-11-25): «berto debe estar en la propia puerta de la mazmorra», fuera del pueblo.
         for (const n of [...Object.values(data.rpg.npcs), ...Object.values(data.rpg.merchants)]) {
-            if (n.id === 'crypt_warden') continue;
+            // CLA-CRIPTA2: «dentro de la mazmorra deberia haber un Npc…»: los `crypt` no salen fuera.
+            if (n.id === 'crypt_warden' || n.crypt) continue;
             expect(map.zoneAt(n.position)?.safe, n.id).toBe(true);
         }
         const first = map.zoneAt(terrainJson.playerStart)!;

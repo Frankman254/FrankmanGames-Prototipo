@@ -550,6 +550,7 @@ export class GameSession implements GameSessionApi {
         if (step.clip) this.character.emit({ type: 'npcClip', npcId: conv.npc.id, clip: step.clip });
         if (step.enterDungeon !== undefined)
             this.character.emit({ type: 'enterDungeon', floor: step.enterDungeon });
+        if (step.leaveDungeon) this.character.emit({ type: 'leaveDungeon' });
         this.character.emit({ type: 'changed' });
         return step.view;
     }

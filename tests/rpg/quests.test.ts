@@ -70,10 +70,11 @@ describe('misiones: datos', () => {
         expect([...types].sort()).toEqual(['collect', 'fish', 'kill', 'reach', 'talk']);
     });
 
-    it('los PNJ nuevos están en el pueblo, cerca de (128, 128), salvo los de Iguanera y Berto', () => {
-        // Creador (2026-11-25): «berto debe estar en la propia puerta de la mazmorra».
+    it('los PNJ nuevos están en el pueblo, cerca de (128, 128), salvo los de Iguanera, Berto y la cripta', () => {
+        // Creador (2026-11-25): «berto debe estar en la propia puerta de la mazmorra» y «dentro de
+        // la mazmorra deberia haber un Npc…» (CLA-CRIPTA2: los `crypt` viven en los pisos).
         const fuera = (id: string): boolean => id.endsWith('_igu') || id === 'crypt_warden';
-        for (const n of Object.values(content().npcs).filter((x) => !fuera(x.id))) {
+        for (const n of Object.values(content().npcs).filter((x) => !fuera(x.id) && !x.crypt)) {
             expect(Math.hypot(n.position.x - 128, n.position.y - 128), n.id).toBeLessThan(25);
         }
     });

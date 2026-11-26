@@ -2320,5 +2320,12 @@
   "spell.tuna_arrow.name": "Carnival Tuna Arrow",
   "spell.tuna_arrow.description": "A lightning arrow that goes from enemy to enemy like a carnival tuna parade: it jumps to the nearest one within 2 m of the last hit, and each jump adds 10 to the base damage, up to 10 jumps. With no one nearby, the parade ends.",
   "spell.hunt_drum.name": "Hunt Drum",
-  "spell.hunt_drum.description": "Hunt drum that empowers an ally or yourself."
+  "spell.hunt_drum.description": "Hunt drum that empowers an ally or yourself.",
+  "Chalo Farol": "Chalo Farol",
+  "Buhonero de la cripta": "Crypt peddler",
+  "Aquí abajo no hay plaza, pero hay frascos. Llévate lo que aguantes cargar.": "There's no market down here, but there are bottles. Take what you can carry.",
+  "Nina Ovillo": "Nina Ovillo",
+  "Guía de la cripta": "Crypt guide",
+  "¿Ya tuviste bastante? Agárrate del hilo y te saco al pueblo, sin gastar ni un trago.": "Had enough? Hold on to the thread and I'll lead you back to town, not a sip spent.",
+  "Llévame al pueblo.": "Take me to town."
 }

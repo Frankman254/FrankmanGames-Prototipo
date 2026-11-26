@@ -484,5 +484,6 @@
  "Bloque 3D": "3D block",
  "Ritmo": "Pace",
  "libre: se lanza a la vez que otro": "free: casts alongside another spell",
- "Tope: {cap} %": "Cap: {cap} %"
+ "Tope: {cap} %": "Cap: {cap} %",
+ "No te puedo sacar mientras peleas.": "I can't get you out while you're fighting."
 }

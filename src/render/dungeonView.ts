@@ -3,6 +3,7 @@
 // draw call por tipo), antorchas, escaleras y cofres (modelo de Blender con su
 // animación). Los muros y su remate llevan el recorte de oclusión para que no
 // tapen a los personajes.
+import { waterCircles, waterDistance } from '../sim/navGrid';
 import '@babylonjs/loaders/glTF';
 import {
     Color3,
@@ -271,7 +272,7 @@ export class DungeonFloorView {
         const floorTiles: Array<{ x: number; y: number; z: number }> = [];
         // Bajo el agua de los estanques no hay losas: se ve el fondo oscuro.
         const wet = (x: number, z: number): boolean =>
-            floor.pools.some((p) => Math.hypot(x - p.x, z - p.y) < p.radius - ts * 0.35);
+            floor.pools.some((p) => waterDistance(p, { x, y: z }) < -ts * 0.35);
         for (let r = 0; r < floor.rows; r++)
             for (let c = 0; c < floor.cols; c++)
                 if (floor.cells[r * floor.cols + c] && !wet((c + 0.5) * ts, (r + 0.5) * ts))
@@ -499,33 +500,32 @@ export class DungeonFloorView {
         water.emissiveColor = new Color3(0.01, 0.05, 0.07);
         water.specularColor = new Color3(0.55, 0.6, 0.65);
         water.specularPower = 96;
-        water.alpha = 0.9;
+        // Opaca: los lóbulos de un estanque se solapan y con transparencia se vería el cruce.
+        water.alpha = 1;
         const rimMats: Matrix[] = [];
         for (const p of floor.pools) {
-            const disc = MeshBuilder.CreateDisc(`dPool-${p.id}`, { radius: p.radius, tessellation: 48 }, this.scene);
-            disc.parent = this.root;
-            disc.rotation.x = Math.PI / 2;
-            disc.position.set(p.x, 0.012, p.y);
-            disc.material = water;
-            disc.isPickable = true;
-            disc.metadata = { dungeonPool: true } satisfies FeatureMeta;
-            const n = Math.max(10, Math.ceil((2 * Math.PI * p.radius) / 0.72));
-            for (let k = 0; k < n; k++) {
-                const a = (2 * Math.PI * k) / n;
-                const rr = p.radius + 0.12;
-                const s = 0.85 + ((k * 37) % 7) * 0.05;
-                rimMats.push(
-                    yawMatrix(
-                        p.x + Math.cos(a) * rr,
-                        0,
-                        p.y + Math.sin(a) * rr,
-                        yawOf(-Math.sin(a), Math.cos(a)),
-                        s,
-                        0.8 + ((k * 13) % 5) * 0.1,
-                        1,
-                    ),
-                );
-            }
+            // Un disco por círculo del estanque (principal y lóbulos); las piedras de orilla solo
+            // donde el borde de un círculo no queda dentro del agua de otro.
+            waterCircles(p).forEach((c, ci) => {
+                const disc = MeshBuilder.CreateDisc(`dPool-${p.id}-${ci}`, { radius: c.radius, tessellation: 48 }, this.scene);
+                disc.parent = this.root;
+                disc.rotation.x = Math.PI / 2;
+                disc.position.set(c.x, 0.012, c.y);
+                disc.material = water;
+                disc.isPickable = true;
+                disc.metadata = { dungeonPool: true } satisfies FeatureMeta;
+                const n = Math.max(10, Math.ceil((2 * Math.PI * c.radius) / 0.72));
+                for (let k = 0; k < n; k++) {
+                    const a = (2 * Math.PI * k) / n;
+                    const rr = c.radius + 0.12;
+                    const q = { x: c.x + Math.cos(a) * rr, y: c.y + Math.sin(a) * rr };
+                    if (waterDistance(p, q) < 0.05) continue;
+                    const s = 0.85 + ((k * 37) % 7) * 0.05;
+                    rimMats.push(
+                        yawMatrix(q.x, 0, q.y, yawOf(-Math.sin(a), Math.cos(a)), s, 0.8 + ((k * 13) % 5) * 0.1, 1),
+                    );
+                }
+            });
         }
         const th = floor.theme;
         const rim = staticMesh(this.scene, 'd_estanque_piedra', 'dPoolRim');

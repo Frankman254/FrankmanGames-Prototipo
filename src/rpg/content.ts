@@ -93,6 +93,11 @@ export interface FishingSpotDef {
     x: number;
     y: number;
     radius: number;
+    /**
+     * Círculos de agua extra que se solapan con el principal: el estanque es la unión de todos y
+     * deja de ser redondo (creador, 2026-11-25: «zonas de agua (no nesesariamente circulares)»).
+     */
+    lobes?: ReadonlyArray<{ x: number; y: number; radius: number }>;
     lootTable: string;
     /** Tabla de noche (peces que sólo pican de noche), o null = la misma de día. */
     nightLootTable: string | null;
@@ -918,6 +923,7 @@ function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
     const pr = r.child('position');
     const po = pr.obj(o['position']);
     const devOnly = flag(r, o, 'devOnly');
+    const crypt = flag(r, o, 'crypt');
     const fixedPrice = o['fixedPrice'] === undefined ? undefined : r.num(o, 'fixedPrice', { min: 0 });
     const maxLevelOffset =
         o['maxLevelOffset'] === undefined ? undefined : r.num(o, 'maxLevelOffset', { int: true, min: 0 });
@@ -939,6 +945,7 @@ function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
             return { itemId: c.str(e, 'itemId'), quantity: q as number | null };
         }),
         ...(devOnly ? { devOnly: true } : {}),
+        ...(crypt ? { crypt: true } : {}),
         ...(fixedPrice !== undefined ? { fixedPrice } : {}),
         ...(maxLevelOffset !== undefined ? { maxLevelOffset } : {}),
     };
@@ -1251,8 +1258,8 @@ function parseCondition(r: Reader, raw: unknown): DialogueCondition {
 
 function parseAction(r: Reader, raw: unknown): DialogueAction {
     const o = r.obj(raw);
-    const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop', 'playClip', 'enterDungeon']);
-    if (type === 'openShop') return { type };
+    const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop', 'playClip', 'enterDungeon', 'leaveDungeon']);
+    if (type === 'openShop' || type === 'leaveDungeon') return { type };
     if (type === 'playClip') return { type, clip: r.str(o, 'clip') };
     if (type === 'enterDungeon') {
         const floor = o.floor === undefined || o.floor === null ? null : r.num(o, 'floor');
@@ -1315,6 +1322,7 @@ function parseNpc(merchants: Record<string, MerchantDef>) {
                 look: m.look,
                 merchantId: id,
                 dialogue,
+                ...(m.crypt ? { crypt: true } : {}),
             };
         }
         const model = o['model'] === undefined ? undefined : r.str(o, 'model');
@@ -1327,6 +1335,7 @@ function parseNpc(merchants: Record<string, MerchantDef>) {
             model,
             merchantId: null,
             dialogue,
+            ...(flag(r, o, 'crypt') ? { crypt: true } : {}),
         };
     };
 }
@@ -1884,7 +1893,7 @@ function checkQuestReferences(
                         fail('npcs.json', `${op_}.actions[${j}]`, 'openShop sólo vale en un mercader');
                     if (a.type === 'playClip' && !n.model)
                         fail('npcs.json', `${op_}.actions[${j}]`, 'playClip sólo vale en un PNJ con «model»');
-                    if (a.type !== 'openShop' && a.type !== 'playClip' && a.type !== 'enterDungeon')
+                    if (a.type !== 'openShop' && a.type !== 'playClip' && a.type !== 'enterDungeon' && a.type !== 'leaveDungeon')
                         needQuest('npcs.json', `${op_}.actions[${j}].questId`, a.questId);
                 });
             });

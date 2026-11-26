@@ -1917,8 +1917,7 @@ menus?.onAction((a) => {
 });
 // Partida nueva o cargada: arena nueva con ese personaje.
 /** Poción de recuerdo: a la última Piedra Pintada, también desde un interior. */
-function recallToStone(): void {
-    const stone = stones.respawn;
+function recallToStone(stone = stones.respawn): void {
     const at = arriveAt(stone);
     veil({ kicker: tr('Volviendo a'), title: stone.name, sub: tr('Piedra Pintada') }, () => {
         if (world.interior) newWorld(data.loadTest.seed + ++runIndex, at);
@@ -1933,6 +1932,12 @@ menus?.onSession((s) => {
         if (e.type === 'dungeonReturn' && crypt?.inside) {
             const dungeon = crypt;
             dungeon.veil('Volviendo a', null, () => dungeon.leave());
+        }
+        // CLA-CRIPTA2: el guía de la cripta devuelve al pueblo (la Piedra de casa) sin pociones.
+        if (e.type === 'leaveDungeon' && crypt?.inside) {
+            if (crypt.fighting)
+                world.character.emit({ type: 'message', text: 'No te puedo sacar mientras peleas.' });
+            else recallToStone(stones.get(stones.def.home) ?? stones.respawn);
         }
         if (e.type === 'npcClip') npcView.playGesture(e.npcId, e.clip);
         // DUN-07: recompensa del guardián.

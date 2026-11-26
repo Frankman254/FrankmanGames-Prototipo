@@ -38,14 +38,34 @@ export interface ZoneGridDef {
     navPaint?: NavPaint | undefined;
 }
 
+/** Agua de un estanque: un círculo y, si los tiene, los lóbulos que se solapan con él. */
+export interface WaterShape {
+    x: number;
+    y: number;
+    radius: number;
+    lobes?: ReadonlyArray<{ x: number; y: number; radius: number }>;
+}
+
+/** Los círculos cuya unión es el agua del estanque (el principal primero). */
+export function waterCircles(s: WaterShape): Array<{ x: number; y: number; radius: number }> {
+    return [{ x: s.x, y: s.y, radius: s.radius }, ...(s.lobes ?? [])];
+}
+
+/** Distancia de `p` a la orilla del estanque (0 o menos = en el agua). */
+export function waterDistance(s: WaterShape, p: { x: number; y: number }): number {
+    let d = Infinity;
+    for (const c of waterCircles(s)) d = Math.min(d, Math.hypot(p.x - c.x, p.y - c.y) - c.radius);
+    return d;
+}
+
 /**
  * Rejilla completa de una zona: obstáculos inflados, agua de los estanques
  * (no se pisa: se pesca desde la orilla) y las celdas pintadas en el editor.
  */
-export function buildZoneGrid(z: ZoneGridDef, water: ReadonlyArray<{ x: number; y: number; radius: number }>): NavGrid {
+export function buildZoneGrid(z: ZoneGridDef, water: ReadonlyArray<WaterShape>): NavGrid {
     const g = z.shared?.grid ?? NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
     if (z.shared) for (const o of z.obstacles) g.stamp(o, z.navRadius);
-    for (const s of water) g.blockCircle(s.x, s.y, s.radius + z.navRadius * 0.5);
+    for (const s of water) for (const c of waterCircles(s)) g.blockCircle(c.x, c.y, c.radius + z.navRadius * 0.5);
     if (z.navPaint) g.applyPaint(z.navPaint);
     return g;
 }

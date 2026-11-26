@@ -23,6 +23,7 @@ import {
     doorApproach,
     entranceExit,
     CRYPT_WARDEN_NPC,
+    cryptStaffSpots,
     floorGameData,
     floorTitle,
     generateFloor,
@@ -90,6 +91,8 @@ export class CryptScene {
     private floorView: DungeonFloorView | null = null;
     private readonly entrance: TransformNode;
     private pending: Pending | null = null;
+    /** CLA-CRIPTA2: PNJ de la cripta puestos en el piso (la vista los olvida al salir). */
+    private staff: string[] = [];
     /** Cofres ya abiertos en esta partida («piso:sala»). */
     private readonly opened = new Set<string>();
     /** Puertas abiertas y jarras o barriles rotos en esta partida. */
@@ -403,6 +406,7 @@ export class CryptScene {
                 }),
         );
         for (const s of f.spawns) w.spawnEnemy(s.archetype, s.pos, s.level, null, s.guardian);
+        this.placeStaff(w, f.arrivalFromAbove);
         this.sprung.clear();
         this.baseBlocked = w.grid.blocked.slice();
         this.stampDoors(w, f);
@@ -418,6 +422,32 @@ export class CryptScene {
             safe: false,
         });
         return true;
+    }
+
+    /**
+     * CLA-CRIPTA2 (creador 2026-11-25): en cada piso, junto a la llegada desde arriba, el mercader
+     * y el guía que devuelve al pueblo (`crypt: true` en merchants.json / npcs.json).
+     */
+    private placeStaff(w: World, arrival: Vec2): void {
+        const c = w.content;
+        const who: { id: string; merchantId: string | null }[] = [
+            ...Object.values(c.merchants)
+                .filter((m) => m.crypt)
+                .map((m) => ({ id: m.id, merchantId: m.id })),
+            ...Object.values(c.npcs)
+                .filter((n) => n.crypt && n.merchantId === null)
+                .map((n) => ({ id: n.id, merchantId: null })),
+        ];
+        const spots = cryptStaffSpots(arrival, who.length, (p) => w.grid.walkable(p));
+        this.staff = [];
+        who.forEach((n, i) => {
+            if (w.placeInteriorNpc(n.id, n.merchantId, spots[i]!)) this.staff.push(n.id);
+        });
+    }
+
+    /** ¿Hay pelea cerca del jugador? (el guía no saca a nadie en combate). */
+    get fighting(): boolean {
+        return this.isInCombat(this.host.world());
     }
 
     /** Cambio de piso tapado por la pantalla de carga; `index` null = salida a la superficie. */
@@ -677,6 +707,8 @@ export class CryptScene {
 
     private showOutdoor(): void {
         const v = this.host.view;
+        for (const id of this.staff) this.host.npcs.forget(id);
+        this.staff = [];
         this.floorView?.dispose();
         this.floorView = null;
         this.floorData = null;

@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Mercaderes del pueblo (Slice 05). position en metros de la zona continua (plano XZ); si cae dentro de un obstáculo se mueve a la celda libre más cercana. Precio de compra = value × rarityValue × buyMultiplier (redondeo hacia arriba); venta = sellValue de la sesión (rules.sellRatio). quantity null = ilimitado. Las existencias se reponen al empezar o cargar partida. look elige la paleta de `npc` en data/assets.json.",
+  "_nota": "Mercaderes del pueblo (Slice 05). position en metros de la zona continua (plano XZ); si cae dentro de un obstáculo se mueve a la celda libre más cercana. Precio de compra = value × rarityValue × buyMultiplier (redondeo hacia arriba); venta = sellValue de la sesión (rules.sellRatio). quantity null = ilimitado. Las existencias se reponen al empezar o cargar partida. look elige la paleta de `npc` en data/assets.json. CLA-CRIPTA2: con \"crypt\": true vive en cada piso de la cripta, junto a la llegada; su position no se usa en partida (el editor la dibuja junto a la reja).",
   "merchants": {
     "smith": {
       "name": "Brunilda Yunque",
@@ -5236,6 +5236,45 @@
         {
           "itemId": "mount_falcopama_brio",
           "quantity": 1
+        }
+      ]
+    },
+    "crypt_peddler": {
+      "name": "Chalo Farol",
+      "title": "Buhonero de la cripta",
+      "greeting": "Aquí abajo no hay plaza, pero hay frascos. Llévate lo que aguantes cargar.",
+      "position": {
+        "x": 136.5,
+        "y": 159
+      },
+      "look": "apothecary",
+      "crypt": true,
+      "buyMultiplier": 1.4,
+      "buybackSize": 8,
+      "stock": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": null
+        },
+        {
+          "itemId": "health_potion",
+          "quantity": null
+        },
+        {
+          "itemId": "resource_tonic",
+          "quantity": null
+        },
+        {
+          "itemId": "pulse_draught",
+          "quantity": null
+        },
+        {
+          "itemId": "corn_bollo",
+          "quantity": null
+        },
+        {
+          "itemId": "raspadura_block",
+          "quantity": null
         }
       ]
     }

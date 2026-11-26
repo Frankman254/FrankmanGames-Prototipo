@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "PNJ con diálogo (Slice 06). position en metros de la zona continua (plano XZ); si cae en un obstáculo se mueve a la celda libre más cercana. look elige la paleta de `npc` en data/assets.json. Con \"merchant\": true la entrada es el diálogo del mercader del mismo id (nombre, sitio y aspecto salen de merchants.json) y la opción «Comerciar» se añade sola. El diálogo es un árbol: `entry` elige el primer nodo cuyas condiciones se cumplan; cada opción puede tener condiciones (quest con states locked/available/active/ready/completed, level min/max, hasItem, not), acciones (acceptQuest, completeQuest, openShop) y next (null = termina). Las misiones que da o recibe el PNJ (quests.json → giver/turnIn) añaden sus opciones solas al nodo de entrada: «!» ofrecer, «?» entregar, y «¿Qué tal va…?» mientras está en curso. Todos los nombres y textos son inventados y cambiables.",
+  "_nota": "PNJ con diálogo (Slice 06). position en metros de la zona continua (plano XZ); si cae en un obstáculo se mueve a la celda libre más cercana. look elige la paleta de `npc` en data/assets.json. Con \"merchant\": true la entrada es el diálogo del mercader del mismo id (nombre, sitio y aspecto salen de merchants.json) y la opción «Comerciar» se añade sola. El diálogo es un árbol: `entry` elige el primer nodo cuyas condiciones se cumplan; cada opción puede tener condiciones (quest con states locked/available/active/ready/completed, level min/max, hasItem, not), acciones (acceptQuest, completeQuest, openShop) y next (null = termina). Las misiones que da o recibe el PNJ (quests.json → giver/turnIn) añaden sus opciones solas al nodo de entrada: «!» ofrecer, «?» entregar, y «¿Qué tal va…?» mientras está en curso. Todos los nombres y textos son inventados y cambiables. CLA-CRIPTA2: con \"crypt\": true vive en cada piso de la cripta, junto a la llegada; su position no se usa en partida (el editor la dibuja junto a la reja).",
   "npcs": {
     "fisher": {
       "name": "Marina Junco",
@@ -866,6 +866,39 @@
                 "text": "Adiós",
                 "conditions": [],
                 "actions": [],
+                "next": null
+              }
+            ]
+          }
+        }
+      }
+    },
+    "crypt_guide": {
+      "name": "Nina Ovillo",
+      "title": "Guía de la cripta",
+      "position": {
+        "x": 141.5,
+        "y": 159
+      },
+      "look": "elder",
+      "crypt": true,
+      "dialogue": {
+        "entry": [
+          {
+            "node": "hello"
+          }
+        ],
+        "nodes": {
+          "hello": {
+            "text": "¿Ya tuviste bastante? Agárrate del hilo y te saco al pueblo, sin gastar ni un trago.",
+            "options": [
+              {
+                "text": "Llévame al pueblo.",
+                "actions": [
+                  {
+                    "type": "leaveDungeon"
+                  }
+                ],
                 "next": null
               }
             ]
