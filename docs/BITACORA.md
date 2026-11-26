@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-344: revisar el contraste del HUD de día y noche (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Revisión visual en Electron del HUD de Villa Raspadura, con el tiempo fijado a día (`0.45`) y noche (`0.85`), y modos de iluminación `vivo` y `claro`. Se contrastaron los textos visibles con tramos claros y oscuros de la escena. No se modificaron estilos ni comportamiento.
+
+**Hallazgos:** Ningún texto visible resultó ilegible por contraste. Se revisaron coordenadas/zona/hora, nombres y oficios de PNJ, chat, personaje y medidores, teclas y contadores de las barras, y textos del minimapa.
+
+**Validación:** Electron `luzModos`: 2/2 comprobaciones, consola limpia; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio.
+
+**Evidencia:** `work/junie-jl344/CONTRASTE.md`, `resultado.json` y cuatro capturas revisadas en `work/junie-jl344/`.
+
+---
+
 ## 2026-11-26 — JL-343: capturar escalas de interfaz y registrar solapes (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
