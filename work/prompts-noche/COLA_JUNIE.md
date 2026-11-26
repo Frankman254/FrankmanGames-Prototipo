@@ -1574,7 +1574,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-337 **Guardado roto:** cargar un guardado truncado, uno con campos de más y uno de una versión vieja. Sale un aviso claro y el juego no se cuelga. Prueba pura del lector. — commit «JL-337: avisar y recuperar guardados ilegibles» — evidencia: `tests/jl337_saveReader.test.ts` (3/3), Electron `jl337GuardadoRoto` (2/2), captura y resultado en `work/junie-jl337/`.
 - [x] JL-338 **Dos guardados seguidos** muy rápido, o guardar mientras se viaja: que nada queda a medias. — commit «JL-338: guardar al terminar los viajes» — evidencia: `tests/sav02_autosave.test.ts` 14/14; Electron `jl338GuardadoViaje` 5/5, consola limpia; resultado y captura en `work/junie-jl338/verified/`.
 - [x] JL-339 **Perder el foco a media pelea:** que no quedan teclas «pegadas». — commit «JL-339: cancelar el apuntado al perder foco» — evidencia: Electron `jl339FocusLost` 6/6; enemigo herido 60→59, objetivo activo tras `blur`, sin hechizo lanzado por `keyup` tardío; capturas revisadas en `work/junie-jl339/`.
-- [ ] JL-340 **Arranque sin audio** (dispositivo ausente o bloqueado): el juego arranca sin errores.
+- [x] JL-340 **Arranque sin audio** (dispositivo ausente o bloqueado): el juego arranca sin errores. — commit «JL-340: arrancar sin audio disponible» — prueba 1/1; Electron `jl340AudioBloqueado` 3/3, consola limpia; `npm test` 5.067 aprobadas; capturas revisadas en `work/junie-jl340/`.
 - [ ] JL-341 **Arranque con `data/` incompleta:** si falta un archivo opcional, el error es claro, no una pantalla en blanco. Prueba.
 
 ### H. Interfaz y accesibilidad

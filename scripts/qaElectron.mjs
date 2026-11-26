@@ -43,8 +43,8 @@ const server = await createServer({
     server: { strictPort: false, hmr: false, watch: null },
     logLevel: 'error',
     // Permite aislar problemas de arranque del postproceso sin alterar las opciones del usuario.
-    plugins:
-        process.env.QA_BOOT_NATURAL === '1'
+    plugins: [
+        ...(process.env.QA_BOOT_NATURAL === '1'
             ? [
                   {
                       name: 'qa-natural',
@@ -55,7 +55,26 @@ const server = await createServer({
                       },
                   },
               ]
-            : [],
+            : []),
+        ...(process.env.QA_AUDIO_BLOCKED === '1'
+            ? [
+                  {
+                      name: 'qa-audio-blocked',
+                      enforce: 'pre',
+                      transform(code, id) {
+                          if (!id.replaceAll('\\', '/').endsWith('/src/audio/director.ts')) return;
+                          const resume =
+                              'void ctx.resume().catch((error: unknown) => this.disableAudio(ctx, error));';
+                          if (!code.includes(resume)) throw new Error('No se pudo bloquear AudioContext.resume()');
+                          return code.replace(
+                              resume,
+                              "void Promise.reject(new DOMException('dispositivo de audio bloqueado', 'NotAllowedError')).catch((error: unknown) => this.disableAudio(ctx, error));",
+                          );
+                      },
+                  },
+              ]
+            : []),
+    ],
 });
 await server.listen();
 const url = server.resolvedUrls.local[0];
@@ -1947,6 +1966,24 @@ const scenarios = {
             end.inBag === start.inBag + start.sp && end.sp === 0 && end.gold === start.gold + start.spGold,
             `${JSON.stringify(start)} → ${JSON.stringify(end)}`,
         );
+    },
+
+    /** JL-340: la interfaz y una partida arrancan aunque se rechace el desbloqueo de audio. */
+    async jl340AudioBloqueado() {
+        await until(
+            `!!document.querySelector('[data-testid="new-game"]')`,
+            30000,
+            'portada visible sin audio',
+        );
+        await shot('jl340-portada-sin-audio');
+        await newGame('QA Sin Audio');
+        await until(`__audio?.audioUnavailable && !__audio.engine`, 5000, 'audio desactivado sin interrumpir la partida');
+        check('Arranque sin audio: personaje y mundo activos', await js(`${S} && ${W}.character.name==='QA Sin Audio'`));
+        check(
+            'Arranque sin audio: el contexto rechazado queda desactivado',
+            await js(`__audio.audioUnavailable && __audio.engine===null`),
+        );
+        await shot('jl340-partida-sin-audio');
     },
 
     /** Nivel medido de cada bus de audio parado junto al inicio. Mide; no juzga si molesta. */

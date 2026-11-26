@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-340: arrancar sin audio disponible (Junie)
+
+**Archivos:** `src/audio/director.ts`, `tests/jl340_audioStartup.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `AudioDirector.start()` aísla los fallos al crear o configurar `AudioContext` y el rechazo de `resume()`: limpia los reproductores, cierra el contexto si puede y deja el juego continuar sin sonido. La prueba unitaria cubre el dispositivo ausente; `jl340AudioBloqueado` fuerza el rechazo asíncrono en Electron y comprueba una partida real.
+
+**Validación:** prueba dirigida 1/1; Electron `jl340AudioBloqueado`: 3/3, consola limpia; `npm test`: 422 archivos, 5.067 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y `node --check scripts/qaElectron.mjs` limpios.
+
+**Evidencia:** capturas revisadas `work/junie-jl340/jl340-portada-sin-audio.jpg` y `work/junie-jl340/jl340-partida-sin-audio.jpg`; `work/junie-jl340/resultado.json`.
+
+---
+
 ## 2026-11-26 — JL-339: cancelar apuntado al perder foco (Junie)
 
 **Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

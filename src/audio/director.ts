@@ -84,6 +84,7 @@ export class AudioDirector {
     private last = performance.now();
     // HZ-06: throttle para curas suaves — no más de una vez cada 1.5 s.
     private lastHealSoft = 0;
+    private audioUnavailable = false;
     /** Muestras WAV decodificadas por id de sonido (vacío hasta que terminan de cargar). */
     private samples = new Map<string, AudioBuffer>();
     /** Sonidos disparados por id (depuración y medición). */
@@ -141,35 +142,73 @@ export class AudioDirector {
 
     /** Crea el contexto de audio (tras un gesto del usuario) o lo reanuda. */
     start(): void {
+        if (this.audioUnavailable) return;
         if (this.engine) {
-            void (this.engine.ctx as AudioContext).resume?.();
+            this.resume(this.engine.ctx as AudioContext);
             return;
         }
         const Ctx =
             window.AudioContext ??
             (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-        if (!Ctx) return;
-        const ctx = new Ctx({ latencyHint: 'interactive' });
-        this.engine = new AudioEngine(ctx, this.data.mix, 1);
-        this.applyVolumes();
-        this.music = new MusicPlayer(this.engine, this.data.music);
-        this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
-        this.contextMusic = new ContextMusicPlayer(this.engine);
-        const music = this.contextMusic;
-        this.stingers = new StingerPlayer(this.engine, (seconds) => music.duck(seconds));
-        this.stingers.preload();
-        // Mientras se decodifican (o si fallan) suenan las recetas sintetizadas.
-        void loadSamples(ctx, this.data.sfx).then((m) => (this.samples = m));
-        // Música local de pruebas: el módulo sólo existe en desarrollo (el build lo descarta entero).
-        if (import.meta.env.DEV) {
-            const engine = this.engine;
-            void import('./localMusic').then(async ({ LocalMusicPlayer }) => {
-                const p = new LocalMusicPlayer(engine);
-                await p.load();
-                this.localMusic = p;
-            });
+        if (!Ctx) {
+            this.audioUnavailable = true;
+            return;
         }
-        void ctx.resume();
+        let ctx: AudioContext | null = null;
+        try {
+            ctx = new Ctx({ latencyHint: 'interactive' });
+            this.engine = new AudioEngine(ctx, this.data.mix, 1);
+            this.applyVolumes();
+            this.music = new MusicPlayer(this.engine, this.data.music);
+            this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
+            this.contextMusic = new ContextMusicPlayer(this.engine);
+            const music = this.contextMusic;
+            this.stingers = new StingerPlayer(this.engine, (seconds) => music.duck(seconds));
+            this.stingers.preload();
+            // Mientras se decodifican (o si fallan) suenan las recetas sintetizadas.
+            void loadSamples(ctx, this.data.sfx).then((m) => {
+                if (!this.audioUnavailable) this.samples = m;
+            });
+            // Música local de pruebas: el módulo sólo existe en desarrollo (el build lo descarta entero).
+            if (import.meta.env.DEV) {
+                const engine = this.engine;
+                void import('./localMusic').then(async ({ LocalMusicPlayer }) => {
+                    if (this.audioUnavailable) return;
+                    const p = new LocalMusicPlayer(engine);
+                    await p.load();
+                    if (!this.audioUnavailable) this.localMusic = p;
+                });
+            }
+            this.resume(ctx);
+        } catch (error) {
+            this.disableAudio(ctx, error);
+        }
+    }
+
+    private resume(ctx: AudioContext): void {
+        try {
+            void ctx.resume().catch((error: unknown) => this.disableAudio(ctx, error));
+        } catch (error) {
+            this.disableAudio(ctx, error);
+        }
+    }
+
+    private disableAudio(ctx: AudioContext | null, error: unknown): void {
+        if (this.audioUnavailable) return;
+        this.audioUnavailable = true;
+        this.engine = null;
+        this.music = null;
+        this.ambience = null;
+        this.contextMusic = null;
+        this.stingers = null;
+        this.localMusic = null;
+        this.samples.clear();
+        try {
+            if (ctx && ctx.state !== 'closed') void ctx.close().catch(() => undefined);
+        } catch {
+            // El cierre también puede fallar cuando el dispositivo de audio no existe.
+        }
+        console.warn('[audio] dispositivo no disponible; el juego continuará sin sonido', error);
     }
 
     private cueContext(world: World): CueContext {
