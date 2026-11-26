@@ -3469,6 +3469,120 @@ const scenarios = {
         await shot('espeja-pueblo');
     },
 
+    /** JL-329: mide los bucles de reposo de los PNJ del pueblo en la escena real. */
+    async jl329PnjIdle() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl329';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+        await newGame('QA PNJ');
+        await js(
+            `(()=>{const w=${W},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:121.6,y:138.6}));p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];v.rig.mode='manual';})()`,
+        );
+
+        const idleGroup = `__game.view.scene.animationGroups.find(g=>g.name.includes('npc-la_espeja')&&g.name.endsWith('Reposo'))`;
+        await until(
+            `${idleGroup}?.isPlaying&&${idleGroup}?.animatables?.length>0&&__game.view.scene.meshes.some(m=>m.name.includes('npc-la_espeja')&&m.isEnabled()&&m.getTotalVertices()>0)`,
+            20000,
+            'reposo de La Espeja',
+        );
+        await js('void __game.view.rig.setFraming("default")');
+        await sleep(1500);
+        await js(
+            `__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`,
+        );
+        await js(`(()=>{
+          const v=__game.view,r=v.rig;
+          r.mode='manual';r.yawDeg=180;r.pitchDeg=14;r.distance=5;r.jumpTo(5);
+          v.player.model.root.setEnabled(false);
+          v.scene.meshes.filter(m=>m.name.startsWith('npc-sign-')||m.name.startsWith('npc-marker-')||m.name.startsWith('npc-coin-')).forEach(m=>m.setEnabled(false));
+        })()`);
+        await sleep(800);
+
+        const population = await js(`(()=>{
+          const scene=__game.view.scene,ids=${W}.npcs.map(n=>n.npcId).sort();
+          return {ids,skeletons:scene.skeletons.map(s=>s.name).filter(n=>n.startsWith('npc-')),
+            idleGroups:scene.animationGroups.filter(g=>g.name.startsWith('npc-')&&g.name.endsWith('Reposo')).map(g=>g.name)};
+        })()`);
+        const missingSkeletons = population.ids.filter(
+            (id) => !population.skeletons.some((name) => name.startsWith(`npc-${id}:`)),
+        );
+        const missingIdleGroups = population.ids.filter(
+            (id) => !population.idleGroups.some((name) => name.startsWith(`npc-${id}:`)),
+        );
+        check(
+            'JL-329: PNJ activos tienen modelo y clip Reposo',
+            population.ids.includes('la_espeja') && missingSkeletons.length === 0 && missingIdleGroups.length === 0,
+            JSON.stringify({ ids: population.ids, missingSkeletons, missingIdleGroups }),
+        );
+        check(
+            'JL-329: La Espeja tiene Reposo activo',
+            population.idleGroups.filter((name) => name.startsWith('npc-la_espeja:')).length === 1 &&
+                (await js(`${idleGroup}.isPlaying`)),
+            JSON.stringify(population.idleGroups.filter((name) => name.startsWith('npc-la_espeja:'))),
+        );
+
+        await shot('jl329-reposo-rsp-inicio');
+        const start = await js(`(()=>{
+          const scene=__game.view.scene,ids=${W}.npcs.map(n=>n.npcId);
+          const tracks=ids.map(id=>{
+            const group=scene.animationGroups.find(g=>g.name.startsWith('npc-'+id+':')&&g.name.endsWith('Reposo'));
+            const targets=[...new Set((group?.targetedAnimations??[]).filter(a=>/(^|:)(hips|spine|chest|head)$/.test(a.target?.name??'')).map(a=>a.target))];
+            return {id,group,targets,baseline:null,maxDelta:0,samples:0,activeFrames:0,frameChanges:0,loops:0,lastFrame:null};
+          });
+          let renderFrames=0;
+          const observer=scene.onAfterRenderObservable.add(()=>{
+            renderFrames++;
+            for(const track of tracks){
+              if(track.group?.isPlaying)track.activeFrames++;
+              const frame=track.group?.animatables?.[0]?.masterFrame;
+              if(Number.isFinite(frame)){
+                if(track.lastFrame!==null&&Math.abs(frame-track.lastFrame)>1e-4)track.frameChanges++;
+                if(track.lastFrame!==null&&frame<track.lastFrame-1)track.loops++;
+                track.lastFrame=frame;
+              }
+              const values=track.targets.flatMap(t=>{
+                const p=t.position??{},r=t.rotation??{},q=t.rotationQuaternion??{},s=t.scaling??{};
+                return [p.x,p.y,p.z,r.x,r.y,r.z,q.x,q.y,q.z,q.w,s.x,s.y,s.z].map(v=>Number(v)||0);
+              });
+              if(!track.baseline)track.baseline=values;
+              else for(let i=0;i<values.length;i++)track.maxDelta=Math.max(track.maxDelta,Math.abs(values[i]-track.baseline[i]));
+              track.samples++;
+            }
+          });
+          window.__jl329Finish=()=>{
+            scene.onAfterRenderObservable.remove(observer);
+            return {renderFrames,tracks:tracks.map(({group,targets,baseline,lastFrame,...track})=>({
+              ...track,playing:!!group?.isPlaying,groupFrame:lastFrame,targetNames:targets.map(t=>t.name),maxDelta:Number(track.maxDelta.toFixed(5))
+            }))};
+          };
+          return {tracks:tracks.map(t=>({id:t.id,group:t.group?.name??null,playing:!!t.group?.isPlaying,targetNames:t.targets.map(n=>n.name)}))};
+        })()`);
+        check(
+            'JL-329: se pueden muestrear los clips de reposo de cada PNJ',
+            start.tracks.length === population.ids.length &&
+                start.tracks.every((track) => track.playing && track.group && track.targetNames.length > 0),
+            JSON.stringify(start),
+        );
+        await sleep(4000);
+        const observed = await js('window.__jl329Finish()');
+        await shot('jl329-reposo-rsp-fin');
+        check(
+            'JL-329: los PNJ recorren Reposo sin congelarse',
+            observed.renderFrames >= 60 &&
+                observed.tracks.length === population.ids.length &&
+                observed.tracks.every(
+                    (track) =>
+                        track.activeFrames > 0 && track.frameChanges > 20 && track.loops > 0 && track.maxDelta > 0.0005,
+                ),
+            JSON.stringify({ renderFrames: observed.renderFrames, tracks: observed.tracks }),
+        );
+        fs.writeFileSync(
+            path.join(outDir, 'observaciones.json'),
+            JSON.stringify({ population, start, observed }, null, 2),
+        );
+        check('JL-329: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+    },
+
     /** 2026-11-17: consola oculta (F8) y nombres de QA que respetan la regla del juego. */
     async consola() {
         const name = await newGame('QA Nombre Larguísimo 123');

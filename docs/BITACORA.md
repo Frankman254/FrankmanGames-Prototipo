@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-329: verificar el reposo animado de los PNJ (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `jl329PnjIdle`. Revisa los PNJ y sus grupos `Reposo`, y durante 4 s registra el avance, los bucles y los cambios de transformaciones. No se modificaron el runtime, los datos ni los assets.
+
+**Lista:** No se encontró ningún PNJ sin clip de reposo ni con pose fija. Ocho PNJ activos usan `personaje.glb`, La Espeja usa `diablica_espejo.glb`, y los dos PNJ de la cripta comparten el modelo genérico. `dev_buhonero` pasó la prueba, pero está marcado `devOnly` y no es parte del roster de juego. El inventario y los límites de la observación están en `work/junie-jl329/LISTA_PNJ.md`.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio; Electron `jl329PnjIdle` 6/6, diez grupos activos durante 482 fotogramas y dos vueltas, cambios de transformación en los diez, cero errores de consola. `npx vitest run`: 419 archivos, 5.053 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl329/resultado.json`, `observaciones.json`, `LISTA_PNJ.md` y las capturas revisadas `jl329-reposo-rsp-inicio.jpg` y `jl329-reposo-rsp-fin.jpg`.
+
+---
+
 ## 2026-11-26 — JL-328: continuidad de los clips de reposo (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
