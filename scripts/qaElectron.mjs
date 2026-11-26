@@ -19,6 +19,15 @@ const SESSION = process.env.QA_SESION ?? '';
 const OUT = process.env.QA_EVIDENCE_DIR ?? `work/qa${SESSION}`;
 const PORT = SESSION ? 9340 + (Number(SESSION) || 1) : 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// JL-336 opts into Chromium's real background throttling instead of the fast-QA defaults.
+const backgroundFlags =
+    process.env.QA_REAL_BACKGROUND === '1'
+        ? []
+        : [
+              '--disable-backgrounding-occluded-windows',
+              '--disable-renderer-backgrounding',
+              '--disable-background-timer-throttling',
+          ];
 fs.mkdirSync(OUT, { recursive: true });
 // Los recorridos de editor prueban el guardado real, pero nunca deben dejar
 // datos productivos modificados. Se restauran incluso si Electron o una aserción falla.
@@ -61,9 +70,7 @@ let app = spawn(
         `--remote-debugging-port=${PORT}`,
         `--user-data-dir=${PROFILE}`,
         '--disable-http-cache',
-        '--disable-backgrounding-occluded-windows',
-        '--disable-renderer-backgrounding',
-        '--disable-background-timer-throttling',
+        ...backgroundFlags,
     ],
     {
         stdio: 'ignore',
@@ -94,7 +101,6 @@ await new Promise((resolve, reject) => {
     ws.once('open', resolve);
     ws.once('error', reject);
 });
-
 let nextId = 1;
 const waiting = new Map();
 const consoleErrors = [];
@@ -112,9 +118,7 @@ async function restartElectron() {
             `--remote-debugging-port=${PORT}`,
             `--user-data-dir=${PROFILE}`,
             '--disable-http-cache',
-            '--disable-backgrounding-occluded-windows',
-            '--disable-renderer-backgrounding',
-            '--disable-background-timer-throttling',
+            ...backgroundFlags,
         ],
         {
             stdio: 'ignore',
@@ -12631,6 +12635,149 @@ Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
             ),
         );
     },
+
+    /** JL-336: minimiza la ventana real durante dos minutos y comprueba la vuelta. */
+    async ventanaSegundoPlano() {
+        try {
+            await newGame('QA Segundo Plano');
+        } catch (error) {
+            const state = await js(`(() => ({
+              readyState: document.readyState,
+              screen: window.__game?.menus?.screen ?? null,
+              sessionName: window.__game?.session?.character?.name ?? null,
+              worldName: window.__game?.world?.character?.name ?? null,
+              nameError: document.querySelector('.name-error')?.textContent?.trim() ?? null,
+              hidden: document.hidden,
+            }))()`).catch((failure) => ({ error: failure.message }));
+            console.log(`     JL-336 newGame state: ${JSON.stringify(state)}`);
+            throw error;
+        }
+        await resize(1920, 1080);
+        await until('__game.menus.screen === "game"', 15000, 'partida lista antes de minimizar');
+        await sleep(1000);
+
+        await js(`(() => {
+          const world=__game.world;
+          const state=window.__jl336={blurCount:0,focusCount:0,visibility:[],wasHidden:false,ticksSinceFrame:0,maxTicksPerFrame:0,resumeFrame:null,f3Down:0,f3Up:0};
+          const tick=world.tick.bind(world);
+          world.tick=(dt)=>{state.ticksSinceFrame++;return tick(dt)};
+          window.addEventListener('blur',()=>state.blurCount++,true);
+          window.addEventListener('focus',()=>state.focusCount++,true);
+          document.addEventListener('visibilitychange',()=>{
+            if(document.hidden) state.wasHidden=true;
+            state.visibility.push({hidden:document.hidden,at:Date.now()});
+          });
+          window.addEventListener('keydown',e=>{if(e.code==='F3'&&!e.repeat)state.f3Down++},true);
+          window.addEventListener('keyup',e=>{if(e.code==='F3')state.f3Up++},true);
+          let previousTime=world.time;
+          const sample=()=>{
+            const ticks=state.ticksSinceFrame;
+            state.maxTicksPerFrame=Math.max(state.maxTicksPerFrame,ticks);
+            if(state.wasHidden&&state.blurCount>0&&!document.hidden&&state.resumeFrame===null)
+              state.resumeFrame={ticks,simulatedSeconds:world.time-previousTime,tickCount:world.tickCount,time:world.time,at:Date.now()};
+            previousTime=world.time;
+            state.ticksSinceFrame=0;
+            requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        })()`);
+
+        const errorsBefore = consoleErrors.length;
+        const startedAt = new Date().toISOString();
+        await shot('jl336-antes-segundo-plano');
+        await js("window.frankmanDesktop.setWindowStateForQa('minimized')");
+        await until(
+            "window.frankmanDesktop.setWindowStateForQa('status').then((state)=>state?.minimized===true)",
+            10000,
+            'ventana nativa minimizada',
+        );
+        await until('document.hidden && window.__jl336.blurCount > 0', 10000, 'ventana desenfocada y oculta');
+        const nativeMinimize = await js("window.frankmanDesktop.setWindowStateForQa('status')");
+        const hiddenAt = Date.now();
+        await sleep(120000);
+        while (Date.now() - hiddenAt < 120000) await sleep(50);
+        const hiddenDurationMs = Date.now() - hiddenAt;
+        const hidden = await js(`({hidden:document.hidden,blurCount:window.__jl336.blurCount,visibility:window.__jl336.visibility.slice(),worldTime:__game.world.time,tickCount:__game.world.tickCount})`);
+
+        await js("window.frankmanDesktop.setWindowStateForQa('normal')");
+        await until('!document.hidden', 15000, 'ventana restaurada y visible');
+        await until(
+            "window.frankmanDesktop.setWindowStateForQa('status').then((state)=>state?.focused===true)",
+            15000,
+            'ventana nativa enfocada',
+        );
+        await until('window.__jl336.resumeFrame !== null', 5000, 'primer fotograma tras recuperar el foco');
+        const resumedAt = Date.now();
+        const resumeFrame = await js('window.__jl336.resumeFrame');
+        const nativeRestore = await js("window.frankmanDesktop.setWindowStateForQa('status')");
+        check(
+            'JL-336: ventana estuvo minimizada y oculta 120 s',
+            nativeMinimize?.minimized === true &&
+                hiddenDurationMs >= 120000 &&
+                hidden.hidden &&
+                hidden.blurCount > 0 &&
+                hidden.visibility.some((v) => v.hidden),
+            `${(hiddenDurationMs / 1000).toFixed(1)} s; ${JSON.stringify({ nativeMinimize, visibility: hidden.visibility })}`,
+        );
+        check(
+            'JL-336: ventana visible y enfocada al volver',
+            nativeRestore?.visible === true && nativeRestore.minimized === false && nativeRestore.focused === true,
+            JSON.stringify(nativeRestore),
+        );
+        check(
+            'JL-336: la reanudación no agrupa más de ocho ticks en un fotograma',
+            resumeFrame.ticks <= 8 && resumeFrame.simulatedSeconds <= 8 / 60 + 0.001,
+            JSON.stringify(resumeFrame),
+        );
+        const maxTicksPerFrame = await js('window.__jl336.maxTicksPerFrame');
+        check(
+            'JL-336: ningún fotograma de los dos minutos excede el límite del reloj',
+            maxTicksPerFrame <= 8,
+            `${maxTicksPerFrame} ticks`,
+        );
+        await shot('jl336-despues-segundo-plano');
+
+        const pressF3 = async () => {
+            const before = await js('__game.world.timeOfDay');
+            await cdp('Input.dispatchKeyEvent', {
+                type: 'rawKeyDown',
+                code: 'F3',
+                key: 'F3',
+                windowsVirtualKeyCode: 114,
+                nativeVirtualKeyCode: 114,
+            });
+            await cdp('Input.dispatchKeyEvent', {
+                type: 'keyUp',
+                code: 'F3',
+                key: 'F3',
+                windowsVirtualKeyCode: 114,
+                nativeVirtualKeyCode: 114,
+            });
+            await until(`(((__game.world.timeOfDay-${before}+1)%1)>0.11)&&(((__game.world.timeOfDay-${before}+1)%1)<0.14)`, 5000, 'F3 procesada al volver del segundo plano');
+        };
+        await pressF3();
+        await pressF3();
+        const input = await js('({down:window.__jl336.f3Down,up:window.__jl336.f3Up})');
+        check('JL-336: las dos pulsaciones de F3 tras volver se reciben y procesan', input.down === 2 && input.up === 2, JSON.stringify(input));
+        const noNewConsoleErrors = consoleErrors.length === errorsBefore;
+        check('JL-336: consola sin errores nuevos', noNewConsoleErrors, consoleErrors.slice(errorsBefore, errorsBefore + 5).join(' | ') || '0');
+
+        const report = {
+            startedAt,
+            finishedAt: new Date().toISOString(),
+            backgroundSeconds: (resumedAt - hiddenAt) / 1000,
+            hiddenDurationMs,
+            hidden,
+            nativeMinimize,
+            nativeRestore,
+            resumeFrame,
+            maxTicksPerFrame,
+            input,
+            finalTimeOfDay: await js('__game.world.timeOfDay'),
+            newConsoleErrors: consoleErrors.slice(errorsBefore),
+        };
+        fs.writeFileSync(path.join(OUT, 'jl336-segundo-plano.json'), JSON.stringify(report, null, 2));
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -12684,6 +12831,8 @@ scenarios.benchCrowd.timeout = 180;
 scenarios.jl332SesionLarga.timeout = 3500;
 // JL-333: descenso real por 19 escaleras, con espera de carga y recuento por piso.
 scenarios.jl333CriptaRecursos.timeout = 600;
+// JL-336: dos minutos en segundo plano más arranque, restauración y verificación.
+scenarios.ventanaSegundoPlano.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

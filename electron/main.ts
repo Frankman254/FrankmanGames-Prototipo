@@ -49,6 +49,20 @@ function createWindow(): void {
 
     if (!benchMode) fitContentSize(win, 1920, 1080);
     win.once('ready-to-show', () => win.show());
+    if (devUrl) {
+        ipcMain.handle('qa:window-state', (event, state: unknown) => {
+            if (event.sender !== win.webContents) return null;
+            if (state === 'minimized') {
+                win.minimize();
+            } else if (state === 'normal') {
+                win.restore();
+                win.show();
+                if (process.platform === 'darwin') app.focus({ steal: true });
+                win.focus();
+            } else if (state !== 'status') return null;
+            return { minimized: win.isMinimized(), visible: win.isVisible(), focused: win.isFocused() };
+        });
+    }
     // Pantalla completa nativa: a diferencia de la del navegador, Esc no la abandona.
     ipcMain.on('window:fullscreen', (event, on: unknown) => {
         if (event.sender === win.webContents) win.setFullScreen(on === true);

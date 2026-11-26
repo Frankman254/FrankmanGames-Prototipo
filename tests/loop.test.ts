@@ -35,6 +35,16 @@ describe('FixedStepClock', () => {
         expect(r.alpha).toBeLessThan(1);
     });
 
+    it('descarta el tiempo de una ventana ausente dos minutos sin arrastrar deuda', () => {
+        const c = new FixedStepClock(60);
+        const resumed = c.advance(120);
+        expect(resumed.steps).toBe(8);
+        expect(resumed.droppedSeconds).toBeCloseTo(120 - 8 / 60, 6);
+        expect(resumed.alpha).toBeGreaterThanOrEqual(0);
+        expect(resumed.alpha).toBeLessThan(1);
+        expect(c.advance(1 / 60).steps).toBe(1);
+    });
+
     it('una pausa externa no provoca ticks de recuperación al reanudar', () => {
         const c = new FixedStepClock(60);
         expect(c.advance(1 / 60).steps).toBe(1);

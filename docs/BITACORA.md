@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-336: ventana en segundo plano (Junie)
+
+**Archivos:** `electron/main.ts`, `electron/preload.ts`, `scripts/qaElectron.mjs`, `tests/loop.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió una prueba pura que simula un intervalo de 120 s y confirma que `FixedStepClock` ejecuta como máximo ocho ticks y no arrastra deuda al siguiente fotograma. El QA de Electron usa un puente limitado al modo de desarrollo para minimizar/restaurar la ventana y consultar su foco nativo; no se cambió la lógica ni el balance del juego.
+
+**Resultado:** Electron `ventanaSegundoPlano`: 7/7; ventana minimizada y oculta 120.002 s, luego visible y enfocada. El primer fotograma al volver avanzó 8 ticks (0,133 s), el máximo observado fue 8 y se recibieron y aplicaron dos pulsaciones F3 con sus liberaciones. Cero errores de consola.
+
+**Validación:** `npm test`: 420 archivos, 5.063 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Vite conserva su aviso de chunks mayores de 500 kB.
+
+**Evidencia:** `work/junie-jl336/jl336-segundo-plano.json`, `resultado.json`, `jl336-antes-segundo-plano.jpg` y `jl336-despues-segundo-plano.jpg` (capturas revisadas).
+
+---
+
 ## 2026-11-26 — JL-335: tamaños de ventana y HUD dentro (Junie)
 
 **Archivos:** `electron/main.ts`, `src/ui/menus/saveStore.ts`, `src/ui/menus/screens/modals.ts`, `data/i18n/en.ui.json`, `scripts/qaElectron.mjs`, `tests/jl60_aspectDefaults.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
