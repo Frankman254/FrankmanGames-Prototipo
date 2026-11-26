@@ -12062,6 +12062,83 @@ ${table}
         );
         check('JL-330: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
     },
+
+    /** JL-331: mide FPS y CPU con 1, 10 y 40 héroes añadidos a CharacterCrowd. */
+    async benchCrowd() {
+        fs.mkdirSync(OUT, { recursive: true });
+        consoleErrors.length = 0;
+        await cdp('Page.navigate', { url: `${url}?bench=humans` });
+        await until('window.__benchCrowdState?.active===40', 120000, '40 héroes animados en benchCrowd');
+        await sleep(1500);
+        await shot('jl331-bench-crowd-40');
+        await until(
+            'window.__benchCrowdState?.active===0 && window.__benchCrowdState.results?.length===9',
+            120000,
+            'nueve mediciones de benchCrowd',
+        );
+
+        const samples = await js('window.__benchCrowdState.results');
+        const counts = [1, 10, 40];
+        const median = (values) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
+        const summary = counts.map((humans) => {
+            const rows = samples.filter((row) => row.humans === humans);
+            return {
+                humans,
+                repetitions: rows.length,
+                fpsMedian: median(rows.map((row) => row.fps)),
+                fpsMin: Math.min(...rows.map((row) => row.fps)),
+                fpsMax: Math.max(...rows.map((row) => row.fps)),
+                cpuMedianMs: median(rows.map((row) => row.cpuMeanMs)),
+                cpuMinMs: Math.min(...rows.map((row) => row.cpuMeanMs)),
+                cpuMaxMs: Math.max(...rows.map((row) => row.cpuMeanMs)),
+                resolution: rows[0]?.resolution ?? 'desconocida',
+            };
+        });
+        const valid =
+            samples.length === 9 &&
+            summary.every(
+                (row) =>
+                    row.repetitions === 3 &&
+                    Number.isFinite(row.fpsMedian) &&
+                    row.fpsMedian > 0 &&
+                    Number.isFinite(row.cpuMedianMs) &&
+                    row.cpuMedianMs >= 0,
+            );
+        check('JL-331: tres mediciones de cada cantidad', valid, JSON.stringify(summary));
+        check(
+            'JL-331: se midió en Electron a resolución constante',
+            new Set(summary.map((r) => r.resolution)).size === 1,
+        );
+        check('JL-331: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+
+        const table = summary
+            .map(
+                (row) =>
+                    `| ${row.humans} | ${row.fpsMedian} (${row.fpsMin}–${row.fpsMax}) | ${row.cpuMedianMs} (${row.cpuMinMs}–${row.cpuMaxMs}) | ${row.resolution} |`,
+            )
+            .join('\n');
+        const report = `# JL-331 — rendimiento de héroes animados en benchCrowd
+
+Medición en Electron en modo de banco \`?bench=humans\`: sin encuentros ni spawns por zona; conserva el entorno visual y el personaje base de la escena. Los valores cuentan los héroes adicionales de \`CharacterCrowd\`, no el total de actores visibles. Cada muestra dura 5 s tras 1 s de calentamiento; tres repeticiones por cantidad (orden 1/10/40, 40/10/1, 1/10/40). FPS y CPU muestran mediana y rango de las tres muestras.
+
+La columna CPU es el tiempo medio por fotograma de los tramos de simulación y render medidos (\`perf.sim + perf.render\`), en milisegundos; refleja trabajo del hilo principal y no el porcentaje de CPU total del proceso. Captura de Electron con 40 héroes en \`jl331-bench-crowd-40.jpg\`.
+
+| Héroes añadidos (\`CharacterCrowd\`) | FPS, mediana (mín–máx) | CPU hilo principal ms/fotograma, mediana (mín–máx) | Resolución |
+|---:|---:|---:|---:|
+${table}
+
+Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
+`;
+        fs.writeFileSync(path.join(OUT, 'TABLA.md'), report);
+        fs.writeFileSync(
+            path.join(OUT, 'jl331-resultados.json'),
+            JSON.stringify(
+                { date: new Date().toISOString(), userAgent: await js('navigator.userAgent'), samples, summary },
+                null,
+                2,
+            ),
+        );
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -12110,6 +12187,7 @@ scenarios.jl328Reposo.timeout = 600;
 scenarios.trajes.timeout = 600;
 // JL-330: recorre los 72 arquetipos, carga sus modelos y muestrea hit/death.
 scenarios.jl330Enemigos.timeout = 600;
+scenarios.benchCrowd.timeout = 180;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

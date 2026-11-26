@@ -1630,6 +1630,8 @@ async function bench(
         frameMeanMs: r2(perf.frame.mean()),
         frameP95Ms: r2(perf.frame.percentile(95)),
         frameMaxMs: r2(perf.frame.percentile(100)),
+        cpuMeanMs: r2(perf.sim.mean() + perf.render.mean()),
+        resolution: `${view.engine.getRenderWidth()}x${view.engine.getRenderHeight()}`,
         longFrames,
         simMeanMs: r2(perf.sim.mean()),
         simP95Ms: r2(perf.sim.percentile(95)),
@@ -1712,9 +1714,23 @@ if (benchMode) {
             [200, 'instanced', 0.95],
         ];
         const results = [];
-        // Corro de humanoides: sin nadie más y con 24 personajes procedurales.
+        // Corro de humanoides: compara la carga adicional sobre el personaje base constante.
         if (benchHumansOnly) {
-            for (const humans of [0, 24]) results.push(await bench(0, 'instanced', 5, 0.5, 0, false, true, humans));
+            const rounds = [
+                [1, 10, 40],
+                [40, 10, 1],
+                [1, 10, 40],
+            ];
+            for (let round = 0; round < rounds.length; round++) {
+                for (const humans of rounds[round]!) {
+                    Object.assign(window, { __benchCrowdState: { active: humans, results } });
+                    results.push({
+                        round: round + 1,
+                        ...(await bench(0, 'instanced', 5, 0.5, 0, false, true, humans)),
+                    });
+                }
+            }
+            Object.assign(window, { __benchCrowdState: { active: 0, results } });
             console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, results })}`);
             return;
         }

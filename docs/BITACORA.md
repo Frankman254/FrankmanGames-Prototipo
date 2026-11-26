@@ -1,3 +1,23 @@
+## 2026-11-26 — JL-331: medir rendimiento de héroes animados (Junie)
+
+**Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El modo de banco `?bench=humans` mide tres pasadas de 5 s (con 1 s de calentamiento) para 1, 10 y 40 héroes añadidos a `CharacterCrowd`, sin encuentros ni spawns por zona. Mantiene el entorno visual y personaje base; los valores no cuentan el total de actores visibles. No cambia la lógica del juego ni las cifras. CPU es el promedio por fotograma de `perf.sim + perf.render`, en ms de trabajo medido del hilo principal, no porcentaje total del proceso.
+
+**Tabla:** Electron a 3600×2160; mediana (rango) de tres repeticiones.
+
+| Héroes añadidos | FPS | CPU ms/fotograma |
+|---:|---:|---:|
+| 1 | 120 (117,094–120,031) | 3,09 (3,081–3,838) |
+| 10 | 120,012 (119,974–120,038) | 4,246 (4,226–4,332) |
+| 40 | 119,988 (119,959–120) | 7,421 (7,419–7,641) |
+
+**Validación:** Electron 4/4 y cero errores de consola; `npm test`: 419 archivos, 5.053 aprobadas, una omitida y una `todo`; `npm run typecheck` y `npm run docs:check` pasaron. `npm run build` terminó correctamente; Vite avisó que los bundles minificados superan 500 kB.
+
+**Evidencia:** Tabla, resultados brutos, `resultado.json` y captura revisada de 40 héroes en `work/junie-jl331/`.
+
+---
+
 ## 2026-11-26 — JL-330: clips de golpe y muerte de enemigos (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
