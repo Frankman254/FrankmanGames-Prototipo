@@ -12,6 +12,7 @@ import electronPath from 'electron';
 import { createServer } from 'vite';
 import WebSocket from 'ws';
 import { buildMain } from './buildMain.mjs';
+import { buildJl332Report } from './jl332Report.mjs';
 
 // QA_SESION permite dos recorridos a la vez, cada uno con su puerto, perfil y capturas.
 const SESSION = process.env.QA_SESION ?? '';
@@ -12139,6 +12140,152 @@ Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
             ),
         );
     },
+    /** JL-332: camina 30 minutos, diez en cada una de tres zonas seguras; mide FPS y heap cada minuto. */
+    async jl332SesionLarga() {
+        consoleErrors.length = 0;
+        await newGame('QA Caminante');
+        await fullscreen();
+        const zones = [
+            { id: 'raspadura', name: 'Villa Raspadura', stone: 'raspadura', x: 127, y: 131 },
+            { id: 'pedasol', name: 'Pedasol', stone: 'pedasol', x: 438, y: 10 },
+            { id: 'chitri', name: 'Chitrí', stone: 'chitri', x: 10, y: 490 },
+        ];
+        const screenshots = [];
+        const rows = [];
+        const initial = await js(
+            `({ resolution: innerWidth + 'x' + innerHeight, userAgent: navigator.userAgent, memoryAvailable: !!performance.memory && Number.isFinite(performance.memory.usedJSHeapSize) })`,
+        );
+        check('JL-332: métrica de heap V8 disponible', initial.memoryAvailable, initial.userAgent);
+        if (!initial.memoryAvailable) throw new Error('Electron no expone performance.memory para medir el heap V8');
+
+        const enterZone = async (zone) => {
+            await js(`__game.travelStone(${JSON.stringify(zone.stone)})`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 30000, `carga de ${zone.name}`);
+            await until(`${W}.currentZone?.id === ${JSON.stringify(zone.id)}`, 20000, `zona ${zone.id}`);
+            const location = await js(
+                `(() => { const w=${W}, p=w.player.pos, zone=w.currentZone, mapped=w.zoneMap.zoneAt(p); return { currentZoneId: zone?.id ?? null, mappedZoneId: mapped?.id ?? null, safe: !!zone?.safe, x:p.x, y:p.y }; })()`,
+            );
+            const isCorrect =
+                location.currentZoneId === zone.id && location.mappedZoneId === zone.id && location.safe;
+            check(`JL-332: llegada a ${zone.name} y zona segura`, isCorrect, JSON.stringify(location));
+            if (!isCorrect) throw new Error(`Llegada fuera de la zona segura ${zone.id}: ${JSON.stringify(location)}`);
+
+            const screenshot = `jl332-zona-${zone.id}`;
+            await shot(screenshot);
+            screenshots.push(`${screenshot}.jpg`);
+            const route = await js(`(() => {
+              const w=${W}, expected=${JSON.stringify(zone.id)}, center={x:${zone.x},y:${zone.y}}, offset=7;
+              const raw=[{x:center.x-offset,y:center.y-offset},{x:center.x+offset,y:center.y-offset},{x:center.x+offset,y:center.y+offset},{x:center.x-offset,y:center.y+offset}];
+              const waypoints=raw.map(point=>{const cell=w.grid.nearestWalkable(point);if(!cell)throw new Error('sin baldosa caminable para '+JSON.stringify(point));const p=w.grid.center(cell);if(w.zoneMap.zoneAt(p)?.id!==expected)throw new Error('el punto sale de la zona '+expected+': '+JSON.stringify(p));return p;});
+              if(new Set(waypoints.map(p=>p.x+','+p.y)).size<3)throw new Error('no hay suficientes puntos distintos para pasear');
+              const t=window.__qaLong??(window.__qaLong={});
+              if(t.walkTimer)clearInterval(t.walkTimer);
+              Object.assign(t,{zoneId:expected,waypoints,waypointIndex:0,walking:true,distanceMeters:0,pathCommands:0,waypointsCompleted:0,frameMs:[],lastFrame:performance.now(),lastCommand:0,lastPosition:{...w.player.pos},walkTimer:null});
+              if(!t.frameLoopStarted){t.frameLoopStarted=true;const frame=()=>{const now=performance.now(),dt=now-t.lastFrame;if(t.walking&&dt>0&&dt<1000)t.frameMs.push(dt);t.lastFrame=now;requestAnimationFrame(frame);};requestAnimationFrame(frame);}
+              t.walkTimer=setInterval(()=>{
+                if(!t.walking)return;
+                const now=performance.now(),p=w.player.pos,dx=p.x-t.lastPosition.x,dy=p.y-t.lastPosition.y;
+                t.distanceMeters+=Math.hypot(dx,dy);t.lastPosition={x:p.x,y:p.y};
+                let target=t.waypoints[t.waypointIndex],distance=Math.hypot(target.x-p.x,target.y-p.y);
+                if(distance<2){t.waypointIndex=(t.waypointIndex+1)%t.waypoints.length;t.waypointsCompleted++;target=t.waypoints[t.waypointIndex];distance=Math.hypot(target.x-p.x,target.y-p.y);}
+                if((!p.path||p.path.length===0)&&distance>=2&&now-t.lastCommand>=1000){w.commandMove(target);t.pathCommands++;t.lastCommand=now;}
+              },250);
+              return {zoneId:expected,waypoints};
+            })()`);
+            console.log(`     ruta ${zone.name}: ${JSON.stringify(route.waypoints)}`);
+            await until(`window.__qaLong?.distanceMeters > 0.5`, 15000, `caminar en ${zone.name}`);
+            await js(`(()=>{const t=window.__qaLong;t.distanceMeters=0;t.pathCommands=0;t.waypointsCompleted=0;t.frameMs=[];t.lastFrame=performance.now();})()`);
+        };
+
+        const stopWalk = () =>
+            js(`(()=>{const t=window.__qaLong;if(t){t.walking=false;if(t.walkTimer)clearInterval(t.walkTimer);t.walkTimer=null;}})()`);
+        const startedAt = new Date().toISOString();
+        for (const zone of zones) {
+            await enterZone(zone);
+            let lastSampleAt = Date.now();
+            let previousDistance = 0;
+            let previousCommands = 0;
+            for (let localMinute = 1; localMinute <= 10; localMinute++) {
+                await sleep(60_000);
+                const measuredAt = new Date();
+                const sample = await js(`(() => {
+                  const t=window.__qaLong,w=${W},p=w.player.pos,m=performance.memory,frames=t.frameMs.splice(0),sorted=[...frames].sort((a,b)=>a-b),frameTotal=frames.reduce((sum,value)=>sum+value,0),zone=w.currentZone;
+                  return {fps:frameTotal>0?frames.length*1000/frameTotal:0,p95FrameMs:sorted.length?sorted[Math.floor((sorted.length-1)*0.95)]:0,frames:frames.length,heapUsedMB:m.usedJSHeapSize/1048576,heapTotalMB:m.totalJSHeapSize/1048576,heapLimitMB:m.jsHeapSizeLimit/1048576,distanceMeters:t.distanceMeters,pathCommands:t.pathCommands,waypointsCompleted:t.waypointsCompleted,currentZoneId:zone?.id??null,mappedZoneId:w.zoneMap.zoneAt(p)?.id??null,safe:!!zone?.safe,walking:t.walking,x:p.x,y:p.y};
+                })()`);
+                const intervalSeconds = (Date.now() - lastSampleAt) / 1000;
+                lastSampleAt = Date.now();
+                const row = {
+                    minute: rows.length + 1,
+                    zoneId: zone.id,
+                    zoneName: zone.name,
+                    ...sample,
+                    walkMeters: sample.distanceMeters - previousDistance,
+                    pathCommands: sample.pathCommands - previousCommands,
+                    intervalSeconds,
+                    sampledAt: measuredAt.toISOString(),
+                };
+                previousDistance = sample.distanceMeters;
+                previousCommands = sample.pathCommands;
+                rows.push(row);
+                fs.writeFileSync(
+                    path.join(OUT, 'jl332-resultados.json'),
+                    JSON.stringify(
+                        {
+                            startedAt,
+                            finishedAt: null,
+                            durationSeconds: rows.reduce((sum, item) => sum + item.intervalSeconds, 0),
+                            metadata: initial,
+                            rows,
+                        },
+                        null,
+                        2,
+                    ),
+                );
+                console.log(
+                    `     minuto ${row.minute}/30 · ${zone.name}: ${row.fps.toFixed(1)} fps, heap ${row.heapUsedMB.toFixed(1)}/${row.heapTotalMB.toFixed(1)} MiB, ${row.walkMeters.toFixed(1)} m, ${row.frames} fotogramas`,
+                );
+            }
+            await stopWalk();
+            const zoneRows = rows.filter((row) => row.zoneId === zone.id);
+            check(
+                `JL-332: diez minutos caminando por ${zone.name}`,
+                zoneRows.length === 10 && zoneRows.every((row) => row.walkMeters > 0 && row.frames > 0),
+                `${zoneRows.length} muestras, ${zoneRows.reduce((sum, row) => sum + row.walkMeters, 0).toFixed(1)} m`,
+            );
+        }
+
+        const validRows =
+            rows.length === 30 &&
+            rows.every(
+                (row) =>
+                    row.currentZoneId === row.zoneId &&
+                    row.mappedZoneId === row.zoneId &&
+                    row.safe &&
+                    row.walkMeters > 0 &&
+                    row.fps > 0 &&
+                    Number.isFinite(row.heapUsedMB) &&
+                    row.frames > 0,
+            );
+        check('JL-332: 30 muestras, zonas correctas y métricas válidas', validRows, `${rows.length}/30`);
+        check('JL-332: sin errores nuevos de consola', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+        await shot('jl332-final');
+        screenshots.push('jl332-final.jpg');
+        const finishedAt = new Date().toISOString();
+        const report = buildJl332Report(rows, {
+            startedAt,
+            finishedAt,
+            resolution: initial.resolution,
+            userAgent: initial.userAgent,
+            screenshots,
+        });
+        fs.writeFileSync(path.join(OUT, 'TABLA.md'), report.markdown);
+        fs.writeFileSync(path.join(OUT, 'jl332-datos.csv'), report.csv);
+        fs.writeFileSync(path.join(OUT, 'jl332-grafico.svg'), report.svg);
+        fs.writeFileSync(
+            path.join(OUT, 'jl332-resultados.json'),
+            JSON.stringify({ startedAt, finishedAt, durationSeconds: report.totalWalkSeconds, metadata: initial, rows }, null, 2),
+        );
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -12188,6 +12335,8 @@ scenarios.trajes.timeout = 600;
 // JL-330: recorre los 72 arquetipos, carga sus modelos y muestrea hit/death.
 scenarios.jl330Enemigos.timeout = 600;
 scenarios.benchCrowd.timeout = 180;
+// JL-332: 30 minutos de caminata más arranque, viajes entre zonas y cierre.
+scenarios.jl332SesionLarga.timeout = 3500;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

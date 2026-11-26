@@ -1566,7 +1566,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-331 Rendimiento de los personajes: FPS y tiempo de CPU con 1, 10 y 40 héroes animados en la sala de pruebas (`benchCrowd`). Tabla. — commit «JL-331: medir rendimiento de héroes animados» — Electron 4/4, consola limpia; tabla, JSON y captura revisada en `work/junie-jl331/`.
 
 ### G. Robustez
-- [ ] JL-332 **Sesión larga:** 30 minutos de paseo automático por tres zonas, con memoria y FPS cada minuto. Tabla y gráfico en `work/junie-jl332/`.
+- [x] JL-332 **Sesión larga:** 30 minutos de paseo automático por tres zonas, con memoria y FPS cada minuto. Tabla y gráfico en `work/junie-jl332/` — commit «JL-332: medir sesión larga por tres zonas» — 30/30 muestras en 1.800,241 s, diez por zona y 10.335,4 m; FPS medio 117,2 y heap V8 medio 525,2 MiB. Tabla, CSV, SVG, resultados y capturas en `work/junie-jl332/`. Electron 8/10 por un `TypeError` conocido de Babylon (`postProcessManager` nulo); detalle conservado en `resultado.json`.
 - [ ] JL-333 **Cripta:** bajar 20 pisos seguidos y contar mallas, materiales y texturas en cada piso; que no crezcan sin parar.
 - [ ] JL-334 **Pulsaciones en ráfaga:** 200 clics y 200 teclas de hechizo en 10 s, sin errores de consola y sin que el personaje se quede trabado.
 - [ ] JL-335 **Cambiar el tamaño de la ventana** a 1280×720, 1920×1080, 2560×1440 y ultrapanorámica: el HUD y el minimapa quedan dentro.

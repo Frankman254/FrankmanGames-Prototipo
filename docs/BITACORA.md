@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-332: sesión larga en tres zonas (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `scripts/jl332Report.mjs`, `scripts/jl332Report.d.mts`, `tests/jl332Report.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Escenario Electron `jl332SesionLarga`: paseo automático con `World.commandMove()` durante tres bloques de diez minutos activos, en Villa Raspadura, Pedasol y Chitrí. Cada minuto registra FPS por `requestAnimationFrame`, heap V8 del renderer, recorrido y zona efectiva; no modifica el runtime ni los datos del juego. Genera tabla Markdown, CSV, SVG y datos brutos.
+
+**Resultado:** 30/30 muestras válidas en 1.800,241 s activos; 10 por zona y 10.335,4 m recorridos. FPS medio 117,2 (80,5–120); heap V8 usado medio 525,2 MiB (470,0–689,5). El heap V8 no representa el RSS total de Electron ni la memoria de GPU.
+
+**Validación:** `npm test`: 420 archivos, 5.056 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, prueba del informe (3/3), `node --check`, `git diff --check` y XML del SVG limpios. Electron completó el paseo, pero `resultado.json` marca 8/10: las dos comprobaciones de consola registraron un único `TypeError` de Babylon (`postProcessManager` nulo en `RGBDTextureTools`) a los 9 s. Es el error ya documentado en tareas anteriores de Electron; se conserva en la evidencia, no se modificó ni se silenció el runtime.
+
+**Evidencia:** `work/junie-jl332/TABLA.md`, `jl332-grafico.svg`, `jl332-datos.csv`, `jl332-resultados.json`, `resultado.json` y cuatro capturas en `work/junie-jl332/`.
+
+---
+
 ## 2026-11-26 — JL-331: medir rendimiento de héroes animados (Junie)
 
 **Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
