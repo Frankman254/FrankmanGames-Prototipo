@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-346: listar acciones no disponibles solo con ratón (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se listaron las acciones básicas sin alternativa de ratón: introducir texto libre (nombre del personaje y mensajes del chat) y ascender en vuelo. Se comprobó que fijar destino durante el vuelo sí admite clic y que varias acciones con atajo pueden reasignarse al clic central; no se modificó código ni comportamiento.
+
+**Validación:** Electron `interfaz`: 55/55 comprobaciones, consola limpia; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** lista `work/junie-jl346/LISTA.md`, resultado `work/junie-jl346/electron/resultado.json` y captura revisada `work/junie-jl346/electron/ui-1080p-hud.jpg`.
+
+---
+
 ## 2026-11-26 — JL-345: listar textos sin traducir en la interfaz inglesa (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
