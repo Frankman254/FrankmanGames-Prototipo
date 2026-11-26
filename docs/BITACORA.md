@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-341: mostrar errores al arrancar con datos incompletos (Junie)
+
+**Archivos:** `src/boot.ts`, `src/ui/startupError.ts`, `data/i18n/en.ui.json`, `scripts/qaElectron.mjs`, `tests/jl341_startupError.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Si falla la carga inicial de modelos o la importación del juego, el renderer reemplaza la pantalla vacía por una pantalla accesible con orientación y detalle original del error en texto. Se respeta el idioma guardado y se usa español si las preferencias no están disponibles; el detalle conserva rutas como `data/weather.json`. El escenario de Electron simula la falta del archivo en Vite sin alterar el JSON productivo.
+
+**Validación:** Reproducción previa: pantalla oscura sin explicación. `tests/jl341_startupError.test.ts`: 4/4; Electron `jl341DatosIncompletos`: 5/5; `npm test`: 423 archivos, 5.071 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `node --check scripts/qaElectron.mjs` limpios. En Electron, el único error de consola corresponde al fallo inducido y se comprueba explícitamente.
+
+**Evidencia:** captura previa `work/junie-jl341/repro/jl341-datos-incompletos.jpg`; captura final revisada `work/junie-jl341/final/jl341-datos-incompletos.jpg` y `work/junie-jl341/final/resultado.json`.
+
+---
+
 ## 2026-11-26 — JL-340: arrancar sin audio disponible (Junie)
 
 **Archivos:** `src/audio/director.ts`, `tests/jl340_audioStartup.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

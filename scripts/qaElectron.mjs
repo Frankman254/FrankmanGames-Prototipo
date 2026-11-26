@@ -74,6 +74,23 @@ const server = await createServer({
                   },
               ]
             : []),
+        ...(process.env.QA_MISSING_WEATHER === '1'
+            ? [
+                  {
+                      name: 'qa-missing-weather',
+                      enforce: 'pre',
+                      transform(code, id) {
+                          if (!id.replaceAll('\\', '/').split('?')[0].endsWith('/src/data/index.ts')) return;
+                          const weatherImport = "import weatherJson from '../../data/weather.json';";
+                          if (!code.includes(weatherImport)) throw new Error('No se encontró la importación de data/weather.json');
+                          return code.replace(
+                              weatherImport,
+                              `const weatherJson: unknown = (() => { throw new Error(${JSON.stringify('No se encontró el archivo opcional data/weather.json.')}); })();`,
+                          );
+                      },
+                  },
+              ]
+            : []),
     ],
 });
 await server.listen();
@@ -123,6 +140,7 @@ await new Promise((resolve, reject) => {
 let nextId = 1;
 const waiting = new Map();
 const consoleErrors = [];
+const expectedConsoleErrors = [];
 let screencastFrames = null;
 
 /** JL-51: relanzar Electron y reconectar CDP (tras un timeout de escenario). */
@@ -663,6 +681,33 @@ const uiFaults = () =>
   return out; })()`);
 
 const scenarios = {
+    async jl341DatosIncompletos() {
+        await sleep(6000);
+        const missingFileError = 'No se encontró el archivo opcional data/weather.json.';
+        expectedConsoleErrors.push(missingFileError);
+        const state = await js(`(() => {
+      const screen = document.querySelector('[data-testid="startup-error"]');
+      return {
+        title: screen?.querySelector('h1')?.textContent ?? null,
+        detail: screen?.querySelector('[data-testid="startup-error-detail"]')?.textContent ?? null,
+        hasTitleMenu: !!document.querySelector('[data-testid="new-game"]'),
+      };
+    })()`);
+        check('JL-341: informa que no pudo iniciar', state.title === 'No se pudo iniciar el juego', JSON.stringify(state));
+        check(
+            'JL-341: identifica el archivo de datos ausente',
+            state.detail?.includes('data/weather.json') && state.detail.includes('opcional'),
+            state.detail ?? 'sin detalle visible',
+        );
+        check('JL-341: no deja una pantalla de título incompleta', !state.hasTitleMenu);
+        check(
+            'JL-341: registra el motivo esperado en consola',
+            consoleErrors.some((error) => error.includes(missingFileError)),
+            consoleErrors.filter((error) => error.includes(missingFileError)).length,
+        );
+        await shot('jl341-datos-incompletos');
+    },
+
     async estados() {
         await newGame('QA Estados');
         await js(`(() => {
@@ -13124,7 +13169,15 @@ try {
             }
         }
     }
-    check('Sin errores en la consola', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | '));
+    const unexpectedConsoleErrors = consoleErrors.filter(
+        (error) => !expectedConsoleErrors.some((expected) => error.includes(expected)),
+    );
+    check(
+        'Sin errores en la consola',
+        unexpectedConsoleErrors.length === 0,
+        unexpectedConsoleErrors.slice(0, 5).join(' | ') ||
+            (expectedConsoleErrors.length ? 'solo el error de arranque inducido por el escenario' : ''),
+    );
     fs.writeFileSync(
         path.join(OUT, 'resultado.json'),
         JSON.stringify({ date: new Date().toISOString(), results, consoleErrors }, null, 2),
