@@ -1,3 +1,11 @@
+## 2026-11-25 — JL-327: QA de físicas de trajes bloqueada (Junie)
+
+**Qué se verificó:** La aceptación exige revisar conjuntamente capas, faldas y pelo. CLA-TEL1 solo completó la primera parte: hay cadenas para algunas capas y el pelo, mientras siguen pendientes las faldas de Oráculo y Centinela, La Diablica con el método común y las capas de `equipo.glb`. No se ejecutó `fisicasTrajes` ni se generaron capturas para evitar una revisión parcial.
+
+**Validación:** Línea base antes de documentar: `npx tsc --noEmit` limpio; `npx vitest run`, 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`. Estado y evidencia del bloqueo en `work/junie-jl327/EVIDENCIA.md`.
+
+---
+
 ## 2026-11-25 — JL-326: capturar conjuntos al andar y correr (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
