@@ -1567,7 +1567,7 @@ Antes de cada una, busca si ya existe.
 
 ### G. Robustez
 - [x] JL-332 **Sesión larga:** 30 minutos de paseo automático por tres zonas, con memoria y FPS cada minuto. Tabla y gráfico en `work/junie-jl332/` — commit «JL-332: medir sesión larga por tres zonas» — 30/30 muestras en 1.800,241 s, diez por zona y 10.335,4 m; FPS medio 117,2 y heap V8 medio 525,2 MiB. Tabla, CSV, SVG, resultados y capturas en `work/junie-jl332/`. Electron 8/10 por un `TypeError` conocido de Babylon (`postProcessManager` nulo); detalle conservado en `resultado.json`.
-- [ ] JL-333 **Cripta:** bajar 20 pisos seguidos y contar mallas, materiales y texturas en cada piso; que no crezcan sin parar.
+- [x] JL-333 **Cripta:** bajar 20 pisos seguidos y contar mallas, materiales y texturas en cada piso; que no crezcan sin parar. — commit «JL-333: evitar la fuga de texturas en la cripta» — Electron 186/186 en 3 vueltas de 20 pisos, consola limpia; conteos idénticos entre vueltas 2–3; informe, JSON y capturas en `work/junie-jl333/`.
 - [ ] JL-334 **Pulsaciones en ráfaga:** 200 clics y 200 teclas de hechizo en 10 s, sin errores de consola y sin que el personaje se quede trabado.
 - [ ] JL-335 **Cambiar el tamaño de la ventana** a 1280×720, 1920×1080, 2560×1440 y ultrapanorámica: el HUD y el minimapa quedan dentro.
 - [ ] JL-336 **Ventana en segundo plano** 2 minutos: al volver, la simulación no hace un salto enorme ni se pierden pulsaciones.

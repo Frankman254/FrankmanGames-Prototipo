@@ -6473,3 +6473,13 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 **Qué se hizo:** Sistema de skins para el indicador de apuntado (OMP-POL-12). Cuatro skins puramente geométricas (simple, doble anillo, brillante, diamante) que cambian el marcador del objetivo, la línea de trayectoria y el aro de aterrizaje. Selector en Opciones → Desarrollo. La interfaz `AimSkinDef` permite añadir skins con modelos/texturas de Blender en el futuro sin cambiar el código.
 
 **Validación:** 13 pruebas verdes (jl264_aimSkins.test.ts), suite 4891/4891, tsc limpio, build OK. Capturas de Electron omitidas (sin display).
+
+## 2026-11-26 — JL-333: recursos de la cripta (Junie)
+
+**Archivos:** `src/render/characters/gltfCharacter.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El descarte de piezas de personaje no elegidas eliminaba su material clonado, pero dejaba viva su textura clonada (`personaje.glb#image3`); en la primera medición se acumularon 44 copias por descenso de 20 pisos. Ahora el material descartado libera también sus texturas. El escenario `jl333CriptaRecursos` mide mallas, materiales, texturas y mallas de la raíz activa piso a piso; tras calentar caché, las vueltas 2 y 3 repiten exactamente los conteos y solo queda una raíz de cripta.
+
+**Cómo se verificó:** Electron, tres vueltas de 20 pisos: 186/186, consola limpia; delta cero entre vueltas 2 y 3. `npm test`: 420 archivos, 5.056 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl333/JL333_RECURSOS.md`, `jl333-recursos.json`, `jl333-cripta-piso-01.jpg` y `jl333-cripta-piso-20.jpg`.

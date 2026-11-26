@@ -6455,6 +6455,146 @@ const scenarios = {
         }
     },
 
+    /** JL-333: mide los recursos de Babylon al recorrer veinte pisos consecutivos. */
+    async jl333CriptaRecursos() {
+        await newGame('QA Recursos');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+        await js(`window.__qaVida=setInterval(()=>{const w=__game.world;if(w?.player)w.player.health=w.player.maxHealth;},50)`);
+        await js(
+            `window.__qaTextureIds=new Map(__game.view.scene.textures.map(t=>[t.uniqueId,{name:t.name,url:t.url??''}]));window.__qaLastFloorTextureIds=[]`,
+        );
+
+        const samples = [];
+        const sample = async (expectedFloor, round) => {
+            await until(`__game.crypt.floor===${expectedFloor}`, 15000, `piso ${expectedFloor + 1}`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, `piso ${expectedFloor + 1} listo`);
+            await sleep(1200);
+            const counts = await js(`(() => {
+                const s=__game.view.scene, floor=__game.crypt.floor;
+                const roots=s.transformNodes.filter(n=>/^dungeon-\\d+$/.test(n.name));
+                const root=roots[0]??null;
+                const floorMeshes=root?s.meshes.filter(m=>m.isDescendantOf(root)):[];
+                const floorMaterials=[...new Set(floorMeshes.map(m=>m.material).filter(Boolean))];
+                const floorTextures=[...new Set(floorMaterials.flatMap(m=>m.getActiveTextures?.()??[]))];
+                const describe=t=>({id:t.uniqueId,name:t.name,url:t.url??''});
+                const previous=window.__qaTextureIds??new Map();
+                const current=new Map(s.textures.map(t=>[t.uniqueId,describe(t)]));
+                const addedTextures=[...current].filter(([id])=>!previous.has(id)).map(([,t])=>t);
+                const removedTextures=[...previous].filter(([id])=>!current.has(id)).map(([,t])=>t);
+                const currentIds=new Set(current.keys());
+                const retainedFloorTextures=window.__qaLastFloorTextureIds.filter(id=>currentIds.has(id));
+                window.__qaTextureIds=current;
+                window.__qaLastFloorTextureIds=floorTextures.map(t=>t.uniqueId);
+                return {floor:floor+1,meshes:s.meshes.length,materials:s.materials.length,textures:s.textures.length,
+                    dungeonRoots:roots.map(n=>n.name),floorMeshes:floorMeshes.length,
+                    floorMaterialNames:floorMaterials.map(m=>m.name),floorTextures:floorTextures.map(describe),
+                    addedTextures,removedTextures,retainedFloorTextures};
+            })()`);
+            counts.round = round;
+            samples.push(counts);
+            check(`JL-333: vuelta ${round}, piso ${counts.floor} contado`, counts.floor === expectedFloor + 1, JSON.stringify(counts));
+            check(
+                `JL-333: vuelta ${round}, piso ${counts.floor} deja una sola raíz`,
+                counts.dungeonRoots.length === 1 && counts.dungeonRoots[0] === `dungeon-${expectedFloor}`,
+                JSON.stringify(counts.dungeonRoots),
+            );
+            fs.writeFileSync(path.join(OUT, 'jl333-recursos.json'), JSON.stringify({ samples }, null, 2));
+            console.log(
+                `     piso ${counts.floor}: ${counts.meshes} mallas, ${counts.materials} materiales, ${counts.textures} texturas; ${counts.floorMeshes} mallas de piso`,
+            );
+            return counts;
+        };
+
+        try {
+            for (let round = 1; round <= 3; round++) {
+                const entered = await js(`__game.crypt.enter(0,'above')`);
+                check(`JL-333: inicia la vuelta ${round} en el piso 1`, entered, String(entered));
+                if (!entered) throw new Error(`No se pudo iniciar la vuelta ${round}`);
+                await sample(0, round);
+                if (round === 1) await shot('jl333-cripta-piso-01');
+
+                for (let expectedFloor = 1; expectedFloor < 20; expectedFloor++) {
+                    const descended = await js(`__game.crypt.enter(${expectedFloor},'above')`);
+                    check(`JL-333: vuelta ${round}, baja al piso ${expectedFloor + 1}`, descended, String(descended));
+                    if (!descended) throw new Error(`No se pudo entrar al piso ${expectedFloor + 1}`);
+                    await sample(expectedFloor, round);
+                }
+            }
+
+            const fields = ['meshes', 'materials', 'textures', 'floorMeshes'];
+            const summary = Object.fromEntries(
+                [1, 2, 3].map((round) => [
+                    `vuelta${round}`,
+                    Object.fromEntries(
+                        fields.map((field) => {
+                            const values = samples.filter((row) => row.round === round).map((row) => row[field]);
+                            return [field, {
+                                first: values[0],
+                                last: values.at(-1),
+                                min: Math.min(...values),
+                                max: Math.max(...values),
+                                increases: values.slice(1).filter((value, i) => value > values[i]).length,
+                            }];
+                        }),
+                    ),
+                ]),
+            );
+            const secondRound = samples.filter((row) => row.round === 2);
+            const thirdRound = samples.filter((row) => row.round === 3);
+            const warmedCountsMatch = fields.every((field) =>
+                secondRound.every((row, i) => row[field] === thirdRound[i]?.[field]),
+            );
+            check(
+                'JL-333: se midieron veinte pisos en cada vuelta',
+                [1, 2, 3].every((round) => samples.filter((row) => row.round === round).length === 20),
+                '3 × 20',
+            );
+            check(
+                'JL-333: no quedan raíces de pisos anteriores',
+                samples.every((row) => row.dungeonRoots.length === 1),
+            );
+            check(
+                'JL-333: las vueltas 2 y 3 repiten los recuentos sin acumular recursos',
+                warmedCountsMatch,
+                JSON.stringify(Object.fromEntries(fields.map((field) => [field, thirdRound.at(-1)[field] - secondRound.at(-1)[field]]))),
+            );
+            fs.writeFileSync(path.join(OUT, 'jl333-recursos.json'), JSON.stringify({ samples, summary, warmedCountsMatch }, null, 2));
+            const table = [
+                '# JL-333 — Recursos de la cripta',
+                '',
+                '| Vuelta | Piso | Mallas de escena | Materiales de escena | Texturas de escena | Mallas del piso activo | Raíces de piso |',
+                '|---:|---:|---:|---:|---:|---:|---|',
+                ...samples.map((row) =>
+                    `| ${row.round} | ${row.floor} | ${row.meshes} | ${row.materials} | ${row.textures} | ${row.floorMeshes} | ${row.dungeonRoots.join(', ')} |`,
+                ),
+                '',
+                '## Resumen',
+                '',
+                '| Vuelta | Recurso | Inicial | Final | Mínimo | Máximo | Transiciones con aumento |',
+                '|---:|---|---:|---:|---:|---:|---:|',
+                ...[1, 2, 3].flatMap((round) =>
+                    fields.map((field) => {
+                        const value = summary[`vuelta${round}`][field];
+                        return `| ${round} | ${field} | ${value.first} | ${value.last} | ${value.min} | ${value.max} | ${value.increases} |`;
+                    }),
+                ),
+                '',
+                'Conteos tomados de `scene.meshes`, `scene.materials` y `scene.textures` tras esperar a que cada piso terminara de cargar. Cada vuelta recorre del piso 1 al 20 mediante `CryptScene.enter` para aislar el ciclo real de construcción y disposición de vistas del movimiento, los enemigos y la ruta hasta cada escalera. La igualdad entre las vueltas 2 y 3 verifica que, una vez calentada la caché, los recursos no sigan acumulándose.',
+                '',
+            ].join('\n');
+            fs.writeFileSync(path.join(OUT, 'JL333_RECURSOS.md'), table);
+            const last = samples.at(-1);
+            await shot('jl333-cripta-piso-20');
+            check('JL-333: el piso final conserva el recuento medido', last.floor === 20, JSON.stringify(last));
+            const errors = await js(`window.__consola ? window.__consola.errores(20) : ''`);
+            const errorText = Array.isArray(errors) ? errors.join('\n') : String(errors ?? '');
+            check('JL-333: consola sin errores', !errorText.trim(), errorText.slice(0, 500));
+        } finally {
+            await js(`clearInterval(window.__qaVida)`);
+        }
+    },
+
     async criptaAislada() {
         await newGame('QA Cripta');
         await until(
@@ -12337,6 +12477,8 @@ scenarios.jl330Enemigos.timeout = 600;
 scenarios.benchCrowd.timeout = 180;
 // JL-332: 30 minutos de caminata más arranque, viajes entre zonas y cierre.
 scenarios.jl332SesionLarga.timeout = 3500;
+// JL-333: descenso real por 19 escaleras, con espera de carga y recuento por piso.
+scenarios.jl333CriptaRecursos.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

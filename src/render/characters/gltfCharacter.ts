@@ -161,7 +161,7 @@ export class GltfCharacter implements CharacterModel {
                 for (const m of unused) {
                     if (m.material && !kept.has(m.material)) {
                         kept.add(m.material);
-                        m.material.dispose();
+                        m.material.dispose(false, true);
                     }
                     m.dispose(false, false);
                 }
