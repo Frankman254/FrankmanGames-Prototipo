@@ -33,6 +33,11 @@ describe('atajos de teclado', () => {
         expect(ACTION_GROUPS.flatMap((g) => g.actions.map((x) => x.action)).sort()).toEqual([...ACTIONS].sort());
     });
 
+    it('los atajos predeterminados no asignan un código a dos acciones', () => {
+        const codes = ACTIONS.flatMap((action) => kb[action]);
+        expect(new Set(codes).size).toBe(codes.length);
+    });
+
     it('la barra son tres filas: QWERTYUIOP, ASDFGHJKLÑ y fila 3 sin tecla', () => {
         const row1 = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP'];
         const row2 = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'];

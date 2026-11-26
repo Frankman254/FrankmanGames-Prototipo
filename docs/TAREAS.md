@@ -423,6 +423,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-340 | J | Hecho (commit «JL-340: arrancar sin audio disponible») | `AudioDirector` contiene los fallos al crear, configurar o reanudar `AudioContext`: el audio se desactiva y el arranque de la partida continúa. | `tests/jl340_audioStartup.test.ts`: 1/1; Electron `jl340AudioBloqueado`: 3/3, consola limpia; `npm test`: 422 archivos, 5.067 aprobadas, 1 omitida y 1 `todo`; typecheck, `docs:check` y `node --check scripts/qaElectron.mjs` limpios. Capturas revisadas en `work/junie-jl340/`. |
 | JL-341 | J | Hecho (commit «JL-341: mostrar errores al arrancar con datos incompletos») | Si falla el arranque, una pantalla accesible explica el error, conserva su ruta como texto y respeta el idioma guardado. | `tests/jl341_startupError.test.ts`: 4/4; `npm test`: 423 archivos, 5.071 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run build` limpios. Electron `jl341DatosIncompletos`: 5/5, con el único error de consola inducido y comprobado; captura revisada `work/junie-jl341/final/jl341-datos-incompletos.jpg`. Reproducción previa oscura en `work/junie-jl341/repro/`. |
 
+## Cierre de la tanda 2026-11-26
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-342 | J | Hecho (commit «JL-342: listar los choques de atajos») | La tabla predeterminada no repite códigos; cruces fuera de ella con WASD durante el vuelo, F4–F6 en desarrollo y F8 con la consola oculta. Choques de sistema dependientes de plataforma documentados sin afirmar prioridad no medida. `tests/ui/keybindings.test.ts`: 8/8; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Informe en `work/junie-jl342/ATAJOS.md`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-342: listar los choques de atajos (Junie)
+
+**Archivos:** `tests/ui/keybindings.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`, `work/junie-jl342/ATAJOS.md`.
+
+**Qué se hizo:** Auditoría de `data/ui/keybindings.json` y de los handlers de teclado del juego. Se añadió una prueba pura explícita de que los atajos predeterminados no asignan un mismo código a dos acciones; el parser ya rechazaba duplicados y la reasignación ya intercambiaba los códigos.
+
+**Hallazgos:** Fuera de la tabla, `W/A/S/D` comparte códigos con los cuatro controles de vuelo (los hechizos se bloquean al volar); `F4`–`F6` se solapan con acciones de desarrollo y `F8` abre la consola oculta en lugar de ejecutar `loadTestClear`. `Alt+F4` en Windows y las teclas de función reservadas de macOS se anotan como dependencias de plataforma cuya prioridad no se probó físicamente. No se modificó el comportamiento del juego ni la interfaz; no aplica captura visual.
+
+**Validación:** `tests/ui/keybindings.test.ts`: 8/8; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl342/ATAJOS.md`.
+
+---
+
 ## 2026-11-26 — JL-341: mostrar errores al arrancar con datos incompletos (Junie)
 
 **Archivos:** `src/boot.ts`, `src/ui/startupError.ts`, `data/i18n/en.ui.json`, `scripts/qaElectron.mjs`, `tests/jl341_startupError.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

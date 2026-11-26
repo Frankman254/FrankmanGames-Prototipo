@@ -1578,7 +1578,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-341 **Arranque con `data/` incompleta:** si falta un archivo opcional, el error es claro, no una pantalla en blanco. Prueba. — commit «JL-341: mostrar errores al arrancar con datos incompletos» — prueba unitaria 4/4; Electron `jl341DatosIncompletos` 5/5 (error inducido comprobado); captura revisada `work/junie-jl341/final/jl341-datos-incompletos.jpg`.
 
 ### H. Interfaz y accesibilidad
-- [ ] JL-342 Atajos de teclado: lista de los que chocan entre sí o con el sistema. Prueba pura si hay una tabla de atajos.
+- [x] JL-342 Atajos de teclado: lista de los que chocan entre sí o con el sistema. Prueba pura si hay una tabla de atajos. — commit «JL-342: listar los choques de atajos» — `tests/ui/keybindings.test.ts` 8/8; suite 5.072 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl342/ATAJOS.md`.
 - [ ] JL-343 Escalas de interfaz de 80 % a 150 %: capturas del HUD y de las ventanas principales, y lista de lo que se sale.
 - [ ] JL-344 Contraste: los textos del HUD sobre fondo claro y oscuro, de día y de noche. Lista de los que no se leen.
 - [ ] JL-345 Interfaz en inglés completa: recorre todas las ventanas en inglés y lista los textos que se quedan en español.
