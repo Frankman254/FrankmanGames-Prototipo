@@ -23,6 +23,7 @@ import { MapState, type MapFrame, type MapWorld } from '../map/mapState';
 import { Minimap } from '../map/minimap';
 import { WorldMap } from '../map/worldMap';
 import { DungeonFloorMap } from '../map/dungeonFloorMap';
+import { CRYPT_WARDEN_NPC } from '../../world/dungeon';
 import {
     RARITIES,
     type GameSessionApi,
@@ -126,6 +127,8 @@ export interface MenusOptions {
     devPresets?: DevPresets;
     /** MUE-02: entra en la cripta en el piso indicado (0-indexado). null = piso 1. */
     enterDungeon?: (floor: number | null) => void;
+    /** MUE-02: piso de la cripta donde murió, pendiente de retomar (y lo consume). null = ninguno. */
+    takeCryptFloor?: () => number | null;
     /** UI-06: vista 3D del personaje en la mochila. */
     preview3d?: Preview3d;
     /** Vista 3D de la creación de personaje con la clase, el sexo y el aspecto elegidos. */
@@ -402,6 +405,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 compendium,
                 professions,
                 worldMap,
+                dungeonMap,
             ] as (Panel | null)[]
         ).filter((p): p is Panel => p !== null);
 
@@ -549,6 +553,32 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             windows.restore(box);
         }
         tooltip.hide();
+    }
+
+    /** MUE-02: ofrecer retomar el piso donde murió o empezar desde el 1. */
+    function showFloorChoice(floor: number): void {
+        const floorLabel = floor + 1;
+        pushModal(
+            modal(
+                'Entrar en la cripta',
+                'dungeon-floor-choice',
+                popModal,
+                h('p', { text: `Moriste en el piso ${floorLabel}. ¿Qué quieres hacer?` }),
+                h(
+                    'div.modal-menu',
+                    null,
+                    button(`Retomar piso ${floorLabel}`, () => {
+                        popModal();
+                        ctx.enterDungeon(floor);
+                    }),
+                    button('Empezar en el piso 1', () => {
+                        popModal();
+                        ctx.enterDungeon(null);
+                    }),
+                ),
+            ),
+            'overlay',
+        );
     }
 
     function popModal(): void {
@@ -719,6 +749,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             tradeInventory.el,
             bank.el,
             worldMap.el,
+            // El mapa del piso de la cripta (tecla M) se creaba pero no entraba en la pantalla.
+            dungeonMap.el,
             dialogue.el,
             spoils.el,
         );
@@ -834,34 +866,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 chat?.system(tr('Si vuelves a caer, te convertirás en fantasma'));
                 break;
             }
-            case 'dungeonFloorChoice': {
-                // MUE-02: ofrecer retomar el piso donde murió o empezar desde el 1.
-                const floorLabel = e.floor + 1;
-                pushModal(
-                    modal(
-                        'Entrar en la cripta',
-                        'dungeon-floor-choice',
-                        popModal,
-                        h('p', {
-                            text: `Moriste en el piso ${floorLabel}. ¿Qué quieres hacer?`,
-                        }),
-                        h(
-                            'div.modal-menu',
-                            null,
-                            button(`Retomar piso ${floorLabel}`, () => {
-                                popModal();
-                                ctx.enterDungeon(e.floor);
-                            }),
-                            button('Empezar en el piso 1', () => {
-                                popModal();
-                                ctx.enterDungeon(null);
-                            }),
-                        ),
-                    ),
-                    'overlay',
-                );
+            case 'dungeonFloorChoice':
+                showFloorChoice(e.floor);
                 break;
-            }
             case 'openMerchant':
                 // La tienda ocupa la columna izquierda; la mochila se abre al lado para vender.
                 dialogue?.close();
@@ -874,6 +881,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 tradeInventory?.open();
                 break;
             case 'talkNpc': {
+                // MUE-02: si murió dentro de la cripta, Berto ofrece antes retomar ese piso.
+                if (e.npcId === CRYPT_WARDEN_NPC) {
+                    const floor = opts.takeCryptFloor?.() ?? null;
+                    if (floor !== null && floor > 0) {
+                        showFloorChoice(floor);
+                        break;
+                    }
+                }
                 const v = s.talk?.(e.npcId) ?? null;
                 if (v) dialogue?.open(v);
                 break;

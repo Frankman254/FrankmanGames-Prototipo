@@ -85,6 +85,10 @@ Actualización del creador (2026-11-19, revisión rápida de HZ-04a; sus palabra
 - Hay más hechizos de daño que de estrategia, y pocos potenciadores.
 - Mecánicas que pidió: empujar sin pegar, cambiar de sitio, repartir daño, desechizar, invulnerabilidad a distancia o cuerpo a cuerpo, potencia con daño de empuje, crítico con daño fijo y escudo de 550 % del nivel.
 
+Actualización del creador (2026-11-25, cripta; respuestas en el chat con el coordinador):
+- **Entrada a la cripta.** Sus palabras: «en realidad para entrar solo debe poderse al hablar con berto y este debe estar en frente de la puerta de la mazmorra, si le damos clic a la puerta de la mazmorra debe redirigir a hablar con berto». Precisión del mismo día: «berto debe estar en la propia puerta de la mazmorra». Berto Candado ofrece los pisos 1, 10, 20, 30, 40 y 50. Si moriste dentro, ofrece retomar ese piso.
+- **Escalera de bajada en el mapa.** Se marca «solo tras descubrirla», en el minimapa y en el mapa del piso. Si queda fuera del minimapa, una flecha en el borde apunta hacia ella.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**

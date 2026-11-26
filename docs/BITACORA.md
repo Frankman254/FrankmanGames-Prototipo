@@ -1,3 +1,20 @@
+## 2026-11-25 — CLA-CRIPTA: mapa, entrada por Berto, escalera y estrella (Claude)
+
+**Archivos:** `src/rpg/content.ts`, `src/ui/map/{mapFeed,minimap,dungeonFloorMap}.ts`, `src/ui/menus/index.ts`, `src/main.ts`, `src/scenes/cryptScene.ts`, `src/world/dungeon.ts`, `data/rpg/npcs.json`, `scripts/mac/junie_continuo.sh`, tres pruebas `tests/cla_*.test.ts`.
+
+**Qué se hizo:**
+- **Estrella de vendaval.** De 241 lanzamientos que debían pegar, solo 49 pegaron. El lector dejaba `atTarget: false`, así que el daño salía en el lanzador y no en el cursor. Afectaba también a `thunder_weave` y `final_quiver`.
+- **Mapa.** El panel «Mapa del piso» (M) nunca se añadía a la pantalla. Además, los pisos 6–100 (de 36 864 a 147 456 casillas) superaban el tope de 16 384 casillas y no mandaban su rejilla.
+- **Entrada.** Decisión del creador: solo se entra hablando con Berto. Berto pasa de (136, 146) a (139, 157,5), en la misma reja y fuera de la zona segura; las pruebas de «PNJ en el pueblo» lo exceptúan citando al creador. Un clic en la reja lleva a hablar con él; si moriste dentro, primero ofrece retomar el piso (MUE-02).
+- **Escalera de bajada.** Se marca solo tras descubrirla, en el minimapa (con flecha en el borde si queda fuera) y en el mapa del piso.
+- **Runner de Junie.** Su buscador respeta `.gitignore` y no veía las casillas de `work/prompts-noche/COLA_JUNIE.md`. Ahora recibe la línea y el texto de la tarea.
+
+**WebGL «Program object expected».** No se reprodujo en el navegador de pruebas. La QA del 2026-11-09 lo atribuyó a destruir materiales cuyo shader aún se compilaba, sin efecto visible. Si vuelve con algo roto en pantalla, se investiga con el escenario concreto.
+
+**Validación:** `npx tsc --noEmit`, `npm test`, `npm run build` y `npm run docs:check`. En el navegador, la partida «Jefe piso 10» muestra el minimapa del piso y el mapa del piso con M. Salidas en `work/claude-mapa/`.
+
+---
+
 ## 2026-11-25 — JL-327: QA de físicas de trajes bloqueada (Junie)
 
 **Qué se verificó:** La aceptación exige revisar conjuntamente capas, faldas y pelo. CLA-TEL1 solo completó la primera parte: hay cadenas para algunas capas y el pelo, mientras siguen pendientes las faldas de Oráculo y Centinela, La Diablica con el método común y las capas de `equipo.glb`. No se ejecutó `fisicasTrajes` ni se generaron capturas para evitar una revisión parcial.

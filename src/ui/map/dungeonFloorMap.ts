@@ -212,6 +212,8 @@ export class DungeonFloorMap extends Panel {
         // Puntos de interés del dungeon.
         const features = f.dungeonFeatures ?? [];
         for (const feat of features) {
+            // Creador (2026-11-25): la escalera de bajada se ve solo tras descubrirla.
+            if (feat.kind === 'down' && !fog.isRevealed(feat.x - g.originX, feat.y - g.originY)) continue;
             const q = toScreen(feat);
             if (q.x < -30 || q.x > cw + 30 || q.y < -30 || q.y > ch + 30) continue;
             let color: string;

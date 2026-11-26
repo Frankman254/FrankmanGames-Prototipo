@@ -590,6 +590,7 @@ const menus = benchMode
           compendiumPreview3d: new CreaturePreview(overworld.characters),
           // SAV-02: configuración del guardado desde data/save.json.
           saveConfig: data.save,
+          takeCryptFloor: () => world.character.spectral.takeFloor(),
           enterDungeon: (floor) => {
               if (!crypt || crypt.inside) return;
               const target = floor ?? 0;

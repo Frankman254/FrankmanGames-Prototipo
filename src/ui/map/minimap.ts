@@ -40,6 +40,9 @@ interface MinimapPrefs {
 /** Suelo y pared de los interiores (F26). */
 const INSIDE_COLORS: InteriorColors = { floor: [150, 128, 92], wall: [62, 50, 38] };
 
+/** Color de la escalera de bajada, el mismo que en el mapa del piso. */
+const DOWN_STAIRS_COLOR = '#e8a84c';
+
 export class Minimap {
     private insideCanvas: HTMLCanvasElement | null = null;
     private insideKey = '';
@@ -333,6 +336,14 @@ export class Minimap {
         const seen = (p: { x: number; y: number }): boolean => fog.isRevealed(p.x - g.originX, p.y - g.originY);
         for (const l of f.loot) if (seen(l)) drawMarker(ctx, 'loot', P(l).x, P(l).y, s * 0.9, C.loot);
         for (const e of f.enemies) if (seen(e)) drawMarker(ctx, 'enemy', P(e).x, P(e).y, s, e.color);
+        // Creador (2026-11-25): la escalera de bajada se marca solo tras descubrirla; si queda
+        // fuera del minimapa, una flecha en el borde apunta hacia ella.
+        const down = f.dungeonFeatures?.find((d) => d.kind === 'down');
+        if (down && seen(down)) {
+            const b = clampToBox(P(down), px, 12 * scale, py);
+            if (!b.outside) drawMarker(ctx, 'quest', b.x, b.y, s * 1.2, DOWN_STAIRS_COLOR);
+            else drawEdgeArrow(ctx, b, DOWN_STAIRS_COLOR, scale);
+        }
         drawMarker(ctx, 'player', px / 2, py / 2, s * 1.2, C.player, this.prefs.rotate ? 0 : f.cameraYaw);
     }
 
@@ -467,24 +478,32 @@ export class Minimap {
         if (f.quest) {
             const b = clampToBox(P(f.quest), px, 22 * dpr, py);
             if (!b.outside) drawMarker(ctx, 'quest', b.x, b.y, s * 1.1, C.quest);
-            else {
-                ctx.save();
-                ctx.translate(b.x, b.y);
-                ctx.rotate(b.angle);
-                ctx.beginPath();
-                ctx.moveTo(9 * dpr, 0);
-                ctx.lineTo(-6 * dpr, -7 * dpr);
-                ctx.lineTo(-2 * dpr, 0);
-                ctx.lineTo(-6 * dpr, 7 * dpr);
-                ctx.closePath();
-                ctx.fillStyle = C.quest;
-                ctx.strokeStyle = 'rgba(0,0,0,.9)';
-                ctx.lineWidth = 1.5 * dpr;
-                ctx.fill();
-                ctx.stroke();
-                ctx.restore();
-            }
+            else drawEdgeArrow(ctx, b, C.quest, dpr);
             this.canvas.title = f.quest.label;
         } else this.canvas.title = '';
     }
+}
+
+/** Flecha en el borde del minimapa que apunta a algo que queda fuera. */
+function drawEdgeArrow(
+    ctx: CanvasRenderingContext2D,
+    b: { x: number; y: number; angle: number },
+    color: string,
+    dpr: number,
+): void {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.angle);
+    ctx.beginPath();
+    ctx.moveTo(9 * dpr, 0);
+    ctx.lineTo(-6 * dpr, -7 * dpr);
+    ctx.lineTo(-2 * dpr, 0);
+    ctx.lineTo(-6 * dpr, 7 * dpr);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = 'rgba(0,0,0,.9)';
+    ctx.lineWidth = 1.5 * dpr;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
 }

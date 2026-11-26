@@ -93,9 +93,11 @@ export function buildMapFrame(i: MapFrameInput): MapFrame {
         cameraMode: i.cameraMode,
         inside: i.inside,
         // F26: solo rejillas de interior pequeñas; el mundo abierto y la barriada (JL-217)
-        // tienen su propia imagen. Un tope de 16 K celdas cubre casas, banco y pisos de cripta,
-        // pero excluye la barriada (~160 K celdas).
-        interiorGrid: i.inside && w.grid.cols * w.grid.rows <= 1 << 14 ? w.grid : null,
+        // tienen su propia imagen. Un tope de 16 K celdas cubre casas y banco, pero excluye la
+        // barriada (~160 K celdas). Los pisos de la cripta van siempre: desde el 6.º pasan de 36 K
+        // celdas (el 100.º, 147 K) y con el tope el mapa del piso y el minimapa salían vacíos.
+        interiorGrid:
+            i.inside && (i.dungeonFloor != null || w.grid.cols * w.grid.rows <= 1 << 14) ? w.grid : null,
         // DUN-06: piso y puntos de interés de la mazmorra.
         dungeonFloor: i.dungeonFloor ?? null,
         dungeonFeatures: i.dungeonFeatures ?? null,

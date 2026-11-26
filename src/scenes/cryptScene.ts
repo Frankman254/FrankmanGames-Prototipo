@@ -22,12 +22,12 @@ import {
     chestLootTable,
     doorApproach,
     entranceExit,
+    CRYPT_WARDEN_NPC,
     floorGameData,
     floorTitle,
     generateFloor,
     inRoom,
     proximityDoors,
-    useDungeonKey,
     type DungeonFloor,
     type DungeonChest,
     type DungeonBreakable,
@@ -308,8 +308,9 @@ export class CryptScene {
                 if (this.opened.has(id)) return true; // abierto: no hace nada, pero el clic no atraviesa
             }
         } else if (pickEntrance(this.host.view.scene, this.entrance, screenX, screenY)) {
-            feature = { kind: 'entrance' };
-            pos = { x: this.host.def.entrance.x, y: this.host.def.entrance.y };
+            // Creador (2026-11-25): la reja no abre sola; se entra hablando con Berto.
+            this.host.world().commandTalk(CRYPT_WARDEN_NPC);
+            return true;
         }
         if (!feature || !pos) return false;
         this.pending = { feature, pos };
@@ -345,25 +346,6 @@ export class CryptScene {
         this.pending = null;
         w.player.path = [];
         switch (p.feature.kind) {
-            case 'entrance': {
-                // MUE-02: si hay un piso pendiente de retomar, se avisa a la interfaz para que pregunte.
-                const pendingFloor = w.character.spectral.takeFloor();
-                if (pendingFloor !== null && pendingFloor > 0) {
-                    w.character.emit({ type: 'dungeonFloorChoice', floor: pendingFloor });
-                    break;
-                }
-                // La reja pide llave (data/dungeon.json, key); sin ella, aviso claro y no se entra.
-                const ch = w.character;
-                const key = this.host.def.key;
-                const res = useDungeonKey(
-                    this.host.def,
-                    ch.inventory,
-                    key ? (w.content.items[key.itemId]?.name ?? key.itemId) : '',
-                );
-                if (res.message) ch.emit({ type: 'message', text: res.message });
-                if (res.ok) this.veil('Entrando en', 0, () => this.enter(0, 'above'));
-                break;
-            }
             case 'down': {
                 const destination = cryptStairDestination(this.floor!, 'down');
                 this.veil('Bajando a', destination.index, () => this.enter(destination.index, destination.from));

@@ -56,8 +56,12 @@ while [ "$(abiertas)" -gt 0 ] && [ "$vuelta" -lt "$VUELTAS" ] && [ "$(date +%s)"
   log="$LOGS/$(date +%Y%m%d-%H%M%S)-v${vuelta}.log"
   echo "[$(date +%H:%M)] Vuelta $vuelta (intento $intentos): $tarea  → $log"
   inicio=$(date +%s)
+  # El buscador de Junie respeta .gitignore y work/ está ignorado: no ve las casillas de la cola.
+  # Se le da la tarea ya localizada (línea y texto) para que no dependa de buscarla.
+  nlinea=$(grep -n -m1 '^- \[ \]' "$COLA" | cut -d: -f1)
+  texto=$(sed -n "${nlinea}p" "$COLA" | cut -c7-)
   junie --skip-update-check --act-as-interactive --max-steps="$PASOS" ${extra[@]+"${extra[@]}"} \
-    --task="Trabajas sin supervisión: nadie responde preguntas. Lee y cumple $REGLAS (reglas del proyecto y del turno). Después abre $COLA y haz SOLO la primera tarea marcada '- [ ]', hasta terminarla y verificarla (pruebas y, si se ve, captura de Electron en work/). Antes del commit cambia esa casilla a '- [x] … — commit «<título>» — <evidencia>' o a '- [!] … — BLOQUEADA: <motivo>' y actualiza TAREAS y BITACORA. Luego UN solo commit con el código, las pruebas, TAREAS, BITACORA y $COLA (git add -f $COLA), solo tus rutas, y git push origin master. Prohibido el commit aparte de docs ni el de una línea suelta. No toques las demás casillas ni empieces otra tarea." \
+    --task="Trabajas sin supervisión: nadie responde preguntas. Lee y cumple $REGLAS (reglas del proyecto y del turno). Después abre $COLA (está en work/, ignorado por Git: ábrelo por su ruta, no lo busques) y haz SOLO la tarea de su línea $nlinea, la primera marcada '- [ ]': «$texto». Lee también las líneas de debajo que la detallan. Trabaja hasta terminarla y verificarla (pruebas y, si se ve, captura de Electron en work/). Antes del commit cambia esa casilla a '- [x] … — commit «<título>» — <evidencia>' o a '- [!] … — BLOQUEADA: <motivo>' y actualiza TAREAS y BITACORA. Luego UN solo commit con el código, las pruebas, TAREAS, BITACORA y $COLA (git add -f $COLA), solo tus rutas, y git push origin master. Prohibido el commit aparte de docs ni el de una línea suelta. No toques las demás casillas ni empieces otra tarea." \
     >"$log" 2>&1
   salida=$?
   dura=$(( $(date +%s) - inicio ))

@@ -79,7 +79,9 @@ describe('zonas: datos', () => {
                 else expect(a.x >= world.x0 && a.x <= world.x1 && a.y >= world.z0 && a.y <= world.z1, z.id).toBe(true);
             }
         }
+        // Creador (2026-11-25): «berto debe estar en la propia puerta de la mazmorra», fuera del pueblo.
         for (const n of [...Object.values(data.rpg.npcs), ...Object.values(data.rpg.merchants)]) {
+            if (n.id === 'crypt_warden') continue;
             expect(map.zoneAt(n.position)?.safe, n.id).toBe(true);
         }
         const first = map.zoneAt(terrainJson.playerStart)!;

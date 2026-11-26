@@ -550,7 +550,9 @@ function area(r: Reader, raw: unknown): AreaDef {
             type,
             arm: r.num(o, 'arm', { min: 0.2, max: 30 }),
             width: r.num(o, 'width', { min: 0.1, max: 10, def: 1 }),
-            atTarget: o['atTarget'] === true,
+            // La estrella cae en el cursor salvo `atTarget: false` (así la apuntan el alcance, la
+            // línea de visión, la vista previa y el efecto). Con `=== true` el daño salía en el lanzador.
+            atTarget: o['atTarget'] !== false,
         };
     if (type === 'square')
         return { type, size: r.num(o, 'size', { min: 0.2, max: 30 }), atTarget: o['atTarget'] === true };

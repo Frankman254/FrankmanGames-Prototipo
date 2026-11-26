@@ -1268,6 +1268,12 @@ export function chestLootTable(base: LootTableDef, index: number, chest: Dungeon
  * Punto del mundo abierto donde aparece el jugador al salir de la cripta:
  * delante de la boca, a `reach` + 1 m en la dirección a la que mira.
  */
+/**
+ * Creador (2026-11-25): a la cripta solo se entra hablando con Berto Candado, el portero, que
+ * está delante de la reja. Un clic en la reja lleva a hablar con él.
+ */
+export const CRYPT_WARDEN_NPC = 'crypt_warden';
+
 export function entranceExit(def: DungeonDef): Vec2 {
     const a = (def.entrance.facingDeg * Math.PI) / 180;
     const d = def.entrance.reach + 1;

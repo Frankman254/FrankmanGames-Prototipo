@@ -70,8 +70,10 @@ describe('misiones: datos', () => {
         expect([...types].sort()).toEqual(['collect', 'fish', 'kill', 'reach', 'talk']);
     });
 
-    it('los PNJ nuevos están en el pueblo, cerca de (128, 128), salvo los de Iguanera', () => {
-        for (const n of Object.values(content().npcs).filter((x) => !x.id.endsWith('_igu'))) {
+    it('los PNJ nuevos están en el pueblo, cerca de (128, 128), salvo los de Iguanera y Berto', () => {
+        // Creador (2026-11-25): «berto debe estar en la propia puerta de la mazmorra».
+        const fuera = (id: string): boolean => id.endsWith('_igu') || id === 'crypt_warden';
+        for (const n of Object.values(content().npcs).filter((x) => !fuera(x.id))) {
             expect(Math.hypot(n.position.x - 128, n.position.y - 128), n.id).toBeLessThan(25);
         }
     });
