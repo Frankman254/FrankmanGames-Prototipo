@@ -12426,6 +12426,164 @@ Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
             JSON.stringify({ startedAt, finishedAt, durationSeconds: report.totalWalkSeconds, metadata: initial, rows }, null, 2),
         );
     },
+
+    /** JL-334: 200 clics de mundo y 200 teclas del primer hechizo en menos de 10 s. */
+    async jl334Rafaga() {
+        await newGame('QA Rafaga', { classId: 'ember_vanguard' });
+        await resize(1920, 1080);
+        await until('__game.menus.screen === "game" && __game.view.rig != null', 15000, 'partida lista para la ráfaga');
+
+        const spellEntries = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells;
+        const spellId = Object.entries(spellEntries).find(([, spell]) => spell.classId === 'ember_vanguard' && !spell.devOnly)?.[0];
+        if (!spellId) throw new Error('No hay hechizo de Vanguardia para probar la tecla');
+
+        await js(`(() => {
+          const c=${S}.character;
+          c.gainXp(5000000);
+          if(c.spellbook.rank(${JSON.stringify(spellId)})===0) c.spellbook.learn(${JSON.stringify(spellId)});
+          c.spellbook.hotbar[0]=${JSON.stringify(spellId)};
+          c.resource=c.maxResource;
+        })()`);
+        await sleep(300);
+
+        const target = await js(`(() => {
+          const c=document.querySelector('canvas'),r=c.getBoundingClientRect(),v=__game.view,p=${W}.player;
+          let point=null;
+          for(let yy=0.35;yy<=0.72&&!point;yy+=0.02) for(let xx=0.3;xx<=0.7;xx+=0.02){
+            const x=r.width*xx,y=r.height*yy,g=v.pickGround(x,y);
+            if(!g) continue;
+            const distance=Math.hypot(g.x-p.pos.x,g.y-p.pos.y);
+            const sx=r.left+x,sy=r.top+y;
+            if(distance>=2&&distance<=12&&document.elementFromPoint(sx,sy)?.tagName==='CANVAS') point={x:sx,y:sy,distance};
+            if(point) break;
+          }
+          return {point,action:__game.keys.action('KeyQ'),spell:${S}.character.spellbook.hotbar[0]};
+        })()`);
+        check('JL-334: Q corresponde al primer hechizo y hay suelo clicable', target.action === 'hotbar1' && target.spell === spellId && !!target.point, JSON.stringify(target));
+        if (!target.point) throw new Error('No se encontró suelo visible a distancia del personaje para los clics');
+
+        await js(`(() => {
+          const c=document.querySelector('canvas'),events={pointerDown:0,pointerUp:0,clicks:0,keyDown:0,keyUp:0};
+          globalThis.__jl334Events=events;
+          c.addEventListener('pointerdown',()=>events.pointerDown++,true);
+          c.addEventListener('pointerup',()=>events.pointerUp++,true);
+          c.addEventListener('click',()=>events.clicks++,true);
+          window.addEventListener('keydown',e=>{if(e.code==='KeyQ'&&!e.repeat)events.keyDown++},true);
+          window.addEventListener('keyup',e=>{if(e.code==='KeyQ')events.keyUp++},true);
+        })()`);
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: target.point.x, y: target.point.y });
+
+        const errorsBefore = consoleErrors.length;
+        const startedAt = new Date().toISOString();
+        const started = performance.now();
+        const count = 200;
+        const intervalMs = 40;
+        for (let i = 0; i < count; i++) {
+            await Promise.all([
+                cdp('Input.dispatchMouseEvent', {
+                    type: 'mousePressed',
+                    x: target.point.x,
+                    y: target.point.y,
+                    button: 'left',
+                    buttons: 1,
+                    clickCount: 1,
+                }),
+                cdp('Input.dispatchKeyEvent', {
+                    type: 'rawKeyDown',
+                    code: 'KeyQ',
+                    key: 'q',
+                    windowsVirtualKeyCode: 81,
+                }),
+            ]);
+            await Promise.all([
+                cdp('Input.dispatchMouseEvent', {
+                    type: 'mouseReleased',
+                    x: target.point.x,
+                    y: target.point.y,
+                    button: 'left',
+                    buttons: 0,
+                    clickCount: 1,
+                }),
+                cdp('Input.dispatchKeyEvent', {
+                    type: 'keyUp',
+                    code: 'KeyQ',
+                    key: 'q',
+                    windowsVirtualKeyCode: 81,
+                }),
+            ]);
+            if (i < count - 1) await sleep(Math.max(0, started + (i + 1) * intervalMs - performance.now()));
+        }
+        const elapsedMs = performance.now() - started;
+        const events = await js('globalThis.__jl334Events');
+        const inputCountsOk =
+            events.pointerDown === count &&
+            events.pointerUp === count &&
+            events.clicks === count &&
+            events.keyDown === count &&
+            events.keyUp === count;
+        check('JL-334: se reciben 200 clics y 200 teclas con sus liberaciones', inputCountsOk, JSON.stringify(events));
+        check('JL-334: las 400 entradas llegan en menos de 10 s', elapsedMs < 10000, `${(elapsedMs / 1000).toFixed(3)} s`);
+
+        await sleep(800);
+        if (await js('__game.castInput.aiming !== null')) {
+            await cdp('Input.dispatchKeyEvent', {
+                type: 'rawKeyDown',
+                code: 'Escape',
+                key: 'Escape',
+                windowsVirtualKeyCode: 27,
+            });
+            await cdp('Input.dispatchKeyEvent', {
+                type: 'keyUp',
+                code: 'Escape',
+                key: 'Escape',
+                windowsVirtualKeyCode: 27,
+            });
+            await until('__game.castInput.aiming === null', 2000, 'cancelación del apuntado tras la ráfaga');
+        }
+        const moveStart = await js(`${W}.player.pos`);
+        const moveTarget = await js(`(() => {
+          const w=${W},p=w.player.pos,cell=w.grid.nearestWalkable({x:p.x+6,y:p.y});
+          if(cell<0) return null;
+          const q=w.grid.center(cell);
+          return {x:q.x,y:q.y,distance:Math.hypot(q.x-p.x,q.y-p.y)};
+        })()`);
+        if (!moveTarget || moveTarget.distance < 1.5) throw new Error(`No hay destino caminable tras la ráfaga: ${JSON.stringify(moveTarget)}`);
+        await clickGroundNear(moveTarget.x, moveTarget.y, 1.5);
+        const moved = await until(
+            `Math.hypot(${W}.player.pos.x-${moveStart.x},${W}.player.pos.y-${moveStart.y})>0.2`,
+            4000,
+            'personaje caminando tras la ráfaga',
+        );
+        const moveEnd = await js(`${W}.player.pos`);
+        const distanceMoved = Math.hypot(moveEnd.x - moveStart.x, moveEnd.y - moveStart.y);
+        check('JL-334: un clic posterior hace que el personaje vuelva a caminar', moved && distanceMoved > 0.2, `${distanceMoved.toFixed(2)} m`);
+
+        const noNewConsoleErrors = consoleErrors.length === errorsBefore;
+        check('JL-334: consola sin errores nuevos durante la prueba', noNewConsoleErrors, consoleErrors.slice(errorsBefore, errorsBefore + 5).join(' | ') || '0');
+        await shot('jl334-rafaga');
+        fs.writeFileSync(
+            path.join(OUT, 'jl334-pulsaciones.json'),
+            JSON.stringify(
+                {
+                    startedAt,
+                    finishedAt: new Date().toISOString(),
+                    elapsedMs,
+                    intervalMs,
+                    sentClicks: count,
+                    sentSpellKeys: count,
+                    spellId,
+                    keyCode: 'KeyQ',
+                    received: events,
+                    positionBeforeMove: moveStart,
+                    positionAfterMove: moveEnd,
+                    distanceMoved,
+                    newConsoleErrors: consoleErrors.slice(errorsBefore),
+                },
+                null,
+                2,
+            ),
+        );
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

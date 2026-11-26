@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-334: pulsaciones en ráfaga (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió `jl334Rafaga`, que envía clics reales al lienzo y la tecla `KeyQ` por CDP durante una partida en Electron. Cuenta también las liberaciones y comprueba la respuesta del movimiento tras la ráfaga; no modifica el runtime ni los datos del juego.
+
+**Resultado:** `fiery_slash` estaba asignado a `KeyQ`; llegaron 200 clics, 200 teclas y las 200 liberaciones de cada tipo en 7,976 ms. Después, el personaje caminó 0,70 m con un clic. Cero errores de consola.
+
+**Validación:** Electron `jl334Rafaga`: 6/6; `npm test`: 420 archivos, 5.056 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `node --check scripts/qaElectron.mjs` limpios.
+
+**Evidencia:** `work/junie-jl334/jl334-pulsaciones.json`, `resultado.json` y captura revisada `jl334-rafaga.jpg`.
+
+---
+
 ## 2026-11-26 — JL-332: sesión larga en tres zonas (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `scripts/jl332Report.mjs`, `scripts/jl332Report.d.mts`, `tests/jl332Report.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
