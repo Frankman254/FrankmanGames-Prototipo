@@ -1,3 +1,17 @@
+## 2026-11-25 — JL-326: capturar conjuntos al andar y correr (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió el escenario Electron `trajes`: equipa los 137 conjuntos y captura andar y correr, de lado, en los tres héroes y ambos sexos. Solo modifica la partida de QA; no cambia lógica productiva, datos ni assets.
+
+**Resultado visual:** Se revisaron las seis láminas y las capturas ampliadas. Diez conjuntos muestran 24 mallas de piezas; 788 de 812 piezas no tienen malla separada y no se pudieron evaluar por clipping. No se confirmó ningún cruce inequívoco. Candidato no confirmado: la malla `diablica_espeja_feet` (piernas/zapatos) se ve bajo el borde de la falda `diablica_espeja_waist` en Cazador femenino, andando y corriendo; la vista no permite distinguir si es parte intencional del atuendo o intersección del cuerpo base.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio. Electron `trajes`: 840/840 comprobaciones (280 por clase), 1.644/1.644 capturas y cero errores de consola. `npm test`: 415 archivos, 5.034 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl326/` (logs, resultados, observaciones, 1.644 capturas y seis láminas); ampliaciones del candidato en `work/junie-jl326/cazador/jl326-cazador-femenino-diablica_espeja-andar.jpg` y `work/junie-jl326/cazador/jl326-cazador-femenino-diablica_espeja-correr.jpg`.
+
+---
+
 ## 2026-11-25 — JL-325: verificar el asiento de todas las monturas (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

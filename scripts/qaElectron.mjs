@@ -3248,6 +3248,177 @@ const scenarios = {
         check('JL-325: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
     },
 
+    /** JL-326: captura los conjuntos equipados al andar y correr en los seis héroes. */
+    async trajes() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl326';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const classFilter = process.env.QA_TRAJES_CLASE;
+        const selectedClasses = classes.filter((hero) => !classFilter || hero.model === classFilter);
+        const sexes = [
+            { id: 'masculino', label: 'masculino', suffix: '' },
+            { id: 'femenino', label: 'femenino', suffix: '_f' },
+        ];
+        const { items } = JSON.parse(fs.readFileSync(path.resolve('data/rpg/items.json'), 'utf8'));
+        const { sets } = JSON.parse(fs.readFileSync(path.resolve('data/rpg/sets.json'), 'utf8'));
+        const outfits = Object.keys(sets)
+            .sort()
+            .map((id) => ({
+                id,
+                label: sets[id].name ?? id,
+                items: Object.entries(items)
+                    .filter(([, item]) => item.setId === id)
+                    .map(([itemId, item]) => ({ id: itemId, name: item.name ?? itemId, slot: item.slot })),
+            }));
+        const poses = [
+            { id: 'andar', state: 'walk' },
+            { id: 'correr', state: 'run' },
+        ];
+        const captures = [];
+        const observations = [];
+        check('JL-326: catálogo de conjuntos leído', outfits.length === Object.keys(sets).length, `${outfits.length}/${Object.keys(sets).length}`);
+        check('JL-326: cada conjunto tiene piezas', outfits.every((outfit) => outfit.items.length > 0));
+        check(
+            'JL-326: clase seleccionada válida',
+            selectedClasses.length === (classFilter ? 1 : classes.length),
+            classFilter ?? 'todas',
+        );
+        if (selectedClasses.length === 0) throw new Error(`Clase no válida en QA_TRAJES_CLASE: ${classFilter}`);
+
+        for (const hero of selectedClasses) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame('QA Trajes', { classId: hero.id });
+                await js(`${W}.character.sex=${JSON.stringify(sex.id)}; ${W}.character.level=200`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.label}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                await js(
+                    `(()=>{ const w=${W},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.speed=0; p.facing=0; p.alive=true; v.rig.mode='manual'; v.rig.yawDeg=180; v.rig.pitchDeg=10; v.rig.distance=4.5; v.rig.jumpTo(4.5); })()`,
+                );
+
+                for (const outfit of outfits) {
+                    const equipped = await js(`(()=>{
+                      const c=${W}.character,s=${S};
+                      for(const slot of Object.keys(c.equipment.slots)) if(c.equipment.get(slot)) s.unequip(slot);
+                      for(const item of c.inventory.slots) if(item) c.inventory.remove(item.uid,item.quantity);
+                      c.level=200;
+                      const failures=[];
+                      for(const def of ${JSON.stringify(outfit.items.map((item) => item.id))}){
+                        const left=c.give(def);
+                        const item=c.inventory.slots.find(i=>i?.itemId===def);
+                        if(left||!item){failures.push({itemId:def,reason:'no se pudo crear'});continue;}
+                        const result=s.equip(item.uid);
+                        if(!result.ok) failures.push({itemId:def,reason:result.reason??'no se pudo equipar'});
+                      }
+                      const slots=Object.fromEntries(Object.entries(c.equipment.slots).filter(([,item])=>item).map(([slot,item])=>[slot,item.itemId]));
+                      const missing=${JSON.stringify(outfit.items.map((item) => item.id))}.filter(id=>!Object.values(slots).includes(id));
+                      return {ok:failures.length===0&&missing.length===0,failures,missing,slots};
+                    })()`);
+                    check(
+                        `JL-326 ${hero.model} ${sex.id}: equipar ${outfit.id}`,
+                        equipped.ok,
+                        JSON.stringify(equipped),
+                    );
+                    if (!equipped.ok)
+                        throw new Error(`No se pudo equipar el conjunto ${outfit.id} en ${hero.label} ${sex.label}: ${JSON.stringify(equipped)}`);
+
+                    await sleep(250);
+                    const gearMeshes = await js(
+                        `__game.view.player.model.meshes.map(m=>m.name).filter(n=>n.includes('obj_'))`,
+                    );
+                    const visiblePieces = outfit.items
+                        .filter((item) => gearMeshes.some((name) => name.includes(`obj_${item.id}`)))
+                        .map((item) => item.id);
+                    const outfitCapture = {
+                        setId: outfit.id,
+                        setName: outfit.label,
+                        hero: hero.model,
+                        sex: sex.id,
+                        itemIds: outfit.items.map((item) => item.id),
+                        visiblePieces,
+                        gearMeshes,
+                        poses: {},
+                    };
+
+                    for (const pose of poses) {
+                        await js(`(()=>{
+                          const w=${W},v=__game.view,p=w.player,a=w.grid.center(w.grid.nearestWalkable({x:127,y:130}));
+                          p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.facing=0;p.alive=true;
+                          v.player.reset();v.player.visualYaw=0;v.player.model.root.rotation.y=0;
+                          v.rig.yawDeg=180;v.rig.pitchDeg=10;v.rig.distance=4.5;v.rig.jumpTo(4.5);
+                          v.player.oneShot=${JSON.stringify(pose.state)};v.player.model.play(${JSON.stringify(pose.state)},{restart:true});
+                        })()`);
+                        await until(
+                            `__game.view.player.model.state===${JSON.stringify(pose.state)}`,
+                            8000,
+                            `${hero.label} ${sex.label} ${outfit.id} ${pose.id}`,
+                        );
+                        await sleep(120);
+                        const file = `jl326-${hero.model}-${sex.id}-${outfit.id}-${pose.id}`;
+                        await shot(file);
+                        outfitCapture.poses[pose.id] = `${file}.jpg`;
+                        captures.push({
+                            hero: hero.model,
+                            sex: sex.id,
+                            setId: outfit.id,
+                            pose: pose.id,
+                            file: `${file}.jpg`,
+                        });
+                    }
+                    observations.push(outfitCapture);
+                }
+            }
+        }
+
+        fs.writeFileSync(path.join(outDir, 'capturas.json'), JSON.stringify(captures, null, 2));
+        fs.writeFileSync(path.join(outDir, 'observaciones.json'), JSON.stringify(observations, null, 2));
+        const visualSets = observations.filter((item) => item.visiblePieces.length > 0);
+        const summaries = [...new Set(observations.map((item) => `${item.hero}-${item.sex}`))];
+        for (const modelSex of summaries) {
+            const [hero, sex] = modelSex.split('-');
+            const tiles = visualSets
+                .filter((item) => item.hero === hero && item.sex === sex)
+                .map((item) => ({
+                    label: `${item.setId} · ${item.visiblePieces.join(', ')}`,
+                    walk: item.poses.andar,
+                    run: item.poses.correr,
+                }));
+            if (tiles.length === 0) continue;
+            const imageUrl = (file) =>
+                new URL(
+                    `/${path.relative(process.cwd(), path.resolve(outDir, file)).split(path.sep).join('/')}`,
+                    url,
+                ).href;
+            const escapeHtml = (text) =>
+                String(text).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+            const sheetHtml = `<style>html,body{margin:0;width:100%;height:100%;background:#151515;color:#fff;font:12px Arial,sans-serif}main{width:1920px;display:grid;grid-template-columns:repeat(4,480px)}figure{margin:0;min-width:0;background:#202020;border:1px solid #444}figcaption{height:28px;line-height:28px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}section{display:flex}img{width:239px;height:135px;object-fit:contain;background:#111}</style><main>${tiles.map((tile) => `<figure><figcaption>${escapeHtml(tile.label)}</figcaption><section><img src="${imageUrl(tile.walk)}"><img src="${imageUrl(tile.run)}"></section></figure>`).join('')}</main>`;
+            await resize(1920, Math.max(1080, Math.ceil(tiles.length / 4) * 165));
+            await js(`document.body.innerHTML=${JSON.stringify(sheetHtml)}`);
+            await until(
+                `document.images.length===${tiles.length * 2} && [...document.images].every(i=>i.complete&&i.naturalWidth>0)`,
+                30000,
+                `lámina de trajes ${hero} ${sex}`,
+            );
+            await shot(`jl326-lamina-${hero}-${sex}`);
+        }
+        check(
+            'JL-326: dos capturas de cada conjunto en las apariencias seleccionadas',
+            captures.length === outfits.length * selectedClasses.length * sexes.length * poses.length,
+            `${captures.length}/${outfits.length * selectedClasses.length * sexes.length * poses.length}`,
+        );
+        check('JL-326: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -11486,6 +11657,8 @@ scenarios.jl323Zancada.timeout = 600;
 scenarios.jl324Transiciones.timeout = 600;
 // JL-325: seis héroes × cada montura, con capturas laterales y láminas.
 scenarios.jinetes.timeout = 600;
+// JL-326: 137 conjuntos × seis modelos/sexos × dos poses.
+scenarios.trajes.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
