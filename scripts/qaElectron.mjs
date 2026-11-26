@@ -12806,6 +12806,89 @@ Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
         );
         await shot('jl337-guardado-ilegible');
     },
+    /** JL-338: un autoguardado mientras viaja no debe dejar la partida en la Piedra de origen. */
+    async jl338GuardadoViaje() {
+        await newGame('QA Guardado Viaje');
+        const source = await js(`(()=>{
+      const p=${W}.player.pos;
+      return __game.stones.stones.map((stone)=>{
+        const root=__game.view.scene.getTransformNodeByName('stone_'+stone.id);
+        if(!root) return null;
+        const at=root.getAbsolutePosition();
+        return {id:stone.id,x:at.x,y:at.z,distance:Math.hypot(at.x-p.x,at.z-p.y)};
+      }).filter(Boolean).sort((a,b)=>a.distance-b.distance)[0]??null;
+    })()`);
+        if (!source) throw new Error('No hay Piedra Pintada visible para iniciar el viaje');
+        await js(`(()=>{const p=${W}.player;p.pos={x:${source.x},y:${source.y}};p.prevPos={...p.pos};p.path=[];})()`);
+        await sleep(600);
+        await clickMesh(`stoneCrystal_${source.id}`);
+        await until(`!!document.querySelector('.stone-modal')`, 10000, 'selector de Piedras Pintadas');
+        const target = await js(`(()=>{
+      const stone=__game.stones.stones.find((item)=>item.id!==${JSON.stringify(source.id)});
+      return stone?{id:stone.id,name:stone.name}:null;
+    })()`);
+        if (!target) throw new Error('No hay una segunda Piedra Pintada seleccionable');
+        const autosaveSeconds = Number(JSON.parse(fs.readFileSync('data/save.json', 'utf8')).autosaveSeconds ?? 5);
+        const duringTrip = await js(`(()=>{
+      const slot=Array.from({length:12},(_,i)=>i).find((i)=>{
+        const save=JSON.parse(localStorage.getItem('frankmangames.save.'+i)||'null');
+        return save?.name===__game.session.character.name;
+      });
+      const button=[...document.querySelectorAll('.stone-modal button')].find((b)=>b.textContent.includes(${JSON.stringify(target.name)}));
+      if(slot===undefined||!button) return null;
+      const originPlace=__game.place;
+      button.click();
+      const loading=!!document.querySelector('.carga:not([hidden])');
+      const before=JSON.parse(localStorage.getItem('frankmangames.save.'+slot));
+      __game.menus.frame(${autosaveSeconds + 0.1});
+      const written=JSON.parse(localStorage.getItem('frankmangames.save.'+slot));
+      const frame=__game.menus.frame.bind(__game.menus);
+      window.__jl338OriginalFrame=frame;
+      __game.menus.frame=(dt)=>{if(!document.querySelector('.carga:not([hidden])')) frame(dt);};
+      return {slot,loading,originPlace,beforePlace:before?.place,writtenPlace:written?.place};
+    })()`);
+        if (!duringTrip) throw new Error('No se pudo forzar el autoguardado durante el viaje');
+        check(
+            'JL-338: la pantalla de viaje está activa al producirse el autoguardado',
+            duringTrip.loading,
+            JSON.stringify(duringTrip),
+        );
+        check(
+            'JL-338: la escritura intermedia conserva una ubicación completa de origen',
+            duringTrip.writtenPlace?.scene === duringTrip.originPlace?.scene &&
+                Math.hypot(
+                    duringTrip.writtenPlace?.x - duringTrip.originPlace?.x,
+                    duringTrip.writtenPlace?.y - duringTrip.originPlace?.y,
+                ) < 0.001 &&
+                Number.isFinite(duringTrip.writtenPlace?.x) &&
+                Number.isFinite(duringTrip.writtenPlace?.y),
+            JSON.stringify({ origin: duringTrip.originPlace, written: duringTrip.writtenPlace }),
+        );
+        await shot('jl338-viaje-en-curso');
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'fin del viaje');
+        const final = await js(`(()=>{
+      const save=JSON.parse(localStorage.getItem('frankmangames.save.'+${duringTrip.slot}));
+      const current=__game.place;
+      __game.menus.frame=window.__jl338OriginalFrame;
+      delete window.__jl338OriginalFrame;
+      return {saved:save?.place,current,pos:{...${W}.player.pos}};
+    })()`);
+        const saved = final.saved;
+        const current = final.current;
+        const matchesDestination =
+            saved?.scene === current?.scene &&
+            saved?.dungeon === current?.dungeon &&
+            saved?.floor === current?.floor &&
+            Number.isFinite(saved?.x) &&
+            Number.isFinite(saved?.y) &&
+            Math.hypot(saved.x - current.x, saved.y - current.y) < 0.001;
+        check(
+            'JL-338: al terminar el viaje la ranura guarda la ubicación final, no la intermedia',
+            matchesDestination,
+            JSON.stringify({ saved, current, pos: final.pos }),
+        );
+        check('JL-338: consola sin errores nuevos', consoleErrors.length === 0, consoleErrors.slice(-3).join(' | ') || '0');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

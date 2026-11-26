@@ -168,6 +168,8 @@ export interface MenusController {
     readonly hudLayout: HudLayout;
     /** Llamar una vez por fotograma con el tiempo real transcurrido. */
     frame(dt: number): void;
+    /** Guarda el estado actual al completar un cambio de escena o lugar. */
+    flushAutosave(): void;
     /** Acciones que la interfaz no resuelve (evasión, depuración, prueba de carga…) y las de la barra. */
     onAction(fn: (a: Action) => void): void;
     onOptions(fn: (o: GameOptions) => void): void;
@@ -1482,6 +1484,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         get hudLayout() {
             return hudLayout;
         },
+        flushAutosave,
         frame(dt: number) {
             if (!session || screen !== 'game') return;
             sinceAutosave += dt;

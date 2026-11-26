@@ -421,7 +421,9 @@ function veil(text: LoadingText, work: () => void): Promise<void> {
         work();
         return Promise.resolve();
     }
-    return loadingScreen.run(text, work);
+    return loadingScreen.run(text, work).then(() => {
+        menus?.flushAutosave();
+    });
 }
 const crypt = benchMode
     ? null

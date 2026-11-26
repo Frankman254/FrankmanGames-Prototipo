@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-338: guardar al terminar los viajes (Junie)
+
+**Archivos:** `src/main.ts`, `src/ui/menus/index.ts`, `scripts/qaElectron.mjs`, `tests/sav02_autosave.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `veil()` fuerza un autoguardado al completarse cada transición con pantalla de carga, después de que el destino está activo. El autoguardado que suceda durante el viaje permanece como snapshot válido de origen; la escritura final deja la ranura en el destino. `MenusController` expone `flushAutosave()`. La prueba de `SaveStore` comprueba dos escrituras seguidas: la última partida y el respaldo anterior conservan sus snapshots completos.
+
+**Validación:** La reproducción antes del arreglo falla al comprobar la ubicación final (Electron 4/5); tras el cambio, Electron `jl338GuardadoViaje` 5/5, guardado coincidente con el destino y consola limpia. `tests/sav02_autosave.test.ts`: 14/14; `npm test`: 421 archivos, 5.066 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Vite avisa por bundles >500 kB.
+
+**Evidencia:** `work/junie-jl338/repro/resultado.json` (fallo antes del cambio), `work/junie-jl338/verified/resultado.json` y captura revisada `work/junie-jl338/verified/jl338-viaje-en-curso.jpg`.
+
+---
+
 ## 2026-11-26 — JL-337: avisar al encontrar guardados ilegibles (Junie)
 
 **Archivos:** `src/ui/menus/saveStore.ts`, `src/ui/menus/index.ts`, `src/ui/menus/screens/title.ts`, `src/ui/menus/screens/modals.ts`, `data/i18n/en.ui.json`, `data/i18n/en.json`, `scripts/qaElectron.mjs`, `tests/jl337_saveReader.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

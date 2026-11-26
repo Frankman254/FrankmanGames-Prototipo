@@ -27,6 +27,21 @@ function makeSave(name = 'Test', slot = 0): SaveData {
     };
 }
 
+function expectedWithDefaultPlace(name: string, slot: number): SaveData {
+    return {
+        ...makeSave(name, slot),
+        place: {
+            scene: 'overworld',
+            dungeon: null,
+            floor: null,
+            x: null,
+            y: null,
+            stone: null,
+            timeOfDay: null,
+        },
+    };
+}
+
 describe('SAV-02: parseSave', () => {
     it('valores por defecto con objeto vacío', () => {
         const def = parseSave({});
@@ -86,12 +101,13 @@ describe('SAV-02: SaveStore.backupAndWrite', () => {
         expect(backup?.name).toBe('Anterior');
     });
 
-    it('cada backupAndWrite sobrescribe el respaldo anterior', () => {
+    it('dos guardados seguidos dejan la última partida y el guardado previo completos', () => {
         store.write(2, makeSave('v1', 2));
         store.backupAndWrite(2, makeSave('v2', 2));
         store.backupAndWrite(2, makeSave('v3', 2));
         const backup = store.readBackup(2);
-        expect(backup?.name).toBe('v2'); // solo la última copia
+        expect(store.read(2)).toEqual(expectedWithDefaultPlace('v3', 2));
+        expect(backup).toEqual(expectedWithDefaultPlace('v2', 2));
     });
 
     it('readBackup devuelve null si no hay respaldo', () => {
