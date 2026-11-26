@@ -1586,7 +1586,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-347 Ayudas de los iconos: cada botón del HUD tiene texto al pasar el puntero. — commit «JL-347: añadir ayudas a los botones del HUD» — Electron `jl347HudAyudas` 2/2, consola limpia; captura revisada `work/junie-jl347/jl347-hud-ayudas.jpg`.
 
 ### I. Cierre de la tanda
-- [ ] JL-348 Consola limpia en todos los escenarios nuevos de esta tanda.
+- [x] JL-348 Consola limpia en todos los escenarios nuevos de esta tanda. — commit «JL-348: verificar consola de escenarios nuevos» — 33 escenarios; 31 recorridos actuales completos, JL-341 solo con error inducido y JL-315 bloqueada sin errores inesperados; JL-326 840/840 y JL-336 7/7 completos. Evidencia: `work/junie-jl348/`, `work/junie-jl326/`, `work/junie-jl336/`.
 - [ ] JL-349 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
 - [ ] JL-350 Reintento obligatorio de lo que haya quedado `[!]` o bloqueado en JL-254…349.
 - [ ] JL-351 Actualiza `docs/ESTADO_ACTUAL.md` con lo que cambió de comportamiento en esta tanda (JL-254, 255 y 262…266), con su evidencia.

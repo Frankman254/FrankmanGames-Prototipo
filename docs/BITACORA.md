@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-348: verificar consola de escenarios nuevos (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Auditoría de consola de los 33 escenarios Electron nuevos de la tanda, ejecutados por separado para evitar estados compartidos entre recargas. No se modificaron código ni pruebas de producción.
+
+**Resultados:** 31 recorridos completados en las ejecuciones actuales, sin errores inesperados. `jl341DatosIncompletos` registra y valida solo el error inducido por `data/weather.json` ausente; `lluvia` queda 5/7 por las ausencias funcionales ya bloqueadas en JL-315, con consola limpia. El reintento de `trajes` se detuvo en 162/163 por falta de respuesta de CDP, pero el recorrido completo JL-326 (840/840) tiene consola limpia en `work/junie-jl326/`. Dos reintentos de `ventanaSegundoPlano` no observaron la ocultación; la ejecución completa JL-336 (7/7, 120 s minimizada y consola limpia) permanece verificada en `work/junie-jl336/resultado.json`.
+
+**Validación:** `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio. Capturas Electron revisadas de `jl347HudAyudas` y `jl343Escalas`.
+
+**Evidencia:** resultados y capturas actuales en `work/junie-jl348/`; ejecuciones completas anteriores en `work/junie-jl326/` y `work/junie-jl336/`.
+
+---
+
 ## 2026-11-26 — JL-347: añadir ayudas a los botones del HUD (Junie)
 
 **Archivos:** `src/ui/menus/dom.ts`, `src/ui/menus/chat.ts`, `src/ui/map/hudLayout.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
