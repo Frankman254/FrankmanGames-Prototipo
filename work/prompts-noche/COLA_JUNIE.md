@@ -1562,7 +1562,7 @@ Antes de cada una, busca si ya existe.
 - [!] JL-327 Escenario `fisicasTrajes`, para cuando el coordinador publique las cadenas de huesos: correr, parar en seco y girar 180°; capas, faldas y pelo se mueven con retraso y vuelven al reposo sin atravesar el cuerpo. — BLOQUEADA: CLA-TEL1 solo publicó la primera parte; faltan las cadenas de faldas, La Diablica y capas del equipo.
 - [x] JL-328 Las mascotas y las monturas en reposo durante 60 s: que el clip de reposo no se corta ni da saltos al repetirse. — commit «JL-328: verificar continuidad de los clips de reposo» — evidencia: Electron `jl328Reposo` 26/26, seis vídeos a 30 fps revisados y resultados en `work/junie-jl328/`.
 - [x] JL-329 Animación de los PNJ: lista de los PNJ que no tienen clip de reposo o se quedan en pose fija. — commit «JL-329: verificar el reposo animado de los PNJ» — Electron 6/6; diez grupos `Reposo` activos, dos bucles y cambios de transformación; sin faltantes ni poses fijas. Lista y capturas revisadas en `work/junie-jl329/`.
-- [ ] JL-330 Enemigos: lista de los arquetipos sin clip de `hit` o `die`, o en los que el cuerpo desaparece sin animación.
+- [x] JL-330 Enemigos: lista de los arquetipos sin clip de `hit` o `die`, o en los que el cuerpo desaparece sin animación. — commit «JL-330: listar clips de golpe y muerte de enemigos» — `work/junie-jl330/LISTA_ENEMIGOS.md`, `observaciones.json`, `resultado.json` y 44 capturas: Electron 4/4, 72/72, sin clips ausentes ni errores finales; diez arquetipos ocultan el cuerpo en `1 s` mientras `Morir` dura `1,033 s`.
 - [ ] JL-331 Rendimiento de los personajes: FPS y tiempo de CPU con 1, 10 y 40 héroes animados en la sala de pruebas (`benchCrowd`). Tabla.
 
 ### G. Robustez

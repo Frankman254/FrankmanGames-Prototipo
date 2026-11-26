@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-330: clips de golpe y muerte de enemigos (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se añadió `jl330Enemigos`, que carga los 72 arquetipos y comprueba los grupos reales `hit` y `death`, el avance de fotogramas y la visibilidad del cuerpo hasta `corpseSeconds`. No se modificaron el runtime, los datos de juego ni los assets.
+
+**Resultado:** No faltan clips ni avance de animación en ningún arquetipo. Diez IDs (`minion`, `chame_chitra`, `boquete_drizzle`, `cerropunta_wisp`, `baru_ember`, `darien_mosquito`, `bocas_jelly`, `perlas_pearl`, `fortuna_flake`, `ancon_soul`) usan `assets/models/diablillo.glb`: el clip `Morir` dura 1,033 s, pero `corpseSeconds` oculta el cuerpo al segundo, cuando el grupo aún se reproduce. No se encontró un cuerpo que desaparezca sin que hubiera empezado una animación; estos diez casos son un recorte al final del clip.
+
+**Validación:** `node --check scripts/qaElectron.mjs` limpio; `npm test`, 419 archivos, 5.053 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Ejecución final Electron 4/4: 72 modelos muestreados, 72 vistas retiradas y consola limpia. Un ensayo exploratorio anterior con `resetRun()` produjo un `TypeError` de Babylon en `RGBDTextureTools` (`postProcessManager` nulo); retiré ese paso, no suprimí errores, y la ejecución final no lo reprodujo. El ensayo exploratorio queda conservado en `work/junie-jl330/debug-minion-reset/`; `work/junie-jl330/error-jl330Enemigos.jpg` es una captura diagnóstica de una ejecución no final.
+
+**Evidencia:** `work/junie-jl330/LISTA_ENEMIGOS.md`, `observaciones.json`, `resultado.json`, 44 capturas de la ejecución final y la pareja visual revisada en `work/junie-jl330/debug-minion-settle/`.
+
+---
+
 ## 2026-11-26 — JL-329: verificar el reposo animado de los PNJ (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

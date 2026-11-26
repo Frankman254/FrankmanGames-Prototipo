@@ -11896,6 +11896,172 @@ const scenarios = {
         await shot('jl321-medidor-dano');
         check('JL-321: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
     },
+
+    /** JL-330: verifica clips de golpe y muerte de cada arquetipo en Electron. */
+    async jl330Enemigos() {
+        const outDir = OUT;
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+        await newGame('QA Enemigos');
+
+        const allArchetypes = Object.keys(JSON.parse(fs.readFileSync('data/enemies.json', 'utf8')).archetypes);
+        const archetypes = process.env.QA_JL330_ARCHETYPE ? [process.env.QA_JL330_ARCHETYPE] : allArchetypes;
+        const rpgEnemies = JSON.parse(fs.readFileSync('data/rpg/enemies.json', 'utf8')).enemies;
+        await js(`(()=>{
+          const w=${W},v=__game.view,p=w.player,g=w.grid;
+          for(const e of [...w.enemies.list]){w.enemies.remove(e.id);w.enemyActors?.delete(e.id);}
+          const cell=g.nearestWalkable({x:121.6,y:138.6}),a=g.center(cell);
+          p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;
+          v.player.model.root.setEnabled(false);
+          v.rig.mode='manual';v.rig.yawDeg=180;v.rig.pitchDeg=14;v.rig.distance=5;v.rig.jumpTo(5);
+        })()`);
+        await until('__game.view.enemies.visuals.size===0', 10000, 'vistas enemigas iniciales retiradas');
+
+        const records = [];
+        const captured = new Set();
+        for (const archetype of archetypes) {
+            const enemyId = await js(`(()=>{const w=${W},p=w.player,e=w.spawnEnemy(${JSON.stringify(archetype)},{x:p.pos.x,y:p.pos.y});e.frozen=true;return e.id;})()`);
+            const visual = `__game.view.enemies.visuals.get(${enemyId})`;
+            await until(
+                `${W}.enemies.get(${enemyId}) && ${visual}?.model?.meshes?.length>0`,
+                30000,
+                `modelo ${archetype}`,
+            );
+            await js(`${visual}.model.ready?.then(()=>true)`);
+
+            const read = (state) =>
+                js(`(()=>{
+                  const e=${W}.enemies.get(${enemyId}),v=${visual},m=v?.model,g=m?.groups?.get(${JSON.stringify(state)}),a=g?.animatables?.[0];
+                  return {state:m?.state,key:m?.cur?.key,file:m?.entry?.file??null,
+                    clipName:m?.entry?.clips?.[${JSON.stringify(state)}]??null,hasClip:!!m?.hasClip?.(${JSON.stringify(state)}),
+                    group:g?.name??null,playing:!!g?.isPlaying,frame:Number.isFinite(a?.masterFrame)?a.masterFrame:null,
+                    seconds:m?.clipSeconds?.(${JSON.stringify(state)})??null,corpseSeconds:e?.def?.corpseSeconds??null,
+                    enabled:!!m?.root?.isEnabled?.(),visibleMeshes:m?.meshes?.filter(x=>x.isEnabled()&&x.getTotalVertices()>0).length??0,
+                    finished:!!m?.finished};
+                })()`);
+
+            const loaded = await read('hit');
+            await js(`(()=>{const w=${W},e=w.enemies.get(${enemyId});e.state='stagger';e.stateTime=-1e9;e.frozen=true;__game.view.enemies.sync(w.enemies.list,1,0);})()`);
+            await until(`${visual}?.model?.state==='hit'`, 5000, `estado hit ${archetype}`);
+            const hitStart = await read('hit');
+            await sleep(120);
+            const hitEnd = await read('hit');
+            const hitAdvanced =
+                hitStart.frame !== null && hitEnd.frame !== null && Math.abs(hitEnd.frame - hitStart.frame) > 0.01;
+            const captureKey = `${loaded.file}|${loaded.clipName}|${(await read('death')).clipName}`;
+            const sampleName = path.basename(loaded.file ?? archetype, '.glb');
+            if (!captured.has(captureKey)) {
+                await shot(`jl330-${sampleName}-${archetype}-hit`);
+            }
+
+            await js(`(()=>{const w=${W},e=w.enemies.get(${enemyId});e.state='dead';e.stateTime=0;__game.view.enemies.sync(w.enemies.list,1,0);})()`);
+            await until(`${visual}?.model?.state==='death'`, 5000, `estado death ${archetype}`);
+            const deathStart = await read('death');
+            await sleep(120);
+            const deathEnd = await read('death');
+            const deathAdvanced =
+                deathStart.frame !== null && deathEnd.frame !== null && Math.abs(deathEnd.frame - deathStart.frame) > 0.01;
+            const deathVisible = deathEnd.enabled && deathEnd.visibleMeshes > 0;
+            if (!captured.has(captureKey)) {
+                await shot(`jl330-${sampleName}-${archetype}-death`);
+                captured.add(captureKey);
+            }
+
+            const corpseSeconds = Number(deathEnd.corpseSeconds ?? 0);
+            await js(`(()=>{${W}.enemies.get(${enemyId}).stateTime=Math.max(0,${corpseSeconds}-0.2);})()`);
+            await sleep(40);
+            const beforeHide = await read('death');
+            await js(`${W}.enemies.get(${enemyId}).stateTime=${corpseSeconds}`);
+            await until(`!${visual}?.model?.root?.isEnabled?.()`, 5000, `cuerpo oculto ${archetype}`);
+            const atHide = await read('death');
+
+            records.push({
+                id: archetype,
+                name: rpgEnemies[archetype]?.name ?? archetype,
+                file: loaded.file,
+                hit: {
+                    configured: loaded.clipName,
+                    loaded: loaded.hasClip,
+                    played: hitEnd.key === 'hit',
+                    frameAdvanced: hitAdvanced,
+                    stateObserved: hitEnd.state === 'hit',
+                },
+                death: {
+                    configured: deathStart.clipName,
+                    loaded: deathStart.hasClip,
+                    played: deathEnd.key === 'death',
+                    frameAdvanced: deathAdvanced,
+                    stateObserved: deathEnd.state === 'death',
+                    seconds: deathEnd.seconds,
+                    corpseSeconds,
+                    visibleDuringClip: deathVisible,
+                    visibleBeforeHide: beforeHide.enabled && beforeHide.visibleMeshes > 0,
+                    hiddenAtThreshold: !atHide.enabled,
+                    clipPlayingAtHide: atHide.playing,
+                    finishedAtHide: atHide.finished,
+                },
+            });
+
+            await js(`${W}.enemies.remove(${enemyId})`);
+            await until(`!__game.view.enemies.visuals.has(${enemyId})`, 5000, `vista retirada ${archetype}`);
+            records[records.length - 1].viewRemoved = true;
+        }
+
+        await sleep(3000);
+        const missingHit = records.filter((r) => !r.hit.loaded || !r.hit.played || !r.hit.frameAdvanced);
+        const missingDeath = records.filter(
+            (r) => !r.death.loaded || !r.death.played || !r.death.frameAdvanced || !r.death.visibleDuringClip,
+        );
+        const cutDeaths = records.filter(
+            (r) => r.death.seconds !== null && r.death.seconds > r.death.corpseSeconds + 1 / 60,
+        );
+        const table = records
+            .map((r) => {
+                const findings = [
+                    ...(!r.hit.loaded || !r.hit.played || !r.hit.frameAdvanced ? ['sin hit animado'] : []),
+                    ...(!r.death.loaded || !r.death.played || !r.death.frameAdvanced ? ['sin death animado'] : []),
+                    ...(!r.death.visibleDuringClip || !r.death.visibleBeforeHide ? ['cuerpo oculto durante death'] : []),
+                    ...(cutDeaths.includes(r) ? ['death supera corpseSeconds'] : []),
+                ];
+                return `| \`${r.id}\` | ${r.name.replaceAll('|', '\\|')} | \`${r.file ?? 'sin modelo'}\` | ${r.hit.loaded ? 'sí' : 'no'} / ${r.hit.frameAdvanced ? 'avanza' : 'sin avance'} | ${r.death.loaded ? 'sí' : 'no'} / ${r.death.frameAdvanced ? 'avanza' : 'sin avance'} | ${r.death.seconds ?? '—'} / ${r.death.corpseSeconds} | ${findings.join(', ') || 'ninguno'} |`;
+            })
+            .join('\n');
+        const findingList = (items) => (items.length ? items.map((r) => `\`${r.id}\``).join(', ') : 'ninguno');
+        const report = `# JL-330 — clips de golpe y muerte de enemigos
+
+Roster: \`${records.length}/${archetypes.length}\` arquetipos de \`data/enemies.json\`. Se comprobó en Electron el grupo cargado y el avance de fotogramas de \`hit\` y \`death\`; durante la muerte se observó el cuerpo hasta \`corpseSeconds\` y su ocultación al alcanzar el umbral. Las capturas son de una instancia por combinación distinta de GLB y nombres de clip.
+
+## Hallazgos
+
+- Sin clip \`hit\` cargado o sin avance: ${findingList(missingHit)}.
+- Sin clip \`death\` cargado, sin avance o sin cuerpo visible durante la muestra: ${findingList(missingDeath)}.
+- \`death\` más largo que \`corpseSeconds\` (se ocultaría antes de terminar): ${findingList(cutDeaths)}.
+- Capturas generadas: ${captured.size} combinaciones de modelo, en \`${outDir}/\`.
+
+## Matriz por arquetipo
+
+| ID | Nombre | Modelo | \`hit\` cargado / fotogramas | \`death\` cargado / fotogramas | duración death / corpseSeconds (s) | Hallazgo |
+|---|---|---|---|---|---:|---|
+${table}
+`;
+        fs.writeFileSync(path.join(outDir, 'LISTA_ENEMIGOS.md'), report);
+        fs.writeFileSync(
+            path.join(outDir, 'observaciones.json'),
+            JSON.stringify({ date: new Date().toISOString(), archetypes: records, missingHit, missingDeath, cutDeaths }, null, 2),
+        );
+        check(
+            'JL-330: modelo real cargado y secuencias muestreadas para cada arquetipo',
+            records.length === archetypes.length &&
+                records.every((r) => r.file && r.hit.stateObserved && r.death.stateObserved),
+            `${records.length}/${archetypes.length}`,
+        );
+        check(
+            'JL-330: la vista del enemigo se retira después de cada muestra',
+            records.length === archetypes.length && records.every((r) => r.viewRemoved),
+            `${records.filter((r) => r.viewRemoved).length}/${archetypes.length}`,
+        );
+        check('JL-330: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).
@@ -11942,6 +12108,8 @@ scenarios.jinetes.timeout = 600;
 scenarios.jl328Reposo.timeout = 600;
 // JL-326: 137 conjuntos × seis modelos/sexos × dos poses.
 scenarios.trajes.timeout = 600;
+// JL-330: recorre los 72 arquetipos, carga sus modelos y muestrea hit/death.
+scenarios.jl330Enemigos.timeout = 600;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
