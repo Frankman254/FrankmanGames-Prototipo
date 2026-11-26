@@ -12889,6 +12889,99 @@ Evidencia bruta: \`jl331-resultados.json\` y \`resultado.json\`.
         );
         check('JL-338: consola sin errores nuevos', consoleErrors.length === 0, consoleErrors.slice(-3).join(' | ') || '0');
     },
+    /** JL-339: perder foco con una tecla de hechizo mantenida cancela el apuntado. */
+    async jl339FocusLost() {
+        await newGame('QA Foco', { classId: 'ember_vanguard' });
+        await resize(1920, 1080);
+        await until('__game.menus.screen === "game" && __game.view.rig != null', 15000, 'partida lista para perder el foco');
+
+        const spellEntries = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells;
+        const spellId = Object.entries(spellEntries).find(([, spell]) => spell.classId === 'ember_vanguard' && !spell.devOnly)?.[0];
+        if (!spellId) throw new Error('No hay hechizo de Vanguardia para probar la tecla');
+
+        await js(`(() => {
+          const c=${S}.character;
+          c.gainXp(5000000);
+          if(c.spellbook.rank(${JSON.stringify(spellId)})===0) c.spellbook.learn(${JSON.stringify(spellId)});
+          c.spellbook.hotbar[0]=${JSON.stringify(spellId)};
+          c.resource=c.maxResource;
+          const world=${W};
+          const p=world.player.pos;
+          const cell=world.grid.nearestWalkable({x:p.x+2.5,y:p.y});
+          const at=cell<0?{x:p.x+2.5,y:p.y}:world.grid.center(cell);
+          const enemy=world.spawnEnemy('melee',at,1);
+          enemy.health=enemy.def.maxHealth;
+          enemy.frozen=true;
+          enemy.state='stagger';
+          enemy.stateTime=-1e9;
+          const command=world.commandCastSlot.bind(world);
+          window.__jl339={enemyId:enemy.id,initialHealth:enemy.health,blurCount:0,focusCount:0,castCommands:0};
+          window.addEventListener('blur',()=>window.__jl339.blurCount++,true);
+          window.addEventListener('focus',()=>window.__jl339.focusCount++,true);
+          world.commandCastSlot=(...args)=>{window.__jl339.castCommands++;return command(...args)};
+          __game.castInput.setMode('indicator');
+        })()`);
+        await sleep(300);
+        await js(`${W}.commandAttack(window.__jl339.enemyId)`);
+        await until(`${W}.enemies.get(window.__jl339.enemyId)?.health < window.__jl339.initialHealth`, 15000, 'primer golpe al enemigo de prueba');
+        const firstHit = await js(`(()=>{const e=${W}.enemies.get(window.__jl339.enemyId);return {initialHealth:window.__jl339.initialHealth,health:e?.health??0}})()`);
+        check('JL-339: el combate ya ha intercambiado daño', firstHit.health < firstHit.initialHealth, JSON.stringify(firstHit));
+        await js(`(()=>{const e=${W}.enemies.get(window.__jl339.enemyId);if(e)e.health=e.def.maxHealth})()`);
+        await js(`window.__jl339Attack=setInterval(()=>{
+          const w=${W},p=w.player,e=w.enemies.get(window.__jl339.enemyId);
+          if(!e||e.state==='dead'||p.casting||p.attackTarget!==null)return;
+          p.resource=${S}.character.maxResource;p.basicCharges=w.data.player.basicAttack.charges;p.basicRecharge=0;
+          w.commandAttack(e.id);
+        },250)`);
+        await until(`${W}.player.attackTarget === window.__jl339.enemyId`, 3000, 'ataque activo contra el enemigo de prueba');
+        const fight = await js(`(()=>{const e=${W}.enemies.get(window.__jl339.enemyId);return {target:${W}.player.attackTarget,enemyId:window.__jl339.enemyId,enemyAlive:!!e&&e.state!=='dead',enemyHealth:e?.health??0}})()`);
+        check(
+            'JL-339: la prueba comienza en combate con un enemigo activo',
+            fight.target === fight.enemyId && fight.enemyAlive,
+            JSON.stringify(fight),
+        );
+
+        const errorsBefore = consoleErrors.length;
+        await cdp('Input.dispatchKeyEvent', {
+            type: 'rawKeyDown',
+            code: 'KeyQ',
+            key: 'q',
+            windowsVirtualKeyCode: 81,
+        });
+        await until('__game.castInput.aiming === 0', 3000, 'hechizo apuntado mientras Q está pulsada');
+        await shot('jl339-tecla-mantenida');
+
+        // Despachar `blur` directamente prueba el listener de la ventana sin depender del
+        // estado de foco nativo del escritorio de QA.
+        await js("window.dispatchEvent(new Event('blur'))");
+        const blurred = await js(`({aiming:__game.castInput.aiming,blurCount:window.__jl339.blurCount,attackTarget:${W}.player.attackTarget})`);
+        await js("window.dispatchEvent(new Event('focus'))");
+        await sleep(150);
+        const restored = await js(`({aiming:__game.castInput.aiming,focusCount:window.__jl339.focusCount,attackTarget:${W}.player.attackTarget,castCommands:window.__jl339.castCommands})`);
+        await shot('jl339-foco-recuperado');
+
+        await cdp('Input.dispatchKeyEvent', {
+            type: 'keyUp',
+            code: 'KeyQ',
+            key: 'q',
+            windowsVirtualKeyCode: 81,
+        });
+        await sleep(150);
+        const afterRelease = await js('({aiming:__game.castInput.aiming,castCommands:window.__jl339.castCommands})');
+        check(
+            'JL-339: al perder foco se cancela el hechizo mantenido',
+            blurred.aiming === null && restored.aiming === null &&
+                blurred.attackTarget === fight.enemyId && restored.attackTarget === fight.enemyId,
+            JSON.stringify({ blurred, restored }),
+        );
+        check(
+            'JL-339: la liberación tardía de Q no lanza el hechizo',
+            afterRelease.aiming === null && afterRelease.castCommands === restored.castCommands,
+            JSON.stringify({ restored, afterRelease }),
+        );
+        check('JL-339: consola sin errores nuevos', consoleErrors.length === errorsBefore, consoleErrors.slice(errorsBefore).join(' | ') || '0');
+        await js('clearInterval(window.__jl339Attack); delete window.__jl339Attack; __game.castInput.cancel()');
+    },
 };
 
 // JL-51: timeouts propios para escenarios de rendimiento (segundos).

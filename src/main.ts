@@ -774,6 +774,7 @@ let holdEnemy: number | null = null;
 
 // ─── Lanzar hechizos (combate v2): pulsar y clic, con indicador o al pulsar ──
 const castInput = new CastInput(startOptions.castMode);
+window.addEventListener('blur', () => castInput.cancel());
 // JL-66: el menú contextual de la barra emite un evento para cambiar el modo de un hueco.
 window.addEventListener('frankmangames:slotCastMode', (e: Event) => {
     const detail = (e as CustomEvent).detail as { slot: number; mode: string };

@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-339: cancelar apuntado al perder foco (Junie)
+
+**Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Al perder el foco de la ventana se cancela el `CastInput` pendiente; una liberación tardía de la tecla ya no lanza el hechizo. `Input` ya limpiaba las teclas mantenidas y los gestos. El escenario de Electron inicia un combate, confirma daño real al enemigo (60→59), mantiene el objetivo, apunta con Q, despacha `blur`, restaura el foco y envía el `keyup` tardío. El escritorio de QA no entregó `blur` al minimizar, por lo que el escenario despacha el evento desde el renderer para probar el mismo listener.
+
+**Validación:** Electron `jl339FocusLost`: 6/6 y consola limpia; `npm test`: 421 archivos, 5.066 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, `npm run docs:check` y `node --check scripts/qaElectron.mjs` limpios. Build conserva el aviso de Vite por bundles mayores de 500 kB. `npx prettier --check` marca `src/main.ts` y `scripts/qaElectron.mjs`; ambos también fallan al comprobar la versión de `HEAD`.
+
+**Evidencia:** Capturas revisadas `work/junie-jl339/jl339-tecla-mantenida.jpg` y `work/junie-jl339/jl339-foco-recuperado.jpg`.
+
+---
+
 ## 2026-11-26 — JL-338: guardar al terminar los viajes (Junie)
 
 **Archivos:** `src/main.ts`, `src/ui/menus/index.ts`, `scripts/qaElectron.mjs`, `tests/sav02_autosave.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
