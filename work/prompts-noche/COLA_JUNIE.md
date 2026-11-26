@@ -1592,3 +1592,86 @@ Antes de cada una, busca si ya existe.
 - [ ] JL-351 Actualiza `docs/ESTADO_ACTUAL.md` con lo que cambió de comportamiento en esta tanda (JL-254, 255 y 262…266), con su evidencia.
 - [ ] JL-352 Lista en `work/junie-jl352/PREGUNTAS.md` todas las preguntas al creador que salieron en esta tanda, cada una con su opción recomendada.
 - [ ] JL-353 Última. `work/junie-propuestas/BOLSA_SIGUIENTE_5.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
+
+## Tanda del 2026-11-26 (el creador: «y arma las tareas de junie tambien»). JL-354…JL-383, en este orden, después de JL-353.
+
+Contexto del coordinador:
+- Viene de dos entregas del coordinador en la cripta:
+  - **CLA-CRIPTA** (`2270b173`): Estrella de vendaval en el cursor, mapa del piso (M) y minimapa en todos los pisos, entrada solo por Berto (en la reja; un clic en la reja lleva a hablar con él), y la escalera de bajada que solo se marca tras descubrirla, con flecha en el borde.
+  - **CLA-CRIPTA2** (`b51281a7`): en cada piso, junto a la llegada, Chalo Farol (buhonero, `crypt_peddler`) y Nina Ovillo (guía, `crypt_guide`, acción `leaveDungeon` → Piedra de casa). Además, estanques con lóbulos (`FishingSpotDef.lobes`, `waterDistance` en `src/sim/navGrid.ts`).
+- Las dos se probaron con `npm test` y en el navegador, **no en Electron**. El bloque A lo cierra.
+- Nombres, surtido, pisos y destino de los PNJ son `PROPUESTA`. No cambies cifras, textos de diálogo, surtido ni nombres.
+- Si una prueba destapa un fallo y el arreglo es pequeño y claro, arréglalo con su prueba. Solo en `src/world/dungeon.ts`, `src/sim/world.ts`, `src/scenes/cryptScene.ts`, `src/sim/navGrid.ts`, `src/sim/fishing.ts` o `src/render/dungeonView.ts`, sin reescribirlos. Si no es pequeño, `[!]` con el diagnóstico.
+- Reglas de siempre:
+  - no tocar `scripts/balance/balM3.ts`, `src/render/characters/`, `mountView.ts` ni `petView.ts`;
+  - privacidad de la casa del creador;
+  - un commit por tarea, con su fila, su bitácora y su casilla;
+  - evidencia en `work/junie-jl<n>/`.
+
+### A. La cripta en Electron (escenarios nuevos en `scripts/qaElectron.mjs`)
+- [ ] JL-354 Escenario `criptaBerto`:
+  - Con la llave, un clic en la reja hace caminar hasta Berto y abre su diálogo con los pisos 1, 10, 20, 30, 40 y 50.
+  - Sin llave sale el nodo `noKey`.
+  - Elegir «Bajar al piso 10» entra en el piso 10.
+  - Capturas.
+- [ ] JL-355 Escenario `criptaPnj`: en el piso 1 se ven Chalo y Nina con su cartel, a menos de 6 m de la llegada.
+  - Comprar a Chalo una poción menor de vida: el oro baja y la poción entra en la mochila.
+  - Hablar con Nina y elegir «Llévame al pueblo.»: sale la pantalla de carga y el jugador aparece en Villa Raspadura.
+  - Capturas de los tres momentos.
+- [ ] JL-356 Escenario `criptaGuiaPelea`: con un enemigo peleando a menos de 20 m, Nina responde «No te puedo sacar mientras peleas.» y el jugador sigue en el piso.
+- [ ] JL-357 Escenario `criptaSalidas`: salir de la cripta por cada vía y comprobar que en `world.npcs` no queda `crypt_peddler` ni `crypt_guide` y que la vista no conserva sus mallas:
+  - escalera de subida del piso 1;
+  - hilo de retorno;
+  - Ovillo de regreso;
+  - Seco del Regreso;
+  - muerte;
+  - cargar una partida del pueblo.
+- [ ] JL-358 Escenario `criptaGuardado`: guardar en el piso 7, recargar y comprobar que Chalo y Nina vuelven a estar junto a la llegada del piso 7.
+- [ ] JL-359 Escenario `pescaLobulos`: en el piso 6 (estanque de tres lóbulos), un clic real en un lóbulo fuera del círculo principal hace caminar a la orilla y lanzar la caña. Captura del borde irregular.
+- [ ] JL-360 Escenario `criptaMapaGrande`: en el piso 10, M abre el mapa del piso con la rejilla.
+  - Al llegar, la escalera de bajada no está en el minimapa ni en el mapa.
+  - Tras descubrirla, sale en los dos, y con flecha en el borde del minimapa cuando queda fuera.
+- [ ] JL-361 Escenario `estrellaCursor`: con el Cazador del Manglar, Estrella de vendaval con clic real a 7 m sobre un enemigo. El enemigo recibe daño, y otro a 2 m del centro también (brazo de la estrella).
+
+### B. Pruebas puras de lo nuevo (Vitest)
+- [ ] JL-362 En los 100 pisos, los sitios de Chalo y Nina (`cryptStaffSpots` y `World.placeInteriorNpc`) cumplen dos cosas:
+  - quedan a ≥ 1 m de la escalera, del poste del hilo de retorno, de los cofres, las jarras y las puertas;
+  - no tapan el paso de la llegada a la escalera de bajada.
+  - Si algún piso falla, arreglo pequeño en `cryptStaffSpots` con la prueba.
+- [ ] JL-363 En los 100 pisos, cada estanque con lóbulos tiene orilla caminable conectada con la llegada y no corta el camino de la llegada a la escalera de bajada (`floodDistances`).
+- [ ] JL-364 Modo edición: `World.applyRpgContent()` llama a `placeNpcs()`, que vacía `this.npcs`. Dentro de la cripta, recargar `npcs.json` borra a Chalo y Nina.
+  - Prueba que lo demuestre.
+  - Arreglo pequeño: conservar los PNJ de interior.
+- [ ] JL-365 Prueba: la acción `leaveDungeon` en un PNJ que no es de la cripta es válida para el lector. Decide si debe serlo. Si no, valida en `content.ts` que solo la lleven PNJ con `crypt: true`, con su prueba y su mensaje de error.
+- [ ] JL-366 Prueba: `waterDistance` y `waterCircles` con un estanque sin lóbulos dan lo mismo que antes, para los estanques del mundo abierto (`meadow_pond`, `poza_iguanera`): orilla, `spotAt` y las aproximaciones de pesca.
+- [ ] JL-367 Prueba: los lóbulos de los 100 pisos quedan dentro de su sala (ningún círculo se sale del rectángulo de la sala menos 1 baldosa).
+- [ ] JL-368 Prueba: los PNJ de la cripta no salen en el compendio ni en la lista de mercaderes del mapa del mundo abierto. Si salen, lista dónde y en qué forma: es pregunta al creador, no la arregles.
+
+### C. Que se vean bien
+- [ ] JL-369 Capturas de Chalo y Nina en los pisos 1, 5, 10, 30, 50 y 100, desde la cámara de juego. Lista los pisos en que una pared o la cámara los tapan. En la prueba del coordinador del piso 5, Chalo quedó detrás de una pared y solo se veía su moneda.
+- [ ] JL-370 Capturas del estanque con lóbulos de día y en el piso más oscuro (tramo hondo). Lista si las piedras del borde hacen huecos o se montan entre lóbulos.
+- [ ] JL-371 Rendimiento: FPS en el piso 6 con y sin el estanque de lóbulos (un disco por círculo). Si baja más de 2 FPS, propón cómo fusionar los discos, sin hacerlo.
+
+### D. Inglés y textos
+- [ ] JL-372 Interfaz en inglés: diálogos de Berto, Chalo y Nina, el aviso de pelea de Nina y el título de los pisos. Lista lo que se quede en español.
+- [ ] JL-373 Lista de los textos del juego que todavía dicen «hilo de retorno», «Ovillo» o «posima/poción de regreso», para que el creador decida si el guía cambia algún nombre. Solo lista.
+
+### E. Reintentos
+- [ ] JL-374 Reintenta JL-64 (rework de los pisos a mano). Las pruebas de antorchas siguen mandando: si sigue bloqueada, `[!]` con la lista exacta de pruebas que caen y por qué.
+- [ ] JL-375 Reintenta JL-315 (`lluvia`) solo con los climas que existen (`clear`, `rain`, `sun`, `snow`): partículas, niebla y luz en cada uno. La tormenta y el sonido de clima pasan a pregunta al creador.
+- [ ] JL-376 Reintenta JL-300 sin borrar nada: lista los 64 audios sin referencia, con su línea de `PROCEDENCIA.md`, en `work/junie-jl376/AUDIOS_SIN_USO.md`. La decisión es del creador.
+
+### F. Cierre de la tanda
+- [ ] JL-377 Consola limpia en los escenarios nuevos JL-354…361.
+- [ ] JL-378 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
+- [ ] JL-379 Reintento obligatorio de lo que haya quedado `[!]` en JL-354…378.
+- [ ] JL-380 Actualiza la fila de la cripta en `docs/ESTADO_ACTUAL.md` con la evidencia de Electron de esta tanda.
+- [ ] JL-381 En `ACCIONES_CREADOR.md`, deja una entrada breve con lo que el creador debe probar en la cripta:
+  - entrar por Berto;
+  - comprar a Chalo;
+  - volver con Nina;
+  - pescar en un lóbulo;
+  - la escalera en el mapa.
+  - Añade las preguntas abiertas: en qué pisos van los PNJ, qué vende Chalo, sus nombres, y si «el pueblo» es la Piedra de casa o la última Piedra elegida.
+- [ ] JL-382 Lista en `work/junie-jl382/PREGUNTAS.md` las preguntas al creador de esta tanda, cada una con su opción recomendada.
+- [ ] JL-383 Última. `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
