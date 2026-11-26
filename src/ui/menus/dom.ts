@@ -60,8 +60,12 @@ export function clear(el: HTMLElement): void {
     while (el.firstChild) el.removeChild(el.firstChild);
 }
 
-export function button(label: string, onClick: () => void, cls = ''): HTMLButtonElement {
-    const b = h(`button.btn${cls ? '.' + cls.split(' ').join('.') : ''}` as 'button', { type: 'button', text: label });
+export function button(label: string, onClick: () => void, cls = '', title?: string): HTMLButtonElement {
+    const b = h(`button.btn${cls ? '.' + cls.split(' ').join('.') : ''}` as 'button', {
+        type: 'button',
+        text: label,
+        title,
+    });
     b.addEventListener('click', (e) => {
         e.stopPropagation();
         onClick();

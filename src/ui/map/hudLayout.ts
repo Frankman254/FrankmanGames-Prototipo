@@ -69,8 +69,9 @@ export class HudLayout {
                     this.nameInput.select();
                 },
                 'small',
+                'Nuevo',
             ),
-            button('Borrar', () => this.removeActive(), 'small'),
+            button('Borrar', () => this.removeActive(), 'small', 'Borrar'),
             button(
                 'Restablecer',
                 () => {
@@ -78,8 +79,9 @@ export class HudLayout {
                     this.apply();
                 },
                 'small',
+                'Restablecer',
             ),
-            button('Listo', () => this.setEditing(false), 'small primary'),
+            button('Listo', () => this.setEditing(false), 'small primary', 'Listo'),
         );
         this.toolbar.hidden = true;
         this.toolbar.addEventListener('pointerdown', (e) => e.stopPropagation());

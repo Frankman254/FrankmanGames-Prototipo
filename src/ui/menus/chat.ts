@@ -118,16 +118,14 @@ export class ChatBox {
         this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
         for (const em of def.emotes) {
             // En la fila del chat el emote se escribe en el campo: se envía con Intro o Enviar.
-            const b = button(em.icon, () => this.insert(`/${em.command}`), 'small chat-emote');
+            const b = button(em.icon, () => this.insert(`/${em.command}`), 'small chat-emote', em.action);
             b.replaceChildren(emoteImage(em, 24));
             b.setAttribute('aria-label', em.command);
-            b.title = em.command;
             this.emotes.appendChild(b);
             // En su ventana se representa sobre el personaje, sin burbuja.
-            const big = button(em.icon, () => this.emote(em.command), 'emote-play');
+            const big = button(em.icon, () => this.emote(em.command), 'emote-play', em.action);
             big.replaceChildren(emoteImage(em, 40));
             big.setAttribute('aria-label', em.command);
-            big.title = `/${em.command}`;
             this.emoteWindow.appendChild(big);
         }
         this.emoteWindow.hidden = true;
@@ -135,15 +133,14 @@ export class ChatBox {
         // arriba si cabe y si no abajo, siempre dentro de la pantalla.
         this.emoteWindow.classList.add('emote-pop');
         this.emoteWindow.addEventListener('pointerdown', (e) => e.stopPropagation());
-        const openEmotes = button(tr('Gestos'), () => this.toggleEmotes(openEmotes), 'small chat-emotes-open');
+        const openEmotes = button('Gestos', () => this.toggleEmotes(openEmotes), 'small chat-emotes-open', 'Gestos');
         const emotesArt = artIcon('ui', 'emotes');
         if (emotesArt) openEmotes.innerHTML = emotesArt;
         else openEmotes.textContent = 'E';
-        openEmotes.title = tr('Gestos');
         // Grip para el modo «Editar interfaz» (F02). Se crea aquí para que siempre exista,
         // incluso si hudLayout.attach() se llama antes o después de este constructor.
         const grip = h('div.hud-grip', { title: 'Mover: Chat' }, h('span', { text: 'Chat' }));
-        const send = button('Enviar', () => this.submit(), 'small');
+        const send = button('Enviar', () => this.submit(), 'small', 'Enviar');
         const row = h('div.chat-row', null, openEmotes, this.input, send);
         this.el.append(this.tabs, this.filtersBar, this.lines, this.emotes, row, grip);
         document.body.appendChild(this.emoteWindow);
@@ -336,6 +333,7 @@ export class ChatBox {
                     this.refreshLines();
                 },
                 'small chip',
+                label,
             );
             b.classList.toggle('on', this.tab === id);
             this.tabs.appendChild(b);
@@ -360,6 +358,7 @@ export class ChatBox {
                     this.refreshLines();
                 },
                 'small chip chat-filter',
+                item.label,
             );
             b.innerHTML = artIcon('ui', item.icon) ?? '';
             b.appendChild(h('span', { text: item.label }));

@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-347: añadir ayudas a los botones del HUD (Junie)
+
+**Archivos:** `src/ui/menus/dom.ts`, `src/ui/menus/chat.ts`, `src/ui/map/hudLayout.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `button()` admite un título opcional mediante `h()`, de modo que la ayuda también se traduce al cambiar de idioma. Se añadieron ayudas a pestañas, filtros, gestos y envío del chat y a los cuatro botones del editor del HUD; los iconos de gestos muestran la acción, no solo el comando. No cambian reglas ni cifras del juego.
+
+**Validación:** La reproducción Electron fallaba antes del arreglo con 14 botones sin título; después `jl347HudAyudas`: 2/2 comprobaciones y consola limpia. `tests/ui/chat.test.ts` y `tests/i18nContent.test.ts`: 17/17; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run build` limpios (aviso habitual de Vite por chunks mayores de 500 kB).
+
+**Evidencia:** captura revisada `work/junie-jl347/jl347-hud-ayudas.jpg`.
+
+---
+
 ## 2026-11-26 — JL-346: listar acciones no disponibles solo con ratón (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

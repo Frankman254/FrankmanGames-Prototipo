@@ -1214,6 +1214,19 @@ const scenarios = {
         fs.writeFileSync(path.join(OUT, 'jl343-mediciones.json'), JSON.stringify(measurements, null, 2));
     },
 
+    // JL-347: todos los botones del HUD deben explicar su función al pasar el puntero.
+    async jl347HudAyudas() {
+        await resize(1920, 1080);
+        await newGame('QA Falcolomba');
+        await until(`!!document.querySelector('.game-hud') && !!document.querySelector('.chat') && !!document.querySelector('.minimap')`, 15000, 'HUD');
+        await sleep(500);
+        const missing = await js(
+            `(() => [...document.querySelectorAll('.game-hud button, .sys-menu button, .chat button, .minimap button, .hud-layout-bar button, .emote-pop button')].filter(b => !b.title.trim()).map(b => ({ className: b.className, text: b.textContent.trim() || b.getAttribute('aria-label') || 'sin etiqueta' })))()`,
+        );
+        check('JL-347: cada botón del HUD tiene ayuda al pasar el puntero', missing.length === 0, JSON.stringify(missing));
+        await shot('jl347-hud-ayudas');
+    },
+
     // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.
     async interfaz() {
         // Título y creación, a 1080p, antes de entrar.

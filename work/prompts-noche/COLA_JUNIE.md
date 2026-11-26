@@ -1583,7 +1583,7 @@ Antes de cada una, busca si ya existe.
 - [x] JL-344 Contraste: los textos del HUD sobre fondo claro y oscuro, de día y de noche. Lista de los que no se leen. — commit «JL-344: revisar el contraste del HUD de día y noche» — Electron `luzModos` 2/2, consola limpia; ningún texto ilegible por contraste. Cuatro capturas revisadas en `work/junie-jl344/`.
 - [x] JL-345 Interfaz en inglés completa: recorre todas las ventanas en inglés y lista los textos que se quedan en español. — commit «JL-345: listar textos sin traducir en la interfaz inglesa» — inventario, capturas y texto capturado en `work/junie-jl345/IDIOMA_INGLES.md` y `work/junie-jl345/ingles-completo-2026-11-26-rev3/`; Electron `ingles` 11/11, consola limpia.
 - [x] JL-346 Ratón solo, sin teclado: qué acciones básicas no se pueden hacer. Solo lista. — commit «JL-346: listar acciones no disponibles solo con ratón» — `work/junie-jl346/LISTA.md`; Electron `interfaz` 55/55, consola limpia; captura revisada `work/junie-jl346/electron/ui-1080p-hud.jpg`.
-- [ ] JL-347 Ayudas de los iconos: cada botón del HUD tiene texto al pasar el puntero.
+- [x] JL-347 Ayudas de los iconos: cada botón del HUD tiene texto al pasar el puntero. — commit «JL-347: añadir ayudas a los botones del HUD» — Electron `jl347HudAyudas` 2/2, consola limpia; captura revisada `work/junie-jl347/jl347-hud-ayudas.jpg`.
 
 ### I. Cierre de la tanda
 - [ ] JL-348 Consola limpia en todos los escenarios nuevos de esta tanda.
