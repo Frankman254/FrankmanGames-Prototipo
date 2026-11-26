@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-350: reintentar bloqueos de la tanda (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reintenté las cuatro tareas bloqueadas entre JL-254…349. JL-300 conserva 64 audios sin referencia y necesita decisión sobre su destino; JL-310 sigue sin menús contextuales del mundo ni compañero visible (los compañeros de GRP-01 son exclusivos del laboratorio); JL-315 no define tormenta ni sonido climático; JL-327 sigue esperando las cadenas de faldas, La Diablica y capas del equipo de CLA-TEL1. No cambié código, assets ni las casillas de las tareas previas.
+
+**Validación:** `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos y `npm run docs:check` con 203 rutas correctas. Electron `lluvia`: 5/7, con lluvia, partículas y niebla verificadas; las dos comprobaciones restantes fallan solo por las capacidades aún ausentes. Consola limpia. No ejecuté `clicDerecho` porque no comprueba menús contextuales, ni `fisicasTrajes` porque aún no están publicadas sus precondiciones.
+
+**Evidencia:** `work/junie-jl350/REINTENTOS.md`, `resultado.json`, `jl315-clima.json`, `jl315-despejado.jpg` y `jl315-lluvia.jpg`.
+
+---
+
 ## 2026-11-26 — JL-348: verificar consola de escenarios nuevos (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
