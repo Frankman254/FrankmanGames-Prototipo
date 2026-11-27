@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-409: probar niveles de objetos de botín (Junie)
+
+**Archivos:** `tests/jl409_lootItemLevels.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; inventario completo en `work/junie-jl409/RESULTADO.md`.
+
+**Qué se hizo:** Añadí una prueba que compara el nivel base de cada enemigo con los niveles de los objetos de su tabla de botín. De los 72 arquetipos se detectaron 471 pares fuera de ±5; quedan enumerados por enemigo, tabla, objeto y diferencia. La prueba fija la identidad de esas excepciones mediante una huella determinista; no se modificaron objetos, enemigos ni cifras.
+
+**Validación:** Prueba dirigida: 1/1; `npm test`: 438 archivos, 5.114 pruebas aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y `npx prettier --check tests/jl409_lootItemLevels.test.ts` limpios. La lista del informe se comparó par por par con los datos: 471/471 coincidencias. No aplica Electron: prueba de datos sin cambio visual.
+
+**Evidencia:** `work/junie-jl409/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-408: verificar el contador del set de la Diablica en tooltips (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `tests/eq10_diablicaEspeja.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia Electron en `work/junie-jl408/electron/`.

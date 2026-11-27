@@ -583,6 +583,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-408 | Junie | Hecho (commit «JL-408: verificar el contador del set de la Diablica en tooltips») | El tooltip del set refleja las piezas equipadas: 0/8, 2/8 y 8/8; umbrales 2/4/6/8 correctos. `tests/eq10_diablicaEspeja.test.ts`: 6/6; Electron `jl408TooltipConjunto`: 7/7, consola limpia y capturas revisadas. `npm test`: 437 archivos, 5.113 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` (220 rutas) limpios. Evidencia: `work/junie-jl408/electron/`. |
 
+## Cierre de JL-409 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-409 | Junie | Hecho (commit «JL-409: probar niveles de objetos de botín») | `tests/jl409_lootItemLevels.test.ts`: 1/1; fija el conjunto actual de 471 pares enemigo–objeto con diferencia mayor que ±5, sin cambiar los datos. `npm test`: 438 archivos, 5.114 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` (220 rutas) limpios; Prettier específico limpio. La lista completa está en `work/junie-jl409/RESULTADO.md`. No aplica Electron: prueba de datos sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
