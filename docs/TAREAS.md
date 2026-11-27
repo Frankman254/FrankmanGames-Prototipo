@@ -589,6 +589,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-409 | Junie | Hecho (commit «JL-409: probar niveles de objetos de botín») | `tests/jl409_lootItemLevels.test.ts`: 1/1; fija el conjunto actual de 471 pares enemigo–objeto con diferencia mayor que ±5, sin cambiar los datos. `npm test`: 438 archivos, 5.114 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` (220 rutas) limpios; Prettier específico limpio. La lista completa está en `work/junie-jl409/RESULTADO.md`. No aplica Electron: prueba de datos sin cambio visual. |
 
+## Cierre de JL-410 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-410 | Junie | Hecho (commit «JL-410: comprobar que hechizos libres no canalizan») | `tests/hechizosLibres.test.ts`: 7/7; para cada hechizo `offGlobalCooldown`, exige `castTime` cero y rechaza cualquier propiedad activa con nombre de canalización. `SpellDef` y los datos no tienen actualmente ese campo. `npm test`: 438 archivos, 5.114 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y Prettier específico limpios. Evidencia: `work/junie-jl410/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

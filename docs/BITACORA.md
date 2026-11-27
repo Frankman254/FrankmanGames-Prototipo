@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-410: comprobar que hechizos libres no canalizan (Junie)
+
+**Archivos:** `tests/hechizosLibres.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl410/RESULTADO.md`.
+
+**Qué se hizo:** Amplié la prueba de los hechizos con `offGlobalCooldown`: todos requieren `castTime` cero y cualquier propiedad con nombre de canalización, si existe, debe ser inactiva. El contrato `SpellDef` y `data/rpg/spells.json` no tienen actualmente un campo de canalización; no se cambiaron datos ni comportamiento del juego.
+
+**Validación:** `tests/hechizosLibres.test.ts`: 7/7; `npm test`: 438 archivos, 5.114 pruebas aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y Prettier específico limpios. No aplica Electron: sin cambio visual.
+
+**Evidencia:** `work/junie-jl410/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-409: probar niveles de objetos de botín (Junie)
 
 **Archivos:** `tests/jl409_lootItemLevels.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; inventario completo en `work/junie-jl409/RESULTADO.md`.

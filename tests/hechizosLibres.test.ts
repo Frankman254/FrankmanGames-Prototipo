@@ -32,10 +32,15 @@ function target(w: World) {
 const at = (x: number, y: number, targetId: number | null = null) => ({ point: { x, y }, targetId });
 
 describe('hechizos libres del enfriamiento global', () => {
-    it('los datos marcan defensas y movimientos instantáneos, nunca un hechizo con carga', () => {
+    it('los datos marcan hechizos libres instantáneos y sin canalización', () => {
         const free = Object.values(spells).filter((s) => s.offGlobalCooldown);
         expect(free.length).toBeGreaterThan(0);
-        for (const s of free) expect(s.castTime, s.id).toBe(0);
+        for (const s of free) {
+            expect(s.castTime, s.id).toBe(0);
+            for (const [field, value] of Object.entries(s)) {
+                if (/channel/i.test(field)) expect(value, `${s.id}.${field}`).toBeFalsy();
+            }
+        }
         expect(spells['storm_focus']!.offGlobalCooldown).toBe(true);
         expect(spells['spark']!.offGlobalCooldown).toBeFalsy();
     });
@@ -46,7 +51,10 @@ describe('hechizos libres del enfriamiento global', () => {
         expect(w.commandCast('spark', at(e.pos.x, e.pos.y, e.id))).toBeNull();
         expect(w.player.gcd).toBeGreaterThan(0);
         expect(w.commandCast('storm_focus', at(10, 10))).toBeNull();
-        const casts = w.drainEvents().filter((ev) => ev.type === 'cast').map((ev) => ev.type === 'cast' && ev.ability);
+        const casts = w
+            .drainEvents()
+            .filter((ev) => ev.type === 'cast')
+            .map((ev) => ev.type === 'cast' && ev.ability);
         expect(casts).toEqual(['spark', 'storm_focus']);
     });
 
