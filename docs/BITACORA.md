@@ -7,7 +7,8 @@
 **Validación:** `npm run typecheck` limpio; `npm run build` correcto. `npm test`: 421 de 424 archivos, 5.070 aprobadas y 2 fallos. El primero es `data01_asciiIds` (2.338 ids no ASCII en `data/`), que ya venía de antes. El segundo es `jl42_compPreview`: el import en frío de Babylon pasa de 5 s en esta máquina, y falla igual sin este cambio. Electron: `pantallaCarga` 18/18, `sondaBrdf` 1/1, `rendimientoHondo` 2/2, `interfaz` 55/55, todos con la consola limpia.
 
 **Evidencia:** `work/qa/` (capturas y resultados de esos escenarios).
-n---
+
+---
 
 ## 2026-11-26 — JL-360: verificar el mapa grande de la cripta (Junie)
 
