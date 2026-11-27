@@ -10043,6 +10043,39 @@ const scenarios = {
         await sleep(300);
     },
 
+    /** JL-368: Chalo aparece en el compendio como vendedor; los PNJ de cripta no salen en el mapa exterior. */
+    async jl368CryptNpcLists() {
+        await newGame('QA Chalo');
+        await key('Numpad3', 'n3');
+        await until(`!!document.querySelector('.panel-compendium')?.offsetParent`, 8000, 'panel compendio JL-368');
+        await js(`(()=>{ const tab=[...document.querySelectorAll('.panel-compendium .bag-chips .chip')].find(b=>b.textContent.trim()==='Objetos'); tab?.click(); })()`);
+        await js(`(()=>{ const input=document.querySelector('.panel-compendium .comp-search'); if(input){input.value='Poción de vida menor';input.dispatchEvent(new Event('input',{bubbles:true}));} })()`);
+        await until(`document.querySelector('.panel-compendium .comp-list')?.children.length===1`, 5000, 'producto de Chalo en compendio');
+        await js(`document.querySelector('.panel-compendium .comp-list')?.firstElementChild?.click()`);
+        await until(`document.querySelector('.panel-compendium .comp-detail h3')?.textContent.trim()==='Poción de vida menor'`, 5000, 'ficha de producto de Chalo');
+        const itemDetail = await js(`document.querySelector('.panel-compendium .comp-detail')?.innerText ?? ''`);
+        check(
+            'JL-368: el compendio muestra a Chalo bajo «Lo venden»',
+            /lo venden/i.test(itemDetail) && itemDetail.includes('Chalo Farol'),
+            itemDetail,
+        );
+        check('JL-368: Nina no aparece en la ficha del producto', !itemDetail.includes('Nina Ovillo'), itemDetail);
+        await shot('jl368-compendio-chalo-vendedor');
+
+        await key('Numpad3', 'n3');
+        await key('KeyM', 'm');
+        await until(`!!document.querySelector('.panel-worldmap')?.offsetParent`, 8000, 'mapa del mundo abierto JL-368');
+        const mapState = await js(`(()=>{
+          const label=[...document.querySelectorAll('.panel-worldmap .wm-layer')].find(e=>e.querySelector('.choice-toggle-label')?.textContent.trim()==='Mercaderes');
+          const input=label?.querySelector('input');
+          if(input&&!input.checked) input.click();
+          return {merchantLayer:input?.checked===true,cryptNpcIds:${W}.npcs.map(n=>n.npcId).filter(id=>id==='crypt_peddler'||id==='crypt_guide')};
+        })()`);
+        check('JL-368: la capa «Mercaderes» del mapa está activa', mapState.merchantLayer, JSON.stringify(mapState));
+        check('JL-368: ningún PNJ de cripta está en la lista del mapa exterior', mapState.cryptNpcIds.length === 0, JSON.stringify(mapState));
+        await shot('jl368-mapa-exterior-mercaderes');
+    },
+
     /** JL-115: Escenario opciones — idioma, volumen, modo de cámara y modo de lanzar
      * se guardan en localStorage y se recuperan al recargar la página. */
     async opciones() {

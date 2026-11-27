@@ -16,6 +16,20 @@
 
 ---
 
+## 2026-11-26 — JL-368: comprobar exposición de PNJ de cripta (Junie)
+
+**Archivos:** `tests/jl368_cryptNpcExposure.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí una prueba pura que distingue las fichas propias del compendio de los nombres de vendedores en las fichas de objetos, y un escenario Electron que abre el detalle de una poción y el mapa del mundo abierto con «Mercaderes» activo. No se modificó el comportamiento productivo.
+
+**Resultado y pregunta:** Chalo no tiene ficha propia, pero aparece bajo «LO VENDEN» en las seis fichas de su stock: Poción de vida menor, Poción de vida, Tónico de recurso, Trago de pulso, Bollo de maíz y Trozo de raspadura. Nina no tiene ficha ni aparece como vendedora. El mapa exterior no lista a `crypt_peddler` ni a `crypt_guide`. Se pregunta al creador si Chalo debe seguir apareciendo como vendedor en el compendio pese a ser un PNJ exclusivo de la cripta; no se cambia.
+
+**Validación:** `npx vitest run tests/jl368_cryptNpcExposure.test.ts`: 3/3; Electron `jl368CryptNpcLists`: 5/5, consola limpia; `npm test`: 430 archivos, 5.083 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en tres proyectos; `npm run docs:check` validó 215 rutas; `node --check scripts/qaElectron.mjs` y Prettier del test limpios.
+
+**Evidencia:** `work/junie-jl368/RESULTADO.md`, `work/junie-jl368/electron/resultado.json` y capturas revisadas `jl368-compendio-chalo-vendedor.jpg`, `jl368-mapa-exterior-mercaderes.jpg`.
+
+---
+
 ## 2026-11-26 — JL-367: comprobar que los lóbulos caben en la sala (Junie)
 
 **Archivos:** `tests/jl367_lobesWithinRoom.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
