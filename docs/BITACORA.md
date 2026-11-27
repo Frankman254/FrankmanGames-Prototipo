@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-404: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No inspeccioné las armas, escudos, tocados ni capas, ni capturé su puesta: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. JL-403 quedó bloqueada por la misma causa, así que detuve la cola y amplié una sola vez la solicitud de autorización existente en `docs/ACCIONES_CREADOR.md`. No se modificaron código, modelos ni pruebas; la tabla de ranuras visibles sin modelo queda para MOD-09.
+
+**Validación:** Línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: la tarea quedó bloqueada antes de la revisión visual.
+
+**Evidencia:** Bloqueo registrado en `docs/TAREAS.md` y `work/prompts-noche/COLA_JUNIE.md`; no se generaron capturas ni archivos en `work/junie-jl404/` porque no se abrió el juego.
+
+---
+
 ## 2026-11-27 — JL-403: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
