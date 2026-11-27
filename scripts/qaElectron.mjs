@@ -6903,6 +6903,113 @@ const scenarios = {
         await shot('jl354-berto-piso-10');
     },
 
+    /** JL-360: mapa grande del piso 10 y escalera de bajada descubierta. */
+    async criptaMapaGrande() {
+        await resize(1920, 1080);
+        await newGame('QA Mapa');
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(9,'above')`);
+        await until('__game.crypt.floor===9', 15000, 'entrar en el piso 10');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 10 listo');
+        await sleep(900);
+
+        const arrival = await js(`(() => {
+            const fd=__game.crypt.floorMapData, p=${W}.player.pos;
+            return {
+                floor:__game.crypt.floor,
+                down:fd?.downStairs??null,
+                distance:fd?.downStairs ? Math.hypot(p.x-fd.downStairs.x,p.y-fd.downStairs.y) : null,
+            };
+        })()`);
+        check('JL-360: la escena está en el piso 10 con escalera de bajada', arrival.floor===9 && arrival.down, JSON.stringify(arrival));
+        if (!arrival.down) throw new Error('El piso 10 no expone la escalera de bajada');
+
+        await key('KeyM', 'm');
+        await until('!!document.querySelector(".panel-dungeonmap")?.offsetParent', 5000, 'abrir mapa del piso con M');
+        await sleep(350);
+        const snapshot = () => js(`(() => {
+            const stats=(selector)=>{
+                const c=document.querySelector(selector);
+                if(!c) return null;
+                const data=c.getContext('2d')?.getImageData(0,0,c.width,c.height).data;
+                if(!data) return null;
+                let orange=0,grid=0,edgeGold=0;
+                for(let y=0;y<c.height;y++) for(let x=0;x<c.width;x++){
+                    const i=(y*c.width+x)*4,r=data[i],g=data[i+1],b=data[i+2];
+                    if(r>100&&r>g*1.2&&g>b*1.5&&b<130) orange++;
+                    if((Math.abs(r-120)<4&&Math.abs(g-110)<4&&Math.abs(b-90)<4)||(Math.abs(r-50)<4&&Math.abs(g-42)<4&&Math.abs(b-32)<4)) grid++;
+                    if((x<24||y<24||x>=c.width-24||y>=c.height-24)&&r>205&&g>130&&g<195&&b<115) edgeGold++;
+                }
+                return {width:c.width,height:c.height,orange,grid,edgeGold};
+            };
+            const panel=document.querySelector('.panel-dungeonmap');
+            return {panelOpen:!!panel&&!!panel.offsetParent,map:stats('.dm-canvas'),minimap:stats('.mm-canvas')};
+        })()`);
+        const atArrival = await snapshot();
+        check('JL-360: M abre el mapa grande y muestra la rejilla del piso', atArrival.panelOpen && atArrival.map?.width>0 && atArrival.map?.grid>20, JSON.stringify(atArrival));
+        // La subida y el retorno se superponen al llegar y comparten el icono; la bajada añadiría otro.
+        check(
+            'JL-360: la escalera no aparece en los mapas al llegar',
+            arrival.distance>6 && atArrival.map?.orange<50 && atArrival.minimap?.orange===0,
+            JSON.stringify({distance:arrival.distance,map:atArrival.map,minimap:atArrival.minimap}),
+        );
+        await shot('jl360-piso-10-llegada-mapa');
+
+        const discover = await js(`(() => {
+            const down=__game.crypt.floorMapData.downStairs, grid=${W}.grid;
+            let point=null, distance=Infinity;
+            for(let i=0;i<grid.cols*grid.rows;i++){
+                const p=grid.center(i);
+                if(!grid.walkable(p)) continue;
+                const d=Math.hypot(p.x-down.x,p.y-down.y);
+                if(d>=3.5&&d<6&&d<distance){point=p;distance=d;}
+            }
+            if(!point) return null;
+            const player=${W}.player;
+            player.pos.x=player.prevPos.x=point.x;
+            player.pos.y=player.prevPos.y=point.y;
+            player.path=[];
+            player.moveTarget=null;
+            return {point,distance};
+        })()`);
+        if (!discover) throw new Error('No se encontró una celda caminable a 3,5–6 m de la escalera');
+        await sleep(700);
+        const revealed = await snapshot();
+        check(
+            'JL-360: tras descubrirla, la escalera aparece en el minimapa y el mapa del piso',
+            revealed.minimap?.orange>atArrival.minimap?.orange && revealed.map?.orange>atArrival.map?.orange,
+            JSON.stringify({discover,arrival:{map:atArrival.map,minimap:atArrival.minimap},revealed:{map:revealed.map,minimap:revealed.minimap}}),
+        );
+        await shot('jl360-piso-10-escalera-descubierta');
+
+        const far = await js(`(() => {
+            const down=__game.crypt.floorMapData.downStairs, grid=${W}.grid;
+            let point=null,distance=0;
+            for(let i=0;i<grid.cols*grid.rows;i++){
+                const p=grid.center(i);
+                if(!grid.walkable(p)) continue;
+                const d=Math.hypot(p.x-down.x,p.y-down.y);
+                if(d>distance){point=p;distance=d;}
+            }
+            if(!point) return null;
+            const player=${W}.player;
+            player.pos.x=player.prevPos.x=point.x;
+            player.pos.y=player.prevPos.y=point.y;
+            player.path=[];
+            player.moveTarget=null;
+            return {point,distance};
+        })()`);
+        if (!far) throw new Error('No se encontró una celda caminable lejos de la escalera');
+        await sleep(700);
+        const edge = await snapshot();
+        check(
+            'JL-360: la escalera fuera del minimapa se señala con una flecha en el borde',
+            far.distance>20 && edge.minimap?.edgeGold>0,
+            JSON.stringify({far, minimap:edge.minimap}),
+        );
+        await shot('jl360-piso-10-flecha-borde-minimapa');
+    },
+
     /** JL-355: PNJ y carteles junto a la llegada del piso 1; compra y retorno con Nina. */
     async criptaPnj() {
         await newGame('QA Chalo');

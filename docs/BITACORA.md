@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-360: verificar el mapa grande de la cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí `criptaMapaGrande`: entra al piso 10, abre el mapa del piso con la tecla M, comprueba la rejilla y la ausencia de la escalera de bajada al llegar. La descubre a 3,5 m y verifica el marcador en ambos mapas; después se aleja a 96,81 m y comprueba la flecha en el borde del minimapa. Solo prepara la partida de QA; no cambia la lógica productiva.
+
+**Validación:** Electron `criptaMapaGrande`: 6/6 comprobaciones y consola limpia. `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl360/electron/resultado.json` y las capturas revisadas `jl360-piso-10-llegada-mapa.jpg`, `jl360-piso-10-escalera-descubierta.jpg` y `jl360-piso-10-flecha-borde-minimapa.jpg`.
+
+---
+
 ## 2026-11-26 — JL-359: verificar pesca en lóbulos de cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
