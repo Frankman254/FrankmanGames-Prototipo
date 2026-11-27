@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-382: reunir preguntas de la cripta y la tanda (Junie)
+
+**Archivos:** `work/junie-jl382/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Recopilé ocho preguntas surgidas en JL-368, JL-373, JL-375 y JL-381 sobre el compendio, nombres, clima y PNJ de la cripta; cada una incluye una opción recomendada y su base. Dejé explícito que son propuestas, separé los fallos de interfaz/render de las decisiones y no cambié código, datos ni reglas.
+
+**Validación:** Línea base: `npx tsc --noEmit` y `npx vitest run` limpios (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`). Verificación final: `npm test` con el mismo resultado, `npm run typecheck` y `npm run docs:check` limpios (218 rutas citadas, todas existen).
+
+**Evidencia:** `work/junie-jl382/PREGUNTAS.md`.
+
+---
+
 ## 2026-11-27 — JL-381: anotar pruebas y decisiones de la cripta (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

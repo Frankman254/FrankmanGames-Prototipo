@@ -1673,7 +1673,7 @@ Contexto del coordinador:
   - pescar en un lóbulo;
   - la escalera en el mapa.
   - Añade las preguntas abiertas: en qué pisos van los PNJ, qué vende Chalo, sus nombres, y si «el pueblo» es la Piedra de casa o la última Piedra elegida.
-- [ ] JL-382 Lista en `work/junie-jl382/PREGUNTAS.md` las preguntas al creador de esta tanda, cada una con su opción recomendada.
+- [x] JL-382 Lista en `work/junie-jl382/PREGUNTAS.md` las preguntas al creador de esta tanda, cada una con su opción recomendada. — commit «JL-382: reunir preguntas de la cripta y la tanda» — evidencia: `work/junie-jl382/PREGUNTAS.md`; Vitest (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`), `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios.
 - [ ] JL-383 `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
 
 
