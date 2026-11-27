@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-357: comprobar limpieza al salir de la cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `criptaSalidas` para las seis vías pedidas: escalera, hilo, Ovillo, Seco, muerte y cargar desde la cripta un guardado del pueblo. Tras cada salida comprueba que no quedan `crypt_peddler` ni `crypt_guide` en `world.npcs` y que Babylon no conserva nodos ni mallas asociados; solo altera la partida de QA, no el comportamiento productivo.
+
+**Validación:** Electron `criptaSalidas`: 17/17 comprobaciones, cada ruta vuelve al exterior sin esos PNJ ni sus mallas/nodos y consola limpia. `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en tres proyectos; `npm run docs:check` limpio.
+
+**Evidencia:** `work/junie-jl357/electron/resultado.json`; seis capturas de salida y la captura del diálogo de muerte, revisadas en `work/junie-jl357/electron/`.
+
+---
+
 ## 2026-11-26 — JL-356: verificar el rechazo de Nina durante el combate (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

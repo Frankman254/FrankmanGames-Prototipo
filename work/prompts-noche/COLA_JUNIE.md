@@ -1619,7 +1619,7 @@ Contexto del coordinador:
   - Hablar con Nina y elegir «Llévame al pueblo.»: sale la pantalla de carga y el jugador aparece en Villa Raspadura.
   - Capturas de los tres momentos.
 - [x] JL-356 Escenario `criptaGuiaPelea`: con un enemigo peleando a menos de 20 m, Nina responde «No te puedo sacar mientras peleas.» y el jugador sigue en el piso. — commit «JL-356: verificar el rechazo de Nina durante el combate» — Electron 4/4, consola limpia; enemigo a 4 m del jugador y 4,72 m de Nina al preparar, mensaje literal y piso 1 confirmados; captura revisada y resultado en `work/junie-jl356/electron/`.
-- [ ] JL-357 Escenario `criptaSalidas`: salir de la cripta por cada vía y comprobar que en `world.npcs` no queda `crypt_peddler` ni `crypt_guide` y que la vista no conserva sus mallas:
+- [x] JL-357 Escenario `criptaSalidas`: salir de la cripta por cada vía y comprobar que en `world.npcs` no queda `crypt_peddler` ni `crypt_guide` y que la vista no conserva sus mallas — commit «JL-357: comprobar limpieza al salir de la cripta» — Electron 17/17, consola limpia; seis rutas y capturas revisadas en `work/junie-jl357/electron/resultado.json` y `work/junie-jl357/electron/`:
   - escalera de subida del piso 1;
   - hilo de retorno;
   - Ovillo de regreso;

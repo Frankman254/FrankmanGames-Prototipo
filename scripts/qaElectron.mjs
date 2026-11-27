@@ -7088,6 +7088,156 @@ const scenarios = {
         check('JL-356: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
     },
 
+    /** JL-357: todas las salidas de la cripta retiran los PNJ y sus mallas. */
+    async criptaSalidas() {
+        await newGame('QA Salidas');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+
+        // La partida nueva se guarda en la ranura 1; activar la ranura 2 deja
+        // intacto ese guardado al cargarlo desde dentro de la cripta.
+        const townSave = await js(`(() => {
+            const save=JSON.parse(localStorage.getItem('frankmangames.save.0')||'null');
+            return save?.place?.scene ?? null;
+        })()`);
+        check('JL-357: la ranura 1 contiene una partida del pueblo', townSave === 'overworld', String(townSave));
+        if (townSave !== 'overworld') throw new Error(`La ranura de QA no es del pueblo: ${townSave}`);
+        await key('F10', 'F10');
+        await button('Guardar partida');
+        await until(`!!document.querySelector('.slots-modal')`, 5000, 'ranuras de guardado');
+        const secondSlot = await js(`(() => {
+            const row=[...document.querySelectorAll('.slots-modal .slot-row')].find((item)=>item.querySelector('.slot-num')?.textContent.trim()==='2');
+            const button=row?.querySelector('button');
+            if (!button) return null;
+            const rect=button.getBoundingClientRect();
+            return {x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+        })()`);
+        if (!secondSlot) throw new Error('No aparece la ranura 2 de guardado');
+        await mouse(secondSlot.x, secondSlot.y);
+        await sleep(250);
+        await key('Escape', 'Escape');
+        await key('Escape', 'Escape');
+        await until(
+            `!document.querySelector('.slots-modal') && !document.querySelector('.pause-modal')`,
+            5000,
+            'volver al pueblo',
+        );
+        const savedPlaces = await js(`(() => [0,1].map((slot)=>JSON.parse(localStorage.getItem('frankmangames.save.'+slot)||'null')?.place?.scene ?? null))()`);
+        check('JL-357: hay dos guardados del pueblo y la ranura 2 queda activa', savedPlaces.every((place)=>place==='overworld'), JSON.stringify(savedPlaces));
+        if (!savedPlaces.every((place)=>place==='overworld')) throw new Error(`Guardados de QA inesperados: ${JSON.stringify(savedPlaces)}`);
+
+        const staffIds = ['crypt_peddler', 'crypt_guide'];
+        const enterFloorOne = async (label) => {
+            await js(`${S}.energy.value=100; ${W}.player.health=${W}.player.maxHealth`);
+            const entered = await js(`__game.crypt.enter(0, 'above')`);
+            if (!entered) throw new Error(`${label}: no se pudo entrar al piso 1`);
+            await until(`__game.crypt.floor===0`, 15000, `${label}: piso 1`);
+            await until(`!document.querySelector('.carga:not([hidden])')`, 20000, `${label}: piso 1 listo`);
+            await sleep(1000);
+            await js(`${W}.enemies.list.forEach((enemy)=>{enemy.frozen=true;enemy.state='idle';})`);
+            await until(
+                `['crypt_peddler','crypt_guide'].every((id)=>${W}.npcs.some((npc)=>npc.npcId===id) && !!__game.view.scene.getTransformNodeByName('npc-'+id))`,
+                10000,
+                `${label}: PNJ de cripta cargados`,
+            );
+        };
+        const auditExit = async (label) => {
+            const returned = await until(
+                `__game.crypt.floor===null && __game.place?.scene==='overworld' && !document.querySelector('.carga:not([hidden])')`,
+                30000,
+                `${label}: volver al pueblo`,
+            ).then(() => true, () => false);
+            if (returned) await sleep(700);
+            const audit = await js(`(() => {
+                const ids=${JSON.stringify(staffIds)};
+                const scene=__game.view.scene;
+                const npcs=${W}.npcs.filter((npc)=>ids.includes(npc.npcId)).map((npc)=>npc.npcId);
+                const retained=ids.map((id)=>{
+                    const root=scene.getTransformNodeByName('npc-'+id);
+                    const meshes=scene.meshes.filter((mesh)=>mesh.name.includes(id) || mesh.metadata?.npcId===id || (root && mesh.isDescendantOf(root))).map((mesh)=>mesh.name);
+                    const nodes=scene.transformNodes.filter((node)=>node.name.includes(id)).map((node)=>node.name);
+                    return {id,meshes,nodes};
+                });
+                return {floor:__game.crypt.floor,scene:__game.place?.scene,npcs,retained};
+            })()`);
+            const noNpcs = audit.floor === null && audit.scene === 'overworld' && audit.npcs.length === 0;
+            const noMeshes = audit.retained.every((npc) => npc.meshes.length === 0 && npc.nodes.length === 0);
+            check(`JL-357: ${label} vuelve al pueblo y deja world.npcs sin Chalo ni Nina`, returned && noNpcs, JSON.stringify(audit));
+            check(`JL-357: ${label} no conserva mallas ni nodos de vista`, noMeshes, JSON.stringify(audit.retained));
+            await shot(`jl357-salida-${label}`);
+        };
+        const approach = async (feature) => {
+            const at = await js(`(() => {
+                const point=__game.crypt.floorData?.${feature};
+                if (!point) return null;
+                const grid=${W}.grid;
+                return grid.center(grid.nearestWalkable({x:point.x+0.5,y:point.y+0.5}));
+            })()`);
+            if (!at) throw new Error(`No existe ${feature} en el piso 1`);
+            await js(`${W}.commandMove({x:${at.x},y:${at.y}})`);
+            await until(`Math.hypot(${W}.player.pos.x-${at.x},${W}.player.pos.y-${at.y})<0.75`, 30000, `llegar a ${feature}`);
+            await js(`(()=>{const r=__game.view.rig;r.pitchDeg=38;r.distance=9})()`);
+            await sleep(500);
+        };
+
+        await enterFloorOne('escalera');
+        await approach('upStairs');
+        await clickMesh('dUpStairs');
+        await auditExit('escalera');
+
+        await enterFloorOne('hilo');
+        await approach('arrivalFromAbove');
+        await clickMesh('d_returnPost');
+        await auditExit('hilo');
+
+        for (const [itemId, label] of [
+            ['ovillo_de_regreso', 'ovillo'],
+            ['seco_del_regreso', 'seco'],
+        ]) {
+            await enterFloorOne(label);
+            const used = await js(`(() => {
+                const c=${S}.character;
+                c.itemCooldowns={};
+                c.pickUp(c.items.create(${JSON.stringify(itemId)}),true);
+                const item=c.inventory.slots.find((slot)=>slot?.itemId===${JSON.stringify(itemId)});
+                return item ? ${S}.useItem(item.uid).ok : false;
+            })()`);
+            if (!used) throw new Error(`${label}: no se pudo usar ${itemId}`);
+            await auditExit(label);
+        }
+
+        await enterFloorOne('carga');
+        const savedTownBeforeLoad = await js(`JSON.parse(localStorage.getItem('frankmangames.save.0')||'null')?.place?.scene ?? null`);
+        check('JL-357: el guardado de pueblo sigue intacto antes de cargar', savedTownBeforeLoad === 'overworld', String(savedTownBeforeLoad));
+        if (!(await locate('button', 'Cargar partida'))) await key('F10', 'F10');
+        await button('Cargar partida');
+        await until(
+            `[...document.querySelectorAll('button')].some((button)=>button.textContent.trim()==='Cargar')`,
+            5000,
+            'ranura de carga del pueblo',
+        );
+        await button('Cargar');
+        await sleep(1500);
+        const confirmLoad = await locate('button', 'Cargar');
+        if (confirmLoad) await button('Cargar');
+        await auditExit('cargar-pueblo');
+
+        await enterFloorOne('muerte');
+        await js(`${S}.energy.value=20; ${W}.player.health=0`);
+        await until(deathShown, 10000, 'pantalla de muerte en la cripta');
+        await shot('jl357-muerte-en-cripta');
+        await button('Continuar como espectro');
+        await until(
+            `__game.crypt.floor===null && ${W}.character.spectral.active && ${W}.player.alive`,
+            15000,
+            'muerte: salir al pueblo como espectro',
+        );
+        await auditExit('muerte');
+
+        const errors = await js(`window.__consola?.errores(20) || ''`);
+        check('JL-357: consola sin errores nuevos', errors.length === 0, errors);
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');
@@ -13715,6 +13865,8 @@ scenarios.jl332SesionLarga.timeout = 3500;
 scenarios.jl333CriptaRecursos.timeout = 600;
 // JL-336: dos minutos en segundo plano más arranque, restauración y verificación.
 scenarios.ventanaSegundoPlano.timeout = 300;
+// JL-357: seis rutas de salida, cada una con una entrada real a la cripta y su captura.
+scenarios.criptaSalidas.timeout = 300;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
