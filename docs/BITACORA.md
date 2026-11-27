@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-399: verificar el ritmo del hechizo libre en ambos idiomas (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl399/electron/`.
+
+**Qué se hizo:** Añadí el escenario Electron `jl399FichaHechizoLibre`. Abre el libro de hechizos, enfoca la carta de `storm_focus` y verifica la fila del tooltip en español (`Ritmo: libre: se lanza a la vez que otro`) y en inglés (`Pace: free: casts alongside another spell`). Las capturas se obtienen del screencast de Electron para conservar el tooltip visible. No cambia código productivo ni reglas.
+
+**Validación:** Electron 15/15, cero errores nuevos de consola; `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` (218 rutas) limpios.
+
+**Evidencia:** `work/junie-jl399/electron/jl399-ficha-hechizo-libre-es.jpg`, `jl399-ficha-hechizo-libre-en.jpg` y `jl399-observacion.json`.
+
+---
+
 ## 2026-11-27 — JL-398: verificar doble lanzamiento de hechizos libres (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl398/electron/`.

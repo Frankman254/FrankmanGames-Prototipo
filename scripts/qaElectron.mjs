@@ -11697,6 +11697,119 @@ const scenarios = {
         );
     },
 
+    /** JL-399: la ficha del hechizo libre se traduce al inglés en la UI real. */
+    async jl399FichaHechizoLibre() {
+        const errorsBefore = consoleErrors.length;
+        await resize(1920, 1080);
+        await newGame('QA Juan', { classId: 'storm_weaver' });
+        await until('__game.view.rig != null', 15000, 'rig de la Tejedora');
+
+        await js(`(() => {
+            const c=${S}.character;
+            if (c.spellbook.rank('storm_focus') === 0) c.spellbook.learn('storm_focus');
+            c.spellbook.hotbar.fill(null);
+            c.spellbook.hotbar[0]='storm_focus';
+        })()`);
+        await sleep(400);
+        const spellName = await js(`${S}.content.spells['storm_focus'].name.toLowerCase()`);
+        const spellSelector = `.spell-card[data-name=${JSON.stringify(spellName)}]`;
+        await key('KeyV', 'v');
+        await until(`!!document.querySelector(${JSON.stringify(spellSelector)})`, 5000, 'tarjeta de storm_focus en el libro');
+        await js(`(() => {
+            window.__jl399PointerTrace=[];
+            if(window.__jl399PointerTraceInstalled)return;
+            window.__jl399PointerTraceInstalled=true;
+            window.addEventListener('pointermove',(e)=>{
+                const card=e.target instanceof Element?e.target.closest('.spell-card'):null;
+                window.__jl399PointerTrace.push({x:e.clientX,y:e.clientY,spell:card?.getAttribute('data-name')??null});
+            },true);
+        })()`);
+
+        const captureTooltip = async (name) => {
+            const frames = [];
+            screencastFrames = frames;
+            let recording = false;
+            try {
+                await cdp('Page.startScreencast', { format: 'jpeg', quality: 90, everyNthFrame: 1 });
+                recording = true;
+                const deadline = Date.now() + 5000;
+                while (frames.length < 2 && Date.now() < deadline) await sleep(25);
+                const frame = frames.at(-1);
+                if (!frame?.data) throw new Error(`Screencast vacío para ${name}`);
+                fs.writeFileSync(path.join(OUT, `${name}.jpg`), Buffer.from(frame.data, 'base64'));
+                check(`JL-399: captura ${name} obtenida del screencast`, frames.length >= 2, `${frames.length} fotogramas`);
+            } finally {
+                if (recording) await cdp('Page.stopScreencast');
+                screencastFrames = null;
+            }
+        };
+
+        const inspectFreeSpell = async (label, value, capture) => {
+            const slot = await js(`(() => {
+                const el=[...document.querySelectorAll(${JSON.stringify(spellSelector)})].find((item)=>item.offsetParent!==null);
+                if(!el) return null;
+                const r=el.getBoundingClientRect();
+                const x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);
+                return {x,y,width:r.width,height:r.height,hit:hit===el||el.contains(hit)};
+            })()`);
+            if (!slot) throw new Error('No está visible la tarjeta de storm_focus');
+            check(`JL-399: puntero cae sobre la tarjeta ${label}`, slot.width>0 && slot.height>0 && slot.hit, JSON.stringify(slot));
+            await js('window.__jl399PointerTrace.length=0');
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 0, y: 0 });
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: slot.x, y: slot.y });
+            const pointerTrace = await js('window.__jl399PointerTrace');
+            check(`JL-399: el puntero entra en la carta ${label}`, pointerTrace.some((event) => event.spell === spellName), JSON.stringify(pointerTrace));
+            await until(`!!document.querySelector('.tooltip') && !document.querySelector('.tooltip').hidden`, 5000, 'ficha de storm_focus');
+            await js('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+            const fact = await js(`(() => {
+                const tip=document.querySelector('.tooltip');
+                const row=[...tip.querySelectorAll('.tip-fact')].find((item)=>item.querySelector('span')?.textContent.trim()===${JSON.stringify(label)});
+                const rect=tip.getBoundingClientRect(), style=getComputedStyle(tip);
+                return row ? {
+                    label:row.querySelector('span')?.textContent.trim(),
+                    value:row.querySelector('b')?.textContent.trim(),
+                    visible:!tip.hidden && style.display!=='none' && style.visibility==='visible' && style.opacity!=='0' && rect.width>0 && rect.height>0 && rect.left>=0 && rect.top>=0 && rect.right<=innerWidth && rect.bottom<=innerHeight,
+                    rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},
+                    zIndex:style.zIndex,
+                    parent:getComputedStyle(tip.parentElement).zIndex,
+                } : null;
+            })()`);
+            check(`JL-399: ficha ${label} muestra el ritmo libre`, fact?.label === label && fact?.value === value, JSON.stringify(fact));
+            check(`JL-399: tooltip ${label} está dentro del viewport`, fact?.visible === true, JSON.stringify(fact));
+            const stillVisible = async () =>
+                js(`(() => { const tips=[...document.querySelectorAll('.tooltip')]; return tips.some((tip)=>!tip.hidden && [...tip.querySelectorAll('.tip-fact')].some((row)=>row.querySelector('span')?.textContent.trim()===${JSON.stringify(label)})); })()`);
+            check(`JL-399: tooltip ${label} sigue abierto antes de capturar`, await stillVisible());
+            await captureTooltip(capture);
+            return fact;
+        };
+
+        const spanish = await inspectFreeSpell('Ritmo', 'libre: se lanza a la vez que otro', 'jl399-ficha-hechizo-libre-es');
+        await key('KeyV', 'v');
+
+        await key('F10', 'F10');
+        await button('Opciones');
+        await sleep(300);
+        for (const tab of ['Interfaz', 'Juego', 'Pantalla', 'Gráficos']) {
+            if (await js(`!!document.querySelector('[data-opt="language"]')`)) break;
+            if (await locate('button', tab)) await button(tab);
+            await sleep(250);
+        }
+        const languageSet = await js(
+            `(()=>{ const s=document.querySelector('[data-opt="language"]'); const el=s?.tagName==='SELECT'?s:s?.querySelector('select'); if(!el)return false; el.value='en'; el.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`,
+        );
+        check('JL-399: inglés se activa en opciones', languageSet);
+        await key('Escape', 'Escape');
+        await key('Escape', 'Escape');
+        await until(`document.querySelector('.dialogue')?.hidden === true`, 5000, 'cerrar pausa en inglés');
+
+        await key('KeyV', 'v');
+        await until(`!!document.querySelector(${JSON.stringify(spellSelector)})`, 5000, 'tarjeta de storm_focus en el libro inglés');
+        const english = await inspectFreeSpell('Pace', 'free: casts alongside another spell', 'jl399-ficha-hechizo-libre-en');
+        await key('KeyV', 'v');
+        check('JL-399: sin errores nuevos de consola', consoleErrors.length === errorsBefore, consoleErrors.slice(errorsBefore).join(' | ') || '0');
+        fs.writeFileSync(path.join(OUT, 'jl399-observacion.json'), JSON.stringify({ spanish, english }, null, 2));
+    },
+
     /** JL-178: captura de cada emote y cada hechizo de las 3 clases, para comparar antes y después de OMP-PJ-02.
      * Lanza cada Emote_* y cada hechizo, captura el fotograma central. Evidencia en work/junie-jl178/ANTES/. */
     async jl178_emotes() {
