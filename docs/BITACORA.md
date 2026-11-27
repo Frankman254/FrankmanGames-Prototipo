@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-394: verificar tipos de la batería fiel (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Revisé `fiel.ts`, `fielRun.ts` y `gear.ts` bajo el `tsconfig.json` estricto, que incluye `scripts/` y excluye `scripts/balance/balM3.ts`. Los tres están limpios; no hizo falta cambiar código ni pruebas.
+
+**Validación:** `npm run typecheck` y `npx tsc --noEmit` limpios; `npx vitest run`: 435 archivos, 5.102 pruebas aprobadas, 1 omitida y 1 `todo`; `npm run docs:check` limpio. No aplica Electron: la tarea solo verifica scripts, sin cambio visual.
+
+**Evidencia:** `work/junie-jl394/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-392: comparar habilidad mala y buena en la batería fiel (Junie)
 
 **Archivos:** `work/junie-jl392/COMPARADA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
