@@ -1302,29 +1302,30 @@ export function chestLootTable(base: LootTableDef, index: number, chest: Dungeon
 export const CRYPT_WARDEN_NPC = 'crypt_warden';
 
 /**
- * CLA-CRIPTA2: sitios para los `n` PNJ de la cripta (`crypt: true`) junto a `arrival`, a 2,5 m a
- * lado y lado, en suelo caminable y sin pisarse entre ellos. Si no hay hueco, repite la llegada
- * (`World.placeInteriorNpc` lo lleva a la celda libre más cercana).
+ * CLA-CRIPTA2: sitios para los `n` PNJ de la cripta (`crypt: true`) cerca de `arrival`, en suelo
+ * caminable, separados de los objetos reservados y sin pisarse entre ellos.
  */
-export function cryptStaffSpots(arrival: Vec2, n: number, walkable: (p: Vec2) => boolean): Vec2[] {
-    const d = 2.5;
-    const tries = [
-        [d, 0],
-        [-d, 0],
-        [0, d],
-        [0, -d],
-        [d, d],
-        [-d, -d],
-        [d, -d],
-        [-d, d],
-    ];
+export function cryptStaffSpots(
+    arrival: Vec2,
+    n: number,
+    walkable: (p: Vec2) => boolean,
+    reserved: readonly Vec2[] = [],
+): Vec2[] {
+    const radii = [2.5, 3.5, 4.5, 5.5];
     const out: Vec2[] = [];
-    for (const [dx, dy] of tries) {
-        if (out.length >= n) break;
-        const p = { x: arrival.x + dx!, y: arrival.y + dy! };
-        if (walkable(p) && out.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1.5)) out.push(p);
+    for (const radius of radii) {
+        for (let step = 0; step < 16; step++) {
+            if (out.length >= n) return out;
+            const angle = (step * Math.PI) / 8;
+            const p = { x: arrival.x + Math.cos(angle) * radius, y: arrival.y + Math.sin(angle) * radius };
+            if (
+                walkable(p) &&
+                reserved.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1) &&
+                out.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 1.5)
+            )
+                out.push(p);
+        }
     }
-    while (out.length < n) out.push({ ...arrival });
     return out;
 }
 

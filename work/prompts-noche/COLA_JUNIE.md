@@ -1634,7 +1634,7 @@ Contexto del coordinador:
 - [x] JL-361 Escenario `estrellaCursor`: con el Cazador del Manglar, Estrella de vendaval con clic real a 7 m sobre un enemigo. El enemigo recibe daño, y otro a 2 m del centro también (brazo de la estrella). — commit «JL-361: verificar Estrella de vendaval con clic real» — Electron 6/6, consola limpia; punto de clic a 7,0368 m, 60 de daño al enemigo central y al del brazo a 2,0003 m; evidencia en `work/junie-jl361/electron/resultado.json` y capturas revisadas.
 
 ### B. Pruebas puras de lo nuevo (Vitest)
-- [ ] JL-362 En los 100 pisos, los sitios de Chalo y Nina (`cryptStaffSpots` y `World.placeInteriorNpc`) cumplen dos cosas:
+- [x] JL-362 En los 100 pisos, los sitios de Chalo y Nina (`cryptStaffSpots` y `World.placeInteriorNpc`) cumplen dos cosas: — commit «JL-362: despejar los sitios de Chalo y Nina» — `tests/jl362_cryptStaff.test.ts` 100/100; `npm test` 5.073 aprobadas; `npm run typecheck`; Electron `criptaPnj` 6/8 (dos errores conocidos de Babylon); captura en `work/junie-jl362/electron/`.
   - quedan a ≥ 1 m de la escalera, del poste del hilo de retorno, de los cofres, las jarras y las puertas;
   - no tapan el paso de la llegada a la escalera de bajada.
   - Si algún piso falla, arreglo pequeño en `cryptStaffSpots` con la prueba.

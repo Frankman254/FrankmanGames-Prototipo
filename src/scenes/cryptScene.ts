@@ -406,10 +406,10 @@ export class CryptScene {
                 }),
         );
         for (const s of f.spawns) w.spawnEnemy(s.archetype, s.pos, s.level, null, s.guardian);
-        this.placeStaff(w, f.arrivalFromAbove);
         this.sprung.clear();
         this.baseBlocked = w.grid.blocked.slice();
         this.stampDoors(w, f);
+        this.placeStaff(w, f);
         this.showFloor(f);
         this.host.install(w);
         this.host.view.rig.jumpTo(def.camera.distance);
@@ -428,7 +428,7 @@ export class CryptScene {
      * CLA-CRIPTA2 (creador 2026-11-25): en cada piso, junto a la llegada desde arriba, el mercader
      * y el guía que devuelve al pueblo (`crypt: true` en merchants.json / npcs.json).
      */
-    private placeStaff(w: World, arrival: Vec2): void {
+    private placeStaff(w: World, floor: DungeonFloor): void {
         const c = w.content;
         const who: { id: string; merchantId: string | null }[] = [
             ...Object.values(c.merchants)
@@ -438,10 +438,19 @@ export class CryptScene {
                 .filter((n) => n.crypt && n.merchantId === null)
                 .map((n) => ({ id: n.id, merchantId: null })),
         ];
-        const spots = cryptStaffSpots(arrival, who.length, (p) => w.grid.walkable(p));
+        const reserved = [
+            floor.upStairs,
+            ...(floor.downStairs ? [floor.downStairs] : []),
+            floor.arrivalFromAbove,
+            ...floor.chests.map((chest) => chest.pos),
+            ...floor.breakables.map((breakable) => breakable.pos),
+            ...floor.doors.map((door) => ({ x: door.x, y: door.y })),
+        ];
+        const spots = cryptStaffSpots(floor.arrivalFromAbove, who.length, (p) => w.grid.walkable(p), reserved);
         this.staff = [];
         who.forEach((n, i) => {
-            if (w.placeInteriorNpc(n.id, n.merchantId, spots[i]!)) this.staff.push(n.id);
+            const spot = spots[i];
+            if (spot && w.placeInteriorNpc(n.id, n.merchantId, spot)) this.staff.push(n.id);
         });
     }
 

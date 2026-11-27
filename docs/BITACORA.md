@@ -8,6 +8,18 @@
 
 **Evidencia:** `work/qa/` (capturas y resultados de esos escenarios).
 
+## 2026-11-26 — JL-362: despejar los sitios de Chalo y Nina (Junie)
+
+**Archivos:** `src/world/dungeon.ts`, `src/scenes/cryptScene.ts`, `tests/jl362_cryptStaff.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** La prueba de los 100 pisos encontró tres sitios demasiado cerca de una puerta o una jarra: pisos 64, 76 y 91. `cryptStaffSpots` ahora busca en anillos de 2,5 a 5,5 m, conserva la separación entre PNJ y evita los puntos reservados; `CryptScene` entrega los objetos reales y aplica las puertas cerradas antes de colocarlos. La prueba usa `World.placeInteriorNpc`, comprueba el metro mínimo respecto a escaleras, poste, cofres, rompibles y puertas, y verifica la ruta a la bajada con un margen de 1 m.
+
+**Validación:** `npx vitest run tests/jl362_cryptStaff.test.ts`: 1/1; `npm test`: 424 archivos, 5.073 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y Prettier en el test nuevo limpios. Electron `criptaPnj`: 6/8; pasaron las seis comprobaciones funcionales de presencia, compra y retorno. Los dos fallos son de consola: `TypeError` de Babylon (`postProcessManager` nulo en `rgbdTextureTools.js:68`), ya documentado en JL-349; no se ocultó ni se modificó la comprobación.
+
+**Evidencia:** `work/junie-jl362/RESULTADO.md`, `work/junie-jl362/electron/resultado.json` y captura revisada `work/junie-jl362/electron/jl355-cripta-llegada-pnjs.jpg`.
+
+---
+
 ## 2026-11-26 — JL-361: verificar Estrella de vendaval con clic real (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
