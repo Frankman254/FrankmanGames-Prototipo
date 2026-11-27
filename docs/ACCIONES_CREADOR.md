@@ -142,6 +142,7 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 
 ### Probar en el juego
 
+- **Cripta (JL-381):** entra hablando con Berto frente a la puerta, compra a Chalo, vuelve con Nina, pesca en un lóbulo y descubre la escalera para comprobar que aparece en el minimapa y el mapa del piso. Decide en qué pisos van Chalo y Nina, qué vende Chalo, qué nombres llevan ambos PNJ y si «el pueblo» es la Piedra de casa o la última Piedra elegida.
 - **Canciones de pueblo (AUD-CTX-07)**: entra en Chitrí, Iguanera muelle, Pedasol, Punta Venada y Cambutal; cada uno suena distinto. Muestras de 30 s en `work/claude-aud-regiones/salida/pueblo_*_muestra30.wav`.
 - **Barra en rojo (HUD-ROJO-02/03)**: apunta a un enemigo lejano o detrás de una pared; la barra ya no se pone roja, porque el personaje se acerca y lanza.
 - **Ajuar de la Diablica (EQ-10c)**: quítate y ponte piezas andando, montado y con la mochila abierta; nada debe salirse de su sitio.

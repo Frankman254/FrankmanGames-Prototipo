@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-381: anotar pruebas y decisiones de la cripta (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí un recorrido para que el creador pruebe la entrada por Berto, la compra a Chalo, el regreso con Nina, la pesca en un lóbulo y la escalera en ambos mapas. Dejé abiertas las decisiones de pisos y nombres de ambos PNJ, el surtido de Chalo y si «el pueblo» corresponde a la Piedra de casa o a la última Piedra elegida. No cambié código, datos ni reglas.
+
+**Validación:** `npx tsc --noEmit`, `npx vitest run` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck` y `npm run docs:check` limpios. No aplica Electron: cambio documental sin efecto visual.
+
+**Evidencia:** Entrada «Cripta (JL-381)» en `docs/ACCIONES_CREADOR.md`.
+
+---
+
 ## 2026-11-27 — JL-380: actualizar el estado de la cripta con QA de Electron (Junie)
 
 **Archivos:** `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
