@@ -7013,6 +7013,81 @@ const scenarios = {
         check('JL-355: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
     },
 
+    /** JL-356: Nina rechaza la salida mientras un enemigo cercano pelea. */
+    async criptaGuiaPelea() {
+        await newGame('QA Pelea');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(0,'above')`);
+        await until('__game.crypt.floor===0', 10000, 'entrar en el piso 1');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 1 listo');
+        await sleep(1000);
+
+        await clickMesh('npc-crypt_guide');
+        await until(`${S}.dialogue()?.npcId==='crypt_guide'`, 15000, 'hablar con Nina');
+        const setup = await js(`(() => {
+            const w=${W}, player=w.player.pos;
+            const cell=w.grid.nearestWalkable({x:player.x+4,y:player.y});
+            if (cell<0) throw new Error('No hay una celda caminable para el enemigo de prueba');
+            const pos=w.grid.center(cell);
+            const enemy=w.spawnEnemy('melee',pos,1);
+            enemy.state='pursue';
+            enemy.frozen=true;
+            const distance=Math.hypot(enemy.pos.x-player.x,enemy.pos.y-player.y);
+            const guide=w.npcs.find((npc)=>npc.npcId==='crypt_guide');
+            return {
+                enemyId:enemy.id,
+                state:enemy.state,
+                distance,
+                guideDistance:guide?Math.hypot(guide.pos.x-enemy.pos.x,guide.pos.y-enemy.pos.y):null,
+                fighting:__game.crypt.fighting,
+                floor:__game.crypt.floor,
+            };
+        })()`);
+        check(
+            'JL-356: hay un enemigo en pelea a menos de 20 m del jugador y Nina',
+            setup.state==='pursue' && setup.distance<=20 && setup.guideDistance!==null && setup.guideDistance<=20 && setup.fighting && setup.floor===0,
+            JSON.stringify(setup),
+        );
+
+        const returnOption='Llévame al pueblo.';
+        const optionPoint = await js(`(() => {
+            const option=[...document.querySelectorAll('.dlg-opt')].find((item)=>item.querySelector('.t')?.textContent.trim()===${JSON.stringify(returnOption)});
+            if (!option) return null;
+            const rect=option.getBoundingClientRect();
+            return {x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+        })()`);
+        if (!optionPoint) throw new Error('No está visible la opción «Llévame al pueblo.»');
+        const message='No te puedo sacar mientras peleas.';
+        await mouse(optionPoint.x, optionPoint.y);
+        await until(
+            `[...document.querySelectorAll('.chat-line, .toast')].some((item)=>item.textContent.includes(${JSON.stringify(message)}))`,
+            5000,
+            'aviso de Nina mientras pelea',
+        );
+        await sleep(250);
+        const response = await js(`(() => {
+            const message=${JSON.stringify(message)};
+            const enemy=${W}.enemies.get(${setup.enemyId});
+            const player=${W}.player.pos;
+            return {
+                message:[...document.querySelectorAll('.chat-line, .toast')].find((item)=>item.textContent.includes(message))?.textContent.trim()??null,
+                floor:__game.crypt.floor,
+                dialogue:${S}.dialogue()?.npcId??null,
+                fighting:__game.crypt.fighting,
+                enemyState:enemy?.state??null,
+                enemyDistance:enemy?Math.hypot(enemy.pos.x-player.x,enemy.pos.y-player.y):null,
+            };
+        })()`);
+        check(
+            'JL-356: Nina muestra el rechazo y el jugador sigue en el piso 1',
+            response.message?.includes(message) && response.floor===0 && response.fighting && response.enemyDistance!==null && response.enemyDistance<=20,
+            JSON.stringify(response),
+        );
+        await shot('jl356-nina-no-saca-durante-pelea');
+        check('JL-356: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');

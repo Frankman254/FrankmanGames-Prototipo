@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-356: verificar el rechazo de Nina durante el combate (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `criptaGuiaPelea`: abre el diálogo real de Nina en el piso 1, prepara un enemigo de QA inmovilizado en el estado de combate `pursue` a menos de 20 m y elige «Llévame al pueblo.». Comprueba que Nina muestra «No te puedo sacar mientras peleas.» y que el jugador permanece en el piso 1; no se modificaron reglas ni código productivo.
+
+**Validación:** Electron `criptaGuiaPelea`: 4/4 comprobaciones, enemigo a 4 m del jugador y 4,72 m de Nina al preparar el escenario, 2,74 m al responder; mensaje literal visible, piso 1 y consola limpia. `node --check scripts/qaElectron.mjs`, `npm test`, `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** resultado `work/junie-jl356/electron/resultado.json` y captura revisada `work/junie-jl356/electron/jl356-nina-no-saca-durante-pelea.jpg`.
+
+---
+
 ## 2026-11-26 — JL-355: probar a Chalo y Nina en la cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
