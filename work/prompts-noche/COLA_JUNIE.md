@@ -1654,7 +1654,7 @@ Contexto del coordinador:
 
 ### D. Inglés y textos
 - [x] JL-372 Interfaz en inglés: diálogos de Berto, Chalo y Nina, el aviso de pelea de Nina y el título de los pisos. Lista lo que se quede en español. — commit «JL-372: traducir diálogos y rótulos de la cripta» — Suite 5.084 aprobadas (1 omitida, 1 todo), typecheck, build y docs:check correctos; Electron `jl372InglesCripta` 10/10, consola limpia. Restan las placas 3D, `Consejo`, `Cargando modelos (N)…`, `100 monedas` y el mensaje de consumo de llave; «duendes» se conserva en una frase inglesa. Evidencia: `work/junie-jl372/RESULTADO.md` y `work/junie-jl372/electron/`.
-- [ ] JL-373 Lista de los textos del juego que todavía dicen «hilo de retorno», «Ovillo» o «posima/poción de regreso», para que el creador decida si el guía cambia algún nombre. Solo lista.
+- [x] JL-373 Lista de los textos del juego que todavía dicen «hilo de retorno», «Ovillo» o «posima/poción de regreso», para que el creador decida si el guía cambia algún nombre. Solo lista. — commit «JL-373: listar los textos de retorno de la cripta» — `work/junie-jl373/RESULTADO.md`; `npm test` 5.084 aprobadas (1 omitida, 1 todo), `npm run typecheck` limpio y `npm run docs:check` (215 rutas).
 
 ### E. Reintentos
 - [ ] JL-374 Reintenta JL-64 (rework de los pisos a mano). Las pruebas de antorchas siguen mandando: si sigue bloqueada, `[!]` con la lista exacta de pruebas que caen y por qué.

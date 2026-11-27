@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-373: listar los textos de retorno de la cripta (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Lista de las menciones visibles de «Hilo de retorno», «Ovillo» y consumibles relacionados con volver desde la cripta, con sus textos en español e inglés. No se modificaron textos ni nombres del juego.
+
+**Validación:** Búsqueda en `src/` y `data/`; `npm test`: 430 archivos, 5.084 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en tres proyectos; `npm run docs:check` validó 215 rutas.
+
+**Evidencia:** `work/junie-jl373/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-372: traducir diálogos y rótulos de la cripta (Junie)
 
 **Archivos:** `src/i18n.ts`, `src/main.ts`, `src/ui/loadingScreen.ts`, `src/ui/menus/shop.ts`, `tests/i18nContent.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
