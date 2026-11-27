@@ -1,6 +1,5 @@
 // EXPLORATORIO, NO FIEL (auditoría externa 2026-11-26): fórmulas aproximadas fuera del World; no
 // usar sus conclusiones para balance. La medición fiel es `npm run balance:fiel` (scripts/balance/fiel.ts).
-// Además aplica la resistencia del propio atacante al daño que hace (fallo conocido, sin corregir).
 // JEQ-07: Auditoría integral de balance — Fase 3, 4, 5, 6
 // Simula builds completas usando las fórmulas reales del juego.
 import { loadGameData } from '../../src/data';
@@ -151,10 +150,10 @@ function computeBuildMetrics(session: GameSession, rules: DamageRules, build: st
             const base = Math.floor(avgBase + scaling * m(elStat));
             const withPower = Math.floor(base * (1 + m('power') / 100));
             const withFlatDmg = withPower + m(dmgStat);
-            const afterResist = Math.max(1, Math.floor(withFlatDmg * (1 - effectiveResistByElement[el] / 100)));
+            const outgoingDamage = Math.max(1, Math.floor(withFlatDmg));
             const speed = weaponDef.weapon.speed || 1.0;
-            dpsSustainable[el] = Math.round((afterResist / speed) * 100) / 100;
-            dpsBurst[el] = afterResist;
+            dpsSustainable[el] = Math.round((outgoingDamage / speed) * 100) / 100;
+            dpsBurst[el] = outgoingDamage;
         } else {
             dpsSustainable[el] = m(dmgStat);
             dpsBurst[el] = m(dmgStat);

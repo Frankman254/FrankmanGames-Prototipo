@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-391: corregir resistencia en el DPS de builds (Junie)
+
+**Archivos:** `scripts/balance/auditBuilds.ts`, `tests/balance/auditBuilds.test.ts`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El DPS exploratorio de `auditBuilds.ts` ya no descuenta la resistencia del mismo personaje que ataca; conserva sus resistencias como métricas defensivas y mantiene la etiqueta «EXPLORATORIO, NO FIEL». La prueba detectó la referencia indebida antes del cambio y pasa tras corregirlo.
+
+**Validación:** La prueba JL-391 falló antes del arreglo y pasó 1/1 después; `npx tsc --noEmit` y `npm run typecheck` limpios; `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check` limpio. No aplica Electron: es una auditoría de consola sin interfaz.
+
+**Evidencia:** `work/junie-jl391/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — MOD-09b: tocados, mochilas, capas y armas con identidad propia (Claude)
 
 **Archivos:** `assets/models/equipo.glb`, `scripts/blender/equipo.py`, `PROCEDENCIA.md`, `docs/TAREAS.md`.

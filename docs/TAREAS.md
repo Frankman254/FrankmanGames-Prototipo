@@ -502,6 +502,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-390 | J | Hecho (commit «JL-390: comprobar exceso de XP mínima en grupos») | `distribute()` puede asignar más XP total que la del monstruo: con un pool de 100 XP, cinco jugadores de `share` 0,20 reciben 25 XP cada uno por `minXpShare: 0.25` (125 XP en total). La prueba observa el comportamiento actual; no se arregló ni cambió ninguna cifra. Pregunta al creador en `docs/ACCIONES_CREADOR.md`. | `tests/rpg/energySpoils.test.ts`: 51/51; `npm test`: 434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` (218 rutas) limpios. Evidencia: `work/junie-jl390/RESULTADO.md`. No aplica Electron: prueba pura, sin cambio visual. |
 
+## Cierre de JL-391 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-391 | Junie | Hecho (commit «JL-391: corregir resistencia en el DPS de builds») | `auditBuilds.ts` calcula el daño saliente sin aplicar la resistencia defensiva del atacante; conserva la cabecera «EXPLORATORIO, NO FIEL». `tests/balance/auditBuilds.test.ts`: roja antes del arreglo, verde 1/1 después. `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios. Evidencia: `work/junie-jl391/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Cierre de JL-393 (2026-11-27)
 
 | ID | Quién | Estado | Evidencia |
