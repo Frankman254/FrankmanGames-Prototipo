@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-408: verificar el contador del set de la Diablica en tooltips (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `tests/eq10_diablicaEspeja.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia Electron en `work/junie-jl408/electron/`.
+
+**Qué se hizo:** Añadí el escenario `jl408TooltipConjunto` y una prueba sobre los datos reales del set de La Diablica Espeja. El tooltip presenta 0/8 sin piezas, 2/8 con dos y 8/8 con todas; los umbrales de 2, 4, 6 y 8 piezas se activan de acuerdo con lo equipado. No se modificó lógica ni datos productivos.
+
+**Validación:** Prueba dirigida: 6/6; Electron: 7/7, consola limpia; capturas de 0/8, 2/8 y 8/8 revisadas. `npm test`: 437 archivos, 5.113 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` (220 rutas), `node --check scripts/qaElectron.mjs` y Prettier del test limpios.
+
+**Evidencia:** `work/junie-jl408/electron/resultado.json` y `jl408-diablica-{0,2,8}-de-8.jpg`.
+
+---
+
 ## 2026-11-27 — JL-407: habilitar teclado en barra y menús principales (Junie)
 
 **Archivos:** `src/main.ts`, `src/ui/menus/hud.ts`, `src/ui/menus/index.ts`, `src/ui/styles/menus.css`, `src/ui/styles/ventanas.css`, `data/i18n/en.ui.json`, `scripts/i18nUi.mjs`, `scripts/qaElectron.mjs`, `tests/jl407_keyboardAccess.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia local en `work/junie-jl407/`.

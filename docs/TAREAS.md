@@ -577,6 +577,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-407 | Junie | Hecho (commit «JL-407: habilitar teclado en barra y menús principales») | `tests/jl407_keyboardAccess.test.ts`: 8/8; `npm test`: 437 archivos, 5.112 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` (220 rutas) limpios; detector i18n: 0 faltantes; Electron 20/20, consola limpia. Las operaciones que siguen requiriendo puntero están listadas en `work/junie-jl407/RESULTADO.md`. `npm run format:check` reporta 226 archivos; la prueba nueva pasa Prettier específico. |
 
+## Cierre de JL-408 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-408 | Junie | Hecho (commit «JL-408: verificar el contador del set de la Diablica en tooltips») | El tooltip del set refleja las piezas equipadas: 0/8, 2/8 y 8/8; umbrales 2/4/6/8 correctos. `tests/eq10_diablicaEspeja.test.ts`: 6/6; Electron `jl408TooltipConjunto`: 7/7, consola limpia y capturas revisadas. `npm test`: 437 archivos, 5.113 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` (220 rutas) limpios. Evidencia: `work/junie-jl408/electron/`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

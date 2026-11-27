@@ -7,6 +7,10 @@ import { describe, expect, it } from 'vitest';
 import ajuste from '../data/art/ajusteEquipo.json';
 import loot from '../data/rpg/loot.json';
 import { loadGameData } from '../src/data';
+import { EQUIP_SLOTS, type EquipmentView } from '../src/rpg/contracts';
+import { ItemFactory } from '../src/rpg/items';
+import { Rng } from '../src/sim/rng';
+import { itemTooltip } from '../src/ui/menus/format';
 
 const ROOT = join(__dirname, '..');
 const game = loadGameData();
@@ -14,8 +18,24 @@ const items = game.rpg.items;
 const SET = 'diablica_espeja';
 const SLOTS = ['head', 'chest', 'amulet', 'waist', 'hands', 'feet', 'back', 'weapon'] as const;
 const pieceId = (slot: string): string => `${SET}_${slot === 'weapon' ? 'staff' : slot}`;
-const BONES = ['hips', 'spine', 'chest', 'head', 'upperArmL', 'foreArmL', 'handL', 'upperArmR', 'foreArmR', 'handR',
-    'thighL', 'shinL', 'footL', 'thighR', 'shinR', 'footR'];
+const BONES = [
+    'hips',
+    'spine',
+    'chest',
+    'head',
+    'upperArmL',
+    'foreArmL',
+    'handL',
+    'upperArmR',
+    'foreArmR',
+    'handR',
+    'thighL',
+    'shinL',
+    'footL',
+    'thighR',
+    'shinR',
+    'footR',
+];
 
 function glbNodes(file: string): string[] {
     const b = readFileSync(join(ROOT, 'assets', 'models', file));
@@ -48,7 +68,8 @@ describe('EQ-10: ajuar de La Diablica Espeja', () => {
             // Nada se sale del orden de su franja (route_03, nivel 52: hasta ~146 de vida, ~31 de atributo).
             for (const r of items[pieceId(slot)]!.rolls) {
                 if (r.stat === 'maxHealth') expect(r.max, `${slot} vida`).toBeLessThanOrEqual(150);
-                if (r.stat === 'strength' || r.stat === 'agility') expect(r.max, `${slot} ${r.stat}`).toBeLessThanOrEqual(32);
+                if (r.stat === 'strength' || r.stat === 'agility')
+                    expect(r.max, `${slot} ${r.stat}`).toBeLessThanOrEqual(32);
             }
         }
         expect(items[pieceId('weapon')]!.weapon?.element).toBe('earth');
@@ -83,7 +104,10 @@ describe('EQ-10: ajuar de La Diablica Espeja', () => {
             .map((t) => t.file.replace(/^.*\//, '').replace(/\.glb$/, ''))
             .filter((f) => /^(centinela|oraculo|cazador)(_f)?_anime$/.test(f));
         expect(heroes.length).toBe(6);
-        const fit = ajuste as unknown as Record<string, Record<string, { at: number[]; rot: number[]; scale: number[] }>>;
+        const fit = ajuste as unknown as Record<
+            string,
+            Record<string, { at: number[]; rot: number[]; scale: number[] }>
+        >;
         for (const h of heroes) {
             for (const b of BONES) {
                 const f = fit[h]?.[b];
@@ -95,5 +119,41 @@ describe('EQ-10: ajuar de La Diablica Espeja', () => {
                 }
             }
         }
+    });
+
+    it('el tooltip cuenta las piezas puestas y activa los umbrales correctos', () => {
+        const factory = new ItemFactory(game.rpg, new Rng(408));
+        const pieces = SLOTS.map((slot) => factory.create(pieceId(slot)));
+        const empty = Object.fromEntries(EQUIP_SLOTS.map((slot) => [slot, null])) as EquipmentView;
+        const setLines = (equipment: EquipmentView, equipped: boolean) =>
+            itemTooltip(pieces[0]!, {
+                content: game.rpg,
+                equipment,
+                equipped,
+                compare: [],
+                sellValue: 0,
+                playerLevel: 50,
+            }).filter((line) => line.kind === 'set');
+        const setName = (lines: ReturnType<typeof setLines>) =>
+            lines.find((line) => line.text.startsWith('de la Diablica Espeja'));
+        const bonusPieces = (lines: ReturnType<typeof setLines>) =>
+            lines.filter((line) => /^\(\d+ piezas\)$/.test(line.text));
+
+        const noneWorn = setLines(empty, false);
+        expect(setName(noneWorn)).toMatchObject({ text: 'de la Diablica Espeja (0/8)', active: false });
+        expect(bonusPieces(noneWorn).map((line) => line.active)).toEqual([false, false, false, false]);
+
+        const partial: EquipmentView = { ...empty, head: pieces[0]!, chest: pieces[1]! };
+        const twoWorn = setLines(partial, true);
+        expect(setName(twoWorn)).toMatchObject({ text: 'de la Diablica Espeja (2/8)', active: true });
+        expect(bonusPieces(twoWorn).map((line) => line.active)).toEqual([true, false, false, false]);
+
+        const full = {
+            ...empty,
+            ...Object.fromEntries(SLOTS.map((slot, index) => [slot, pieces[index]!])),
+        } as EquipmentView;
+        const allWorn = setLines(full, true);
+        expect(setName(allWorn)).toMatchObject({ text: 'de la Diablica Espeja (8/8)', active: true });
+        expect(bonusPieces(allWorn).map((line) => line.active)).toEqual([true, true, true, true]);
     });
 });

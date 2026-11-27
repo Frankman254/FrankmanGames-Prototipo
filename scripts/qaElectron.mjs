@@ -6950,6 +6950,73 @@ const scenarios = {
         await shot('eq10-mochila');
     },
 
+    // JL-408: el tooltip del set debe reflejar las piezas de la Diablica que están puestas.
+    async jl408TooltipConjunto() {
+        await resize(1920, 1080);
+        await newGame('QA Set Tooltip');
+        const ids = ['head', 'chest', 'amulet', 'waist', 'hands', 'feet', 'back', 'staff'].map(
+            (s) => `diablica_espeja_${s}`,
+        );
+        const equippedTwo = await js(`(() => {
+            const c=${S}.character;
+            c.level=50;
+            c.spellbook.level=50;
+            const ids=${JSON.stringify(ids)};
+            for (const id of ids) c.give(id);
+            return ids.slice(0, 2).map(id => {
+                const item=c.inventory.slots.find(slot => slot?.itemId===id);
+                return item ? ${S}.equip(item.uid) : null;
+            });
+        })()`);
+        check('JL-408: se equipan dos piezas de la Diablica', equippedTwo.every((result) => result?.ok));
+        await key('KeyB', 'b');
+        await until(`!!document.querySelector('.panel-inventory')?.offsetParent`, 5000, 'mochila abierta');
+
+        const verifyTooltip = async (selector, expected, capture) => {
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1, y: 1 });
+            const point = await locate(selector);
+            if (!point) throw new Error(`No está visible: ${selector}`);
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y });
+            const expectedText = `de la Diablica Espeja (${expected}/8)`;
+            await until(
+                `!!document.querySelector('.tooltip') && !document.querySelector('.tooltip').hidden && [...document.querySelectorAll('.tooltip .tip-set')].some(line => line.textContent.trim()===${JSON.stringify(expectedText)})`,
+                3000,
+                `tooltip ${expectedText}`,
+            );
+            const shown = await js(`document.querySelector('.tooltip .tip-set')?.textContent.trim() ?? null`);
+            const actual = await js(`Object.values(${S}.equipment()).filter(item => item && ${S}.content.items[item.itemId]?.setId==='diablica_espeja').length`);
+            check(`JL-408: tooltip ${expected}/8 coincide con las piezas puestas`, shown === expectedText && actual === expected, JSON.stringify({ shown, actual }));
+            await js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+            await shot(capture);
+        };
+
+        await verifyTooltip(
+            '.panel-inventory .inv-grid .cell.filled[aria-label="Cuello de la Diablica Espeja"]',
+            2,
+            'jl408-diablica-2-de-8',
+        );
+
+        const unequipped = await js(`['head', 'chest'].map(slot => ${S}.unequip(slot))`);
+        check('JL-408: se retiran las dos piezas equipadas', unequipped.every((result) => result.ok));
+        await sleep(250);
+        await verifyTooltip(
+            '.panel-inventory .inv-grid .cell.filled[aria-label="Cuello de la Diablica Espeja"]',
+            0,
+            'jl408-diablica-0-de-8',
+        );
+
+        const equippedAll = await js(`(() => {
+            const c=${S}.character;
+            return ${JSON.stringify(ids)}.map(id => {
+                const item=c.inventory.slots.find(slot => slot?.itemId===id);
+                return item ? ${S}.equip(item.uid) : null;
+            });
+        })()`);
+        check('JL-408: se equipan las ocho piezas de la Diablica', equippedAll.every((result) => result?.ok));
+        await sleep(250);
+        await verifyTooltip('.panel-inventory .doll .eq-head', 8, 'jl408-diablica-8-de-8');
+    },
+
     async mochilaMitades() {
         // UI-06b: mitad personaje y mitad casillas, y al agrandar la ventana crece el personaje.
         await newGame('QA Mochila');
