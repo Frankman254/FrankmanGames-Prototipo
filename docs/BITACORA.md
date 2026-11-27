@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-376: audios sin referencia y su procedencia (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reintenté JL-300 e inventarié por separado los 64 audios sin referencia de ejecución que están en `assets/audio/`: 63 WAV y `cripta_descenso.ogg`. Cada ruta incluye el número de la fila que la registra en `PROCEDENCIA.md`. No se borró, movió ni modificó ningún audio; conservarlo o retirarlo sigue siendo decisión del creador.
+
+**Validación:** El inventario actual contiene 63 WAV y 23 OGG; las rutas de `contextMusic.ts` y `stingers.ts` referencian las otras 22 pistas OGG. `npx tsc --noEmit`, `npx vitest run` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`) y `npm run docs:check` limpios. No aplica captura Electron: auditoría documental sin cambio visual.
+
+**Evidencia:** `work/junie-jl376/AUDIOS_SIN_USO.md`.
+
+---
+
 ## 2026-11-27 — JL-375: verificar partículas, niebla y luz de los tiempos existentes (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `tests/weatherVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
