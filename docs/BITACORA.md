@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-355: probar a Chalo y Nina en la cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `criptaPnj`: verifica a Chalo y Nina con sus rótulos a 2,5 m de la llegada del piso 1; compra una poción menor de vida a Chalo y confirma el descuento y el inventario; luego elige con Nina «Llévame al pueblo.» y comprueba la pantalla de carga y el regreso a Villa Raspadura. El oro de prueba y el encuadre de cámara se ajustan solo en QA; no se alteran cifras ni comportamiento productivos.
+
+**Validación:** Electron `criptaPnj`: 8/8 comprobaciones, consola limpia; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` (214 rutas) limpios.
+
+**Evidencia:** `work/junie-jl355/electron/resultado.json` y las tres capturas revisadas `jl355-cripta-llegada-pnjs.jpg`, `jl355-chalo-compra-pocion.jpg` y `jl355-nina-villa-raspadura.jpg`.
+
+---
+
 ## 2026-11-26 — JL-354: probar el acceso a la cripta con Berto (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

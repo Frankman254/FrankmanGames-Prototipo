@@ -1614,7 +1614,7 @@ Contexto del coordinador:
   - Sin llave sale el nodo `noKey`.
   - Elegir «Bajar al piso 10» entra en el piso 10.
   - Capturas.
-- [ ] JL-355 Escenario `criptaPnj`: en el piso 1 se ven Chalo y Nina con su cartel, a menos de 6 m de la llegada.
+- [x] JL-355 Escenario `criptaPnj`: en el piso 1 se ven Chalo y Nina con su cartel, a menos de 6 m de la llegada. — commit «JL-355: probar a Chalo y Nina en la cripta» — Electron 8/8, consola limpia; ambos visibles a 2,5 m de la llegada, compra 100→93 monedas y 3→4 pociones, regreso con carga a Villa Raspadura. Tres capturas revisadas en `work/junie-jl355/electron/`.
   - Comprar a Chalo una poción menor de vida: el oro baja y la poción entra en la mochila.
   - Hablar con Nina y elegir «Llévame al pueblo.»: sale la pantalla de carga y el jugador aparece en Villa Raspadura.
   - Capturas de los tres momentos.

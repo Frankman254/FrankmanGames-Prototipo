@@ -6903,6 +6903,116 @@ const scenarios = {
         await shot('jl354-berto-piso-10');
     },
 
+    /** JL-355: PNJ y carteles junto a la llegada del piso 1; compra y retorno con Nina. */
+    async criptaPnj() {
+        await newGame('QA Chalo');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100; ${S}.character.gold=100`);
+        await js(`__game.crypt.enter(0,'above')`);
+        await until('__game.crypt.floor===0', 10000, 'entrar en el piso 1');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 1 listo');
+        await sleep(1400);
+
+        const arrival = await js(`(() => {
+            const w=${W}, scene=__game.view.scene, point=__game.crypt.floorData?.arrivalFromAbove;
+            const staff=['crypt_peddler','crypt_guide'].map((id) => {
+                const npc=w.npcs.find((item) => item.npcId===id);
+                const sign=scene.getMeshByName('npc-sign-'+id);
+                const model=scene.getTransformNodeByName('npc-'+id);
+                return {
+                    id,
+                    distance: npc&&point ? Math.hypot(npc.pos.x-point.x,npc.pos.y-point.y) : null,
+                    sign: !!sign&&sign.isEnabled()&&sign.isVisible,
+                    model: !!model&&model.isEnabled(),
+                };
+            });
+            return {floor:__game.crypt.floor,point,staff};
+        })()`);
+        const nearbyStaff = arrival.staff.length===2 && arrival.staff.every((npc) => npc.distance!==null && npc.distance<6);
+        const visibleStaff = arrival.staff.length===2 && arrival.staff.every((npc) => npc.sign && npc.model);
+        check('JL-355: Chalo y Nina están a menos de 6 m de la llegada del piso 1', arrival.floor===0 && nearbyStaff, JSON.stringify(arrival));
+        check('JL-355: se ven ambos PNJ y sus carteles en la llegada', visibleStaff, JSON.stringify(arrival.staff));
+        await js('(() => { const r=__game.view.rig; r.pitchDeg=68; r.distance=12; })()');
+        await sleep(900);
+        await shot('jl355-cripta-llegada-pnjs');
+
+        await clickMesh('npc-crypt_peddler');
+        await until('!!document.querySelector(".panel-shop")?.offsetParent', 15000, 'tienda de Chalo');
+        const offer = await js(`(() => {
+            const merchant=${S}.merchant('crypt_peddler');
+            return {
+                heading:document.querySelector('.panel-shop h2')?.textContent.trim() ?? '',
+                index:merchant?.stock.findIndex((item) => item.item.itemId==='minor_health_potion') ?? -1,
+                gold:${S}.character.gold,
+                potions:${S}.character.inventory.count('minor_health_potion'),
+            };
+        })()`);
+        check('JL-355: el clic en Chalo abre su tienda con la poción menor de vida', offer.heading.includes('Chalo Farol') && offer.index>=0, JSON.stringify(offer));
+        if (offer.index<0) throw new Error('Chalo no ofrece la poción menor de vida');
+        const potionCell = await js(`(() => {
+            const cell=document.querySelector('.panel-shop .shop-grid:not(.buyback)')?.children[${offer.index}];
+            if (!cell) return null;
+            const rect=cell.getBoundingClientRect();
+            return {x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+        })()`);
+        if (!potionCell) throw new Error('No aparece la poción menor de vida en el stock de Chalo');
+        await mouse(potionCell.x, potionCell.y);
+        await until('[...document.querySelectorAll("button")].some((b)=>b.offsetParent!==null&&b.textContent.trim()==="Comprar")', 5000, 'confirmación de compra');
+        await button('Comprar');
+        await until(`${S}.character.inventory.count('minor_health_potion')>${offer.potions}`, 5000, 'poción en la mochila');
+        const purchase = await js(`({gold:${S}.character.gold,potions:${S}.character.inventory.count('minor_health_potion')})`);
+        check('JL-355: comprar la poción menor de vida descuenta oro y la guarda en la mochila', purchase.gold<offer.gold && purchase.potions>offer.potions, JSON.stringify({before:offer,after:purchase}));
+        await sleep(350);
+        await shot('jl355-chalo-compra-pocion');
+
+        for (let i=0; i<4 && (await js('!!document.querySelector(".panel-shop")?.offsetParent || !!document.querySelector(".panel-inventory-trade")?.offsetParent')); i++) {
+            await key('Escape','Escape');
+            await sleep(250);
+        }
+        await clickMesh('npc-crypt_guide');
+        await until(`${S}.dialogue()?.npcId==='crypt_guide'`, 15000, 'hablar con Nina');
+        const nina = await js(`(() => {
+            const d=${S}.dialogue();
+            return {npcId:d?.npcId??null,name:d?.name??null,options:d?.options.map((option)=>option.text)??[]};
+        })()`);
+        const returnOption='Llévame al pueblo.';
+        check('JL-355: Nina ofrece «Llévame al pueblo.»', nina.npcId==='crypt_guide' && nina.options.includes(returnOption), JSON.stringify(nina));
+        const optionPoint = await js(`(() => {
+            const option=[...document.querySelectorAll('.dlg-opt')].find((item)=>item.querySelector('.t')?.textContent.trim()===${JSON.stringify(returnOption)});
+            if (!option) return null;
+            const rect=option.getBoundingClientRect();
+            return {x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+        })()`);
+        if (!optionPoint) throw new Error('No está visible la opción «Llévame al pueblo.»');
+        await js(`(() => {
+            const loading=document.querySelector('.carga');
+            if (!loading) throw new Error('No existe el elemento de pantalla de carga');
+            window.__jl355LoadingSeen=false;
+            const observe=()=>{ if (!loading.hidden) window.__jl355LoadingSeen=true; };
+            const observer=new MutationObserver(observe);
+            observer.observe(loading,{attributes:true,attributeFilter:['hidden','class']});
+            window.__jl355LoadingObserver=observer;
+        })()`);
+        await mouse(optionPoint.x, optionPoint.y);
+        await until('window.__jl355LoadingSeen===true', 5000, 'pantalla de carga al salir con Nina');
+        await until(
+            `__game.crypt.floor===null && __game.place?.scene==='overworld' && ${W}.currentZone?.id==='raspadura' && __game.place?.stone==='raspadura'`,
+            30000,
+            'aparecer en Villa Raspadura',
+        );
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'fin de la carga a Villa Raspadura');
+        const destination = await js(`({place:__game.place,zone:${W}.currentZone?.id??null,floor:__game.crypt.floor,loadingSeen:window.__jl355LoadingSeen,player:${W}.player.pos})`);
+        check(
+            'JL-355: la opción de Nina muestra carga y deja al jugador en Villa Raspadura',
+            destination.place?.scene==='overworld' && destination.place?.stone==='raspadura' && destination.zone==='raspadura' && destination.floor===null && destination.loadingSeen,
+            JSON.stringify(destination),
+        );
+        await js('window.__jl355LoadingObserver?.disconnect(); delete window.__jl355LoadingObserver');
+        await sleep(700);
+        await shot('jl355-nina-villa-raspadura');
+        check('JL-355: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');
