@@ -1,3 +1,17 @@
+## 2026-11-26 — JL-369: capturar la visibilidad de Chalo y Nina en la cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `criptaPnjVisibilidad`, que captura los pisos 1, 5, 10, 30, 50 y 100 desde la cámara manual del juego (yaw 45°, pitch 55°, distancia 13 m). No se modificó el comportamiento productivo ni los datos.
+
+**Resultado:** Chalo queda detrás de una pared en los pisos 1 y 5; solo se ven su moneda y su rótulo. En los pisos 10, 30, 50 y 100 se ve su cuerpo. Nina es visible en los seis pisos; no se observó oclusión de cámara.
+
+**Validación:** Electron 13/13, consola limpia; `npm test`: 430 archivos, 5.083 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y `node --check scripts/qaElectron.mjs` limpios. Capturas revisadas tras despejar los avisos transitorios de entrada.
+
+**Evidencia:** `work/junie-jl369/electron/resultado.json` y las seis capturas `jl369-piso-*.jpg`.
+
+---
+
 ## 2026-11-26 — MOD-09: equipo.glb cubre todos los equipables visibles; AUD-SFX-02 propuesto (Claude)
 
 **Archivos:** `assets/models/equipo.glb`, `scripts/blender/equipo.py`, `scripts/blender/validar_equipo.py`, `PROCEDENCIA.md`, `docs/TAREAS.md`.

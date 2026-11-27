@@ -7141,6 +7141,56 @@ const scenarios = {
         check('JL-355: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
     },
 
+    /** JL-369: capturas de Chalo y Nina desde la cámara de juego en seis pisos. */
+    async criptaPnjVisibilidad() {
+        await newGame('QA Chalo');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+        await js(`window.__qaVida=setInterval(()=>{const w=__game.world;if(w?.player)w.player.health=w.player.maxHealth;},50)`);
+
+        try {
+            for (const floor of [1, 5, 10, 30, 50, 100]) {
+                const entered = await js(`__game.crypt.enter(${floor - 1},'above')`);
+                check(`JL-369: entra al piso ${floor}`, entered, String(entered));
+                if (!entered) throw new Error(`No se pudo entrar al piso ${floor}`);
+                await until(`__game.crypt.floor===${floor - 1}`, 15000, `piso ${floor}`);
+                await until('!document.querySelector(".carga:not([hidden])")', 20000, `piso ${floor} listo`);
+                await sleep(4500);
+
+                const view = await js(`(() => {
+                    const w=${W}, scene=__game.view.scene, rig=__game.view.rig;
+                    const staff=['crypt_peddler','crypt_guide'].map(id => {
+                        const npc=w.npcs.find(item => item.npcId===id);
+                        const model=scene.getTransformNodeByName('npc-'+id);
+                        const sign=scene.getMeshByName('npc-sign-'+id);
+                        return {
+                            id,
+                            pos:npc ? {x:npc.pos.x,y:npc.pos.y} : null,
+                            model:!!model&&model.isEnabled(),
+                            visibleMeshes:model ? model.getChildMeshes().filter(mesh => mesh.isEnabled()&&mesh.isVisible).length : 0,
+                            sign:!!sign&&sign.isEnabled()&&sign.isVisible,
+                        };
+                    });
+                    const camera=rig.camera.position;
+                    return {
+                        floor:__game.crypt.floor+1,
+                        arrival:__game.crypt.floorData?.arrivalFromAbove??null,
+                        camera:{x:camera.x,y:camera.y,z:camera.z,yawDeg:rig.yawDeg,pitchDeg:rig.pitchDeg,distance:rig.viewDistance,mode:rig.mode},
+                        staff,
+                    };
+                })()`);
+                const rendered = view.floor===floor && view.staff.length===2 && view.staff.every(npc =>
+                    npc.pos && npc.model && npc.visibleMeshes>0 && npc.sign,
+                );
+                check(`JL-369: piso ${floor} carga modelos y rótulos de Chalo y Nina`, rendered, JSON.stringify(view));
+                console.log(`     piso ${floor}: ${JSON.stringify(view)}`);
+                await shot(`jl369-piso-${String(floor).padStart(3,'0')}`);
+            }
+        } finally {
+            await js(`clearInterval(window.__qaVida)`);
+        }
+    },
+
     /** JL-364: recargar npcs.json dentro de la cripta conserva a Chalo y Nina. */
     async criptaRecargaPnj() {
         await newGame('QA Chalo');
