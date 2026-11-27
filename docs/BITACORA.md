@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-386: ampliar la batería fiel a grupos (Junie)
+
+**Archivos:** `scripts/balance/fiel.ts`, `scripts/balance/metrics.ts`, `tests/balance/fiel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí `count: 2` para enemigos normales y de distancia, y `--jugadores 1,2,3,4`. Cada grupo rota por clases distintas hasta tres; el cuarto participante repite la clase inicial. Todos los personajes se crean al nivel base del enemigo y `placeGroup` distribuye los enemigos. `Recorder` suma el daño y la vida perdida de todos los participantes; el informe muestra la composición del grupo y TTK P10, mediana y P90. No cambié cifras productivas ni datos del juego.
+
+**Validación:** Batería completa: 2.376 filas y 23.760 corridas (10 semillas); cero discrepancias entre nivel inicial de los personajes y del enemigo, cero métricas no finitas y 219 partidas alcanzaron el límite de 120 s. Prueba dirigida: 6/6; `npm test`: 432 archivos, 5.093 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Prettier limpio en los tres archivos de código. No aplica Electron: solo cambia una herramienta de medición.
+
+**Evidencia:** `work/junie-jl386/FIEL.md` y `work/junie-jl386/runs.json`.
+
+---
+
 ## 2026-11-27 — JL-385: añadir perfil razonable a fiel.ts (Junie)
 
 **Archivos:** `scripts/balance/fiel.ts`, `tests/balance/fiel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

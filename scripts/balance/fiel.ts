@@ -15,7 +15,7 @@
 // - `razonable`: puntos gastados y equipo de nivel ≤ N con fuente en el botín de la franja o en una
 //   tienda normal del pueblo; no incluye los vendedores de pruebas ni de la cripta.
 //
-//   npm run balance:fiel -- [--seeds 10] [--skill medio] [--limit 120] [--out work/balance/FIEL]
+//   npm run balance:fiel -- [--seeds 10] [--skill medio] [--jugadores 1,2,3,4] [--limit 120] [--out work/balance/FIEL]
 import { mkdirSync, writeFileSync } from 'node:fs';
 import type { GameData } from '../../src/data';
 import type { ItemDef } from '../../src/rpg/contracts';
@@ -96,6 +96,7 @@ export interface FielSpec {
     classId: string;
     foe: Foe;
     count: number;
+    players?: number;
     profile: Profile;
     skill: SkillId;
     seed: number;
@@ -104,6 +105,9 @@ export interface FielSpec {
 
 export interface FielRun {
     classId: string;
+    classIds: string[];
+    playerLevels: number[];
+    players: number;
     enemy: string;
     role: Role;
     level: number;
@@ -206,32 +210,85 @@ export function enemyLevel(data: GameData, id: string): number {
     return data.rpg.enemies[id]?.level ?? 1;
 }
 
+export function parsePlayerCounts(value: string): number[] {
+    const counts = value.split(',').map((part) => Number(part.trim()));
+    if (counts.some((count) => !Number.isInteger(count) || count < 1 || count > 4))
+        throw new Error('--jugadores debe contener cantidades enteras de 1 a 4');
+    if (new Set(counts).size !== counts.length) throw new Error('--jugadores no admite valores repetidos');
+    return counts;
+}
+
+export function classRoster(classes: readonly string[], primary: string, players: number): string[] {
+    if (!Number.isInteger(players) || players < 1 || players > 4) throw new Error('classRoster: de 1 a 4 jugadores');
+    const start = classes.indexOf(primary);
+    if (classes.length === 0 || start < 0) throw new Error(`classRoster: clase desconocida ${primary}`);
+    return Array.from({ length: players }, (_, i) => classes[(start + i) % classes.length]!);
+}
+
+function dropSummons(session: GameSession): void {
+    const book = session.character.spellbook;
+    book.hotbar.forEach((id, i) => {
+        if (id && session.content.spells[id]?.effects.some((effect) => effect.type === 'summon')) book.hotbar[i] = null;
+    });
+}
+
 export function runFiel(field: GameData, spec: FielSpec): FielRun {
     const level = enemyLevel(field, spec.foe.id);
-    const seed = spec.seed * 7919 + 17;
-    const s =
-        spec.profile === 'preparado'
-            ? makeSessionAt(field, spec.classId, level, seed, true)
+    const classIds = classRoster(Object.keys(field.rpg.classes), spec.classId, spec.players ?? 1);
+    const sessions = classIds.map((classId, i) => {
+        const seed = spec.seed * 7919 + 17 + i * 101;
+        return spec.profile === 'preparado'
+            ? makeSessionAt(field, classId, level, seed, true)
             : spec.profile === 'razonable'
-              ? reasonableSession(field, spec.classId, spec.foe.id, level, seed)
-              : bareSession(field, spec.classId, level, seed);
-    const w = new World(field, { encounter: false, character: s.character, seed: spec.seed });
-    s.attach(w);
+              ? reasonableSession(field, classId, spec.foe.id, level, seed)
+              : bareSession(field, classId, level, seed);
+    });
+    const playerLevels = sessions.map((session) => session.character.level);
+    const w = new World(field, {
+        encounter: false,
+        character: sessions[0]!.character,
+        seed: spec.seed,
+        ...(sessions.length > 1 ? { lab: { companions: true } } : {}),
+    });
+    sessions[0]!.attach(w);
     w.player.pos = { ...FIELD_CENTER };
     w.player.prevPos = { ...FIELD_CENTER };
+    const ids = [w.player.id];
+    for (let i = 1; i < sessions.length; i++) {
+        const angle = (i / sessions.length) * Math.PI * 2;
+        const id = w.addCompanion(sessions[i]!.character, {
+            x: FIELD_CENTER.x + Math.cos(angle) * 1.5,
+            y: FIELD_CENTER.y + Math.sin(angle) * 1.5,
+        });
+        sessions[i]!.attach(w);
+        dropSummons(sessions[i]!);
+        ids.push(id);
+    }
     placeGroup(w, [{ archetype: spec.foe.id, count: spec.count }], new Rng(spec.seed ^ 0x9e3779b9));
-    const first = w.enemies.list[0];
-    const enemyMaxHealth = first ? first.def.maxHealth : 0;
-    const bot = new PlayerBot(w, s, { dodge: SKILLS[spec.skill], seed: spec.seed * 31 + 7 });
+    const enemyMaxHealth = w.enemies.list.reduce((total, enemy) => total + enemy.def.maxHealth, 0);
+    const bots = sessions.map(
+        (session, i) => new PlayerBot(w, session, { dodge: SKILLS[spec.skill], seed: spec.seed * 31 + 7 + i * 101 }),
+    );
     const rec = new Recorder(w);
     while (w.outcome === 'playing' && w.time < spec.limit) {
-        bot.think();
+        bots.forEach((bot, i) => w.as(ids[i]!, () => bot.think()));
         w.tick(DT);
-        rec.step(DT, bot.inCombat());
+        rec.step(
+            DT,
+            bots.some((bot) => bot.inCombat()),
+        );
     }
-    const ch = s.character;
+    const totalMaxHealth = sessions.reduce((total, session) => total + session.character.maxHealth, 0);
+    const remainingHealth = ids.reduce((total, id) => {
+        const participant = w.participant(id);
+        return total + (participant?.player.alive && participant.character.alive ? participant.character.health : 0);
+    }, 0);
+    const decisions = bots.reduce((total, bot) => total + bot.counters.decisions, 0);
     return {
         classId: spec.classId,
+        classIds,
+        playerLevels,
+        players: sessions.length,
         enemy: spec.foe.id,
         role: spec.foe.role,
         level,
@@ -241,14 +298,14 @@ export function runFiel(field: GameData, spec: FielSpec): FielRun {
         win: w.outcome === 'victory',
         died: w.outcome === 'defeat',
         seconds: w.endTime ?? w.time,
-        playerMaxHealth: ch.maxHealth,
+        playerMaxHealth: totalMaxHealth,
         enemyMaxHealth,
-        healthLeft: ch.alive ? ch.health / ch.maxHealth : 0,
-        potions: bot.counters.potions,
+        healthLeft: totalMaxHealth > 0 ? remainingHealth / totalMaxHealth : 0,
+        potions: bots.reduce((total, bot) => total + bot.counters.potions, 0),
         dealt: rec.tally.dealt,
         petDealt: rec.tally.petDealt,
         healthLost: rec.tally.healthLost,
-        starved: bot.counters.decisions > 0 ? bot.counters.starved / bot.counters.decisions : 0,
+        starved: decisions > 0 ? bots.reduce((total, bot) => total + bot.counters.starved, 0) / decisions : 0,
     };
 }
 
@@ -269,15 +326,15 @@ interface Row {
 function summarize(rows: Row[], limit: number): string {
     const f = (n: number, d = 0) => (Number.isFinite(n) ? n.toFixed(d) : '—');
     const lines = [
-        '| Clase | Perfil | Nv | Enemigo (papel) | × | Vida PJ | Vida enemigo | Victorias | Muertes | TTK P10 / mediana / P90 (s) | Vida restante (mediana) | Pociones (mediana) |',
-        '|---|---|---:|---|---:|---:|---:|---:|---:|---|---:|---:|',
+        '| Clases del grupo | Jugadores | Perfil | Nv | Enemigo (papel) | × | Vida grupo | Vida enemigos | Victorias | Muertes | TTK P10 / mediana / P90 (s) | Vida restante (mediana) | Pociones (mediana) |',
+        '|---|---:|---|---:|---|---:|---:|---:|---:|---:|---|---:|---:|',
     ];
     for (const r of rows) {
         const x = r.runs[0]!;
         const wins = r.runs.filter((q) => q.win);
         const t = wins.map((q) => q.seconds);
         lines.push(
-            `| ${x.classId} | ${x.profile} | ${x.level} | ${x.enemy} (${x.role}) | ${x.count} | ${x.playerMaxHealth} | ${x.enemyMaxHealth} | ${wins.length}/${r.runs.length} | ${r.runs.filter((q) => q.died).length} | ${
+            `| ${x.classIds.join(' + ')} | ${x.players} | ${x.profile} | ${x.level} | ${x.enemy} (${x.role}) | ${x.count} | ${x.playerMaxHealth} | ${x.enemyMaxHealth} | ${wins.length}/${r.runs.length} | ${r.runs.filter((q) => q.died).length} | ${
                 t.length
                     ? `${f(quantile(t, 0.1), 1)} / ${f(quantile(t, 0.5), 1)} / ${f(quantile(t, 0.9), 1)}`
                     : `— (límite ${limit} s)`
@@ -330,6 +387,7 @@ export function main(): void {
     const limit = Number(opt('--limit', '120'));
     const out = opt('--out', 'work/balance/FIEL');
     const only = opt('--clases', '');
+    const playerCounts = parsePlayerCounts(opt('--jugadores', '1'));
     const bandsArg = opt('--franjas', '');
     const data = buildData(rawData());
     const field = openField(data);
@@ -339,15 +397,18 @@ export function main(): void {
     const t0 = Date.now();
     for (const band of bands)
         for (const foe of band)
-            for (const count of foe.role === 'bruto' ? [1] : [1, 3])
-                for (const classId of classes)
-                    for (const profile of ['sin_puntos', 'preparado', 'razonable'] as Profile[]) {
-                        const runs: FielRun[] = [];
-                        for (let seed = 1; seed <= seeds; seed++)
-                            runs.push(runFiel(field, { classId, foe, count, profile, skill, seed, limit }));
-                        rows.push({ key: `${classId}/${profile}/${foe.id}x${count}`, runs });
-                        process.stdout.write('.');
-                    }
+            for (const count of foe.role === 'bruto' ? [1] : [1, 2, 3])
+                for (const players of playerCounts)
+                    for (const classId of classes)
+                        for (const profile of ['sin_puntos', 'preparado', 'razonable'] as Profile[]) {
+                            const runs: FielRun[] = [];
+                            for (let seed = 1; seed <= seeds; seed++)
+                                runs.push(
+                                    runFiel(field, { classId, foe, count, players, profile, skill, seed, limit }),
+                                );
+                            rows.push({ key: `${classId}/${players}j/${profile}/${foe.id}x${count}`, runs });
+                            process.stdout.write('.');
+                        }
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
     mkdirSync(out.replace(/\/[^/]*$/, '') || '.', { recursive: true });
     mkdirSync(out, { recursive: true });
@@ -364,9 +425,10 @@ export function main(): void {
         [
             '# BAL-P0-FIEL — combate a igualdad de nivel (medición, no balance aprobado)',
             '',
-            `${seeds} semillas por fila, bot «${skill}», límite ${limit} s, campo abierto, mascota invocada. Generado en ${secs} s con \`npm run balance:fiel\`.`,
+            `${seeds} semillas por fila, bot «${skill}», jugadores ${playerCounts.join(',')}, límite ${limit} s, campo abierto. Generado en ${secs} s con \`npm run balance:fiel\`.`,
             '`preparado` = puntos gastados + lo mejor de cada objeto de nivel ≤ N sin mirar si se consigue (techo). `sin_puntos` = diagnóstico.',
             '`razonable` = puntos gastados + equipo equipable de nivel ≤ N con fuente en la franja o en una tienda ordinaria.',
+            'Los grupos rotan clases; hasta tres participantes son de clases distintas, y el cuarto repite la clase inicial. Todos los personajes y enemigos están al nivel base del enemigo. `×` indica cantidad de enemigos; los bots usan `placeGroup` para colocar los enemigos.',
             'TTK solo de las victorias. Las cifras de `data/` siguen siendo PROPUESTA: esto no las cambia.',
             '',
             sourceReport(field, bands),

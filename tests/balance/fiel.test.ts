@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { BANDS, equipmentSources, obtainableEquipment, runFiel } from '../../scripts/balance/fiel';
+import {
+    BANDS,
+    classRoster,
+    equipmentSources,
+    obtainableEquipment,
+    parsePlayerCounts,
+    runFiel,
+} from '../../scripts/balance/fiel';
 import { buildData, rawData } from '../../scripts/balance/data';
 
 const field = buildData(rawData());
@@ -47,6 +54,54 @@ describe('balance fiel', () => {
         };
 
         expect(runFiel(field, spec)).toEqual(runFiel(field, spec));
+    });
+
+    it('parsea cantidades de jugadores de 1 a 4 y rechaza listas inválidas', () => {
+        expect(parsePlayerCounts('1,2,3,4')).toEqual([1, 2, 3, 4]);
+        expect(parsePlayerCounts('4, 2')).toEqual([4, 2]);
+        expect(() => parsePlayerCounts('0')).toThrow(/1 a 4/);
+        expect(() => parsePlayerCounts('2,2')).toThrow(/repetidos/);
+        expect(() => parsePlayerCounts('uno')).toThrow(/1 a 4/);
+    });
+
+    it('rota clases distintas en grupos de hasta tres y repite la inicial para cuatro', () => {
+        const classes = Object.keys(field.rpg.classes);
+
+        expect(classRoster(classes, 'ember_vanguard', 1)).toEqual(['ember_vanguard']);
+        expect(classRoster(classes, 'ember_vanguard', 3)).toEqual([
+            'ember_vanguard',
+            'storm_weaver',
+            'mangrove_hunter',
+        ]);
+        expect(classRoster(classes, 'mangrove_hunter', 4)).toEqual([
+            'mangrove_hunter',
+            'ember_vanguard',
+            'storm_weaver',
+            'mangrove_hunter',
+        ]);
+    });
+
+    it('simula count 2 con dos bots de clases distintas al nivel del enemigo', () => {
+        const result = runFiel(field, {
+            classId: 'ember_vanguard',
+            foe,
+            count: 2,
+            players: 2,
+            profile: 'sin_puntos',
+            skill: 'medio',
+            seed: 1,
+            limit: 120,
+        });
+
+        expect(result.count).toBe(2);
+        expect(result.players).toBe(2);
+        expect(result.classIds).toEqual(['ember_vanguard', 'storm_weaver']);
+        expect(result.level).toBe(field.rpg.enemies[foe.id]!.level);
+        expect(result.playerLevels).toEqual([result.level, result.level]);
+        expect(result.win || result.died).toBe(true);
+        for (const value of Object.values(result)) {
+            if (typeof value === 'number') expect(Number.isFinite(value)).toBe(true);
+        }
     });
 
     it('excluye equipo sin fuente de botín o tienda', () => {

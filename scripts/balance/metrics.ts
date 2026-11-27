@@ -104,7 +104,10 @@ export class Recorder {
     readonly tally = emptyTally();
 
     constructor(readonly world: World) {
-        watchHealth(world.character, this);
+        for (const id of world.participantIds()) {
+            const participant = world.participant(id);
+            if (participant) watchHealth(participant.character, this);
+        }
         // El botín puede recogerse en el mismo tick en que cae (radio de recogida),
         // antes de leer los sucesos: se cuenta al caer envolviendo `dropLoot`.
         const drop = world.dropLoot.bind(world);
@@ -118,8 +121,8 @@ export class Recorder {
     /** Llamar tras cada `world.tick(dt)`. */
     step(dt: number, inCombat: boolean): void {
         const w = this.world;
-        const me = w.player.id;
-        for (const e of w.drainEvents()) this.event(e, me);
+        const participants = new Set(w.participantIds());
+        for (const e of w.drainEvents()) this.event(e, participants);
         if (inCombat && w.player.alive) {
             const ch = w.character;
             const frac = ch.maxResource > 0 ? ch.resource / ch.maxResource : 1;
@@ -129,14 +132,14 @@ export class Recorder {
         }
     }
 
-    private event(e: GameEvent, me: number): void {
+    private event(e: GameEvent, participants: ReadonlySet<number>): void {
         const t = this.tally;
         switch (e.type) {
             case 'damage':
                 if (e.toPlayer) {
                     t.taken += e.amount;
                     if (e.ability === null) t.hitsTaken++;
-                } else if (e.sourceId === me) {
+                } else if (participants.has(e.sourceId)) {
                     t.dealt += e.amount;
                     const k = e.ability ?? '?';
                     t.damageBy[k] = (t.damageBy[k] ?? 0) + e.amount;
