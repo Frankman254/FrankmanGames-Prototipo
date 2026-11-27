@@ -1,3 +1,13 @@
+## 2026-11-27 — JL-394: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No comprobé ni corregí `scripts/balance/fiel.ts`, `fielRun.ts` o `gear.ts`: la única autorización en lote para Junie cubre JL-354…JL-383, y JL-384…JL-423 no consta autorizada. `BAL-P0-FIEL` describe la medición ampliada, pero no autoriza JL-394. Dejé la tarea bloqueada y añadí JL-394 a la solicitud de autorización existente; no cambié código ni pruebas.
+
+**Validación:** No ejecuté el typecheck ni las pruebas de código de JL-394 por falta de autorización. `npm run docs:check` valida los documentos modificados. No aplica Electron: no hubo cambio visual.
+
+---
+
 ## 2026-11-27 — JL-393: listar extremos de la batería fiel (Junie)
 
 **Archivos:** `work/junie-jl393/EXTREMOS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -4,9 +4,9 @@ Actualizado: 2026-11-27. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
-## Autorización pendiente (JL-391 y JL-392)
+## Autorización pendiente (JL-391, JL-392 y JL-394)
 
-En `docs/TAREAS.md`, la única autorización en lote para Junie cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe la batería ampliada, pero no autoriza la ejecución de sus tareas. JL-391 y JL-392 quedan bloqueadas por el mismo motivo y se detiene la cola. ¿Autorizas la tanda JL-384…JL-423 en `TAREAS.md`?
+En `docs/TAREAS.md`, la única autorización en lote para Junie cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe la batería ampliada, pero no autoriza la ejecución de sus tareas. JL-391, JL-392 y JL-394 quedan bloqueadas por el mismo motivo. ¿Autorizas la tanda JL-384…JL-423 en `TAREAS.md`?
 
 ## Pregunta pendiente (JL-390)
 
