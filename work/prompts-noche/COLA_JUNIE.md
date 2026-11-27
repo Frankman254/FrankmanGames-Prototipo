@@ -1639,7 +1639,7 @@ Contexto del coordinador:
   - no tapan el paso de la llegada a la escalera de bajada.
   - Si algún piso falla, arreglo pequeño en `cryptStaffSpots` con la prueba.
 - [x] JL-363 En los 100 pisos, cada estanque con lóbulos tiene orilla caminable conectada con la llegada y no corta el camino de la llegada a la escalera de bajada (`floodDistances`). — commit «JL-363: verificar orillas caminables de estanques con lóbulos» — `tests/jl363_lobedPonds.test.ts` 1/1; suite 5.074 aprobadas, typecheck limpio; evidencia en `work/junie-jl363/RESULTADO.md`.
-- [ ] JL-364 Modo edición: `World.applyRpgContent()` llama a `placeNpcs()`, que vacía `this.npcs`. Dentro de la cripta, recargar `npcs.json` borra a Chalo y Nina.
+- [x] JL-364 Modo edición: `World.applyRpgContent()` llama a `placeNpcs()`, que vacía `this.npcs`. Dentro de la cripta, recargar `npcs.json` borra a Chalo y Nina. — commit «JL-364: conservar PNJ interiores al recargar contenido RPG» — `tests/jl364_interiorNpcHotApply.test.ts` 1/1; Electron `criptaRecargaPnj` 6/6, consola limpia; capturas revisadas en `work/junie-jl364/electron/`.
   - Prueba que lo demuestre.
   - Arreglo pequeño: conservar los PNJ de interior.
 - [ ] JL-365 Prueba: la acción `leaveDungeon` en un PNJ que no es de la cripta es válida para el lector. Decide si debe serlo. Si no, valida en `content.ts` que solo la lleven PNJ con `crypt: true`, con su prueba y su mensaje de error.

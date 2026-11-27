@@ -7141,6 +7141,86 @@ const scenarios = {
         check('JL-355: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
     },
 
+    /** JL-364: recargar npcs.json dentro de la cripta conserva a Chalo y Nina. */
+    async criptaRecargaPnj() {
+        await newGame('QA Chalo');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(0,'above')`);
+        await until('__game.crypt.floor===0', 10000, 'entrar en el piso 1');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 1 listo');
+        await sleep(1200);
+
+        const before = await js(`(() => {
+            const w=${W}, scene=__game.view.scene, point=__game.crypt.floorData?.arrivalFromAbove;
+            return ['crypt_peddler','crypt_guide'].map((id) => {
+                const npc=w.npcs.find((item) => item.npcId===id);
+                const sign=scene.getMeshByName('npc-sign-'+id);
+                const model=scene.getTransformNodeByName('npc-'+id);
+                return {
+                    id,
+                    pos:npc ? {x:npc.pos.x,y:npc.pos.y} : null,
+                    distance:npc&&point ? Math.hypot(npc.pos.x-point.x,npc.pos.y-point.y) : null,
+                    sign:!!sign&&sign.isEnabled()&&sign.isVisible,
+                    model:!!model&&model.isEnabled(),
+                };
+            });
+        })()`);
+        check(
+            'JL-364: Chalo y Nina están presentes y visibles antes de recargar npcs.json',
+            before.length===2 && before.every((npc) => npc.pos && npc.distance<6 && npc.sign && npc.model),
+            JSON.stringify(before),
+        );
+        await js('(() => { const r=__game.view.rig; r.pitchDeg=68; r.distance=12; })()');
+        await sleep(700);
+        await shot('jl364-cripta-antes-recargar-npcs');
+
+        const applied = await js(`(async () => {
+            const original=__game.editor.applied('npcs');
+            const doc=JSON.parse(original);
+            doc.npcs.elder.position.x+=1;
+            const changed=JSON.stringify(doc);
+            window.__jl364Npcs={original,changed,expectedX:doc.npcs.elder.position.x};
+            const summary=await __game.editorApply(['npcs'],{npcs:original},{npcs:changed});
+            return {summary,expectedX:window.__jl364Npcs.expectedX,contentX:__game.world.content.npcs.elder.position.x};
+        })()`);
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'fin de recarga de npcs.json');
+        await sleep(700);
+        const after = await js(`(() => {
+            const w=${W}, scene=__game.view.scene;
+            const staff=['crypt_peddler','crypt_guide'].map((id) => {
+                const npc=w.npcs.find((item) => item.npcId===id);
+                const sign=scene.getMeshByName('npc-sign-'+id);
+                const model=scene.getTransformNodeByName('npc-'+id);
+                return {
+                    id,
+                    pos:npc ? {x:npc.pos.x,y:npc.pos.y} : null,
+                    sign:!!sign&&sign.isEnabled()&&sign.isVisible,
+                    model:!!model&&model.isEnabled(),
+                };
+            });
+            return {staff,changedElderX:w.content.npcs.elder.position.x};
+        })()`);
+        check(
+            'JL-364: la recarga aplicó el cambio a npcs.json',
+            applied.summary.includes('contenido') && applied.contentX===applied.expectedX,
+            JSON.stringify(applied),
+        );
+        check(
+            'JL-364: Chalo y Nina conservan sus posiciones, modelos y carteles tras recargar',
+            before.length===2 && after.staff.length===before.length && after.staff.every((npc,i) =>
+                before[i] && npc.id===before[i].id && npc.pos?.x===before[i].pos?.x && npc.pos?.y===before[i].pos?.y && npc.sign && npc.model),
+            JSON.stringify(after),
+        );
+        await shot('jl364-cripta-despues-recargar-npcs');
+
+        await js(`__game.editorApply(['npcs'],{npcs:window.__jl364Npcs.changed},{npcs:window.__jl364Npcs.original})`);
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'restaurar npcs.json de QA');
+        const restored = await js(`({elderX:__game.world.content.npcs.elder.position.x,expectedX:JSON.parse(window.__jl364Npcs.original).npcs.elder.position.x})`);
+        check('JL-364: el contenido RPG de QA vuelve al dato original en memoria', restored.elderX===restored.expectedX, JSON.stringify(restored));
+        check('JL-364: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
+    },
+
     /** JL-356: Nina rechaza la salida mientras un enemigo cercano pelea. */
     async criptaGuiaPelea() {
         await newGame('QA Pelea');

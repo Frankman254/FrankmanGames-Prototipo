@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-364: conservar PNJ interiores al recargar contenido RPG (Junie)
+
+**Archivos:** `src/sim/world.ts`, `tests/jl364_interiorNpcHotApply.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `World.placeNpcs()` retorna antes de vaciar `this.npcs` cuando el mundo es interior; la colocación de PNJ del mundo abierto sigue reconstruyéndose normalmente. La prueba de regresión reproduce la llamada a `applyRpgContent()` tras colocar a Chalo y Nina: fallaba antes del arreglo porque la lista quedaba vacía. El escenario Electron `criptaRecargaPnj` modifica temporalmente el X del anciano solo en memoria, aplica `npcs.json` desde el editor y verifica que Chalo y Nina conservan posiciones, modelos y carteles; luego restaura los datos originales sin escribir el JSON productivo.
+
+**Validación:** `npx vitest run tests/jl364_interiorNpcHotApply.test.ts`: 1/1; `npm test`: 426 archivos, 5.075 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; Electron `criptaRecargaPnj`: 6/6, consola limpia; `node --check scripts/qaElectron.mjs`, Prettier para el test y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl364/RESULTADO.md`; capturas revisadas `work/junie-jl364/electron/jl364-cripta-antes-recargar-npcs.jpg` y `work/junie-jl364/electron/jl364-cripta-despues-recargar-npcs.jpg`.
+
+---
+
 ## 2026-11-26 — JL-363: verificar orillas caminables de estanques con lóbulos (Junie)
 
 **Archivos:** `tests/jl363_lobedPonds.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

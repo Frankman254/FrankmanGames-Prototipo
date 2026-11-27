@@ -643,10 +643,10 @@ export class World implements SessionWorld {
 
     /** Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio. */
     private placeNpcs(): void {
+        if (this.interior) return;
         this.npcs.length = 0;
         const z = this.data.zone;
         const place = (npcId: string, merchantId: string | null, at: Vec2): void => {
-            if (this.interior) return;
             const ox = z.originX ?? 0;
             const oy = z.originY ?? 0;
             if (at.x < ox || at.y < oy || at.x > ox + z.width || at.y > oy + z.depth) return;
