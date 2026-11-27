@@ -1626,7 +1626,7 @@ Contexto del coordinador:
   - Seco del Regreso;
   - muerte;
   - cargar una partida del pueblo.
-- [ ] JL-358 Escenario `criptaGuardado`: guardar en el piso 7, recargar y comprobar que Chalo y Nina vuelven a estar junto a la llegada del piso 7.
+- [x] JL-358 Escenario `criptaGuardado`: guardar en el piso 7, recargar y comprobar que Chalo y Nina vuelven a estar junto a la llegada del piso 7. — commit «JL-358: comprobar el guardado de PNJ en piso 7» — Electron 8/8, consola limpia; Chalo y Nina a 2,5 m de la llegada antes y después, con modelos y rótulos visibles. Capturas revisadas y resultado en `work/junie-jl358/electron/`.
 - [ ] JL-359 Escenario `pescaLobulos`: en el piso 6 (estanque de tres lóbulos), un clic real en un lóbulo fuera del círculo principal hace caminar a la orilla y lanzar la caña. Captura del borde irregular.
 - [ ] JL-360 Escenario `criptaMapaGrande`: en el piso 10, M abre el mapa del piso con la rejilla.
   - Al llegar, la escalera de bajada no está en el minimapa ni en el mapa.

@@ -7238,6 +7238,83 @@ const scenarios = {
         check('JL-357: consola sin errores nuevos', errors.length === 0, errors);
     },
 
+    /** JL-358: guardar y recargar en el piso 7 conserva a Chalo y Nina junto a la llegada. */
+    async criptaGuardado() {
+        await newGame('QA Cripta');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+
+        const entered = await js(`__game.crypt.enter(6, 'above')`);
+        check('JL-358: se puede entrar al piso 7', entered, String(entered));
+        await until('__game.crypt.floor===6', 15000, 'entrar en el piso 7');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 7 listo');
+        await until(
+            `['crypt_peddler','crypt_guide'].every((id)=>${W}.npcs.some((npc)=>npc.npcId===id) && !!__game.view.scene.getTransformNodeByName('npc-'+id))`,
+            15000,
+            'PNJ de cripta cargados en el piso 7',
+        );
+
+        const inspectArrival = () => js(`(() => {
+            const w=${W}, scene=__game.view.scene, arrival=__game.crypt.floorData?.arrivalFromAbove;
+            const staff=['crypt_peddler','crypt_guide'].map((id)=>{
+                const npc=w.npcs.find((item)=>item.npcId===id);
+                const root=scene.getTransformNodeByName('npc-'+id);
+                const sign=scene.getMeshByName('npc-sign-'+id);
+                return {
+                    id,
+                    distance:npc&&arrival?Math.hypot(npc.pos.x-arrival.x,npc.pos.y-arrival.y):null,
+                    model:!!root&&root.isEnabled(),
+                    sign:!!sign&&sign.isEnabled()&&sign.isVisible,
+                };
+            });
+            return {floor:__game.crypt.floor,arrival,staff};
+        })()`);
+        const frameArrival = async () => {
+            await js('(()=>{const r=__game.view.rig;r.pitchDeg=68;r.distance=12})()');
+            await sleep(900);
+        };
+
+        await frameArrival();
+        const before = await inspectArrival();
+        check('JL-358: los dos PNJ están junto a la llegada del piso 7 antes de guardar',
+            before.floor===6 && before.staff.length===2 && before.staff.every((npc)=>npc.distance!==null&&npc.distance<6),
+            JSON.stringify(before));
+        check('JL-358: se ven Chalo y Nina antes de guardar',
+            before.staff.length===2 && before.staff.every((npc)=>npc.model&&npc.sign),
+            JSON.stringify(before.staff));
+        await shot('jl358-piso-7-antes-guardado');
+
+        await saveAndLoad();
+        await until('__game.crypt.floor===6', 30000, 'recargar el piso 7 guardado');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 7 recargado');
+        await until(
+            `['crypt_peddler','crypt_guide'].every((id)=>${W}.npcs.some((npc)=>npc.npcId===id) && !!__game.view.scene.getTransformNodeByName('npc-'+id))`,
+            15000,
+            'PNJ de cripta recreados al cargar el piso 7',
+        );
+        await frameArrival();
+
+        const saved = await js(`(() => {
+            const data=JSON.parse(localStorage.getItem('frankmangames.save.0')||'null');
+            return {place:data?.place??null,dungeonState:data?.dungeonState??null};
+        })()`);
+        check('JL-358: la ranura guarda la cripta y el piso 7',
+            saved.place?.scene==='dungeon' && saved.place?.dungeon==='crypt' && saved.place?.floor===6 &&
+                saved.dungeonState?.dungeon==='crypt' && saved.dungeonState?.floor===6,
+            JSON.stringify(saved));
+
+        const after = await inspectArrival();
+        check('JL-358: tras recargar, Chalo y Nina siguen junto a la llegada del piso 7',
+            after.floor===6 && after.staff.length===2 && after.staff.every((npc)=>npc.distance!==null&&npc.distance<6),
+            JSON.stringify(after));
+        check('JL-358: ambos PNJ y sus carteles se ven tras recargar',
+            after.staff.length===2 && after.staff.every((npc)=>npc.model&&npc.sign),
+            JSON.stringify(after.staff));
+        await shot('jl358-piso-7-despues-recargar');
+
+        check('JL-358: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ')||'0');
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');
@@ -13867,6 +13944,8 @@ scenarios.jl333CriptaRecursos.timeout = 600;
 scenarios.ventanaSegundoPlano.timeout = 300;
 // JL-357: seis rutas de salida, cada una con una entrada real a la cripta y su captura.
 scenarios.criptaSalidas.timeout = 300;
+// JL-358: entrada, guardado y carga integrados en el piso 7.
+scenarios.criptaGuardado.timeout = 180;
 
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).

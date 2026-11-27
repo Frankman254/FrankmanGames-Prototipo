@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-358: comprobar el guardado de PNJ en piso 7 (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `criptaGuardado`: entra al piso 7, guarda y carga por los menús reales, verifica el estado serializado y comprueba que Chalo y Nina aparecen a 2,5 m de la llegada con sus modelos y rótulos visibles antes y después. No modifica la lógica productiva.
+
+**Validación:** Electron `criptaGuardado`: 8/8 comprobaciones y consola limpia. `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` (214 rutas) limpios.
+
+**Evidencia:** `work/junie-jl358/electron/resultado.json` y las capturas revisadas `jl358-piso-7-antes-guardado.jpg` y `jl358-piso-7-despues-recargar.jpg`.
+
+---
+
 ## 2026-11-26 — JL-357: comprobar limpieza al salir de la cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
