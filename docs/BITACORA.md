@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-396: conservar barra y enfriamiento propio al cargar (Junie)
+
+**Archivos:** `tests/hechizosLibres.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí una prueba de guardado y carga con `GameSession.save()`, `SaveStore` y `RpgSessionFactory.load()`. La prueba comprueba que la barra mantiene su orden y que `storm_focus` puede lanzarse con GCD activo, conservando su enfriamiento propio en el estado de la barra. No modifica la persistencia de temporizadores de combate ni el juego productivo.
+
+**Validación:** `npx vitest run tests/hechizosLibres.test.ts`: 7/7; `npm test`: 434 archivos, 5.100 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run typecheck` limpios; `npm run docs:check`: 218 rutas citadas, todas existen. No aplica Electron: solo prueba lógica/persistencia, sin cambio visual.
+
+**Evidencia:** `work/junie-jl396/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-395: medir las pruebas más lentas de Vitest (Junie)
 
 **Archivos:** `work/junie-jl395/LENTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

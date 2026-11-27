@@ -4,8 +4,10 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { Character } from '../src/rpg/character';
+import { RpgSessionFactory } from '../src/rpg/session';
 import { Rng } from '../src/sim/rng';
 import { World } from '../src/sim/world';
+import { MemoryStore, SaveStore } from '../src/ui/menus/saveStore';
 import { prepareSpells } from './levels';
 
 const data = loadGameData();
@@ -75,6 +77,38 @@ describe('hechizos libres del enfriamiento global', () => {
         const state = w.hotbarState();
         expect(state[iFocus]!.cooldownRemaining).toBe(0);
         if (iSpark >= 0 && w.spell('spark').cooldown === 0) expect(state[iSpark]!.cooldownRemaining).toBeGreaterThan(0);
+    });
+
+    it('al guardar y cargar conserva la barra y el enfriamiento propio de un hechizo libre', () => {
+        const factory = new RpgSessionFactory(data.rpg);
+        const session = factory.newGame('storm_weaver', 'Prueba', 1);
+        prepareSpells(session.character, 'spark', 'storm_focus');
+        const savedHotbar = [...session.character.spellbook.hotbar];
+        const focusSlot = savedHotbar.indexOf('storm_focus');
+        expect(focusSlot).toBeGreaterThanOrEqual(0);
+
+        const saves = new SaveStore(new MemoryStore());
+        saves.write(0, session.save());
+        const save = saves.read(0);
+        expect(save).not.toBeNull();
+        const loaded = factory.load(save!, 1);
+        expect(loaded.character.spellbook.hotbar).toEqual(savedHotbar);
+
+        const w = new World(data, { encounter: false, character: loaded.character });
+        w.player.pos = { x: 10, y: 10 };
+        w.player.prevPos = { x: 10, y: 10 };
+        w.player.resource = 1e6;
+        const focus = w.spell('storm_focus');
+        w.player.gcd = w.cooldownOf(focus) + 1;
+        w.player.gcdTotal = w.player.gcd;
+
+        expect(w.commandCast('storm_focus', at(10, 10))).toBeNull();
+        expect(w.player.cooldowns['storm_focus']).toBe(w.cooldownOf(focus));
+        expect(w.hotbarState()[focusSlot]).toMatchObject({
+            spellId: 'storm_focus',
+            cooldownRemaining: w.cooldownOf(focus),
+            cooldownTotal: w.cooldownOf(focus),
+        });
     });
 });
 

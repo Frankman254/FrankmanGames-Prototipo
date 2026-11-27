@@ -503,6 +503,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-395 | J | Hecho (commit «JL-395: medir las diez pruebas más lentas de Vitest») | Lista las 10 pruebas individuales más lentas medidas con `npx vitest run --reporter=verbose`; propone optimizar el muestreo de páginas sin cambiar el recorrido ni sus aserciones, sin aplicar cambios. | `work/junie-jl395/LENTAS.md`; `npx vitest run --reporter=verbose`: 434 archivos aprobados, 1 omitido; 5.099 pruebas aprobadas, 1 `todo`, 68,58 s. `npm test`: mismos resultados, 68,72 s; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios. No aplica Electron: solo medición y documentación. |
 
+## Cierre de JL-396 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-396 | J | Hecho (commit «JL-396: conservar barra y enfriamiento propio al cargar») | `tests/hechizosLibres.test.ts` cubre el guardado y carga real de `storm_focus`: conserva el orden de la barra y el hechizo conserva su enfriamiento propio frente a un GCD mayor. No cambia la persistencia de temporizadores de combate ni el comportamiento productivo. | Prueba dirigida 7/7; suite 434 archivos, 5.100 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios. Evidencia: `work/junie-jl396/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - JL-391 (2026-11-27): bloqueada porque la única autorización en lote para Junie del tablero cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe una medición ampliada, no una autorización para cambiar `auditBuilds.ts`. No se modificaron código ni pruebas.
