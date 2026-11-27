@@ -7096,6 +7096,160 @@ const scenarios = {
         await shot('jl354-berto-piso-10');
     },
 
+    /** JL-372: diálogos, aviso de Nina y rótulo de piso en inglés. */
+    async jl372InglesCripta() {
+        await resize(1920, 1080);
+        await newGame('QA Ingles Cripta');
+        await key('F10', 'F10');
+        await button('Opciones');
+        await sleep(300);
+        for (const tab of ['Interfaz', 'Juego', 'Pantalla', 'Gráficos']) {
+            if (await js(`!!document.querySelector('[data-opt="language"]')`)) break;
+            if (await locate('button', tab)) await button(tab);
+            await sleep(250);
+        }
+        const languageSet = await js(
+            `(()=>{ const s=document.querySelector('[data-opt="language"]'); const el=s?.tagName==='SELECT'?s:s?.querySelector('select'); if(!el)return false; el.value='en'; el.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`,
+        );
+        check('JL-372: se activa inglés en las opciones', languageSet);
+        await key('Escape', 'Escape');
+        await sleep(200);
+        await key('Escape', 'Escape');
+        await until(`document.querySelector('.dialogue')?.hidden === true`, 5000, 'cerrar pausa en inglés');
+        await js(`${S}.energy.value=100; ${S}.character.gold=100`);
+
+        const entrance = await js(`(() => {
+            const root=__game.view.scene.getTransformNodeByName('cryptEntrance');
+            const player=${W}.player, grid=${W}.grid;
+            const pos=grid.center(grid.nearestWalkable({x:root.position.x+5,y:root.position.z+3}));
+            player.pos.x=player.prevPos.x=pos.x;
+            player.pos.y=player.prevPos.y=pos.y;
+            player.path=[];
+            player.moveTarget=null;
+            return pos;
+        })()`);
+        await js(`${W}.commandTalk('crypt_warden')`);
+        await until(`${S}.dialogue()?.npcId==='crypt_warden'`, 15000, 'diálogo inglés de Berto sin llave');
+        const berto = await js(`(() => ({
+            name:document.querySelector('.dlg-name')?.textContent.trim()??'',
+            title:document.querySelector('.dlg-title')?.textContent.trim()??'',
+            text:document.querySelector('.dlg-text')?.textContent.trim()??'',
+            options:[...document.querySelectorAll('.dlg-opt .t')].map((item)=>item.textContent.trim()),
+        }))()`);
+        check(
+            'JL-372: Berto muestra nombre, título y diálogo en inglés',
+            berto.name==='Berto Padlock' && berto.title==='Crypt gatekeeper' && berto.text.includes('The gate is padlocked'),
+            JSON.stringify(berto),
+        );
+        await shot('jl372-berto-dialogo-ingles');
+        const clickOption = async (label) => {
+            const point = await js(`(() => {
+                const option=[...document.querySelectorAll('.dlg-opt')].find((item)=>item.querySelector('.t')?.textContent.trim()===${JSON.stringify(label)});
+                if(!option)return null;
+                const rect=option.getBoundingClientRect();
+                return {x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+            })()`);
+            if (!point) throw new Error(`No está visible la opción inglesa ${label}`);
+            await mouse(point.x, point.y);
+        };
+        await clickOption("I'll come back with the key.");
+        await until(`!${S}.dialogue()`, 5000, 'cerrar diálogo de Berto');
+        await js(`(() => {
+            ${S}.character.give('crypt_key');
+            const player=${W}.player;
+            player.pos.x=player.prevPos.x=${entrance.x};
+            player.pos.y=player.prevPos.y=${entrance.y};
+            player.path=[];
+            player.moveTarget=null;
+            ${W}.talkTarget=null;
+        })()`);
+        await js(`${W}.commandTalk('crypt_warden')`);
+        await until(`${S}.dialogue()?.npcId==='crypt_warden'`, 15000, 'diálogo inglés de Berto con llave');
+        const options = await js(`({
+            text:document.querySelector('.dlg-text')?.textContent.trim()??'',
+            options:[...document.querySelectorAll('.dlg-opt .t')].map((item)=>item.textContent.trim()),
+        })`);
+        check(
+            'JL-372: Berto ofrece pisos con las opciones traducidas',
+            options.text.includes('Which floor do you want to go to?') && options.options.includes('Start on floor 1.'),
+            JSON.stringify(options),
+        );
+        await shot('jl372-berto-pisos-ingles');
+        await clickOption('Start on floor 1.');
+        await until(
+            `__game.crypt.floor===0 && document.querySelector('.carga-titulo')?.textContent==='Tulivieja Crypt · floor 1' && /^Level \\d+–\\d+$/.test(document.querySelector('.carga-sub')?.textContent??'')`,
+            15000,
+            'título y rango del piso en inglés',
+        );
+        const floorLabel = await js(`({title:document.querySelector('.carga-titulo')?.textContent??'',sub:document.querySelector('.carga-sub')?.textContent??''})`);
+        check(
+            'JL-372: título y rango del piso aparecen en inglés durante la carga',
+            floorLabel.title==='Tulivieja Crypt · floor 1' && /^Level \d+–\d+$/.test(floorLabel.sub),
+            JSON.stringify(floorLabel),
+        );
+        await shot('jl372-titulo-piso-ingles');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 1 listo');
+
+        await js(`${W}.commandTalk('crypt_peddler')`);
+        await until('!!document.querySelector(".panel-shop")?.offsetParent', 15000, 'tienda inglesa de Chalo');
+        const chalo = await js(`({
+            heading:document.querySelector('.panel-shop h2')?.textContent.trim()??'',
+            greeting:document.querySelector('.shop-greeting')?.textContent.trim()??'',
+        })`);
+        check(
+            'JL-372: nombre, oficio y saludo de Chalo aparecen en inglés',
+            chalo.heading==='Chalo Farol · Crypt peddler' && chalo.greeting.includes("There's no market down here"),
+            JSON.stringify(chalo),
+        );
+        await shot('jl372-chalo-saludo-ingles');
+        for (let i=0;i<4 && (await js('!!document.querySelector(".panel-shop")?.offsetParent || !!document.querySelector(".panel-inventory-trade")?.offsetParent'));i++) {
+            await key('Escape','Escape');
+            await sleep(200);
+        }
+
+        await js(`${W}.commandTalk('crypt_guide')`);
+        await until(`${S}.dialogue()?.npcId==='crypt_guide'`, 15000, 'diálogo inglés de Nina');
+        const nina = await js(`({
+            name:document.querySelector('.dlg-name')?.textContent.trim()??'',
+            title:document.querySelector('.dlg-title')?.textContent.trim()??'',
+            text:document.querySelector('.dlg-text')?.textContent.trim()??'',
+            options:[...document.querySelectorAll('.dlg-opt .t')].map((item)=>item.textContent.trim()),
+        })`);
+        check(
+            'JL-372: diálogo y opción de Nina aparecen en inglés',
+            nina.name==='Nina Ovillo' && nina.title==='Crypt guide' && nina.text.includes('Had enough?') && nina.options.includes('Take me to town.'),
+            JSON.stringify(nina),
+        );
+        await shot('jl372-nina-dialogo-ingles');
+        const enemy = await js(`(() => {
+            const w=${W}, player=w.player.pos;
+            const cell=w.grid.nearestWalkable({x:player.x+4,y:player.y});
+            const foe=w.spawnEnemy('melee',w.grid.center(cell),1);
+            foe.state='pursue';
+            foe.frozen=true;
+            return {id:foe.id,distance:Math.hypot(foe.pos.x-player.x,foe.pos.y-player.y),fighting:__game.crypt.fighting};
+        })()`);
+        check('JL-372: se prepara un combate activo para el aviso de Nina', enemy.fighting && enemy.distance<=20, JSON.stringify(enemy));
+        await clickOption('Take me to town.');
+        const warning = "I can't get you out while you're fighting.";
+        await until(
+            `[...document.querySelectorAll('.chat-line, .toast')].some((item)=>item.textContent.includes(${JSON.stringify(warning)}))`,
+            5000,
+            'aviso de pelea en inglés',
+        );
+        const response = await js(`({
+            text:[...document.querySelectorAll('.chat-line, .toast')].find((item)=>item.textContent.includes(${JSON.stringify(warning)}))?.textContent.trim()??null,
+            floor:__game.crypt.floor,
+        })`);
+        check(
+            'JL-372: el aviso de Nina se muestra en inglés sin salir del piso',
+            response.text===warning && response.floor===0,
+            JSON.stringify(response),
+        );
+        await shot('jl372-aviso-nina-pelea-ingles');
+        check('JL-372: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ') || '0');
+    },
+
     /** JL-360: mapa grande del piso 10 y escalera de bajada descubierta. */
     async criptaMapaGrande() {
         await resize(1920, 1080);

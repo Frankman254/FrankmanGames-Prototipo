@@ -1653,7 +1653,7 @@ Contexto del coordinador:
 - [x] JL-371 Rendimiento: FPS en el piso 6 con y sin el estanque de lóbulos (un disco por círculo). Si baja más de 2 FPS, propón cómo fusionar los discos, sin hacerlo. — commit «JL-371: medir FPS del estanque lobulado» — Electron 3/3, consola limpia; medias 119,01 FPS con agua y 119,68 sin agua, pérdida 0,67 FPS (<2), no se propone fusionar. Evidencia: `work/junie-jl371/FPS.md`, `resultado.json` y capturas.
 
 ### D. Inglés y textos
-- [ ] JL-372 Interfaz en inglés: diálogos de Berto, Chalo y Nina, el aviso de pelea de Nina y el título de los pisos. Lista lo que se quede en español.
+- [x] JL-372 Interfaz en inglés: diálogos de Berto, Chalo y Nina, el aviso de pelea de Nina y el título de los pisos. Lista lo que se quede en español. — commit «JL-372: traducir diálogos y rótulos de la cripta» — Suite 5.084 aprobadas (1 omitida, 1 todo), typecheck, build y docs:check correctos; Electron `jl372InglesCripta` 10/10, consola limpia. Restan las placas 3D, `Consejo`, `Cargando modelos (N)…`, `100 monedas` y el mensaje de consumo de llave; «duendes» se conserva en una frase inglesa. Evidencia: `work/junie-jl372/RESULTADO.md` y `work/junie-jl372/electron/`.
 - [ ] JL-373 Lista de los textos del juego que todavía dicen «hilo de retorno», «Ovillo» o «posima/poción de regreso», para que el creador decida si el guía cambia algún nombre. Solo lista.
 
 ### E. Reintentos

@@ -1,3 +1,17 @@
+## 2026-11-27 — JL-372: traducir diálogos y rótulos de la cripta (Junie)
+
+**Archivos:** `src/i18n.ts`, `src/main.ts`, `src/ui/loadingScreen.ts`, `src/ui/menus/shop.ts`, `tests/i18nContent.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Los diálogos y opciones de Berto y Nina ya se representan en inglés; el panel de Chalo traduce su nombre/oficio y saludo. El aviso de Nina al intentar salir durante una pelea y el título y rango numérico del piso también se traducen. Se añadió una regresión de contenido y el recorrido Electron `jl372InglesCripta`.
+
+**Resultado:** Berto, Chalo, Nina, el aviso y el título/rango del piso se vieron en inglés. No se modificaron reglas, cifras ni datos productivos.
+
+**Validación:** `tests/i18nContent.test.ts`: 9/9; `npm test`: 430 archivos, 5.084 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` (215 rutas) limpios; Electron 10/10 con consola limpia. Vite mantiene el aviso habitual de chunks mayores de 500 kB.
+
+**Español restante:** Placas 3D con nombres/oficios de Berto, Chalo y Nina; «Consejo», «Cargando modelos (N)…», «100 monedas» y el mensaje de uso de la llave en chat. «duendes» se conserva como término propio en la frase inglesa de Berto. Detalle y capturas en `work/junie-jl372/RESULTADO.md` y `work/junie-jl372/electron/`.
+
+---
+
 ## 2026-11-27 — JL-371: medir FPS del estanque lobulado (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

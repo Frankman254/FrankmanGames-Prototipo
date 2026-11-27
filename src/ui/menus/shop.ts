@@ -144,8 +144,8 @@ export class ShopPanel extends Panel {
             this.close();
             return;
         }
-        this.heading.textContent = `${v.name} · ${v.title}`;
-        this.greeting.textContent = `«${v.greeting}»`;
+        this.heading.textContent = `${tr(v.name)} · ${tr(v.title)}`;
+        this.greeting.textContent = `«${tr(v.greeting)}»`;
         // JUI-02: filtrar stock por catálogo
         const filteredStock = v.stock.filter((offer) => {
             const def = s.content.items[offer.item.itemId];

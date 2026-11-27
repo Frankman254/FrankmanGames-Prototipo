@@ -145,9 +145,9 @@ export class LoadingScreen {
 
     private label(text: LoadingText): void {
         if (!this.root) return;
-        this.kicker.textContent = text.kicker;
-        this.title.textContent = text.title;
-        this.sub.textContent = text.sub ?? '';
+        this.kicker.textContent = tr(text.kicker);
+        this.title.textContent = tr(text.title);
+        this.sub.textContent = tr(text.sub ?? '');
         this.sub.hidden = !text.sub;
     }
 

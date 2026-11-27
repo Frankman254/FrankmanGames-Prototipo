@@ -25,6 +25,7 @@ const PATTERNS: Record<Language, readonly [RegExp, string][]> = {
     es: [],
     en: [
         [/^niv\. (.+)$/, 'lv. $1'],
+        [/^Nivel (\d+)–(\d+)$/, 'Level $1–$2'],
         [/^nivel (\d+)$/, 'level $1'],
         [/^piso (\d+)$/, 'floor $1'],
         [/^ranura (\d+)$/, 'slot $1'],

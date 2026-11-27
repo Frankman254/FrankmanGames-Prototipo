@@ -135,6 +135,29 @@ describe('F07: inglés completo de los datos', () => {
         expect(tr('Cripta de la Tulivieja · piso 5')).toBe('Cripta de la Tulivieja · piso 5');
     });
 
+    it('traduce diálogos, aviso y títulos de piso de la cripta', () => {
+        setLanguage('en');
+        expect(tr('Berto Candado')).toBe('Berto Padlock');
+        expect(tr('Portero de la cripta')).toBe('Crypt gatekeeper');
+        expect(tr('Tienes la llave. ¿A qué piso quieres bajar? Elige y la reja se la traga.')).toBe(
+            'You have the key. Which floor do you want to go to? Pick one and the gate swallows the key.',
+        );
+        expect(tr('Chalo Farol')).toBe('Chalo Farol');
+        expect(tr('Buhonero de la cripta')).toBe('Crypt peddler');
+        expect(tr('Aquí abajo no hay plaza, pero hay frascos. Llévate lo que aguantes cargar.')).toBe(
+            "There's no market down here, but there are bottles. Take what you can carry.",
+        );
+        expect(tr('Nina Ovillo')).toBe('Nina Ovillo');
+        expect(tr('Guía de la cripta')).toBe('Crypt guide');
+        expect(tr('¿Ya tuviste bastante? Agárrate del hilo y te saco al pueblo, sin gastar ni un trago.')).toBe(
+            "Had enough? Hold on to the thread and I'll lead you back to town, not a sip spent.",
+        );
+        expect(tr('Llévame al pueblo.')).toBe('Take me to town.');
+        expect(tr('No te puedo sacar mientras peleas.')).toBe("I can't get you out while you're fighting.");
+        expect(tr('Cripta de la Tulivieja · piso 5')).toBe('Tulivieja Crypt · floor 5');
+        expect(tr('Nivel 1–10')).toBe('Level 1–10');
+    });
+
     it('traduce los roles y afinidades compuestos de las clases', () => {
         setLanguage('en');
         expect(tr('Cuerpo a cuerpo · fuego y tierra')).toBe('Melee · Fire and Earth');

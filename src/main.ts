@@ -1955,7 +1955,7 @@ menus?.onSession((s) => {
         // CLA-CRIPTA2: el guía de la cripta devuelve al pueblo (la Piedra de casa) sin pociones.
         if (e.type === 'leaveDungeon' && crypt?.inside) {
             if (crypt.fighting)
-                world.character.emit({ type: 'message', text: 'No te puedo sacar mientras peleas.' });
+                world.character.emit({ type: 'message', text: tr('No te puedo sacar mientras peleas.') });
             else recallToStone(stones.get(stones.def.home) ?? stones.respawn);
         }
         if (e.type === 'npcClip') npcView.playGesture(e.npcId, e.clip);
