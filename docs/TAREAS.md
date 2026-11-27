@@ -527,6 +527,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|---|
 | JL-399 | Junie | Hecho (commit «JL-399: mostrar el ritmo del hechizo libre en inglés») | Escenario Electron `jl399FichaHechizoLibre`: abre la ficha de `storm_focus` en el libro de hechizos y verifica el campo `Ritmo: libre: se lanza a la vez que otro` en español y `Pace: free: casts alongside another spell` en inglés. No modifica la interfaz productiva ni las reglas. | Electron 15/15, consola limpia; `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` limpios. Capturas revisadas: `work/junie-jl399/electron/jl399-ficha-hechizo-libre-es.jpg` y `jl399-ficha-hechizo-libre-en.jpg`. |
 
+## Cierre de JL-400 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-400 | Junie | Hecho (commit «JL-400: probar el relleno de la cola de Junie») | Arnés aislado con copia literal de `rellenar()`: con cola vacía y reserva de 12, pasa 10 y marca `[>]`; tras simular su cierre, pasa 2; tras cerrar esas, para y no altera los archivos. `bash -n`, prueba del arnés, `npx tsc --noEmit`, `npm run typecheck`, `npm test` (434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`) y `npm run docs:check` (218 rutas) limpios. Evidencia: `work/junie-jl400/RESULTADO.md`. No se ejecutó Junie ni el script original; no aplica Electron. |
+
 ## Bloqueadas
 
 - JL-391 (2026-11-27): bloqueada porque la única autorización en lote para Junie del tablero cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe una medición ampliada, no una autorización para cambiar `auditBuilds.ts`. No se modificaron código ni pruebas.

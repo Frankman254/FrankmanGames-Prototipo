@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-400: probar el relleno de la cola de Junie (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; arnés y evidencia en `work/junie-jl400/`.
+
+**Qué se hizo:** Copié literalmente `rellenar()` a un arnés aislado y probé una cola sin tareas abiertas con una reserva de 12: la primera pasada transfirió 10 y marcó `[>]`, la segunda transfirió las 2 restantes, y la tercera paró sin modificar cola ni reserva. No modifiqué ni ejecuté `scripts/mac/junie_continuo.sh` y no lancé Junie.
+
+**Validación:** `bash -n` y `work/junie-jl400/prueba.sh` limpios; `npx tsc --noEmit`, `npm run typecheck`, `npm test` (434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`) y `npm run docs:check` (218 rutas) limpios. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `work/junie-jl400/RESULTADO.md`, `prueba.sh`, `rellenar_copiada.sh` y fixtures.
+
+---
+
 ## 2026-11-27 — JL-399: verificar el ritmo del hechizo libre en ambos idiomas (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl399/electron/`.
