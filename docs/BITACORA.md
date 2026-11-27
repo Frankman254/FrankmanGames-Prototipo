@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-406: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No inspeccioné inventario, libro de hechizos, mapa ni tienda ni abrí Electron: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383 y JL-384…JL-423 no consta autorizada. JL-405 quedó bloqueada por la misma causa; registré JL-406 en la solicitud de autorización ya existente y detuve la cola. No se modificaron código ni pruebas y no se generaron capturas.
+
+**Validación:** Línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: la tarea quedó bloqueada antes de revisar la interfaz.
+
+**Evidencia:** Bloqueo registrado en `docs/TAREAS.md` y `work/prompts-noche/COLA_JUNIE.md`; capturas y lista visual pendientes de autorización.
+
+---
+
 ## 2026-11-27 — JL-405: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

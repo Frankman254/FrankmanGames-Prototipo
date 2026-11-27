@@ -6,7 +6,7 @@ Actualizado: 2026-11-27. Revisión completa: lo anterior está íntegro en [hist
 
 ## Autorización pendiente (JL-384…JL-423)
 
-En `docs/TAREAS.md`, la única autorización en lote para Junie cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe la batería ampliada, pero no autoriza la ejecución de sus tareas. JL-391, JL-392, JL-394, JL-401, JL-403, JL-404 y JL-405 quedaron bloqueadas por este motivo. ¿Autorizas la tanda JL-384…JL-423 en `TAREAS.md`?
+En `docs/TAREAS.md`, la única autorización en lote para Junie cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe la batería ampliada, pero no autoriza la ejecución de sus tareas. JL-391, JL-392, JL-394 y JL-401, JL-403…JL-406 quedaron bloqueadas por este motivo. ¿Autorizas la tanda JL-384…JL-423 en `TAREAS.md`?
 
 ## Pregunta pendiente (JL-390)
 

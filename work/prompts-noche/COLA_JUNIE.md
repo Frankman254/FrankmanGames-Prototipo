@@ -1725,7 +1725,7 @@ Contexto del coordinador:
 
 ### D. Interfaz y textos
 - [!] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionó `src/ui/` ni se ejecutó la prueba de i18n.
-- [ ] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista.
+- [!] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionaron las pantallas ni se abrió Electron; la solicitud de autorización de la tanda ya figura en `docs/ACCIONES_CREADOR.md`.
 - [ ] JL-407 Accesibilidad: todas las acciones de la barra y de los menús principales se pueden hacer con teclado. Lista lo que solo va con ratón.
 - [ ] JL-408 Electron: tooltip de un objeto de set con piezas puestas y sin ellas. El contador de piezas cuadra con lo equipado (el creador vio posiciones rotas en el set de la Diablica).
 
