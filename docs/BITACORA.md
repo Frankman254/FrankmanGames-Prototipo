@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-379: revisar bloqueos de la tanda de cripta (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Revisé las casillas JL-354…JL-378 y no encontré ninguna marcada `[!]`; no había tareas bloqueadas que reintentar. Los siete checks fallidos de Electron que JL-378 registra (dos de `modelos` y cinco `dProp`) están documentados en tareas cerradas `[x]`, así que no se reabrieron ni se modificó código o pruebas. No aplica QA visual nuevo.
+
+**Validación:** `npx tsc --noEmit`, `npm run typecheck`, `npx vitest run` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`) y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl379/REINTENTOS.md`.
+
+---
+
 ## 2026-11-27 — JL-378: cerrar la tanda de pruebas (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

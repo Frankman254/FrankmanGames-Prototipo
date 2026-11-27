@@ -1664,7 +1664,7 @@ Contexto del coordinador:
 ### F. Cierre de la tanda
 - [x] JL-377 Consola limpia en los escenarios nuevos JL-354…361. — commit «JL-377: verificar consola limpia en los escenarios de cripta» — Electron 62/62, cero errores de consola en los ocho escenarios; capturas revisadas y resultados en `work/junie-jl377/electron/`.
 - [x] JL-378 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones. — commit «JL-378: cerrar la tanda de pruebas» — `npm test`: 431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`; typecheck y build limpios. Electron: 154/161 en 20 escenarios, cero errores de consola; persisten dos fallos del escenario `modelos` (ya históricamente parcial) y los cinco `dProp` documentados en JL-374. Evidencia: JSON y capturas en `work/junie-jl378/electron/`.
-- [ ] JL-379 Reintento obligatorio de lo que haya quedado `[!]` en JL-354…378.
+- [x] JL-379 Reintento obligatorio de lo que haya quedado `[!]` en JL-354…378. — commit «JL-379: revisar bloqueos de la tanda de cripta» — no había casillas `[!]` que reintentar; sin cambio de código. Informe `work/junie-jl379/REINTENTOS.md`; `npx tsc --noEmit`, `npm run typecheck`, `npx vitest run` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`) y `npm run docs:check` limpios.
 - [ ] JL-380 Actualiza la fila de la cripta en `docs/ESTADO_ACTUAL.md` con la evidencia de Electron de esta tanda.
 - [ ] JL-381 En `ACCIONES_CREADOR.md`, deja una entrada breve con lo que el creador debe probar en la cripta:
   - entrar por Berto;
