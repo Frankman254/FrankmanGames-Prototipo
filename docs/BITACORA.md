@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-384: añadir prueba de humo para fiel.ts (Junie)
+
+**Archivos:** `tests/balance/fiel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí la prueba de humo de `runFiel` para `melee`, con las semillas 1 y 2 y los perfiles `sin_puntos` y `preparado`. Verifica que la batería de cuatro casos termina en menos de 10 s, que cada resultado es victoria o derrota exclusiva con métricas numéricas finitas, y que repetir la misma especificación reproduce todos los campos. No cambié `fiel.ts`, cifras ni datos productivos.
+
+**Validación:** Prueba dirigida: 2/2 (79 ms); `npm test`: 432 archivos, 5.089 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios. No aplica Electron: no hay cambio visual.
+
+**Evidencia:** `work/junie-jl384/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-383: proponer la siguiente bolsa de pruebas (Junie)
 
 **Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_6.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

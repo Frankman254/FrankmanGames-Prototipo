@@ -1691,7 +1691,7 @@ Contexto del coordinador:
   - no tocar `src/render/characters/`, `mountView.ts` ni `petView.ts`.
 
 ### A. Balance fiel (BAL-P0-FIEL)
-- [ ] JL-384 Prueba de humo de `fiel.ts` en `tests/balance/fiel.test.ts`:
+- [x] JL-384 Prueba de humo de `fiel.ts` en `tests/balance/fiel.test.ts`: — commit «JL-384: añadir prueba de humo para fiel.ts» — prueba dirigida 2/2 (79 ms); cuatro combinaciones `melee`/dos semillas/dos perfiles bajo 10 s, métricas finitas y determinismo comprobado. `npm test`: 432 archivos, 5.089 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `docs:check` limpios. Evidencia: `work/junie-jl384/RESULTADO.md`.
   - `runFiel` con `melee`, 2 semillas y los dos perfiles termina en menos de 10 s;
   - da victoria o derrota, nunca `NaN`;
   - con la misma semilla, el mismo resultado (determinismo).

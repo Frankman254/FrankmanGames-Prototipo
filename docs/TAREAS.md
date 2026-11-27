@@ -473,6 +473,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 | JL-376 | J | Hecho (commit «JL-376: listar audios sin referencia y su procedencia») | Reintento de JL-300: lista individual de los 64 archivos sin referencia de ejecución bajo `assets/audio/`, cada uno enlazado a su fila de `PROCEDENCIA.md`. No se borró ni movió ningún audio; la decisión de conservar o retirar sigue siendo del creador. | Inventario y líneas de procedencia en `work/junie-jl376/AUDIOS_SIN_USO.md`; `npx tsc --noEmit`, `npx vitest run` y `npm run docs:check` limpios. No aplica Electron: auditoría documental, sin cambio visual. |
 | JL-379 | J | Hecho (commit «JL-379: revisar bloqueos de la tanda de cripta») | Auditoría de JL-354…JL-378: ninguna tarea está marcada `[!]`, por lo que no había reintentos elegibles. Los siete checks Electron fallidos que JL-378 documenta (dos de `modelos` y cinco `dProp`) ya constan en tareas cerradas `[x]`; no se reabren ni se corrigen dentro de este alcance. | Informe `work/junie-jl379/REINTENTOS.md`; `npx tsc --noEmit`, `npx vitest run` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck` y `npm run docs:check` limpios. Sin cambio visual ni reintento Electron. |
 
+## Cierre de JL-384 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-384 | J | Hecho (commit «JL-384: añadir prueba de humo para fiel.ts») | `tests/balance/fiel.test.ts`: 2/2; `melee` con las dos semillas y los dos perfiles termina en menos de 10 s, todos los resultados son finitos y la misma semilla reproduce exactamente el resultado. `npm test`: 432 archivos, 5.089 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl384/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
