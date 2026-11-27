@@ -91,6 +91,31 @@ describe('bot de equilibrio', () => {
         expect(bot.counters.potions).toBe(1);
         expect(s.character.health).toBeGreaterThan(10);
     });
+
+    it('no encadena en el mismo tick un hechizo libre y uno normal aunque ambos estén listos', () => {
+        const d = openField(data);
+        const s = makeSession(d, 'storm_weaver', 'inicial', 7);
+        const w = new World(d, { encounter: false, character: s.character, seed: 7 });
+        s.attach(w);
+        w.player.pos = { ...FIELD_CENTER };
+        w.player.prevPos = { ...FIELD_CENTER };
+        w.player.resource = 1e6;
+        const e = w.spawnEnemy('melee', { x: FIELD_CENTER.x + 3, y: FIELD_CENTER.y });
+        e.state = 'stagger';
+        e.stateTime = -1e9;
+
+        expect(w.checkCast(w.spell('spark'), e.id, e.pos)).toBeNull();
+        expect(w.checkCast(w.spell('storm_focus'), null, w.player.pos)).toBeNull();
+
+        const bot = new PlayerBot(w, s, { dodge: 0, seed: 7 });
+        bot.think();
+        const casts = w
+            .drainEvents()
+            .filter((ev) => ev.type === 'cast')
+            .map((ev) => ev.type === 'cast' && ev.ability);
+
+        expect(casts).toEqual(['storm_focus']);
+    });
 });
 
 describe('reglas fuera de combate', () => {

@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-397: medir doble lanzamiento del bot (Junie)
+
+**Archivos:** `tests/balance/bot.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl397/`.
+
+**Qué se hizo:** Añadí una prueba de caracterización: `spark` (normal) y `storm_focus` (libre) están listos, pero `PlayerBot.think()` emite solo el libre. Medí 180 pares `runFiel()` (360 corridas) en `melee` y `alpha_wolf`, tres clases, tres perfiles y diez semillas. La variante experimental añadió 52 acciones complementarias; delta medio variante−bot actual: −0,89 de daño directo por par, solo 8 pares positivos (+65 total, máximo +19), sin cambio de victorias. No cambié `scripts/balance/bot.ts`, `data/` ni el balance productivo.
+
+**Validación:** Prueba dirigida: 8/8; `npx vite-node work/junie-jl397/medir.ts`: 180 pares/360 corridas; `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio; `npm run docs:check`: 218 rutas, todas existen. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `work/junie-jl397/MEDICION.md`, `work/junie-jl397/runs.json` y `work/junie-jl397/medir.ts`.
+
+---
+
 ## 2026-11-27 — JL-396: conservar barra y enfriamiento propio al cargar (Junie)
 
 **Archivos:** `tests/hechizosLibres.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
