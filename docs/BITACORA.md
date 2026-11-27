@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-392: comparar habilidad mala y buena en la batería fiel (Junie)
+
+**Archivos:** `work/junie-jl392/COMPARADA.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Ejecuté la batería fiel con `--skill malo` y `--skill bueno`, manteniendo iguales las 594 combinaciones y las semillas 1–10 (5.940 corridas por nivel). `malo` ganó 3.477/5.940 y `bueno` 4.853/5.940; la tabla compara victorias, TTK mediano de victorias y vida restante mediana por franja. No cambié código, pruebas, cifras ni datos productivos.
+
+**Validación:** Ambas ejecuciones terminaron correctamente; los JSON coinciden en escenarios y semillas y todas las métricas son finitas. `npx tsc --noEmit` y `npm run typecheck` (tres proyectos) limpios; `npx vitest run`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check`: 218 rutas citadas, todas existen. No aplica Electron: no hay cambios visuales.
+
+**Evidencia:** `work/junie-jl392/COMPARADA.md` y los informes/JSON en `work/junie-jl392/malo/` y `work/junie-jl392/bueno/`.
+
+---
+
 ## 2026-11-27 — JL-391: corregir resistencia en el DPS de builds (Junie)
 
 **Archivos:** `scripts/balance/auditBuilds.ts`, `tests/balance/auditBuilds.test.ts`, `docs/TAREAS.md`, `work/prompts-noche/COLA_JUNIE.md`.

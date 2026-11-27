@@ -1705,7 +1705,7 @@ Contexto del coordinador:
 - [x] JL-391 `scripts/balance/auditBuilds.ts` aplica la resistencia del propio atacante a su daño. — commit «JL-391: corregir resistencia en el DPS de builds» — `tests/balance/auditBuilds.test.ts` 1/1 (roja antes, verde después); `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run typecheck` limpios; evidencia `work/junie-jl391/RESULTADO.md`.
   - Prueba que lo demuestre y arreglo en el script (es exploratorio; no toca `src/` ni `data/`).
   - Deja la cabecera «EXPLORATORIO, NO FIEL».
-- [ ] JL-392 Batería fiel con `--skill malo` y `--skill bueno`; la de `medio` es la del coordinador. Tabla comparada por franja en `work/junie-jl392/COMPARADA.md`: victorias, TTK mediano y vida restante.
+- [x] JL-392 Batería fiel con `--skill malo` y `--skill bueno`; la de `medio` es la del coordinador. Tabla comparada por franja en `work/junie-jl392/COMPARADA.md`: victorias, TTK mediano y vida restante. — commit «JL-392: comparar habilidad mala y buena en batería fiel» — `work/junie-jl392/COMPARADA.md`
 - [x] JL-393 De la batería fiel, lista las filas `preparado` con 0 victorias y las que terminan en menos de 3 s. Por cada una, el nivel, la vida y el daño por segundo medidos. Solo lista, en `work/junie-jl393/EXTREMOS.md`. — commit «JL-393: listar extremos de la batería fiel» — 10 filas validadas a partir de 2.880 corridas; `npx tsc --noEmit`, `npx vitest run` y `npm run docs:check` limpios; evidencia en `work/junie-jl393/EXTREMOS.md`.
 - [ ] JL-394 `npm run typecheck` pasa salvo `balM3.ts` (conocido). Comprueba si `fiel.ts`, `fielRun.ts` y `gear.ts` están limpios; arregla los tipos de esos tres si no.
 
