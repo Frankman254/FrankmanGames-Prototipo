@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-377: verificar consola limpia en los escenarios de cripta (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Repetí en Electron los ocho escenarios nuevos JL-354…361 (`criptaBerto`, `criptaPnj`, `criptaGuiaPelea`, `criptaSalidas`, `criptaGuardado`, `pescaLobulos`, `criptaMapaGrande` y `estrellaCursor`). No se cambió código ni datos del juego. Revisé capturas representativas de cada flujo.
+
+**Validación:** 62/62 comprobaciones y cero errores de consola en todos los escenarios; los ocho `resultado.json` tienen `consoleErrors: []`. Línea base: `npm test` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`) y `npm run typecheck` limpios; `npm run docs:check` limpio tras actualizar la documentación.
+
+**Evidencia:** `work/junie-jl377/electron/`, con subdirectorios y capturas de cada escenario.
+
+---
+
 ## 2026-11-27 — JL-376: audios sin referencia y su procedencia (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

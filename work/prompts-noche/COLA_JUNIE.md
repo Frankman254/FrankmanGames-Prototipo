@@ -1662,7 +1662,7 @@ Contexto del coordinador:
 - [x] JL-376 Reintenta JL-300 sin borrar nada: lista los 64 audios sin referencia, con su línea de `PROCEDENCIA.md`, en `work/junie-jl376/AUDIOS_SIN_USO.md`. La decisión es del creador. — commit «JL-376: listar audios sin referencia y su procedencia» — evidencia: `work/junie-jl376/AUDIOS_SIN_USO.md`; 64 rutas con su línea de procedencia, no se borró nada.
 
 ### F. Cierre de la tanda
-- [ ] JL-377 Consola limpia en los escenarios nuevos JL-354…361.
+- [x] JL-377 Consola limpia en los escenarios nuevos JL-354…361. — commit «JL-377: verificar consola limpia en los escenarios de cripta» — Electron 62/62, cero errores de consola en los ocho escenarios; capturas revisadas y resultados en `work/junie-jl377/electron/`.
 - [ ] JL-378 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
 - [ ] JL-379 Reintento obligatorio de lo que haya quedado `[!]` en JL-354…378.
 - [ ] JL-380 Actualiza la fila de la cripta en `docs/ESTADO_ACTUAL.md` con la evidencia de Electron de esta tanda.
