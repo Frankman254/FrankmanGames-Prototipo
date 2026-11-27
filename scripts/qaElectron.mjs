@@ -7736,6 +7736,86 @@ const scenarios = {
         check('JL-359: consola sin errores nuevos',consoleErrors.length===0,consoleErrors.slice(0,5).join(' | ')||'0');
     },
 
+    /** JL-370: encuadre de los estanques con lóbulos de día y en el tramo más oscuro. */
+    async jl370EstanqueLobulos() {
+        await newGame('QA Estanque');
+        await resize(1920, 1080);
+        await js(`${S}.character.gainXp(5000000); ${S}.energy.value=100`);
+
+        const capturePond = async ({ floorIndex, expectedTheme, screenshot }) => {
+            await js(`${S}.energy.value=100; ${W}.timeScale=0; ${W}.timeOfDay=0.5`);
+            const entered = await js(`__game.crypt.enter(${floorIndex}, 'above')`);
+            check(`JL-370: entra al piso ${floorIndex + 1}`, entered, String(entered));
+            await until(`__game.crypt.floor===${floorIndex}`, 20000, `piso ${floorIndex + 1}`);
+            await until('!document.querySelector(".carga:not([hidden])")', 20000, `piso ${floorIndex + 1} listo`);
+            await js(`(() => {
+                const w=${W};w.timeScale=0;
+                for(const enemy of w.enemies.list){enemy.frozen=true;enemy.state='idle';enemy.stateTime=0;}
+            })()`);
+            await sleep(500);
+
+            const setup = await js(`(() => {
+                const floor=__game.crypt.floorData,w=${W},ts=floor?.tileSize;
+                if (!floor || floor.index!==${floorIndex}) throw new Error('No están cargados los datos del piso ${floorIndex + 1}');
+                const candidates=[];
+                for (const pool of floor.pools) {
+                    if ((pool.lobes?.length??0)<2) continue;
+                    const room=floor.rooms.find((r)=>
+                        pool.x>r.x0*ts&&pool.x<(r.x0+r.w)*ts&&pool.y>r.y0*ts&&pool.y<(r.y0+r.h)*ts,
+                    );
+                    if (!room) continue;
+                    const circles=[{x:pool.x,y:pool.y,radius:pool.radius},...pool.lobes];
+                    const starts=[];
+                    for (let c=room.x0+1;c<room.x0+room.w-1;c++) {
+                        for (let r=room.y0+1;r<room.y0+room.h-1;r++) {
+                            const cell=w.grid.nearestWalkable({x:(c+0.5)*ts,y:(r+0.5)*ts});
+                            if (cell<0) continue;
+                            const at=w.grid.center(cell);
+                            if (!w.grid.walkable(at)||starts.some((s)=>Math.hypot(s.x-at.x,s.y-at.y)<0.1)) continue;
+                            const shore=Math.min(...circles.map((circle)=>Math.hypot(at.x-circle.x,at.y-circle.y)-circle.radius));
+                            if (shore>=3&&shore<=8) starts.push({x:at.x,y:at.y,shore});
+                        }
+                    }
+                    starts.sort((a,b)=>Math.abs(a.shore-4)-Math.abs(b.shore-4));
+                    if (starts[0]) candidates.push({pool,room,start:starts[0]});
+                }
+                candidates.sort((a,b)=>a.start.shore-b.start.shore);
+                const chosen=candidates[0];
+                if (!chosen) throw new Error('El piso ${floorIndex + 1} no tiene estanque con lóbulos y un encuadre seco cercano');
+                return {
+                    floor:floor.index,
+                    theme:floor.def.theme,
+                    floorColor:floor.theme.floor,
+                    pool:{id:chosen.pool.id,x:chosen.pool.x,y:chosen.pool.y,radius:chosen.pool.radius,lobes:chosen.pool.lobes},
+                    start:chosen.start,
+                    room:{...chosen.room},
+                };
+            })()`);
+
+            check(
+                `JL-370: piso ${floorIndex + 1} usa el tema esperado y un estanque con lóbulos`,
+                setup.floor===floorIndex&&setup.theme===expectedTheme&&setup.pool.lobes.length>=2,
+                JSON.stringify(setup),
+            );
+            const cameraYaw=(Math.atan2(setup.pool.x-setup.start.x,setup.pool.y-setup.start.y)*180)/Math.PI;
+            await js(`(() => {
+                const w=${W},p=w.player;
+                p.pos.x=p.prevPos.x=${setup.start.x};p.pos.y=p.prevPos.y=${setup.start.y};p.path=[];p.moveTarget=null;
+                p.attackTarget=null;p.pickupTarget=null;p.health=p.maxHealth;p.invulnerable=1000;
+                for(const enemy of w.enemies.list){enemy.frozen=true;enemy.state='idle';enemy.stateTime=0;}
+                const rig=__game.view.rig;rig.yawDeg=${cameraYaw};rig.pitchDeg=45;rig.distance=11;
+            })()`);
+            await sleep(2200);
+            await shot(screenshot);
+            return setup;
+        };
+
+        const daylight = await capturePond({ floorIndex: 5, expectedTheme: 'raices', screenshot: 'jl370-estanque-dia-piso-6' });
+        const darkest = await capturePond({ floorIndex: 49, expectedTheme: 'humedo', screenshot: 'jl370-estanque-tramo-humedo-piso-50' });
+        console.log('     JL-370 estanques', JSON.stringify({ daylight, darkest }));
+        check('JL-370: consola sin errores nuevos',consoleErrors.length===0,consoleErrors.slice(0,5).join(' | ')||'0');
+    },
+
     /** JL-361: clic real de Estrella de vendaval a 7 m y daño en el centro y un brazo. */
     async estrellaCursor() {
         await newGame('QA Estrella', { classId: 'mangrove_hunter' });

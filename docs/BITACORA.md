@@ -1,3 +1,17 @@
+## 2026-11-27 — JL-370: capturar estanques con lóbulos en la cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `jl370EstanqueLobulos`, que encuadra el estanque de tres lóbulos del piso 6 (reloj a 0,5) y otro del piso 50, en el tema `humedo`, el más oscuro del tramo hondo. Solo se prepara la partida y la cámara de QA; no se cambia comportamiento ni datos productivos.
+
+**Resultado visual:** En las dos capturas no se aprecian huecos en la corona de piedras ni piedras montadas sobre el agua de lóbulos vecinos. El contorno irregular se percibe, aunque es sutil. Dentro de la cripta la luz es interior fija y el reloj del día se detiene: el reloj a mediodía no produce luz solar visible.
+
+**Validación:** Electron 6/6, consola limpia; `npm test`: 430 archivos, 5.083 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` y `node --check scripts/qaElectron.mjs` limpios. La primera suite concurrente dio un pico aislado en la prueba de rendimiento JL-70; la prueba dirigida pasó 15/15 y la suite completa pasó al repetirla sin otras validaciones simultáneas.
+
+**Evidencia:** `work/junie-jl370/electron/resultado.json`, `jl370-estanque-dia-piso-6.jpg` y `jl370-estanque-tramo-humedo-piso-50.jpg`.
+
+---
+
 ## 2026-11-26 — JL-369: capturar la visibilidad de Chalo y Nina en la cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
