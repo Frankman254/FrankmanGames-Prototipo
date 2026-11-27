@@ -12,6 +12,7 @@ import {
     Scene,
     Vector3,
 } from '@babylonjs/core';
+import { disposeWhenSettled } from '../../render/disposeWhenSettled';
 import { AssetCache } from '../../render/assetCache';
 import { createCharacter, type CharacterModel } from '../../render/characters/characterModel';
 import type { AnimationDataDef, AssetManifest } from '../../data/worldSchema';
@@ -219,8 +220,7 @@ export class CreaturePreview implements CreaturePreview3d {
         this.stop();
         this.model?.dispose();
         this.model = null;
-        this.scene.dispose();
-        this.engine.dispose();
         this.canvas.remove();
+        disposeWhenSettled(this.scene, this.engine);
     }
 }

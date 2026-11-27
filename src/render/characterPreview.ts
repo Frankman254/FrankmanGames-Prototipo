@@ -13,6 +13,7 @@ import {
     Scene,
     Vector3,
 } from '@babylonjs/core';
+import { disposeWhenSettled } from './disposeWhenSettled';
 import { AssetCache } from './assetCache';
 import { createCharacter, type CharacterModel } from './characters/characterModel';
 import type { PlayerChars, PlayerLookSpec } from './characters/playerLook';
@@ -222,8 +223,7 @@ export class CharacterPreview {
         this.stop();
         this.model?.dispose();
         this.model = null;
-        this.scene.dispose();
-        this.engine.dispose();
         this.canvas.remove();
+        disposeWhenSettled(this.scene, this.engine);
     }
 }

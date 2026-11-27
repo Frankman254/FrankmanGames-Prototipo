@@ -1,3 +1,14 @@
+## 2026-11-26 — Windows tras bajar los cambios del Mac: limpieza y errores (Claude)
+
+**Archivos:** `src/render/disposeWhenSettled.ts` (nuevo), `src/render/characterPreview.ts`, `src/ui/menus/compendiumPreview.ts`, `scripts/qaElectron.mjs`, `tests/jl102_resetConfirm.test.ts`, `tests/jl29_keyboardFocus.test.ts`, `tests/ui/modalP12.test.ts`.
+
+**Qué se hizo:** Lo que quedaba sin guardar en Windows se guardó en `work/_respaldo-windows-2026-11-26/` (con `LEEME.md`) y en el stash «respaldo Windows antes de bajar del Mac (2026-11-26)»: la carpeta `docs/Frankman_OMP_Windows/`, un prompt suelto y el guardado del editor del piso 1. El juego no arrancaba porque `node_modules/@babylonjs/core` estaba incompleto; se reinstaló con `npm ci`. Las vistas previas 3D (personaje y compendio) cerraban su escena antes de que Babylon terminara de preparar la textura BRDF y saltaba «Cannot read properties of null (reading 'postProcessManager')». Ahora el cierre espera a que esa textura esté lista (máximo 15 s) y su shader se carga de antemano. El escenario `pantallaCarga` perdía su vigilante cuando la partida nueva recargaba la página; ahora se instala en cada documento. Tres pruebas leían archivos con `URL.pathname`, que en Windows da `C:\C:\…`; ahora usan `fileURLToPath`, sin cambiar lo que comprueban.
+
+**Validación:** `npm run typecheck` limpio; `npm run build` correcto. `npm test`: 421 de 424 archivos, 5.070 aprobadas y 2 fallos. El primero es `data01_asciiIds` (2.338 ids no ASCII en `data/`), que ya venía de antes. El segundo es `jl42_compPreview`: el import en frío de Babylon pasa de 5 s en esta máquina, y falla igual sin este cambio. Electron: `pantallaCarga` 18/18, `sondaBrdf` 1/1, `rendimientoHondo` 2/2, `interfaz` 55/55, todos con la consola limpia.
+
+**Evidencia:** `work/qa/` (capturas y resultados de esos escenarios).
+n---
+
 ## 2026-11-26 — JL-360: verificar el mapa grande de la cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

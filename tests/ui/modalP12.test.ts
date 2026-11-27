@@ -3,9 +3,10 @@
 // Las pruebas verifican el código fuente y el CSS sin depender de JSDOM.
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 function readSrc(path: string): string {
-    return readFileSync(new URL(path, import.meta.url).pathname, 'utf-8');
+    return readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf-8');
 }
 
 describe('P12 — modales con botón cerrar y pie fijo', () => {

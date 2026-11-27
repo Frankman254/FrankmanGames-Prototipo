@@ -1,10 +1,11 @@
 // JL-102: Botón "Restablecer posiciones" con confirmación antes de ejecutar.
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { getDefaultPositions } from '../src/ui/map/hudProfiles';
 
 function readSrc(path: string): string {
-    return readFileSync(new URL(path, import.meta.url).pathname, 'utf-8');
+    return readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf-8');
 }
 
 describe('JL-102: resetWindows pide confirmación', () => {

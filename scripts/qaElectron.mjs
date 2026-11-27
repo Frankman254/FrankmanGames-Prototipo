@@ -770,7 +770,10 @@ const scenarios = {
     },
 
     async pantallaCarga() {
-        await js(`(() => {
+        // El vigilante se instala también en cada documento nuevo: el primer js() puede caer en la
+        // página que aún arranca y la partida nueva puede recargar, y se perdía (window.__qaLoading).
+        const watcher = `(() => {
+      if (window.__qaLoading) return;
       const state = window.__qaLoading = { events: [] };
       const sample = () => {
         const screen = document.querySelector('.carga');
@@ -792,9 +795,14 @@ const scenarios = {
         subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'hidden'],
       });
       sample();
-    })()`);
+    })()`;
+        await cdp('Page.addScriptToEvaluateOnNewDocument', {
+            source: `document.addEventListener('DOMContentLoaded', () => ${watcher.slice(0, -2)})`,
+        });
+        await until("document.readyState === 'complete'", 20000, 'página cargada');
+        await js(watcher);
 
-        const eventCount = () => js('window.__qaLoading.events.length');
+        const eventCount = () => js('window.__qaLoading?.events.length ?? 0');
         const verifyTrip = async (name, start, ready) => {
             try {
                 await until(
@@ -823,8 +831,9 @@ const scenarios = {
             await until(ready, 20000, `${name}: destino listo`);
         };
 
-        const newGameStart = await eventCount();
+        // La partida nueva puede recargar la página: sus eventos empiezan en un registro nuevo.
         await newGame('QA Carga');
+        const newGameStart = 0;
         const initialEvents = await js(`window.__qaLoading.events.slice(${newGameStart})`);
         const initialShown = initialEvents.find((e) => e.visible);
         const initialHidden = initialEvents.find((e) => e.hidden && initialShown && e.at > initialShown.at);
@@ -6653,6 +6662,18 @@ const scenarios = {
             path.join(OUT, `sonda-sucio-${process.env.QA_ETIQUETA ?? 'ultima'}.json`),
             JSON.stringify(out, null, 1),
         );
+    },
+    async sondaBrdf() {
+        // Quién destruye la textura BRDF (o su escena) antes de que Babylon termine de prepararla.
+        await until('Boolean(window.__game && __game.view && __game.view.scene)', 20000, 'juego');
+        await js(`(()=>{ const sc=__game.view.scene; window.__qaB=[]; let P=Object.getPrototypeOf(sc.getEngine()); while(P && !Object.prototype.hasOwnProperty.call(P,'dispose')) P=Object.getPrototypeOf(P);
+          const st=()=>new Error().stack.split(String.fromCharCode(10)).slice(2,8).map(l=>l.trim()).join(' < ');
+          const fe=P.dispose; P.dispose=function(){ window.__qaB.push('ENGINE '+st()); return fe.apply(this,arguments); };
+          let S=Object.getPrototypeOf(sc); while(S && !Object.prototype.hasOwnProperty.call(S,'dispose')) S=Object.getPrototypeOf(S);
+          const fs=S.dispose; S.dispose=function(){ const b=this.environmentBRDFTexture, it=b&&b.getInternalTexture(); window.__qaB.push('SCENE '+(this===sc?'principal ':'otra ')+JSON.stringify({brdf:!!b, ready:b&&b.isReady(), it:!!it, itReady:it&&it.isReady, t:Math.round(performance.now())})+' '+st()); return fs.apply(this,arguments); }; })()`);
+        await newGame('QA Brdf');
+        await sleep(6000);
+        console.log('BRDF', JSON.stringify(await js('window.__qaB')));
     },
     async rendimientoHondo() {
         // Rendimiento en pantalla completa en el pueblo, Iguanera y pisos de la cripta (hecho a mano y hondos):
