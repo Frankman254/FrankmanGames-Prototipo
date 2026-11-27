@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-359: verificar pesca en lóbulos de cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `pescaLobulos`: entra al piso 6, elige un punto de un lóbulo fuera del círculo principal y envía el clic real por el lienzo. Comprueba que la orden inicia el camino hasta la orilla y deja el corcho y el sedal activos; la posición, cámara y enemigos se preparan solo en la partida de QA, sin modificar la lógica productiva.
+
+**Validación:** Electron `pescaLobulos`: 7/7, consola limpia; clic real a 5,43 m del centro del estanque (radio 4,65 m), caminata de 1,3 m y pesca iniciada a 5,99 m de la orilla (alcance 6 m). `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl359/electron/resultado.json` y las capturas revisadas `jl359-estanque-irregular-piso-6.jpg` y `jl359-pesca-orilla-irregular.jpg`.
+
+---
+
 ## 2026-11-26 — JL-358: comprobar el guardado de PNJ en piso 7 (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

@@ -1627,7 +1627,7 @@ Contexto del coordinador:
   - muerte;
   - cargar una partida del pueblo.
 - [x] JL-358 Escenario `criptaGuardado`: guardar en el piso 7, recargar y comprobar que Chalo y Nina vuelven a estar junto a la llegada del piso 7. — commit «JL-358: comprobar el guardado de PNJ en piso 7» — Electron 8/8, consola limpia; Chalo y Nina a 2,5 m de la llegada antes y después, con modelos y rótulos visibles. Capturas revisadas y resultado en `work/junie-jl358/electron/`.
-- [ ] JL-359 Escenario `pescaLobulos`: en el piso 6 (estanque de tres lóbulos), un clic real en un lóbulo fuera del círculo principal hace caminar a la orilla y lanzar la caña. Captura del borde irregular.
+- [x] JL-359 Escenario `pescaLobulos`: en el piso 6 (estanque de tres lóbulos), un clic real en un lóbulo fuera del círculo principal hace caminar a la orilla y lanzar la caña. Captura del borde irregular. — commit «JL-359: verificar pesca en lóbulos de cripta» — Electron 7/7, consola limpia; caminata de 1,3 m, pesca a 5,99 m de la orilla, corcho y sedal visibles. Evidencia: `work/junie-jl359/electron/resultado.json` y capturas `jl359-estanque-irregular-piso-6.jpg`, `jl359-pesca-orilla-irregular.jpg`.
 - [ ] JL-360 Escenario `criptaMapaGrande`: en el piso 10, M abre el mapa del piso con la rejilla.
   - Al llegar, la escalera de bajada no está en el minimapa ni en el mapa.
   - Tras descubrirla, sale en los dos, y con flecha en el borde del minimapa cuando queda fuera.

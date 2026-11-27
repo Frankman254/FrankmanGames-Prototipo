@@ -7315,6 +7315,169 @@ const scenarios = {
         check('JL-358: consola sin errores nuevos', consoleErrors.length===0, consoleErrors.slice(0,5).join(' | ')||'0');
     },
 
+    /** JL-359: el clic real en un lóbulo del piso 6 lleva a la orilla y lanza la caña. */
+    async pescaLobulos() {
+        await newGame('QA Pesca Cripta');
+        await resize(1920, 1080);
+        await js(`${S}.energy.value=100`);
+
+        const entered = await js(`__game.crypt.enter(5, 'above')`);
+        check('JL-359: se puede entrar al piso 6', entered, String(entered));
+        await until('__game.crypt.floor===5', 15000, 'entrar en el piso 6');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 6 listo');
+        await sleep(900);
+
+        const setup = await js(`(() => {
+            const floor=__game.crypt.floorData, w=${W}, ts=floor?.tileSize;
+            if (!floor || floor.index!==5) throw new Error('Los datos cargados no son el piso 6');
+            const candidates=[];
+            for (const pool of floor.pools) {
+                if (pool.lobes?.length!==3) continue;
+                const room=floor.rooms.find((r)=>
+                    pool.x>r.x0*ts&&pool.x<(r.x0+r.w)*ts&&pool.y>r.y0*ts&&pool.y<(r.y0+r.h)*ts,
+                );
+                if (!room) continue;
+                const circles=[{x:pool.x,y:pool.y,radius:pool.radius},...pool.lobes];
+                const starts=[];
+                for (let c=room.x0+1;c<room.x0+room.w-1;c++) {
+                    for (let r=room.y0+1;r<room.y0+room.h-1;r++) {
+                        const cell=w.grid.nearestWalkable({x:(c+0.5)*ts,y:(r+0.5)*ts});
+                        if (cell<0) continue;
+                        const at=w.grid.center(cell);
+                        if (!w.grid.walkable(at)||starts.some((s)=>Math.hypot(s.x-at.x,s.y-at.y)<0.1)) continue;
+                        const shore=Math.min(...circles.map((circle)=>Math.hypot(at.x-circle.x,at.y-circle.y)-circle.radius));
+                        if (shore>w.content.fishing.rules.castRange+1) starts.push({x:at.x,y:at.y,shore});
+                    }
+                }
+                starts.sort((a,b)=>a.shore-b.shore);
+                const start=starts[0];
+                if (!start) continue;
+                pool.lobes.forEach((lobe,index)=>{
+                    const dx=lobe.x-pool.x, dy=lobe.y-pool.y, len=Math.hypot(dx,dy)||1;
+                    const target={x:lobe.x+dx/len*lobe.radius*0.8,y:lobe.y+dy/len*lobe.radius*0.8};
+                    const mainDistance=Math.hypot(target.x-pool.x,target.y-pool.y);
+                    const lobeDistance=Math.hypot(target.x-lobe.x,target.y-lobe.y);
+                    if (mainDistance>pool.radius+0.3&&lobeDistance<lobe.radius)
+                        candidates.push({pool,lobe,index,target,start,mainDistance,lobeDistance,room:{...room},castRange:w.content.fishing.rules.castRange});
+                });
+            }
+            candidates.sort((a,b)=>(a.start.shore-a.castRange)-(b.start.shore-b.castRange));
+            const chosen=candidates[0];
+            if (!chosen) throw new Error('El piso 6 no tiene lóbulo de tres fuera del círculo principal con suelo seco alcanzable');
+            return {
+                floor:floor.index,
+                poolId:chosen.pool.id,
+                pool:{x:chosen.pool.x,y:chosen.pool.y,radius:chosen.pool.radius,lobes:chosen.pool.lobes},
+                lobeIndex:chosen.index,
+                lobe:chosen.lobe,
+                target:chosen.target,
+                start:chosen.start,
+                mainDistance:chosen.mainDistance,
+                lobeDistance:chosen.lobeDistance,
+                castRange:chosen.castRange,
+                room:chosen.room,
+            };
+        })()`);
+        check(
+            'JL-359: el piso 6 tiene un estanque de tres lóbulos y el clic queda fuera del círculo principal',
+            setup.floor===5 && setup.pool.lobes.length===3 && setup.mainDistance>setup.pool.radius+0.3 && setup.lobeDistance<setup.lobe.radius,
+            JSON.stringify(setup),
+        );
+
+        const cameraYaw=(Math.atan2(setup.pool.x-setup.start.x,setup.pool.y-setup.start.y)*180)/Math.PI;
+        await js(`(() => {
+            const w=${W},p=w.player,start=${JSON.stringify({x:setup.start.x,y:setup.start.y})};
+            p.pos.x=p.prevPos.x=start.x;p.pos.y=p.prevPos.y=start.y;p.path=[];p.moveTarget=null;
+            p.attackTarget=null;p.pickupTarget=null;p.health=p.maxHealth;p.invulnerable=1000;
+            for(const enemy of w.enemies.list){enemy.frozen=true;enemy.state='idle';enemy.stateTime=0;}
+            const rig=__game.view.rig;rig.yawDeg=${cameraYaw};rig.pitchDeg=45;rig.distance=12;
+        })()`);
+        await sleep(900);
+        await shot('jl359-estanque-irregular-piso-6');
+
+        const screen = await js(`(() => {
+            const v=__game.view,s=v.scene,cam=v.rig.camera,c=s.getEngine().getRenderingCanvas(),r=c.getBoundingClientRect();
+            const V=cam.position.constructor,M=cam.getViewMatrix().constructor,e=s.getEngine();
+            const vp=cam.viewport.toGlobal(e.getRenderWidth(),e.getRenderHeight());
+            const p=V.Project(new V(${setup.target.x},0.012,${setup.target.y}),M.Identity(),s.getTransformMatrix(),vp);
+            const k=r.width/e.getRenderWidth(),x=p.x*k,y=p.y*k;
+            const feature=__game.crypt.floorView.pick(x,y);
+            const picked=feature?.kind==='pool'&&feature.x!==undefined?{x:feature.x,y:feature.y}:null;
+            return {
+                x:r.x+x,y:r.y+y,localX:x,localY:y,
+                within:x>=0&&y>=0&&x<r.width&&y<r.height,
+                element:document.elementFromPoint(r.x+x,r.y+y)?.tagName??null,
+                feature:feature?{kind:feature.kind,x:feature.x,y:feature.y}:null,
+                picked,
+            };
+        })()`);
+        const pickedMainDistance=screen.picked?Math.hypot(screen.picked.x-setup.pool.x,screen.picked.y-setup.pool.y):null;
+        const pickedLobeDistance=screen.picked?Math.hypot(screen.picked.x-setup.lobe.x,screen.picked.y-setup.lobe.y):null;
+        check(
+            'JL-359: la proyección del lóbulo irregular selecciona agua fuera del círculo principal',
+            screen.within&&screen.element==='CANVAS'&&screen.feature?.kind==='pool'&&pickedMainDistance>setup.pool.radius&&pickedLobeDistance<setup.lobe.radius,
+            JSON.stringify({screen,pickedMainDistance,pickedLobeDistance}),
+        );
+        if (!(screen.within&&screen.element==='CANVAS'&&screen.feature?.kind==='pool'))
+            throw new Error(`El lóbulo no queda bajo el cursor en Electron: ${JSON.stringify(screen)}`);
+
+        await js(`(() => {
+            const w=${W},original=w.commandFish.bind(w);
+            window.__jl359Clicks=[];
+            w.commandFish=(point)=>{window.__jl359Clicks.push(point?{x:point.x,y:point.y}:null);return original(point);};
+        })()`);
+        await mouse(screen.x,screen.y);
+        await until('window.__jl359Clicks?.length===1',5000,'recibir el clic real en el estanque');
+        const clicked = await js(`(() => {
+            const w=${W},point=window.__jl359Clicks[0],pool=w.fishingSpots[${JSON.stringify(setup.poolId)}];
+            const circles=[{x:pool.x,y:pool.y,radius:pool.radius},...(pool.lobes??[])];
+            const shore=Math.min(...circles.map((c)=>Math.hypot(w.player.pos.x-c.x,w.player.pos.y-c.y)-c.radius));
+            return {
+                point,
+                targetSpot:w.fishingSpotAt(point)?.id??null,
+                pointMainDistance:Math.hypot(point.x-pool.x,point.y-pool.y),
+                pointLobeDistance:Math.hypot(point.x-${setup.lobe.x},point.y-${setup.lobe.y}),
+                shore,
+                clicks:window.__jl359Clicks.length,
+                player:{x:w.player.pos.x,y:w.player.pos.y,path:w.player.path.length},
+                fishing:!!w.fishing,
+            };
+        })()`);
+        check(
+            'JL-359: el clic real en el lóbulo inicia el acercamiento caminando',
+            clicked.clicks===1&&clicked.targetSpot===setup.poolId&&clicked.pointMainDistance>setup.pool.radius&&clicked.pointLobeDistance<setup.lobe.radius&&clicked.shore>setup.castRange&&clicked.player.path>0&&!clicked.fishing,
+            JSON.stringify(clicked),
+        );
+
+        await until(`${W}.fishing?.spotId===${JSON.stringify(setup.poolId)}`,45000,'llegar a la orilla y lanzar la caña');
+        await sleep(700);
+        const cast = await js(`(() => {
+            const w=${W},f=w.fishing,p=w.player,scene=__game.view.scene,pool=w.fishingSpots[${JSON.stringify(setup.poolId)}];
+            const circles=[{x:pool.x,y:pool.y,radius:pool.radius},...(pool.lobes??[])];
+            const shore=Math.min(...circles.map((c)=>Math.hypot(p.pos.x-c.x,p.pos.y-c.y)-c.radius));
+            const bobber=scene.getMeshByName('bobber'),line=scene.getMeshByName('fishLine');
+            return {
+                floor:__game.crypt.floor,
+                spotId:f?.spotId??null,
+                state:f?.state??null,
+                moved:Math.hypot(p.pos.x-${setup.start.x},p.pos.y-${setup.start.y}),
+                shore,castRange:w.content.fishing.rules.castRange,
+                bobber:!!bobber&&bobber.isEnabled(),line:!!line&&line.isEnabled(),
+                bobberPosition:bobber?{x:bobber.position.x,z:bobber.position.z}:null,
+                player:{x:p.pos.x,y:p.pos.y,path:p.path.length},
+            };
+        })()`);
+        check(
+            'JL-359: camina hasta alcance de orilla y lanza el sedal',
+            cast.floor===5&&cast.spotId===setup.poolId&&cast.moved>0.5&&cast.shore<=cast.castRange&&cast.bobber&&cast.line,
+            JSON.stringify(cast),
+        );
+        await js('(()=>{__game.view.rig.distance=20})()');
+        await sleep(900);
+        await shot('jl359-pesca-orilla-irregular');
+        check('JL-359: consola sin errores nuevos',consoleErrors.length===0,consoleErrors.slice(0,5).join(' | ')||'0');
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');
