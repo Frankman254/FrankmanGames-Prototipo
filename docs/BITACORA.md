@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-380: actualizar el estado de la cripta con QA de Electron (Junie)
+
+**Archivos:** `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Actualicé la fila de la cripta con los recorridos verificados de Electron JL-354…378 y separé las pruebas puras de 100 pisos de la inspección visual de seis pisos. Dejé explícitos los siete checks fallidos conocidos del cierre, los cero errores de consola y la oclusión de Chalo en pisos 1 y 5. No cambié código, pruebas ni datos productivos.
+
+**Validación:** `npx tsc --noEmit`, `npx vitest run` (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck` y `npm run docs:check` limpios. Electron de la tanda: 154/161 checks en 20 escenarios, cero errores de consola.
+
+**Evidencia:** JSON y capturas revisadas en `work/junie-jl378/electron/`; en particular `lote-08/jl355-chalo-compra-pocion.jpg`, `lote-08/jl355-nina-villa-raspadura.jpg`, `lote-04/jl360-piso-10-escalera-descubierta.jpg` y `lote-05/jl369-piso-001.jpg` / `jl369-piso-005.jpg`.
+
+---
+
 ## 2026-11-27 — JL-379: revisar bloqueos de la tanda de cripta (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
