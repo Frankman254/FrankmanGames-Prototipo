@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-353: proponer la siguiente bolsa de pruebas (Junie)
+
+**Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_5.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Preparé 20 propuestas de pruebas para simulación, workers de páginas, aplicación en caliente y componentes DOM. Las comprobé con búsquedas en `tests/`: 19 símbolos no tienen referencias directas y `titleScreen` solo aparece en una prueba estática. Son propuestas sin autorizar; no se inició ninguna ni se cambió código, pruebas productivas, datos o assets.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check`: 214 rutas correctas. No aplica Electron ni capturas: no hubo cambios visuales ni de comportamiento.
+
+**Evidencia:** `work/junie-propuestas/BOLSA_SIGUIENTE_5.md` (artefacto local ignorado por Git).
+
+---
+
 ## 2026-11-26 — JL-352: recopilar preguntas de la tanda (Junie)
 
 **Archivos:** `work/junie-jl352/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
