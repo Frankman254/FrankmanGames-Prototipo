@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-352: recopilar preguntas de la tanda (Junie)
+
+**Archivos:** `work/junie-jl352/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se consolidaron ocho preguntas o decisiones surgidas en JL-254…JL-351: línea de visión de áreas, contenido de las siete piedras pendientes, vuelo en la barriada, destino de 64 audios, menús contextuales y compañero, tormenta, sonido climático y una posible intersección bajo la falda de La Diablica. Cada una tiene una recomendación; se distinguen expresamente de fallos funcionales y dependencias del coordinador. No se modificaron código, assets ni reglas del juego.
+
+**Validación:** Línea base y verificación final: `npx tsc --noEmit` limpio; `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check` limpio. No aplica Electron ni captura: el cambio es documental y no modifica la interfaz.
+
+**Evidencia:** `work/junie-jl352/PREGUNTAS.md`.
+
+---
+
 ## 2026-11-26 — JL-351: actualizar el estado de la tanda (Junie)
 
 **Archivos:** `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
