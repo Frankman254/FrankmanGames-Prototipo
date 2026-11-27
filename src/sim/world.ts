@@ -1631,16 +1631,18 @@ export class World implements SessionWorld {
         const roll = resolveHit(this.rng, hit, reflexive ? null : this.profile(source), target.stats, this.damageRules);
         const scaled = reflexive ? roll.amount : this.levelScaled(roll.amount, source, target);
         const amount = this.weatherScaled(scaled, hit.element);
-        this.events.push({
+        const event: Extract<GameEvent, { type: 'damage' }> = {
             type: 'damage',
             sourceId: source.id,
             targetId: target.id,
             amount,
+            effectiveAmount: 0,
             crit: roll.crit,
             toPlayer,
             ability: tag,
-        });
-        target.takeDamage(amount);
+        };
+        this.events.push(event);
+        event.effectiveAmount = target.takeDamage(amount);
         // HZ-04b-defensa: shareDamage — si el objetivo tiene share_damage activo, transfiere % al aliado.
         this.shareDamageToAlly(target, amount, source);
         if (!reflexive) this.counterHit(source, target, amount, hit.element);
@@ -1663,12 +1665,13 @@ export class World implements SessionWorld {
         // El shareTarget es el lanzador original (aliado). Buscamos el actor correspondiente.
         const ally = share.shareTarget === this.character ? this.character : null;
         if (!ally || !ally.alive) return;
-        ally.takeDamage(shared);
+        const effectiveAmount = ally.takeDamage(shared);
         this.events.push({
             type: 'damage',
             sourceId: source.id,
             targetId: ally.id,
             amount: shared,
+            effectiveAmount,
             crit: false,
             toPlayer: ally === this.character,
             ability: 'share_damage',

@@ -7205,3 +7205,13 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 - Electron: `previa` 10/11, `iguanera` 6/7 (repetido, solo falla el chequeo de consola), `modelos` 8/11 y `criptaAccesos` 4/4. Las comprobaciones funcionales de `previa` e `iguanera` pasaron; `modelos` repite las tres incidencias ya documentadas en JL-251. En `previa`, `iguanera` y `modelos` se reprodujo el `TypeError: Cannot read properties of null (reading 'postProcessManager')` de Babylon (`rgbdTextureTools.js:68`), previamente observado en otros recorridos; no se ocultó ni se alteró el QA.
 
 **Evidencia:** logs, resultados JSON y capturas revisadas en `work/junie-jl349/`.
+
+## 2026-11-27 — JL-388: contar daño efectivo tras escudos (Junie)
+
+**Archivos:** `src/sim/events.ts`, `src/sim/groupLedger.ts`, `src/sim/world.ts`, `tests/jl388_groupLedgerEffectiveDamage.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `GroupLedger` mantiene `damageDealt` como bruto y añade `effectiveDamageDealt` con el daño que alcanzó la vida tras resistencias y escudos. `World.strike()` conserva `amount` y el orden del evento de daño antes del evento de baja, y adjunta el valor devuelto por `Actor.takeDamage()`; el daño compartido también incluye su valor postescudo. La participación sigue usando el bruto.
+
+**Validación:** `tests/jl388_groupLedgerEffectiveDamage.test.ts` 1/1: un impacto real genera daño bruto positivo, el escudo absorbe todo, la vida no cambia y el contador efectivo queda en cero. `npm test`: 434 archivos, 5.097 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; `npm run docs:check` limpio. No aplica Electron: cambio de métrica sin efecto visual.
+
+**Evidencia:** `work/junie-jl388/RESULTADO.md`.

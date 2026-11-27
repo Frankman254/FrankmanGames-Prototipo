@@ -7,6 +7,8 @@ export type GameEvent =
           type: 'damage';
           sourceId: number;
           targetId: number;
+          /** Daño que llegó a la vida tras resistencia y escudos. */
+          effectiveAmount?: number;
           amount: number;
           crit: boolean;
           toPlayer: boolean;

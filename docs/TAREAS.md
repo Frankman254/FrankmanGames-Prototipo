@@ -479,6 +479,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-384 | J | Hecho (commit «JL-384: añadir prueba de humo para fiel.ts») | `tests/balance/fiel.test.ts`: 2/2; `melee` con las dos semillas y los dos perfiles termina en menos de 10 s, todos los resultados son finitos y la misma semilla reproduce exactamente el resultado. `npm test`: 432 archivos, 5.089 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl384/RESULTADO.md`. No aplica Electron: sin cambio visual. |
 
+## Cierre de JL-388 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-388 | J | Hecho (commit «JL-388: contar daño efectivo tras escudos») | `GroupLedger` conserva `damageDealt` bruto y suma `effectiveDamageDealt`; `World` informa el daño que llega a la vida tras resistencias y escudos, sin cambiar el `amount` existente ni la participación. `tests/jl388_groupLedgerEffectiveDamage.test.ts`: 1/1; un golpe real con escudo que absorbe todo, bruto positivo, efectivo 0 y vida intacta. `npm test`: 434 archivos, 5.097 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Evidencia: `work/junie-jl388/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

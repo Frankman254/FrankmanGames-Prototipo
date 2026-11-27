@@ -6,8 +6,10 @@ import type { GameEvent } from './events';
 
 export interface ParticipantMetrics {
     id: number;
-    /** Daño que hizo a enemigos (el de sus mascotas cuenta para él). */
+    /** Daño bruto antes de escudos que hizo a enemigos (el de sus mascotas cuenta para él). */
     damageDealt: number;
+    /** Daño que llegó a la vida de enemigos tras resistencias y escudos. */
+    effectiveDamageDealt: number;
     /** Daño que le llegó. */
     damageTaken: number;
     /** Curación efectiva recibida de sus hechizos y objetos (sin la regeneración pasiva). */
@@ -50,6 +52,7 @@ export class GroupLedger {
             r = {
                 id,
                 damageDealt: 0,
+                effectiveDamageDealt: 0,
                 damageTaken: 0,
                 healing: 0,
                 activeSeconds: 0,
@@ -80,6 +83,7 @@ export class GroupLedger {
                     toPart.damageTaken += ev.amount;
                 } else if (from !== null) {
                     this.row(from).damageDealt += ev.amount;
+                    this.row(from).effectiveDamageDealt += ev.effectiveAmount ?? ev.amount;
                     this.lastHitBy.set(ev.targetId, from);
                 }
             } else if (ev.type === 'heal' && ev.source !== 'regen') {
