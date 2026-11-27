@@ -274,7 +274,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     /** Autoguardado (creador, 2026-11-07): segundos de juego desde el último guardado en la ranura en curso. */
     let sinceAutosave = 0;
     let screen: MenuScreen = 'title';
-    const modals: Array<{ el: HTMLElement; mode: ModalMode; dismissible: boolean }> = [];
+    const modals: Array<{
+        el: HTMLElement;
+        mode: ModalMode;
+        dismissible: boolean;
+        returnFocus: HTMLElement | null;
+    }> = [];
 
     // Capas: pantallas completas < HUD y paneles < modales < toasts < tooltip/fantasma.
     const screenLayer = h('div.layer.layer-screen');
@@ -300,9 +305,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     );
 
     // U03: menú fijo arriba a la derecha (no se mueve) con lo imprescindible del sistema.
+    const sysLabels = new Map<HTMLButtonElement, string>();
     const sysButton = (art: string | null, glyph: string, label: string, fn: () => void): HTMLButtonElement => {
         const b = h('button.sys-btn', { type: 'button', title: label, 'aria-label': label });
         b.innerHTML = (art ? artIcon('ui', art) : null) ?? `<span class="sys-glyph">${glyph}</span>`;
+        sysLabels.set(b, label);
         b.addEventListener('click', (e) => {
             e.stopPropagation();
             fn();
@@ -325,11 +332,16 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             }),
         ),
     );
+    function refreshSysMenuLabels(): void {
+        sysMenu.setAttribute('aria-label', tr('Menú del sistema'));
+        for (const [button, label] of sysLabels) button.setAttribute('aria-label', tr(label));
+    }
     sysMenu.addEventListener('pointerdown', (e) => e.stopPropagation());
     gameLayer.appendChild(sysMenu);
     hudEditLayer.appendChild(hudLayout.toolbar);
     setLanguage(options.language);
     document.documentElement.lang = options.language;
+    refreshSysMenuLabels();
     let appliedWindowSize: WindowSizeId | null = null;
     applyLook(options);
     // Con el tamaño automático, la escala sigue a la ventana.
@@ -543,8 +555,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     // ─── Modales ──────────────────────────────────────────────────────────────
 
     function pushModal(el: HTMLElement, mode: ModalMode = 'blocking', dismissible = true): void {
+        const active = document.activeElement;
+        const returnFocus = active instanceof HTMLElement && active !== document.body ? active : null;
         for (const m of modals) m.el.hidden = true;
-        modals.push({ el, mode, dismissible });
+        modals.push({ el, mode, dismissible, returnFocus });
         el.classList.toggle('world-overlay', mode === 'overlay');
         modalLayer.appendChild(el);
         // Las ventanas modales también se arrastran por la cabecera.
@@ -556,6 +570,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             windows.restore(box);
         }
         tooltip.hide();
+        const focusTarget = el.querySelector<HTMLElement>(
+            'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+        focusTarget?.focus();
     }
 
     /** MUE-02: ofrecer retomar el piso donde murió o empezar desde el 1. */
@@ -585,13 +603,21 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     }
 
     function popModal(): void {
-        const gone = modals.pop()?.el;
+        const closed = modals.pop();
+        const gone = closed?.el;
         const box = gone?.querySelector<HTMLElement>('.panel.modal');
         if (box) windows.detach(box);
         gone?.remove();
         const top = modals[modals.length - 1]?.el;
         if (top) top.hidden = false;
         tooltip.hide();
+        const restoreFocus = closed?.returnFocus;
+        if (restoreFocus?.isConnected && !restoreFocus.closest('[hidden]')) restoreFocus.focus();
+        else if (top) {
+            top.querySelector<HTMLElement>(
+                'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            )?.focus();
+        }
     }
 
     function closeModals(): void {
@@ -697,6 +723,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         unsubscribe = s.on(onSessionEvent);
         ctx.trade = new ConfirmGate();
         clear(gameLayer);
+        gameLayer.appendChild(sysMenu);
         hud = new GameHud(ctx, (a) => handleAction(a));
         inventory = new InventoryPanel(
             ctx,
@@ -983,6 +1010,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         document.documentElement.lang = options.language;
         // F07: lo ya construido (paneles, títulos, avisos) cambia de idioma en su sitio.
         retranslate(document.body);
+        refreshSysMenuLabels();
         if (screen === 'title') showScreen('title');
         if (screen === 'game') {
             rebuildHud();
@@ -1392,6 +1420,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
     window.addEventListener('keydown', (e) => {
         const t = e.target as HTMLElement | null;
+        if (e.code === 'Tab' && (screen !== 'game' || !(t instanceof HTMLCanvasElement))) return;
+        if (t instanceof HTMLButtonElement && (e.code === 'Enter' || e.code === 'Space')) return;
         if (
             t &&
             (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') &&

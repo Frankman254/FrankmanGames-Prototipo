@@ -820,6 +820,8 @@ window.addEventListener('keyup', (e) => {
 window.addEventListener(
     'keydown',
     (e) => {
+        if (e.code === 'Escape' && e.target instanceof Element && e.target.closest('.layer-modal, [role="menu"]'))
+            return;
         if (castInput.aiming === null) return;
         if (e.code !== 'Escape' && menus?.keys.action(e.code) !== 'closeWindow') return;
         castInput.cancel();

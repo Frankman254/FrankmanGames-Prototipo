@@ -21,6 +21,7 @@ interface HotSlot {
     time: HTMLElement;
     cost: HTMLElement;
     rank: HTMLElement;
+    key: string;
     spellId: string | null | undefined;
 }
 
@@ -29,6 +30,7 @@ interface Potion {
     root: HTMLElement;
     icon: HTMLElement;
     count: HTMLElement;
+    key: string;
     itemId: string | null | undefined;
 }
 
@@ -36,8 +38,21 @@ interface ItemBarSlot {
     root: HTMLElement;
     icon: HTMLElement;
     count: HTMLElement;
+    key: string;
     uid: string | null;
     itemId: string | null;
+}
+
+function keyboardAction(root: HTMLElement, label: string): void {
+    root.setAttribute('role', 'button');
+    root.tabIndex = 0;
+    root.setAttribute('aria-label', label);
+    root.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        root.click();
+    });
 }
 
 export class GameHud {
@@ -165,9 +180,15 @@ export class GameHud {
         this.visibleRows = this.loadVisibleRows();
         this.rowToggles = h('div.hud-row-toggles');
         const toggleBtn = (r: number) => {
+            const label = trf('Fila {n}: {state}', {
+                n: r + 1,
+                state: tr(r < this.visibleRows ? 'Visible' : 'Oculta').toLowerCase(),
+            });
             const b = h('button.hud-row-toggle', {
                 type: 'button',
-                title: trf('Fila {n}: {state}', { n: r + 1, state: r < this.visibleRows ? 'visible' : 'oculta' }),
+                title: label,
+                'aria-label': label,
+                'aria-pressed': r < this.visibleRows ? 'true' : 'false',
             });
             b.textContent = String(r + 1);
             b.classList.toggle('on', r < this.visibleRows);
@@ -188,13 +209,19 @@ export class GameHud {
         const itemSlots = h('div.hud-itembar-slots', null, qh.root, qr.root);
         for (let i = 2; i < 10; i++)
             itemSlots.appendChild(this.itemSlot(i, keys.label(`itembar${i + 1}` as Action)).root);
-        const fold = h('button.hud-itembar-fold', { type: 'button', title: 'Plegar o desplegar la barra de objetos' });
+        const fold = h('button.hud-itembar-fold', {
+            type: 'button',
+            title: 'Plegar o desplegar la barra de objetos',
+            'aria-expanded': 'true',
+        });
         const itembar = h('div.hud-itembar', null, fold, itemSlots);
         const setFolded = (on: boolean): void => {
             itembar.classList.toggle('folded', on);
             fold.textContent = on ? '▸' : '▾';
-            fold.setAttribute('aria-label', on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos');
-            fold.title = on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos';
+            const label = tr(on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos');
+            fold.setAttribute('aria-label', label);
+            fold.title = label;
+            fold.setAttribute('aria-expanded', String(!on));
             try {
                 localStorage.setItem('frankmangames.itembarFolded', on ? '1' : '0');
             } catch {
@@ -215,9 +242,14 @@ export class GameHud {
         const centre = h('div.hud-bar-centre', null, itembar, row, xp);
 
         // Accesos a los paneles.
-        const menu = h('div.hud-menu');
+        const menu = h('nav.hud-menu', { 'aria-label': tr('Accesos de la partida') });
         const btn = (action: Action, label: string, icon: string): HTMLElement => {
-            const b = h('button.hud-menu-btn', { type: 'button', title: `${tr(label)} (${keys.label(action)})` });
+            const accessibleLabel = `${tr(label)} (${keys.label(action)})`;
+            const b = h('button.hud-menu-btn', {
+                type: 'button',
+                title: accessibleLabel,
+                'aria-label': accessibleLabel,
+            });
             b.classList.add(`hud-btn-${action}`);
             // Arte de Codex (assets/icons/ui/<acción>.png) si lo hay; si no, el dibujo por código.
             b.innerHTML = artIcon('ui', action) ?? namedIcon(icon, '#d9b26a');
@@ -240,13 +272,21 @@ export class GameHud {
 
     private hotSlot(index: number, key: string): HotSlot {
         const root = h('div.hot-slot', { 'data-drop': dropAttr({ kind: 'hotbar', index }) });
+        keyboardAction(
+            root,
+            trf('Hechizo {slot}: {spell}; tecla {key}', {
+                slot: index + 1,
+                spell: tr('Hueco vacío'),
+                key: key || tr('Sin tecla asignada'),
+            }),
+        );
         const icon = h('div.icon');
         const sweep = h('div.sweep');
         const time = h('div.time');
         const cost = h('div.cost');
         const rank = h('div.rank');
         root.append(icon, sweep, time, cost, rank, h('div.key', { text: key }));
-        const slot: HotSlot = { root, icon, sweep, time, cost, rank, spellId: undefined };
+        const slot: HotSlot = { root, icon, sweep, time, cost, rank, key, spellId: undefined };
         this.slots.push(slot);
         root.addEventListener('click', () => this.cast(index));
         // JL-66: clic derecho abre el menú de modo de lanzamiento para este hueco.
@@ -254,6 +294,13 @@ export class GameHud {
             e.preventDefault();
             e.stopPropagation();
             this.showCastModeMenu(e.clientX, e.clientY, index);
+        });
+        root.addEventListener('keydown', (e) => {
+            if (e.key !== 'ContextMenu' && !(e.key === 'F10' && e.shiftKey)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const rect = root.getBoundingClientRect();
+            this.showCastModeMenu(rect.left + rect.width / 2, rect.top + rect.height / 2, index);
         });
         this.ctx.drag.draggable(
             root,
@@ -270,7 +317,7 @@ export class GameHud {
         this.closeCastModeMenu?.();
         const menu = h('div.hot-slot-cast-mode-menu', {
             role: 'menu',
-            'aria-label': 'Modo de lanzamiento',
+            'aria-label': tr('Modo de lanzamiento'),
             tabindex: '-1',
         });
         menu.style.cssText =
@@ -282,14 +329,22 @@ export class GameHud {
         const mh = CAST_MODES.length * 28 + 8;
         menu.style.left = `${Math.min(x, vw - mw - 8)}px`;
         menu.style.top = `${Math.min(y, vh - mh - 8)}px`;
+        const items: HTMLButtonElement[] = [];
+        const focusItem = (index: number): void => {
+            const target = (index + items.length) % items.length;
+            items.forEach((item, i) => (item.tabIndex = i === target ? 0 : -1));
+            items[target]?.focus();
+        };
         for (const mode of CAST_MODES) {
-            const item = h('div', {
+            const item = h('button', {
+                type: 'button',
                 role: 'menuitem',
-                tabindex: '0',
+                tabindex: '-1',
                 text: CAST_MODE_NAMES[mode],
                 'data-mode': mode,
-            });
-            item.style.cssText = 'padding:6px 10px;cursor:pointer;border-radius:3px;';
+            }) as HTMLButtonElement;
+            item.style.cssText =
+                'padding:6px 10px;cursor:pointer;border-radius:3px;border:0;text-align:left;background:transparent;color:inherit;font:inherit;';
             item.addEventListener('mouseenter', () => (item.style.background = 'var(--paper-2)'));
             item.addEventListener('mouseleave', () => (item.style.background = ''));
             item.addEventListener('click', () => {
@@ -300,31 +355,61 @@ export class GameHud {
                     }),
                 );
                 this.closeCastModeMenu?.();
+                this.slots[slotIndex]?.root.focus();
             });
             menu.appendChild(item);
+            items.push(item);
         }
+        menu.addEventListener('keydown', (e) => {
+            const current = items.indexOf(document.activeElement as HTMLButtonElement);
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                e.stopPropagation();
+                focusItem(current + (e.key === 'ArrowDown' ? 1 : -1));
+            } else if (e.key === 'Home' || e.key === 'End') {
+                e.preventDefault();
+                e.stopPropagation();
+                focusItem(e.key === 'Home' ? 0 : items.length - 1);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closeCastModeMenu?.();
+                this.slots[slotIndex]?.root.focus();
+            }
+        });
         document.body.appendChild(menu);
-        this.closeCastModeMenu = () => {
+        let onClose: (e: MouseEvent) => void;
+        const close = (): void => {
             menu.remove();
+            document.removeEventListener('mousedown', onClose);
             this.closeCastModeMenu = undefined;
         };
+        this.closeCastModeMenu = close;
         // Cierra al hacer clic fuera.
-        const onClose = (e: MouseEvent) => {
+        onClose = (e: MouseEvent) => {
             if (!menu.contains(e.target as Node)) {
-                this.closeCastModeMenu?.();
-                document.removeEventListener('mousedown', onClose);
+                close();
             }
         };
         document.addEventListener('mousedown', onClose);
+        focusItem(0);
     }
 
     private closeCastModeMenu: (() => void) | undefined;
 
     private itemSlot(index: number, key: string): ItemBarSlot {
         const root = h('div.hot-slot.item-slot.empty');
+        keyboardAction(
+            root,
+            trf('Objeto {slot}: {item}; tecla {key}', {
+                slot: index + 1,
+                item: tr('Hueco vacío'),
+                key: key || tr('Sin tecla asignada'),
+            }),
+        );
         const icon = h('div.icon');
         const count = h('div.count');
-        const slot: ItemBarSlot = { root, icon, count, uid: null, itemId: null };
+        const slot: ItemBarSlot = { root, icon, count, key, uid: null, itemId: null };
         root.append(icon, count, h('div.key', { text: key }));
         root.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -364,6 +449,14 @@ export class GameHud {
             slot.icon.innerHTML = id ? itemIcon(s.content.items[id]!) : '';
             slot.count.textContent = total ? String(total.count) : '';
             slot.root.classList.toggle('empty', !id);
+            slot.root.setAttribute(
+                'aria-label',
+                trf('Objeto {slot}: {item}; tecla {key}', {
+                    slot: i + 3,
+                    item: id ? s.content.items[id]!.name : tr('Hueco vacío'),
+                    key: slot.key || tr('Sin tecla asignada'),
+                }),
+            );
         });
     }
 
@@ -379,10 +472,17 @@ export class GameHud {
 
     private potion(kind: QuickUseKind, key: string): Potion {
         const root = h(`div.hot-slot.potion.${kind}` as 'div');
+        keyboardAction(
+            root,
+            trf('Poción rápida: {name}; tecla {key}', {
+                name: tr(kind === 'health' ? 'Poción de vida' : 'Tónico de recurso'),
+                key: key || tr('Sin tecla asignada'),
+            }),
+        );
         const icon = h('div.icon');
         const count = h('div.count');
         root.append(icon, count, h('div.key', { text: key }));
-        const p: Potion = { kind, root, icon, count, itemId: undefined };
+        const p: Potion = { kind, root, icon, count, key, itemId: undefined };
         this.potions.push(p);
         root.addEventListener('click', () => this.quickUse(kind));
         this.ctx.tooltip.bind(root, () => {
@@ -511,6 +611,14 @@ export class GameHud {
                 const sp = id ? s.content.spells[id] : undefined;
                 slot.icon.innerHTML = sp ? spellIcon(sp) : '';
                 slot.root.classList.toggle('empty', !sp);
+                slot.root.setAttribute(
+                    'aria-label',
+                    trf('Hechizo {slot}: {spell}; tecla {key}', {
+                        slot: i + 1,
+                        spell: sp?.name ?? tr('Hueco vacío'),
+                        key: slot.key || tr('Sin tecla asignada'),
+                    }),
+                );
                 const rk = book.known.find((k) => k.spellId === id)?.rank ?? 1;
                 slot.cost.textContent = sp
                     ? String(Math.round(sp.resourceCost * (1 - ((rk - 1) * sp.perRank.costPercent) / 100)))
@@ -543,6 +651,13 @@ export class GameHud {
                 pot.icon.innerHTML = def ? itemIcon(def) : '';
                 pot.root.classList.toggle('empty', !def);
             }
+            pot.root.setAttribute(
+                'aria-label',
+                trf('Poción rápida: {name}; tecla {key}', {
+                    name: id ? (s.content.items[id]?.name ?? id) : tr(pot.kind === 'health' ? 'Poción de vida' : 'Tónico de recurso'),
+                    key: pot.key || tr('Sin tecla asignada'),
+                }),
+            );
             // Cuenta total de ese tipo (todas las pilas del mismo objeto).
             const total = id ? s.inventory().slots.reduce((a, x) => a + (x?.itemId === id ? x.quantity : 0), 0) : 0;
             pot.count.textContent = total ? String(total) : '';
@@ -680,7 +795,13 @@ export class GameHud {
         for (let r = 0; r < btns.length; r++) {
             const b = btns[r] as HTMLButtonElement;
             b.classList.toggle('on', r < this.visibleRows);
-            b.title = trf('Fila {n}: {state}', { n: r + 1, state: r < this.visibleRows ? 'visible' : 'oculta' });
+            const label = trf('Fila {n}: {state}', {
+                n: r + 1,
+                state: tr(r < this.visibleRows ? 'Visible' : 'Oculta').toLowerCase(),
+            });
+            b.title = label;
+            b.setAttribute('aria-label', label);
+            b.setAttribute('aria-pressed', String(r < this.visibleRows));
         }
     }
 

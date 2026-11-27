@@ -1,3 +1,17 @@
+## 2026-11-27 — JL-407: habilitar teclado en barra y menús principales (Junie)
+
+**Archivos:** `src/main.ts`, `src/ui/menus/hud.ts`, `src/ui/menus/index.ts`, `src/ui/styles/menus.css`, `src/ui/styles/ventanas.css`, `data/i18n/en.ui.json`, `scripts/i18nUi.mjs`, `scripts/qaElectron.mjs`, `tests/jl407_keyboardAccess.test.ts`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia local en `work/junie-jl407/`.
+
+**Qué se hizo:** Los atajos globales dejan que Tab navegue por la interfaz y que Enter/Espacio activen botones nativos; el menú del sistema vuelve a montarse tras iniciar/cargar partida. Las ranuras reciben foco, rol y nombre accesible; filas y plegado exponen su estado; el selector de modo de lanzamiento abre con ContextMenu/Shift+F10, navega con flechas/Home/End y cierra con Escape. Los modales trasladan el foco al abrirse y lo restauran al cerrarse; Escape ya no queda consumido por la cancelación de apuntado cuando se enfoca un menú.
+
+**Validación:** `tests/jl407_keyboardAccess.test.ts`: 8/8; `npm test`: 437 archivos, 5.112 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, `npm run docs:check` (220 rutas), `node --check scripts/qaElectron.mjs` y `node scripts/i18nUi.mjs`: 0 errores / 0 textos sin inglés. Electron `jl407AccesibilidadTeclado`: 20/20, consola limpia. `npm run format:check` sigue reportando 226 archivos; el test nuevo pasa `npx prettier --check tests/jl407_keyboardAccess.test.ts`.
+
+**Acciones solo de ratón:** asignar hechizos/objetos arrastrándolos; mover o cambiar tamaño de paneles y elementos del HUD mediante asas; abrir el menú contextual de un objeto con clic derecho y desequipar con doble clic/clic derecho; arrastrar para desplazar el mapa grande y girar a mano la vista 3D del compendio; mostrar tooltips requiere hover. El movimiento/ataque del mundo continúa por clic conforme a DEC-2026-003, sin cambiar esa decisión.
+
+**Evidencia:** `work/junie-jl407/RESULTADO.md`, `work/junie-jl407/i18n-faltantes.json`, `work/junie-jl407/electron/resultado.json` y capturas `jl407-{titulo,modo-lanzamiento,opciones,menu-principal}-teclado.jpg`. `error-jl407AccesibilidadTeclado.jpg` es una captura diagnóstica anterior a la corrección del arnés; no forma parte del resultado aceptado.
+
+---
+
 ## 2026-11-27 — JL-406: revisar textos de ventanas a dos resoluciones (Junie)
 
 **Archivos:** `src/ui/map/mapDraw.ts`, `src/ui/map/worldMap.ts`, `tests/ui/mapLabelBounds.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia local en `work/junie-jl406/`.

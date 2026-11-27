@@ -14,7 +14,7 @@ const files = (d) =>
         );
 const skipDir = /[\\/](fake|editor|dev)[\\/]/;
 const all = [...files('src/ui').filter((f) => !skipDir.test(f)), 'src/main.ts'];
-const NOT_TEXT = /^[.#[]|^[a-z]+(\.[a-z-]+)+$|px|rgba?\(|var\(--|^\/|\.json|\.glb|=>|^[a-z-]+:|^M[0-9 ]|^[A-Z]{1,4}$|^S:M|^F:M|^<path|^<circle|^translate\(|^small |^primary |^danger |^chip |^wm-tab|\.join\(|\? ''|test\(|return |FrankmanGames|Escarcha|^Key|^Mouse|^End$|^Insert$|^Space$|^Tab$|^Alt( Gr)?$|^Escape$|^INPUT$|^TEXTAREA$|^H\d$|, dmg\)|carga-cenefa|^button, input|^F\d+$|bottom left|tr\('/;
+const NOT_TEXT = /^[.#[]|^[a-z]+(\.[a-z-]+)+$|px|rgba?\(|var\(--|^\/|\.json|\.glb|=>|^[a-z-]+:|^M[0-9 ]|^[A-Z]{1,4}$|^S:M|^F:M|^<path|^<circle|^translate\(|^small |^primary |^danger |^chip |^wm-tab|\.join\(|\? ''|test\(|return |FrankmanGames|Escarcha|^Key|^Mouse|^End$|^Home$|^Insert$|^ArrowDown$|^ArrowUp$|^ContextMenu$|^Space$|^Tab$|^Alt( Gr)?$|^Escape$|^INPUT$|^TEXTAREA$|^H\d$|, dmg\)|carga-cenefa|^button, input|^F\d+$|bottom left|tr\('/;
 const LINE_SKIP = /console\.|import |throw new|querySelector|classList|dataset|addEventListener|getItem|setItem|\.svg|\.icon|\.path|\.d =|<path|<circle|\.cssText|⚠ Dev|Se pierde|No se puede deshacer/;
 const by = {};
 const seen = new Set();

@@ -358,11 +358,36 @@ async function key(code, keyName = code.replace(/^Key|^Digit/, '').toLowerCase()
                     ? 121
                     : code === 'F8'
                       ? 119
-                      : code === 'Space'
-                        ? 32
-                        : 0;
-    const base = { code, key: code === 'Escape' ? 'Escape' : keyName, windowsVirtualKeyCode: vk };
-    await cdp('Input.dispatchKeyEvent', { ...base, type: 'rawKeyDown' });
+                      : code === 'Escape'
+                        ? 27
+                        : code === 'Enter'
+                          ? 13
+                          : code === 'Tab'
+                            ? 9
+                            : code === 'ArrowDown'
+                              ? 40
+                              : code === 'ArrowUp'
+                                ? 38
+                                : code === 'Home'
+                                  ? 36
+                                  : code === 'End'
+                                    ? 35
+                                    : code === 'ContextMenu'
+                                      ? 93
+                                      : code === 'Space'
+                                        ? 32
+                                        : 0;
+    const base = {
+        code,
+        key: code === 'Escape' ? 'Escape' : keyName,
+        windowsVirtualKeyCode: vk,
+        nativeVirtualKeyCode: vk,
+    };
+    await cdp('Input.dispatchKeyEvent', {
+        ...base,
+        ...(code === 'Enter' ? { text: '\r', unmodifiedText: '\r' } : {}),
+        type: code === 'Enter' ? 'keyDown' : 'rawKeyDown',
+    });
     await cdp('Input.dispatchKeyEvent', { ...base, type: 'keyUp' });
     await sleep(200);
 }
@@ -1234,6 +1259,200 @@ const scenarios = {
         );
         check('JL-347: cada botón del HUD tiene ayuda al pasar el puntero', missing.length === 0, JSON.stringify(missing));
         await shot('jl347-hud-ayudas');
+    },
+
+    // JL-407: barra y menús principales operables con teclado.
+    async jl407AccesibilidadTeclado() {
+        await resize(1920, 1080);
+        await until(`!!document.querySelector('[data-testid="new-game"]')`, 15000, 'título');
+        await js(`document.activeElement?.blur()`);
+        let titleTab = { button: false, insideMenu: false, visible: false };
+        for (let i = 0; i < 5 && !titleTab.button; i++) {
+            await key('Tab', 'Tab');
+            titleTab = await js(`({
+                button: document.activeElement?.tagName === 'BUTTON',
+                insideMenu: document.querySelector('.title-menu')?.contains(document.activeElement) === true,
+                visible: document.activeElement?.matches(':focus-visible') === true
+            })`);
+        }
+        check(
+            'JL-407: Tab alcanza una acción de portada con foco visible',
+            titleTab.button && titleTab.insideMenu && titleTab.visible,
+            JSON.stringify(titleTab),
+        );
+        await js(`document.querySelector('[data-testid="new-game"]').focus()`);
+        await shot('jl407-titulo-teclado');
+        await js(`(() => {
+            window.__jl407Enter = { key: null, clicked: false };
+            const button = document.querySelector('[data-testid="new-game"]');
+            button.addEventListener('click', () => (window.__jl407Enter.clicked = true), { once: true });
+            window.addEventListener('keydown', e => {
+                if (e.code === 'Enter') window.__jl407Enter.key = {
+                    code: e.code, key: e.key, target: e.target?.tagName, prevented: e.defaultPrevented
+                };
+            }, { once: true });
+        })()`);
+        await key('Enter', 'Enter');
+        const enterResult = await js(`({ ...window.__jl407Enter, created: !!document.querySelector('.name-input') })`);
+        check(
+            'JL-407: Nueva partida se activa con Enter',
+            enterResult.clicked && enterResult.key?.code === 'Enter' && enterResult.created,
+            JSON.stringify(enterResult),
+        );
+        if (!enterResult.created) return;
+
+        await cdp('Page.navigate', { url });
+        await until(`!!document.querySelector('[data-testid="new-game"]')`, 15000, 'título tras recarga');
+        await newGame('QA Teclado');
+        await until(`!!document.querySelector('.game-hud') && !!document.querySelector('.sys-menu')`, 15000, 'HUD');
+        await js(`document.activeElement?.blur()`);
+        await key('Tab', 'Tab');
+        const gameTab = await js(`({
+            action: document.activeElement?.matches('button, [role="button"]') === true,
+            insideHud: [...document.querySelectorAll('.sys-menu, .game-hud')].some(e => e.contains(document.activeElement)),
+            visible: document.activeElement?.matches(':focus-visible') === true
+        })`);
+        check('JL-407: Tab alcanza el menú o la barra durante la partida', gameTab.action && gameTab.insideHud && gameTab.visible, JSON.stringify(gameTab));
+
+        const slots = await js(`(() => [...document.querySelectorAll('.game-hud .hot-slot')].map(e => ({
+            role: e.getAttribute('role'), tabIndex: e.tabIndex, label: e.getAttribute('aria-label')
+        })))()`);
+        check(
+            'JL-407: cada ranura de hechizo y objeto tiene foco y nombre accesible',
+            slots.length >= 30 && slots.every((s) => s.role === 'button' && s.tabIndex === 0 && !!s.label),
+            `${slots.length} ranuras; ${slots.filter((s) => s.role !== 'button' || s.tabIndex !== 0 || !s.label).length} incompletas`,
+        );
+        await js(`document.querySelector('.hud-slot-rows .hot-slot').focus()`);
+        await key('Tab', 'Tab');
+        const slotTab = await js(`({
+            slot: document.activeElement?.classList.contains('hot-slot'),
+            visible: document.activeElement?.matches(':focus-visible') === true
+        })`);
+        check('JL-407: Tab recorre las ranuras del HUD con foco visible', slotTab.slot && slotTab.visible, JSON.stringify(slotTab));
+
+        await js(`(() => {
+            window.__jl407Clicks = [];
+            const spell = document.querySelector('.hud-slot-rows .hot-slot');
+            const potion = document.querySelector('.game-hud .hot-slot.potion');
+            spell?.addEventListener('click', () => window.__jl407Clicks.push('spell'), { once: true });
+            potion?.addEventListener('click', () => window.__jl407Clicks.push('potion'), { once: true });
+            spell?.focus();
+        })()`);
+        await key('Enter', 'Enter');
+        check('JL-407: la ranura de hechizo responde a Enter', await js(`window.__jl407Clicks.includes('spell')`));
+        await key('Escape', 'Escape');
+        await js(`document.querySelector('.game-hud .hot-slot.potion').focus()`);
+        await key('Space', ' ');
+        check('JL-407: el consumible responde a Espacio', await js(`window.__jl407Clicks.includes('potion')`));
+
+        await js(`(() => {
+            window.__jl407Modes = [];
+            window.addEventListener('frankmangames:slotCastMode', e => window.__jl407Modes.push(e.detail.mode));
+            window.__jl407Slot = document.querySelector('.hud-slot-rows .hot-slot');
+            window.__jl407Slot.focus();
+        })()`);
+        await key('ContextMenu', 'ContextMenu');
+        await until(`!!document.querySelector('.hot-slot-cast-mode-menu')`, 3000, 'menú de modo de lanzamiento');
+        const firstMode = await js(`(() => ({
+            active: document.activeElement?.dataset.mode,
+            modes: [...document.querySelectorAll('.hot-slot-cast-mode-menu [role="menuitem"]')].map(e => e.dataset.mode)
+        }))()`);
+        check(
+            'JL-407: ContextMenu abre el menú y enfoca la primera opción',
+            firstMode.modes.length >= 2 && firstMode.active === firstMode.modes[0],
+            JSON.stringify(firstMode),
+        );
+        await shot('jl407-modo-lanzamiento-teclado');
+        await key('ArrowDown', 'ArrowDown');
+        const selectedMode = await js(`document.activeElement?.dataset.mode ?? null`);
+        check('JL-407: Flecha abajo cambia la opción enfocada', selectedMode === firstMode.modes[1], selectedMode);
+        await key('Enter', 'Enter');
+        await until(`window.__jl407Modes.length === 1`, 3000, 'selección de modo');
+        check(
+            'JL-407: Enter selecciona el modo y devuelve el foco a la ranura',
+            (await js(`window.__jl407Modes[0] === ${JSON.stringify(selectedMode)} && document.activeElement === window.__jl407Slot`)),
+            await js(`window.__jl407Modes[0]`),
+        );
+        await key('ContextMenu', 'ContextMenu');
+        await until(`!!document.querySelector('.hot-slot-cast-mode-menu')`, 3000, 'segundo menú de modo');
+        const menuBeforeEscape = await js(`({
+            focusInside: document.querySelector('.hot-slot-cast-mode-menu')?.contains(document.activeElement),
+            activeKey: document.activeElement?.dataset.mode,
+            activeTag: document.activeElement?.tagName
+        })`);
+        await js(`(() => {
+            window.__jl407Escape = [];
+            document.addEventListener('keydown', e => window.__jl407Escape.push({
+                key: e.key, code: e.code, target: e.target?.tagName
+            }), { capture: true, once: true });
+        })()`);
+        await key('Escape', 'Escape');
+        const escapeState = await js(`({
+            menu: !!document.querySelector('.hot-slot-cast-mode-menu'),
+            slotFocused: document.activeElement === window.__jl407Slot,
+            before: ${JSON.stringify(menuBeforeEscape)},
+            event: window.__jl407Escape
+        })`);
+        check(
+            'JL-407: Escape cierra el selector y devuelve el foco',
+            !escapeState.menu && escapeState.slotFocused,
+            JSON.stringify(escapeState),
+        );
+
+        const rowToggle = await js(`document.querySelectorAll('.game-hud .hud-row-toggle')[1]?.getAttribute('aria-pressed')`);
+        await js(`document.querySelectorAll('.game-hud .hud-row-toggle')[1].focus()`);
+        await key('Enter', 'Enter');
+        const rowToggleAfter = await js(`document.querySelectorAll('.game-hud .hud-row-toggle')[1]?.getAttribute('aria-pressed')`);
+        check(
+            'JL-407: el botón de filas conmuta con Enter y anuncia su estado',
+            rowToggle === 'true' && rowToggleAfter === 'false',
+            `${rowToggle} → ${rowToggleAfter}`,
+        );
+        await js(`document.querySelector('.game-hud .hud-itembar-fold').focus()`);
+        await key('Enter', 'Enter');
+        check(
+            'JL-407: el plegado de la barra de objetos responde a Enter',
+            (await js(`document.querySelector('.game-hud .hud-itembar-fold')?.getAttribute('aria-expanded')`)) === 'false',
+        );
+
+        await js(`document.querySelector('.game-hud .hud-btn-inventory').focus()`);
+        await key('Enter', 'Enter');
+        await until(`!!document.querySelector('.panel-inventory')?.offsetParent`, 5000, 'inventario desde el HUD');
+        check('JL-407: el acceso principal del HUD abre la mochila con Enter', true);
+        await key('Escape', 'Escape');
+        check(
+            'JL-407: Escape cierra la mochila',
+            !(await js(`!!document.querySelector('.panel-inventory')?.offsetParent`)),
+        );
+
+        await js(`document.querySelector('.sys-menu button[aria-label="Opciones"]').focus()`);
+        await key('Enter', 'Enter');
+        await until(`!!document.querySelector('.layer-modal .panel.modal')`, 5000, 'Opciones desde el menú del sistema');
+        const modalFocus = await js(`(() => ({
+            inside: document.querySelector('.layer-modal')?.contains(document.activeElement),
+            tag: document.activeElement?.tagName
+        }))()`);
+        check('JL-407: Opciones se abre con Enter y recibe el foco', modalFocus.inside, JSON.stringify(modalFocus));
+        await shot('jl407-opciones-teclado');
+        await key('Escape', 'Escape');
+        check(
+            'JL-407: al cerrar Opciones, el foco vuelve al acceso que la abrió',
+            await js(`document.activeElement === document.querySelector('.sys-menu button[aria-label="Opciones"]')`),
+        );
+
+        await js(`document.querySelector('.sys-menu button[aria-label="Menú"]').focus()`);
+        await key('Enter', 'Enter');
+        await until(`!!document.querySelector('.layer-modal .pause-modal')`, 5000, 'menú de pausa');
+        check(
+            'JL-407: el menú principal se abre con Enter y recibe el foco',
+            await js(`document.querySelector('.layer-modal .pause-modal')?.contains(document.activeElement)`),
+        );
+        await shot('jl407-menu-principal-teclado');
+        await key('Escape', 'Escape');
+        check(
+            'JL-407: al cerrar el menú principal, el foco vuelve al acceso que lo abrió',
+            await js(`document.activeElement === document.querySelector('.sys-menu button[aria-label="Menú"]')`),
+        );
     },
 
     // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.

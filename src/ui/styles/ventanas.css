@@ -2565,6 +2565,10 @@ img.art-icon-ui-professions {
 .sys-btn:hover {
     background: rgba(var(--accent-rgb), 0.25);
 }
+.sys-btn:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
 .sys-btn .sys-glyph {
     font: var(--fs-17)/1 var(--sans);
     color: #f3ede2;

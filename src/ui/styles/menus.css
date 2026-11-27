@@ -281,6 +281,31 @@ input:focus-visible {
     outline-offset: 2px;
 }
 
+.hot-slot:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+.hud-menu-btn:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+.hud-row-toggle:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+.hud-itembar-fold:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+.hot-slot-cast-mode-menu button:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 1px;
+}
+
 /* Filtros del chat. */
 .chat-filter:focus-visible {
     outline: 2px solid var(--gold-hi);

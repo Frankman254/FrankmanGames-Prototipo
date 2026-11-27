@@ -571,6 +571,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-403 | Junie | Hecho (commit «JL-403: capturar seis héroes de pie y corriendo») | Electron `jl403Heroes`: 37/37 comprobaciones, consola limpia; 36 capturas de seis modelos, dos poses y tres vistas, todas revisadas. Cruces confirmados: falda/capa de Centinela femenina de pie, espalda; cintas del tocado sobre el dorso del traje de Oráculo femenina de pie y corriendo. No se modificaron assets. `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `node --check scripts/qaElectron.mjs` limpios; `npm run docs:check`: 218 rutas, todas existen. Evidencia: `work/junie-jl403/RESULTADO.md` y `work/junie-jl403/electron/`. |
 
+## Cierre de JL-407 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-407 | Junie | Hecho (commit «JL-407: habilitar teclado en barra y menús principales») | `tests/jl407_keyboardAccess.test.ts`: 8/8; `npm test`: 437 archivos, 5.112 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` (220 rutas) limpios; detector i18n: 0 faltantes; Electron 20/20, consola limpia. Las operaciones que siguen requiriendo puntero están listadas en `work/junie-jl407/RESULTADO.md`. `npm run format:check` reporta 226 archivos; la prueba nueva pasa Prettier específico. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
