@@ -1,3 +1,5 @@
+// EXPLORATORIO, NO FIEL (auditoría externa 2026-11-26): fórmulas aproximadas fuera del World; no
+// usar sus conclusiones para balance. La medición fiel es `npm run balance:fiel` (scripts/balance/fiel.ts).
 // BAL-M3: Vida de los monstruos por nivel frente al daño del jugador por nivel.
 // Solo medición: no cambia cifras.
 //

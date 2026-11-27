@@ -77,7 +77,7 @@ Orden: primero lo que pide la rebanada 1–10, luego el hito 1–40. Cada paso e
 | Generación de mapas reproducible | Terreno, dispersión y pisos hondos usan semilla (`src/world/{noise,scatter,terrain}.ts`, `data/dungeon.json`). `npm run audit:density` reproduce la medición, pero solo de la parcela antigua | Extender la auditoría a las zonas de la rebanada | D-30 |
 | Pipeline de Blender | Generador `scripts/blender/<modelo>.py` + `validar_<modelo>.py` + GLB en `assets/`; contrato en [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md). Un modelo entregado no es un asset aprobado: entra en `data/` solo tras revisión del creador | Revisar las entregas pendientes de OMP antes de pedir más | D-17, P05 |
 | Métricas de render y streaming | FPS medidos por escenario en `scripts/qaElectron.mjs`; `src/world/stream.ts` calcula sectores y páginas, pero no se mide carga ni liberación de regiones | Medir llamadas de dibujo y memoria por página cuando se construya la rebanada | M01 |
-| Simulación de balance | `scripts/balance/` (V3, `auditBuilds.ts`, `auditCombat.ts`) con una semilla por combinación. Mezcla sumas brutas con efectos en juego | Informar bruto y efecto por separado; varias semillas | BAL-01, T01 |
+| Simulación de balance | `scripts/balance/`: la medición fiel es `fiel.ts` (`npm run balance:fiel`, World real a igualdad de nivel, varias semillas). `balM3.ts`, `auditBuilds.ts` y `auditCombat.ts` son exploratorios, no fieles | Informar bruto y efecto por separado; varias semillas | BAL-01, T01 |
 | Servidor autoritativo futuro | `server/` es una PoC local en loopback (protocolo, transporte y bot); el juego no tiene red | Nada hasta que el creador decida el online. La simulación determinista a paso fijo es la base para que un servidor la ejecute | T10 |
 
 ## Audio (2026-11-20)
@@ -107,4 +107,4 @@ Vitest como motor. La suite no sustituye a `npm run typecheck`, `npm run build` 
 |---|---|
 | `tests/fixtures/overworld.ts` | Fixture compartido (QA-03): cachea `overworld`, `worldData` y `gameData` en `globalThis` para evitar reconstruir el mundo en cada archivo de prueba. `buildOverworld()` tarda ~680 ms; con ~27 llamadas dispersas, los tests ahorraban ~18 s |
 | `tests/fixtures/save_v*.json` | Guardados de versiones antiguas para pruebas de migración |
-| `scripts/balance/` | Auditorías de balance (V3): `auditBuilds.ts`, `auditCombat.ts`, con semilla por combinación |
+| `scripts/balance/` | Balance: `fiel.ts` (fiel, BAL-P0-FIEL), V3 y bots; `balM3.ts`, `auditBuilds.ts`, `auditCombat.ts` exploratorios (no fieles) |

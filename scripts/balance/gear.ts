@@ -107,7 +107,10 @@ export function spendPoints(s: GameSession): void {
     while (ch.unspentStatPoints > 0) {
         const m = ch.allocated[main] ?? 0;
         const v = ch.allocated.vitality ?? 0;
-        s.spendStatPoint(m < 2 * (v + 1) ? main : 'vitality');
+        const want: PrimaryStat = m < 2 * (v + 1) ? main : 'vitality';
+        const other: PrimaryStat = want === main ? 'vitality' : main;
+        // Con costes escalonados pueden sobrar puntos que no llegan a ninguna: parar, no girar.
+        if (!s.spendStatPoint(want).ok && !s.spendStatPoint(other).ok) break;
     }
 }
 

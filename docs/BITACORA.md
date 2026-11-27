@@ -1,3 +1,21 @@
+## 2026-11-26 — BAL-P0-FIEL: batería de combate fiel y cola de Junie con reserva (Claude)
+
+**Archivos:** `scripts/balance/fiel.ts`, `scripts/balance/fielRun.ts`, `package.json` (`balance:fiel`), `scripts/balance/gear.ts`, cabeceras de `balM3.ts`, `auditCombat.ts` y `auditBuilds.ts`, `tests/balance/spendPoints.test.ts`, `scripts/mac/junie_continuo.sh`, `docs/TAREAS.md`, `docs/ARQUITECTURA.md`.
+
+**Qué se hizo:**
+- **Batería fiel.** Responde a la auditoría externa del 2026-11-26. Combate en `World` real, con el personaje al nivel base del enemigo: 10 franjas × 3 papeles × 3 clases × perfiles `sin_puntos`/`preparado` × 10 semillas, con P10, mediana y P90.
+- **Bucle infinito de `spendPoints`.** Con costes escalonados, `spendPoints` giraba sin fin cuando sobraban puntos que no llegaban a ningún coste, y la batería colgaba en el nivel 45.
+- **Scripts no fieles marcados** como «EXPLORATORIO, NO FIEL». La conclusión de BAL-M3 queda invalidada en TAREAS.
+- **El bucle de Junie ya no se para** al vaciarse la cola: pasa 10 tareas de `work/prompts-noche/RESERVA_JUNIE.md` (RJ-01…40). Se añadió además la tanda JL-384…423.
+
+**Resultado:** con el techo de equipo, la curva es plana a igualdad de nivel. 1v1 normal tarda 6–10 s, 1v1 bruto 13–25 s y 1v3 normal 21–30 s, del nivel 15 al 97. 1v3 normal es lo más duro: Tejedora 60/80, Vanguardia 66/80 y Cazador 76/80. Falta el perfil de equipo «razonable» (JL-385). No cambia ninguna cifra de `data/`.
+
+**Validación:** `npm test` (430 archivos, 5.083 aprobadas y 1 `todo`), `npm run typecheck` (sin errores nuevos) y `npm run docs:check` limpios. El relleno de la cola se probó con bash 3.2 sobre archivos de prueba: 10, luego 2, luego para.
+
+**Evidencia:** `work/claude-bal-fiel/FIEL/FIEL.md`, `work/claude-bal-fiel/FIEL/runs.json`, `work/claude-bal-fiel/dbg4.log`.
+
+---
+
 ## 2026-11-26 — JL-367: comprobar que los lóbulos caben en la sala (Junie)
 
 **Archivos:** `tests/jl367_lobesWithinRoom.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

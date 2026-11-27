@@ -1674,4 +1674,76 @@ Contexto del coordinador:
   - la escalera en el mapa.
   - Añade las preguntas abiertas: en qué pisos van los PNJ, qué vende Chalo, sus nombres, y si «el pueblo» es la Piedra de casa o la última Piedra elegida.
 - [ ] JL-382 Lista en `work/junie-jl382/PREGUNTAS.md` las preguntas al creador de esta tanda, cada una con su opción recomendada.
-- [ ] JL-383 Última. `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
+- [ ] JL-383 `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
+
+
+## Tanda del 2026-11-26, segunda parte (el creador: «arreglar la cola de junie para que no se quede sin tareas» y la auditoría externa de balance). JL-384…JL-423, en este orden, después de JL-383.
+
+Contexto del coordinador:
+- La auditoría externa del 2026-11-26 (BAL-P0-FIEL) mostró que `balM3.ts`, `auditCombat.ts` y `auditBuilds.ts` no reproducen el juego. Ahora llevan la cabecera «EXPLORATORIO, NO FIEL».
+- La medición fiel es `npm run balance:fiel` (`scripts/balance/fiel.ts`): `World` real a 60 Hz, el enemigo a su nivel base y el personaje al mismo nivel. La primera batería está en `work/claude-bal-fiel/FIEL/FIEL.md`.
+- El coordinador arregló el bucle infinito de `spendPoints` en `scripts/balance/gear.ts`: colgaba a nivel ≥ 45. La prueba es `tests/balance/spendPoints.test.ts`.
+- **Solo medir.** No se cambia ninguna cifra de `data/`: ni stats, ni enemigos, ni magia, ni XP, ni sets, ni economía, ni guardados. Lo que parezca mal va como pregunta a `ACCIONES_CREADOR.md`, con números.
+- Si la cola se vacía, el bucle pasa tareas de `work/prompts-noche/RESERVA_JUNIE.md`. No crees tareas nuevas fuera de la última de esta tanda.
+- Reglas de siempre:
+  - un commit por tarea, con su fila, su bitácora y su casilla;
+  - evidencia en `work/junie-jl<n>/`;
+  - no tocar `src/render/characters/`, `mountView.ts` ni `petView.ts`.
+
+### A. Balance fiel (BAL-P0-FIEL)
+- [ ] JL-384 Prueba de humo de `fiel.ts` en `tests/balance/fiel.test.ts`:
+  - `runFiel` con `melee`, 2 semillas y los dos perfiles termina en menos de 10 s;
+  - da victoria o derrota, nunca `NaN`;
+  - con la misma semilla, el mismo resultado (determinismo).
+- [ ] JL-385 Perfil `razonable` en `fiel.ts`: equipo obtenible a ese nivel, del botín de los enemigos de la franja y de las tiendas de su pueblo (de `data/`, con la lista de fuentes en el informe). Añade una prueba de que un objeto sin fuente no entra. Corre la batería con los tres perfiles y deja el resultado en `work/junie-jl385/`.
+- [ ] JL-386 `fiel.ts` con `count` 2 además de 1 y 3, y la opción `--jugadores 1,2,3,4`: varios bots de clases distintas al mismo nivel que los enemigos, con `placeGroup`. Informe P10, mediana y P90 en `work/junie-jl386/`.
+- [ ] JL-387 `grupoRun.ts`: opción `--mismo-nivel`, que sube a los jugadores al nivel base de los enemigos en vez de dejarlos a 10 frente a enemigos de nivel 1–2. Sin cambiar el modo por defecto. Corre los dos modos y compara en `work/junie-jl387/`.
+- [ ] JL-388 `src/sim/groupLedger.ts` cuenta el daño antes del escudo. Añade un contador de daño efectivo (tras escudo y resistencia) junto al bruto, sin quitar el bruto, con una prueba de un golpe contra un escudo que lo absorbe entero.
+- [ ] JL-389 Prueba que demuestre si `flatPerLevel.armor` de `data/zones.json` cambia algo en el enemigo (`src/sim/zones.ts:65`, `src/data/zonesSchema.ts:131`).
+  - Si no tiene efecto, escribe la pregunta al creador en `ACCIONES_CREADOR.md`: quitar la clave o hacer que cuente. No lo arregles.
+- [ ] JL-390 Prueba de `src/rpg/spoils.ts`: con varios jugadores, ¿puede la suma de los `minXpShare` pasar de la XP total del monstruo? Si pasa, haz una tabla con un caso concreto y pregunta al creador en `ACCIONES_CREADOR.md`. No lo arregles.
+- [ ] JL-391 `scripts/balance/auditBuilds.ts` aplica la resistencia del propio atacante a su daño.
+  - Prueba que lo demuestre y arreglo en el script (es exploratorio; no toca `src/` ni `data/`).
+  - Deja la cabecera «EXPLORATORIO, NO FIEL».
+- [ ] JL-392 Batería fiel con `--skill malo` y `--skill bueno`; la de `medio` es la del coordinador. Tabla comparada por franja en `work/junie-jl392/COMPARADA.md`: victorias, TTK mediano y vida restante.
+- [ ] JL-393 De la batería fiel, lista las filas `preparado` con 0 victorias y las que terminan en menos de 3 s. Por cada una, el nivel, la vida y el daño por segundo medidos. Solo lista, en `work/junie-jl393/EXTREMOS.md`.
+- [ ] JL-394 `npm run typecheck` pasa salvo `balM3.ts` (conocido). Comprueba si `fiel.ts`, `fielRun.ts` y `gear.ts` están limpios; arregla los tipos de esos tres si no.
+
+### B. Pruebas y robustez
+- [ ] JL-395 Las 10 pruebas más lentas de la suite (`npx vitest run --reporter=verbose`, con su tiempo) en `work/junie-jl395/LENTAS.md`. Propón cómo acelerar la más lenta sin cambiar lo que prueba; no lo apliques.
+- [ ] JL-396 Prueba: guardar y cargar con un hechizo libre de GCD en la barra (`offGlobalCooldown`, `tests/hechizosLibres.test.ts`) conserva la barra y el enfriamiento propio.
+- [ ] JL-397 Prueba: el bot de `scripts/balance/bot.ts` lanza un hechizo libre en el mismo tick que uno normal cuando los dos están listos. Si no lo hace, mide en `work/junie-jl397/` cuánto daño pierde en `fiel.ts` con `melee` y `alpha_wolf`. Solo medir.
+- [ ] JL-398 Escenario Electron `hechizosLibres`: con la Tejedora, un hechizo normal y uno libre con dos pulsaciones seguidas. Los dos eventos `cast` salen en menos de 100 ms y la barra no pinta el barrido del GCD sobre el libre. Capturas en `work/junie-jl398/`.
+- [ ] JL-399 Electron: la ficha de un hechizo libre muestra «Ritmo: libre…» en español y «Pace: free…» en inglés. Capturas.
+- [ ] JL-400 Prueba de `junie_continuo.sh`, sin lanzar Junie: con una cola sin `- [ ]` y una reserva con 12, el relleno pasa 10 y marca `[>]`; la segunda vez pasa 2; la tercera para. Hazla con archivos en `work/junie-jl400/` y la función `rellenar` copiada; no modifiques el script.
+
+### C. Audio y modelos (solo medir y capturar; el código y los assets son del coordinador o de OMP)
+- [ ] JL-401 Lista de los sonidos que el juego pide y no existen (claves de `data/` o de `src/audio/` sin archivo en `assets/`), en `work/junie-jl401/FALTAN.md`.
+- [ ] JL-402 Electron: en cada pueblo con música propia, comprueba que suena la pista de ese pueblo (nombre del archivo en la consola de depuración o en el estado del mezclador). Lista los pueblos con pista repetida o sin pista.
+- [ ] JL-403 Electron: capturas de frente, perfil y espalda de las tres clases, en hombre y en mujer, de pie y en carrera. Lista dónde atraviesa la ropa o el pelo. Evidencia en `work/junie-jl403/`.
+- [ ] JL-404 Electron: captura puesta de cada arma, escudo, tocado y capa con modelo propio. La tabla de las ranuras que se ven sin modelo es para MOD-09.
+
+### D. Interfaz y textos
+- [ ] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla.
+- [ ] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista.
+- [ ] JL-407 Accesibilidad: todas las acciones de la barra y de los menús principales se pueden hacer con teclado. Lista lo que solo va con ratón.
+- [ ] JL-408 Electron: tooltip de un objeto de set con piezas puestas y sin ellas. El contador de piezas cuadra con lo equipado (el creador vio posiciones rotas en el set de la Diablica).
+
+### E. Datos (solo validar)
+- [ ] JL-409 Prueba: cada `item.level` de los objetos de botín cae dentro de ±5 del nivel base del enemigo que lo suelta. Lista las excepciones; no las cambies.
+- [ ] JL-410 Prueba: cada hechizo con `offGlobalCooldown` tiene `castTime` 0 y no es de canalización. Ya hay una parte en `hechizosLibres.test.ts`; amplía a la canalización si existe el campo.
+- [ ] JL-411 Prueba: ningún enemigo de `data/rpg/enemies.json` tiene un hechizo con alcance menor que su ataque básico y papel `distancia`. Solo listar.
+- [ ] JL-412 Prueba: todas las tiendas venden algo que un personaje de su franja puede usar (nivel ≤ techo de la franja). Lista las tiendas vacías para la franja.
+
+### F. Reintentos y cierre
+- [ ] JL-413 Reintento de lo que esté `[!]` en JL-368…JL-412 que no dependa del creador.
+- [ ] JL-414 Consola limpia en los escenarios nuevos de esta tanda.
+- [ ] JL-415 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
+- [ ] JL-416 Actualiza en `docs/ESTADO_ACTUAL.md` la parte de balance: la batería fiel y lo que mide; quita conclusiones de `balM3` si quedan.
+- [ ] JL-417 `ACCIONES_CREADOR.md`: entrada breve con lo que el creador debe decidir del balance, con números de la batería fiel: tiempo de muerte objetivo por franja, `flatPerLevel.armor`, `minXpShare`.
+- [ ] JL-418 `work/junie-jl418/PREGUNTAS.md` con las preguntas de esta tanda, cada una con su opción recomendada.
+- [ ] JL-419 Revisa `work/prompts-noche/RESERVA_JUNIE.md`: marca `[x]` lo que ya esté hecho por otra tarea (con la prueba de `grep`), sin borrar líneas.
+- [ ] JL-420 `docs:check` limpio y `docs/TAREAS.md` sin filas de JL-354…419 en estado ambiguo.
+- [ ] JL-421 Rendimiento: FPS medio en el mundo abierto (Chame), en la cripta piso 1 y en el piso 50, en `work/junie-jl421/FPS.md`. Compáralo con la última medida que haya en `work/`.
+- [ ] JL-422 Mide el tamaño del paquete de `npm run build` por carpeta de `assets/`; lista las 10 más pesadas.
+- [ ] JL-423 `work/junie-propuestas/BOLSA_SIGUIENTE_7.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces. La cola sigue con la reserva.

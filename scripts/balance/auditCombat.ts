@@ -1,3 +1,5 @@
+// EXPLORATORIO, NO FIEL (auditoría externa 2026-11-26): fórmulas aproximadas fuera del World; no
+// usar sus conclusiones para balance. La medición fiel es `npm run balance:fiel` (scripts/balance/fiel.ts).
 // JEQ-08: Completar JEQ-07 — FASE 3b, 4b, 5b, 6b
 // Simulación de combate real, escenarios de resistencia, economía y validación de presets.
 import { loadGameData } from '../../src/data';

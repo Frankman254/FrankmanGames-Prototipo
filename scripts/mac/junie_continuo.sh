@@ -10,6 +10,7 @@
 #   ESFUERZO=...   --effort; Junie sólo lo acepta junto con MODELO
 #   HORAS=10       tiempo máximo total
 #   VUELTAS=30     máximo de ejecuciones de Junie
+#   RESERVA=...    tareas preaprobadas que rellenan la cola vacía (work/prompts-noche/RESERVA_JUNIE.md)
 #   PASOS=400      --max-steps por ejecución
 #   MINIMO=60      una vuelta más corta (segundos) se trata como fallo de arranque
 #                  y detiene el bucle sin marcar nada en la cola
@@ -31,8 +32,23 @@ if [ -n "${ESFUERZO:-}" ] && [ -z "${MODELO:-}" ]; then
   echo "ESFUERZO necesita MODELO (Junie no acepta --effort sin --model). Ver: junie list-models"; exit 1
 fi
 
+RESERVA="${RESERVA:-work/prompts-noche/RESERVA_JUNIE.md}"
 fin=$(( $(date +%s) + HORAS * 3600 ))
 abiertas() { grep -c '^- \[ \]' "$COLA" || true; }
+# Cola vacía: se pasan a la cola las 10 primeras tareas abiertas de la reserva (preaprobadas por
+# el coordinador) y se marcan «[>]» allí, para que Junie no se quede sin trabajo a media noche.
+rellenar() {
+  [ -f "$RESERVA" ] || return 1
+  local n
+  n=$(grep -c '^- \[ \]' "$RESERVA" || true)
+  [ "$n" -gt 0 ] || return 1
+  { echo; echo "## Reserva pasada a la cola el $(date +%Y-%m-%d\ %H:%M) (de ${RESERVA})"; grep '^- \[ \]' "$RESERVA" | head -n 10; } >>"$COLA"
+  local k=0 l
+  for l in $(grep -n '^- \[ \]' "$RESERVA" | head -n 10 | cut -d: -f1); do
+    sed -i '' "${l}s/^- \[ \]/- [>]/" "$RESERVA"; k=$((k + 1))
+  done
+  echo "[$(date +%H:%M)] Cola vacía: ${k} tareas de la reserva pasadas a la cola."
+}
 primera() { grep -m1 '^- \[ \]' "$COLA" | cut -c7- | cut -c1-80; }
 
 extra=()
@@ -42,7 +58,8 @@ extra=()
 vuelta=0
 intentos=0
 anterior=""
-while [ "$(abiertas)" -gt 0 ] && [ "$vuelta" -lt "$VUELTAS" ] && [ "$(date +%s)" -lt "$fin" ]; do
+while [ "$vuelta" -lt "$VUELTAS" ] && [ "$(date +%s)" -lt "$fin" ]; do
+  if [ "$(abiertas)" -eq 0 ]; then rellenar || break; fi
   tarea="$(primera)"
   if [ "$tarea" = "$anterior" ]; then intentos=$((intentos + 1)); else intentos=1; anterior="$tarea"; fi
   if [ "$intentos" -gt 2 ]; then
