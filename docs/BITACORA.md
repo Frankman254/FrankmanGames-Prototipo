@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-401: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No inspeccioné las claves de audio ni los assets, ni generé `work/junie-jl401/FALTAN.md`: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383 y JL-384…JL-423 no consta autorizada. La solicitud de autorización para esa tanda ya figura en `docs/ACCIONES_CREADOR.md`; no cambié código, datos ni pruebas.
+
+**Validación:** Línea base: `npx tsc --noEmit` limpio; `npx vitest run`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** Bloqueo registrado en `docs/TAREAS.md` y `work/prompts-noche/COLA_JUNIE.md`; inventario pendiente de autorización.
+
+---
+
 ## 2026-11-27 — JL-400: probar el relleno de la cola de Junie (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; arnés y evidencia en `work/junie-jl400/`.

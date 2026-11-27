@@ -1718,7 +1718,7 @@ Contexto del coordinador:
 - [x] JL-400 Prueba de `junie_continuo.sh`, sin lanzar Junie: con una cola sin `- [ ]` y una reserva con 12, el relleno pasa 10 y marca `[>]`; la segunda vez pasa 2; la tercera para. Hazla con archivos en `work/junie-jl400/` y la función `rellenar` copiada; no modifiques el script. — commit «JL-400: probar el relleno de la cola de Junie» — `work/junie-jl400/RESULTADO.md`, arnés y fixtures; 10 + 2 + parada, sin lanzar Junie.
 
 ### C. Audio y modelos (solo medir y capturar; el código y los assets son del coordinador o de OMP)
-- [ ] JL-401 Lista de los sonidos que el juego pide y no existen (claves de `data/` o de `src/audio/` sin archivo en `assets/`), en `work/junie-jl401/FALTAN.md`.
+- [!] JL-401 Lista de los sonidos que el juego pide y no existen (claves de `data/` o de `src/audio/` sin archivo en `assets/`), en `work/junie-jl401/FALTAN.md`. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionó el audio ni se creó el inventario.
 - [ ] JL-402 Electron: en cada pueblo con música propia, comprueba que suena la pista de ese pueblo (nombre del archivo en la consola de depuración o en el estado del mezclador). Lista los pueblos con pista repetida o sin pista.
 - [ ] JL-403 Electron: capturas de frente, perfil y espalda de las tres clases, en hombre y en mujer, de pie y en carrera. Lista dónde atraviesa la ropa o el pelo. Evidencia en `work/junie-jl403/`.
 - [ ] JL-404 Electron: captura puesta de cada arma, escudo, tocado y capa con modelo propio. La tabla de las ranuras que se ven sin modelo es para MOD-09.
