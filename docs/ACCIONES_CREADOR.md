@@ -4,6 +4,17 @@ Actualizado: 2026-11-27. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Pregunta pendiente (JL-390)
+
+`data/rpg/spoils.json` marca `minXpShare: 0.25` como `PROPUESTA`. `distribute()` aplica ese mínimo individualmente: con un monstruo que aporta 100 XP y cinco jugadores con el mismo aporte (20 de daño y 10 s cada uno), cada uno tiene `share` 0,20 y recibe 25 XP. La suma del grupo queda en 125 XP:
+
+| Jugador | Aporte (daño / tiempo) | `share` | XP asignada |
+|---|---:|---:|---:|
+| 1–5 (cada uno) | 20 / 10 s | 0,20 | 25 |
+| **Total** | — | **1,00** | **125 de 100** |
+
+¿Es intencional que el mínimo por jugador permita repartir más XP que la que aportó el monstruo, o debe el total asignado al grupo limitarse al pool? No se cambió la regla ni el dato. Prueba: `tests/rpg/energySpoils.test.ts`; evidencia: `work/junie-jl390/RESULTADO.md`.
+
 ## Pregunta pendiente (JL-389)
 
 - `data/zones.json` declara `scaling.flatPerLevel.armor: 0.15`, pero `parseZones()` acepta y descarta esa clave. La prueba compara el enemigo de nivel 10 con `armor` 0,15 y 100,15: sus estadísticas no cambian. ¿Quitamos la clave heredada o quieres que tenga efecto en los enemigos? No se modificó el juego ni se decidió una regla de armadura. Evidencia: `tests/zones.test.ts` y `work/junie-jl389/RESULTADO.md`.

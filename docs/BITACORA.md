@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-390: comprobar exceso de XP mínima en grupos (Junie)
+
+**Archivos:** `tests/rpg/energySpoils.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí un caso con un pool de 100 XP y cinco jugadores de aporte igual, cada uno con `share` 0,20. Con `minXpShare: 0.25`, cada asignación recibe 25 XP y la suma es 125. Dejé la tabla y la pregunta para el creador en `ACCIONES_CREADOR.md`; no corregí `distribute()` ni cambié cifras o datos.
+
+**Validación:** `npx vitest run tests/rpg/energySpoils.test.ts`: 51/51; `npm test`: 434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` (218 rutas) limpios. No aplica Electron: es una prueba pura y no cambia la presentación.
+
+**Evidencia:** `work/junie-jl390/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-389: comprobar el efecto de armor en enemigos (Junie)
 
 **Archivos:** `tests/zones.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

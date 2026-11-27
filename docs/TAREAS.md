@@ -485,6 +485,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-388 | J | Hecho (commit «JL-388: contar daño efectivo tras escudos») | `GroupLedger` conserva `damageDealt` bruto y suma `effectiveDamageDealt`; `World` informa el daño que llega a la vida tras resistencias y escudos, sin cambiar el `amount` existente ni la participación. `tests/jl388_groupLedgerEffectiveDamage.test.ts`: 1/1; un golpe real con escudo que absorbe todo, bruto positivo, efectivo 0 y vida intacta. `npm test`: 434 archivos, 5.097 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Evidencia: `work/junie-jl388/RESULTADO.md`. No aplica Electron: sin cambio visual. |
 
+## Cierre de JL-390 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-390 | J | Hecho (commit «JL-390: comprobar exceso de XP mínima en grupos») | `distribute()` puede asignar más XP total que la del monstruo: con un pool de 100 XP, cinco jugadores de `share` 0,20 reciben 25 XP cada uno por `minXpShare: 0.25` (125 XP en total). La prueba observa el comportamiento actual; no se arregló ni cambió ninguna cifra. Pregunta al creador en `docs/ACCIONES_CREADOR.md`. | `tests/rpg/energySpoils.test.ts`: 51/51; `npm test`: 434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` (218 rutas) limpios. Evidencia: `work/junie-jl390/RESULTADO.md`. No aplica Electron: prueba pura, sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

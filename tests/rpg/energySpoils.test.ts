@@ -304,6 +304,20 @@ describe('botín de fin de combate', () => {
         }
     });
 
+    it('distribute() puede asignar más XP que el pool al aplicar minXpShare a varios jugadores', () => {
+        const monsterXp = 100;
+        const parts = new Map(
+            Array.from({ length: 5 }, (_, i) => [`jugador-${i + 1}`, { damage: 20, healing: 0, time: 10 }] as const),
+        );
+        const out = distribute(new Rng(2), { gold: 0, xp: monsterXp, kills: 1, items: [] }, parts, rules());
+
+        expect(out).toHaveLength(5);
+        for (const allotment of out) expect(allotment.share).toBeCloseTo(0.2);
+        expect(out.map((allotment) => allotment.xp)).toEqual([25, 25, 25, 25, 25]);
+        expect(out.reduce((total, allotment) => total + allotment.xp, 0)).toBe(125);
+        expect(out.reduce((total, allotment) => total + allotment.xp, 0)).toBeGreaterThan(monsterXp);
+    });
+
     it('distribute() ordena por share descendente', () => {
         const parts = new Map([
             ['a', { damage: 100, healing: 0, time: 5 }],
