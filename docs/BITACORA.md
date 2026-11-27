@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-401: listar sonidos pedidos sin archivo (Junie)
+
+**Archivos:** `work/junie-jl401/FALTAN.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Revisé las rutas de audio explícitas, las muestras WAV y las claves de los eventos. No hay faltantes reales: existen los 22 archivos de música/avisos y las 26 muestras declaradas, y las claves de evento tienen receta en `data/audio/sfx.json`. Las muestras SFX viven en `src/audio/sfx/generated_original/`, son cargadas desde `src/` y tienen receta sintetizada de respaldo; no se clasifican erróneamente como ausencias de `assets/`.
+
+**Validación:** `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios; `npm run docs:check`: 218 rutas citadas, todas existen. La línea base inicial (`npx vitest run`) también pasó con el mismo resultado. No aplica Electron: solo inventario estático, sin cambio visual.
+
+**Evidencia:** `work/junie-jl401/FALTAN.md`.
+
+---
+
 ## 2026-11-27 — JL-394: verificar tipos de la batería fiel (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
