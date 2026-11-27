@@ -1706,7 +1706,7 @@ Contexto del coordinador:
   - Prueba que lo demuestre y arreglo en el script (es exploratorio; no toca `src/` ni `data/`).
   - Deja la cabecera «EXPLORATORIO, NO FIEL».
 - [!] JL-392 Batería fiel con `--skill malo` y `--skill bueno`; la de `medio` es la del coordinador. Tabla comparada por franja en `work/junie-jl392/COMPARADA.md`: victorias, TTK mediano y vida restante. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada.
-- [ ] JL-393 De la batería fiel, lista las filas `preparado` con 0 victorias y las que terminan en menos de 3 s. Por cada una, el nivel, la vida y el daño por segundo medidos. Solo lista, en `work/junie-jl393/EXTREMOS.md`.
+- [x] JL-393 De la batería fiel, lista las filas `preparado` con 0 victorias y las que terminan en menos de 3 s. Por cada una, el nivel, la vida y el daño por segundo medidos. Solo lista, en `work/junie-jl393/EXTREMOS.md`. — commit «JL-393: listar extremos de la batería fiel» — 10 filas validadas a partir de 2.880 corridas; `npx tsc --noEmit`, `npx vitest run` y `npm run docs:check` limpios; evidencia en `work/junie-jl393/EXTREMOS.md`.
 - [ ] JL-394 `npm run typecheck` pasa salvo `balM3.ts` (conocido). Comprueba si `fiel.ts`, `fielRun.ts` y `gear.ts` están limpios; arregla los tipos de esos tres si no.
 
 ### B. Pruebas y robustez

@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-393: listar extremos de la batería fiel (Junie)
+
+**Archivos:** `work/junie-jl393/EXTREMOS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Listé las 10 filas `preparado` con 0 victorias o TTK mediano inferior a 3 s. Incluí nivel, vida máxima del PJ y de los enemigos, y DPS mediano total por corrida (daño del PJ más mascota dividido por duración). No cambié código, pruebas, cifras ni datos.
+
+**Validación:** `npx tsc --noEmit`, `npx vitest run` (434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`) y `npm run docs:check` limpios. No aplica Electron: solo se añadió una lista.
+
+**Evidencia:** `work/junie-jl393/EXTREMOS.md`, a partir de `work/claude-bal-fiel/FIEL/FIEL.md` y `runs.json`.
+
+---
+
 ## 2026-11-27 — JL-392: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

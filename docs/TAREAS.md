@@ -491,6 +491,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-390 | J | Hecho (commit «JL-390: comprobar exceso de XP mínima en grupos») | `distribute()` puede asignar más XP total que la del monstruo: con un pool de 100 XP, cinco jugadores de `share` 0,20 reciben 25 XP cada uno por `minXpShare: 0.25` (125 XP en total). La prueba observa el comportamiento actual; no se arregló ni cambió ninguna cifra. Pregunta al creador en `docs/ACCIONES_CREADOR.md`. | `tests/rpg/energySpoils.test.ts`: 51/51; `npm test`: 434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` (218 rutas) limpios. Evidencia: `work/junie-jl390/RESULTADO.md`. No aplica Electron: prueba pura, sin cambio visual. |
 
+## Cierre de JL-393 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-393 | J | Hecho (commit «JL-393: listar extremos de la batería fiel») | Lista de las 10 filas `preparado` que cumplen cero victorias o TTK mediano <3 s. DPS mediano calculado por corrida desde el daño registrado del PJ y su mascota; no se cambiaron cifras ni datos. | Batería de origen: 2.880 corridas en `work/claude-bal-fiel/FIEL/runs.json`; lista y cálculos en `work/junie-jl393/EXTREMOS.md`. `npx tsc --noEmit`, `npx vitest run` y `npm run docs:check` limpios. No aplica Electron: solo lista, sin cambio visual. |
+
 ## Bloqueadas
 
 - JL-391 (2026-11-27): bloqueada porque la única autorización en lote para Junie del tablero cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe una medición ampliada, no una autorización para cambiar `auditBuilds.ts`. No se modificaron código ni pruebas.
