@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-403: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No inspeccioné los modelos ni generé capturas de frente, perfil y espalda: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383, y JL-384…JL-423 no consta autorizada. La solicitud de autorización de esa tanda ya figura en `docs/ACCIONES_CREADOR.md`; no cambié código, modelos ni pruebas.
+
+**Validación:** Línea base: `npx tsc --noEmit` limpio; `npx vitest run` y `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; `npm run docs:check`: 218 rutas válidas. No aplica Electron: la tarea quedó bloqueada antes de la revisión visual.
+
+**Evidencia:** Bloqueo registrado en `docs/TAREAS.md` y `work/prompts-noche/COLA_JUNIE.md`; no se generó evidencia visual en `work/junie-jl403/` porque no se abrió el juego.
+
+---
+
 ## 2026-11-27 — JL-402: comprobar las pistas propias de los pueblos (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia de Electron en `work/junie-jl402/electron/`.
