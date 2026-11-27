@@ -1609,7 +1609,7 @@ Contexto del coordinador:
   - evidencia en `work/junie-jl<n>/`.
 
 ### A. La cripta en Electron (escenarios nuevos en `scripts/qaElectron.mjs`)
-- [ ] JL-354 Escenario `criptaBerto`:
+- [x] JL-354 Escenario `criptaBerto` — commit «JL-354: probar el acceso a la cripta con Berto» — Electron 6/6, consola limpia; capturas revisadas y resultado en `work/junie-jl354/electron/`.
   - Con la llave, un clic en la reja hace caminar hasta Berto y abre su diálogo con los pisos 1, 10, 20, 30, 40 y 50.
   - Sin llave sale el nodo `noKey`.
   - Elegir «Bajar al piso 10» entra en el piso 10.

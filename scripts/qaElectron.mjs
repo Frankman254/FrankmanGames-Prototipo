@@ -6799,6 +6799,110 @@ const scenarios = {
         check('T02 cripta: sigue siendo espectro', await js(`${W}.character.spectral.active`));
     },
 
+    /** JL-354: la reja lleva a Berto; la llave permite elegir y entrar al piso 10. */
+    async criptaBerto() {
+        await newGame('QA Berto');
+        await js(`${S}.energy.value=100`);
+        const start = await js(`(() => {
+            const root = __game.view.scene.getTransformNodeByName('cryptEntrance');
+            const player = ${W}.player;
+            const grid = ${W}.grid;
+            const pos = grid.center(grid.nearestWalkable({ x: root.position.x + 5, y: root.position.z + 3 }));
+            player.pos.x = player.prevPos.x = pos.x;
+            player.pos.y = player.prevPos.y = pos.y;
+            player.path = [];
+            player.moveTarget = null;
+            return { x: pos.x, y: pos.y };
+        })()`);
+        await sleep(700);
+
+        check('JL-354: empieza sin llave', (await js(`${S}.character.inventory.count('crypt_key')`)) === 0);
+        await clickMesh('d_entrada');
+        await until(`${S}.dialogue()?.npcId === 'crypt_warden'`, 20000, 'diálogo de Berto sin llave');
+        const noKey = await js(`(() => {
+            const dialogue = ${S}.dialogue();
+            return {
+                npcId: dialogue?.npcId ?? null,
+                node: ${S}.conversation?.nodeId ?? null,
+                text: dialogue?.text ?? '',
+            };
+        })()`);
+        check(
+            'JL-354: sin llave se muestra el nodo noKey de Berto',
+            noKey.npcId === 'crypt_warden' && noKey.node === 'noKey' && noKey.text.includes('Sin llave'),
+            JSON.stringify(noKey),
+        );
+        await shot('jl354-berto-sin-llave');
+        await click('.dlg-opt');
+        await until(`!${S}.dialogue()`, 5000, 'cerrar diálogo sin llave');
+
+        await js(`(() => {
+            const character = ${S}.character;
+            character.give('crypt_key');
+            const player = ${W}.player;
+            player.pos.x = player.prevPos.x = ${start.x};
+            player.pos.y = player.prevPos.y = ${start.y};
+            player.path = [];
+            player.moveTarget = null;
+            ${W}.talkTarget = null;
+        })()`);
+        await sleep(1000);
+        const beforeTalk = await js(`({ x: ${W}.player.pos.x, y: ${W}.player.pos.y })`);
+        await clickMesh('d_entrada');
+        await until(`${S}.dialogue()?.npcId === 'crypt_warden'`, 20000, 'diálogo de Berto con llave');
+        const withKey = await js(`(() => {
+            const dialogue = ${S}.dialogue();
+            const npc = ${W}.npcs.find((item) => item.npcId === 'crypt_warden');
+            const player = ${W}.player.pos;
+            return {
+                npcId: dialogue?.npcId ?? null,
+                text: dialogue?.text ?? '',
+                options: dialogue?.options.map((option) => option.text) ?? [],
+                moved: Math.hypot(player.x - ${beforeTalk.x}, player.y - ${beforeTalk.y}),
+                npcDistance: npc ? Math.hypot(player.x - npc.pos.x, player.y - npc.pos.y) : null,
+            };
+        })()`);
+        const floorOptions = [
+            'Empezar en el piso 1.',
+            'Bajar al piso 10.',
+            'Bajar al piso 20.',
+            'Bajar al piso 30.',
+            'Bajar al piso 40.',
+            'Bajar al piso 50.',
+        ];
+        check(
+            'JL-354: un clic en la reja hace caminar hasta Berto y abre el diálogo',
+            withKey.npcId === 'crypt_warden' && withKey.moved > 1 && withKey.npcDistance <= 2.6,
+            JSON.stringify(withKey),
+        );
+        check(
+            'JL-354: Berto ofrece los pisos 1, 10, 20, 30, 40 y 50',
+            floorOptions.every((option) => withKey.options.includes(option)),
+            JSON.stringify(withKey.options),
+        );
+        await shot('jl354-berto-opciones-pisos');
+
+        const piso10 = await js(`(() => {
+            const option = [...document.querySelectorAll('.dlg-opt')].find(
+                (item) => item.querySelector('.t')?.textContent.trim() === 'Bajar al piso 10.',
+            );
+            if (!option) return null;
+            const rect = option.getBoundingClientRect();
+            return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+        })()`);
+        if (!piso10) throw new Error('No está visible la opción «Bajar al piso 10.»');
+        await mouse(piso10.x, piso10.y);
+        await until(`__game.crypt.floor === 9`, 30000, 'entrar en el piso 10 de la cripta');
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso 10 listo');
+        await sleep(900);
+        check(
+            'JL-354: elegir «Bajar al piso 10» entra en el piso 10',
+            await js(`__game.crypt.floor === 9`),
+            'índice 9',
+        );
+        await shot('jl354-berto-piso-10');
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');

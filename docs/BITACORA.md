@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-354: probar el acceso a la cripta con Berto (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `criptaBerto`. Hace clic real en la reja sin llave y verifica el nodo `noKey`; luego concede una llave solo a la partida de QA, vuelve a hacer clic desde fuera del alcance, comprueba el movimiento hasta Berto y sus opciones de piso, y selecciona el piso 10. No se modificaron reglas, datos ni comportamiento productivos.
+
+**Validación:** Electron `criptaBerto`: 6/6 comprobaciones y consola limpia; el jugador caminó 4,9 m hasta quedar dentro del alcance de Berto. `npx tsc --noEmit` y `npm test` limpios; la suite tiene 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`. `npm run docs:check` limpio.
+
+**Evidencia:** `work/junie-jl354/electron/resultado.json` y las capturas revisadas `jl354-berto-sin-llave.jpg`, `jl354-berto-opciones-pisos.jpg` y `jl354-berto-piso-10.jpg`.
+
+---
+
 ## 2026-11-26 — JL-353: proponer la siguiente bolsa de pruebas (Junie)
 
 **Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_5.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
