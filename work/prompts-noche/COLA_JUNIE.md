@@ -1736,7 +1736,7 @@ Contexto del coordinador:
 - [x] JL-412 Prueba: todas las tiendas venden algo que un personaje de su franja puede usar (nivel ≤ techo de la franja). Lista las tiendas vacías para la franja. — commit «JL-412: comprobar tiendas con stock por franja» — `tests/jl412_merchantStockByBand.test.ts`: 19/19; `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y Prettier limpios. 18 zonas, 14 techos distintos; ninguna tienda vacía. Evidencia: `work/junie-jl412/RESULTADO.md`.
 
 ### F. Reintentos y cierre
-- [ ] JL-413 Reintento de lo que esté `[!]` en JL-368…JL-412 que no dependa del creador.
+- [x] JL-413 Reintento de lo que esté `[!]` en JL-368…JL-412 que no dependa del creador. — commit «JL-413: verificar bloqueos de la tanda» — cero casillas `- [!]` en el rango; no había reintentos elegibles. Evidencia: `work/junie-jl413/RESULTADO.md`.
 - [ ] JL-414 Consola limpia en los escenarios nuevos de esta tanda.
 - [ ] JL-415 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
 - [ ] JL-416 Actualiza en `docs/ESTADO_ACTUAL.md` la parte de balance: la batería fiel y lo que mide; quita conclusiones de `balM3` si quedan.

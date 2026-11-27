@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-413: verificar bloqueos de la tanda (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl413/RESULTADO.md`.
+
+**Qué se hizo:** Audité las casillas de las tareas JL-368…JL-412 en la cola. No hay ninguna marcada `- [!]`, por lo que no había tareas bloqueadas que reintentar, fueran o no dependientes del creador. No reabrí tareas cerradas ni modifiqué código, pruebas o casillas ajenas.
+
+**Validación:** Línea base `npx tsc --noEmit` limpia; `npx vitest run`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: tarea de auditoría documental, sin cambio visual.
+
+**Evidencia:** `work/junie-jl413/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-412: comprobar tiendas con stock por franja (Junie)
 
 **Archivos:** `tests/jl412_merchantStockByBand.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl412/RESULTADO.md`.

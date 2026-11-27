@@ -607,6 +607,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-412 | Junie | Hecho (commit «JL-412: comprobar tiendas con stock por franja») | `tests/jl412_merchantStockByBand.test.ts`: 19/19; las 18 zonas con franja de `data/zones.json` revisan las tres tiendas productivas y no encuentran tiendas vacías (14 techos distintos). `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier específico limpios. Inventario detallado: `work/junie-jl412/RESULTADO.md`. No aplica Electron: comprobación de datos sin cambio visual. |
 
+## Cierre de JL-413 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-413 | Junie | Hecho (commit «JL-413: verificar bloqueos de la tanda») | Auditoría de las casillas JL-368…JL-412 en la cola: cero tareas marcadas `[!]`, así que no había reintentos elegibles. No se modificaron código, pruebas ni tareas previas. `npx tsc --noEmit` limpio; `npx vitest run`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`. Informe en `work/junie-jl413/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
