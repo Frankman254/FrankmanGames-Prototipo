@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-378: cerrar la tanda de pruebas (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Ejecuté la suite completa, typecheck, build y QA Electron en siete lotes para 20 escenarios, cubriendo los smoke tests y los recorridos de la cripta de JL-354…377. No cambié código, pruebas ni datos productivos. Revisé capturas de PNJ, mapa, estanque, inglés y utilería; la oclusión de Chalo en piso 1 coincide con JL-369.
+
+**Validación:** `npm test`: 431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` y `npm run docs:check` limpios. Electron: 154/161 checks y cero errores de consola. Los siete checks rojos son los dos de `modelos` (escenario ya parcial en JL-251: 8/11) y los cinco `dProp` de pisos 1–5, documentados en JL-374; no aparecieron regresiones nuevas.
+
+**Evidencia:** `work/junie-jl378/electron/` (siete lotes de esta sesión, con JSON y capturas revisadas).
+
+---
+
 ## 2026-11-27 — JL-377: verificar consola limpia en los escenarios de cripta (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
