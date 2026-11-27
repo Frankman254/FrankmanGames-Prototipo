@@ -2939,6 +2939,87 @@ const scenarios = {
         await shot('modelos-trapiche');
     },
 
+    /** JL-403: captura reposo y carrera de cada héroe y sexo desde tres ángulos. */
+    async jl403Heroes() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl403';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const sexes = [
+            { id: 'masculino', suffix: '' },
+            { id: 'femenino', suffix: '_f' },
+        ];
+        const poses = [
+            { id: 'de-pie', state: 'idle' },
+            { id: 'carrera', state: 'run' },
+        ];
+        const views = [
+            { id: 'frente', yaw: 270 },
+            { id: 'perfil', yaw: 180 },
+            { id: 'espalda', yaw: 90 },
+        ];
+        const captures = [];
+
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame(`QA ${hero.label}`, { classId: hero.id });
+                await js(`${S}.character.sex=${JSON.stringify(sex.id)}`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.id}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                await js(`(()=>{ const w=${W},v=__game.view,p=w.player,g=w.grid; const a=g.center(g.nearestWalkable({x:127,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; p.speed=0; p.facing=0; p.alive=true; v.rig.mode='manual'; v.rig.pitchDeg=14; v.rig.distance=5; v.rig.jumpTo(5); })()`);
+                await sleep(500);
+
+                for (const pose of poses) {
+                    await js(`(()=>{ const p=${W}.player,v=__game.view.player; p.alive=true; p.path=[]; p.speed=0; p.facing=0; v.reset(); v.oneShot=${JSON.stringify(pose.state === 'run' ? 'run' : null)}; v.model.play(${JSON.stringify(pose.state)},{restart:true}); })()`);
+                    await until(
+                        `__game.view.player.model.state===${JSON.stringify(pose.state)}`,
+                        8000,
+                        `${hero.label} ${sex.id} ${pose.id}`,
+                    );
+
+                    for (const view of views) {
+                        await js(`(()=>{ const r=__game.view.rig; r.yawDeg=${view.yaw}; r.pitchDeg=14; r.distance=5; r.jumpTo(5); })()`);
+                        await sleep(180);
+                        const observed = await js(
+                            `(()=>({state:__game.view.player.model.state,file:__game.view.player.model.entry.file,visible:__game.view.player.model.root.isEnabled()}))()`,
+                        );
+                        const ok = observed.state === pose.state && observed.file === expectedFile && observed.visible;
+                        check(
+                            `JL-403 ${hero.label} ${sex.id} ${pose.id} ${view.id}`,
+                            ok,
+                            JSON.stringify(observed),
+                        );
+                        const file = `jl403-${hero.model}-${sex.id}-${pose.id}-${view.id}`;
+                        await shot(file);
+                        captures.push({
+                            screenshot: `${file}.jpg`,
+                            class: hero.label,
+                            sex: sex.id,
+                            modelFile: expectedFile,
+                            pose: pose.id,
+                            animation: pose.state,
+                            view: view.id,
+                            yaw: view.yaw,
+                            ...observed,
+                        });
+                    }
+                }
+            }
+        }
+
+        fs.writeFileSync(path.join(outDir, 'capturas.json'), JSON.stringify(captures, null, 2));
+    },
+
     /** JL-322: captura los ocho clips de cada clase y sexo desde el frente y el lado. */
     async clipsHeroes() {
         const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl322';
@@ -15225,6 +15306,8 @@ scenarios.jl248_rendimientoTres.timeout = 300;
 scenarios.medidorDano.timeout = 90;
 // JL-322: seis modelos × ocho poses × dos ángulos y sus láminas de capturas.
 scenarios.clipsHeroes.timeout = 600;
+// JL-403: seis modelos × dos estados × tres ángulos.
+scenarios.jl403Heroes.timeout = 550;
 // JL-323: seis modelos × dos marchas, muestreadas durante tres ciclos.
 scenarios.jl323Zancada.timeout = 600;
 // JL-324: seis modelos × cuatro transiciones grabadas desde Electron.

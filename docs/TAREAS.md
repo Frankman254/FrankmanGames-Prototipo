@@ -562,6 +562,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-402 | Junie | Hecho (commit «JL-402: comprobar las pistas propias de los pueblos») | Electron: las cinco zonas seguras con música propia seleccionan y reproducen en bucle su archivo exclusivo (`chitri.ogg`, `iguanera_muelle.ogg`, `pedasol.ogg`, `punta_venada.ogg`, `cambutal.ogg`); búfer presente, `AudioContext` en `running`, ganancia >0,99 y consola limpia. Ninguna repetición ni pista ausente. Escenario `musicaContextos`: 18/18, consola limpia. `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` (218 rutas) limpios. Capturas revisadas y tabla en `work/junie-jl402/electron/RESULTADO.md`. |
 
+## Cierre de JL-403 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-403 | Junie | Hecho (commit «JL-403: capturar seis héroes de pie y corriendo») | Electron `jl403Heroes`: 37/37 comprobaciones, consola limpia; 36 capturas de seis modelos, dos poses y tres vistas, todas revisadas. Cruces confirmados: falda/capa de Centinela femenina de pie, espalda; cintas del tocado sobre el dorso del traje de Oráculo femenina de pie y corriendo. No se modificaron assets. `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `node --check scripts/qaElectron.mjs` limpios; `npm run docs:check`: 218 rutas, todas existen. Evidencia: `work/junie-jl403/RESULTADO.md` y `work/junie-jl403/electron/`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

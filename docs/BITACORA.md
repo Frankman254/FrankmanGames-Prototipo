@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-403: capturar seis héroes de pie y corriendo (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario `jl403Heroes` para capturar los seis modelos de clase/sexo en `idle` y `run`, desde frente, perfil y espalda. Revisé las 36 imágenes: la falda de Centinela femenina aparece por delante/dentro de la capa roja en reposo, espalda; las cintas del tocado de Oráculo femenina se superponen al panel dorsal del traje, espalda, en reposo y carrera. No observé otros cruces inequívocos ni cambié modelos o datos.
+
+**Validación:** Electron 37/37, consola limpia; las 36 imágenes existen y son únicas. `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `node --check scripts/qaElectron.mjs` limpios. `npm run docs:check`: 218 rutas citadas, todas existen.
+
+**Evidencia:** `work/junie-jl403/RESULTADO.md`, `work/junie-jl403/electron/capturas.json`, `resultado.json`, las 36 capturas JPG y seis láminas revisadas.
+
+---
+
 ## 2026-11-27 — JL-401: listar sonidos pedidos sin archivo (Junie)
 
 **Archivos:** `work/junie-jl401/FALTAN.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
