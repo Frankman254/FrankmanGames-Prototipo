@@ -1,3 +1,17 @@
+## 2026-11-27 — JL-375: verificar partículas, niebla y luz de los tiempos existentes (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `tests/weatherVisualLogic.test.ts`, `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** El escenario Electron `lluvia` fuerza `clear`, `rain`, `sun` y `snow` a mediodía, y comprueba emisores, niebla aplicada y estado de luz/tinte para cada uno. La prueba pura contrasta también los cuatro tipos del `data/weather.json`. No se cambió el juego ni sus datos; la nieve se forzó en Villa Raspadura solo para validar el render, porque no hay una zona fría activa.
+
+**Resultado:** Electron 19/19, consola limpia. Lluvia: 1.800 emisiones/s y 1.260 partículas; nieve: 900/s y 976 partículas. El sol aumenta la luz y reduce el estado de niebla a 0,003, pero la niebla de escena queda en el mínimo 0,00865. El catálogo no tiene IDs de sonido climático; tormenta y audio pasan a pregunta al creador.
+
+**Validación:** `tests/weatherVisualLogic.test.ts`: 5/5; `npm test`: 431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` (tres proyectos), `npm run docs:check` (217 rutas) y `node --check scripts/qaElectron.mjs` limpios. Capturas revisadas.
+
+**Evidencia:** `work/junie-jl375/electron/resultado.json`, `jl375-clima.json` y `jl375-clima-clear.jpg`, `jl375-clima-rain.jpg`, `jl375-clima-sun.jpg`, `jl375-clima-snow.jpg`.
+
+---
+
 ## 2026-11-27 — JL-374: rehacer los pisos manuales de la cripta (Junie)
 
 **Archivos:** `data/dungeons/cripta-tulivieja.json`, `tests/jl374_handFloorRework.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

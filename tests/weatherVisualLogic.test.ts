@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import weatherJson from '../data/weather.json';
+import { parseWeather } from '../src/data/weatherSchema';
+import { WEATHER_KINDS } from '../src/data/zonesSchema';
 import type { WeatherDef } from '../src/data/weatherSchema';
 import { weatherVisualState } from '../src/render/weatherVisualLogic';
 
@@ -10,6 +13,26 @@ const visual: WeatherDef['visual'] = {
 };
 
 describe('weatherVisualState', () => {
+    it('aplica partículas, niebla y luz de cada tiempo configurado', () => {
+        const weather = parseWeather(weatherJson);
+
+        for (const kind of WEATHER_KINDS) {
+            const configured = weather.visual[kind];
+            const state = weatherVisualState(weather.visual, kind, 1);
+            const emitter = kind === 'rain' ? 'rain' : kind === 'snow' ? 'snow' : null;
+
+            expect(state).toEqual({
+                rainEmitRate: emitter === 'rain' ? configured.particles : 0,
+                snowEmitRate: emitter === 'snow' ? configured.particles : 0,
+                rainActive: emitter === 'rain' && configured.particles > 0.01,
+                snowActive: emitter === 'snow' && configured.particles > 0.01,
+                dim: configured.dim,
+                fog: configured.fog,
+                tint: configured.tint,
+            });
+        }
+    });
+
     it('scales rain particles and atmosphere by the weather intensity', () => {
         expect(weatherVisualState(visual, 'rain', 0.5)).toEqual({
             rainEmitRate: 120,

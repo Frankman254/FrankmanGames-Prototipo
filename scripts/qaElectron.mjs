@@ -12924,7 +12924,7 @@ const scenarios = {
         check('barriadaNoche: sin errores en consola', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
-    /** JL-315: clima forzado en Electron; anota los tipos y sonidos aún no soportados. */
+    /** JL-375: verifica partículas, niebla y luz de los cuatro tiempos existentes. */
     async lluvia() {
         await newGame('QA Lluvia');
         await resize(1920, 1080);
@@ -12932,73 +12932,119 @@ const scenarios = {
 
         const setup = await js(`(() => {
       const w=${W}, zone=w.weatherZone(), weather=w.weather;
-      return { zone, ready:!!weather && !!weather.at(zone), kinds:Object.keys(weather?.def.kinds ?? {}) };
+      return {
+        zone,
+        climate:w.zoneMap.get(zone)?.climate ?? null,
+        ready:!!weather && !!weather.at(zone),
+        kinds:Object.keys(weather?.def.kinds ?? {}),
+        weatherSoundIds:Object.keys(window.__audio?.data?.sfx?.sounds ?? {}).filter(id=>/(rain|weather|thunder)/i.test(id)),
+      };
     })()`);
         if (!setup.ready) throw new Error(`No hay sistema de clima en la zona del jugador: ${JSON.stringify(setup)}`);
 
+        const kinds = ['clear', 'rain', 'sun', 'snow'];
+        const missingKinds = kinds.filter((kind) => !setup.kinds.includes(kind));
+        check('JL-375: existen los cuatro tiempos probados', missingKinds.length === 0, JSON.stringify({ kinds: setup.kinds, missingKinds }));
+
         const zoneId = JSON.stringify(setup.zone);
-        await js(`__game.world.weather.force(${zoneId}, 'clear', 1)`);
+        await js(`(() => { __game.world.timeScale=0; __game.world.timeOfDay=0.5; })()`);
         await sleep(500);
-        const clear = await js(`(() => {
-      const a=__game.view.atmosphere, s=__game.view.scene;
-      return { fog:a.weather.fog, fogDensity:s.fogDensity };
-    })()`);
-        await shot('jl315-despejado');
+        const samples = {};
+        const capture = async (kind) => {
+            await js(`__game.world.weather.force(${zoneId}, ${JSON.stringify(kind)}, 1)`);
+            await sleep(kind === 'rain' || kind === 'snow' ? 1800 : 1000);
+            const sample = await js(`(() => {
+        const w=${W}.weather, zone=${zoneId}, weather=w.at(zone);
+        const scene=__game.view.scene, atmosphere=__game.view.atmosphere;
+        const emitter=name=>{
+          const p=scene.particleSystems.find(x=>x.name===name);
+          return p ? {started:p.isStarted(),emitRate:p.emitRate,active:p.getActiveCount()} : null;
+        };
+        return {
+          kind:w.kindAt(zone), rawKind:weather?.kind ?? null, intensity:weather?.intensity ?? null,
+          visual:w.def.visual[${JSON.stringify(kind)}], weather:atmosphere.weather,
+          particles:{rain:emitter('rain'),snow:emitter('snow')},
+          lighting:{sun:atmosphere.state.sun,ambient:atmosphere.state.ambient,haze:atmosphere.state.haze,
+            fogDensity:atmosphere.state.fogDensity,sceneFogDensity:scene.fogDensity,
+            minFogDensity:atmosphere.minFogDensity,cameraDistance:atmosphere.cameraDistance,altitude:atmosphere.altitude},
+        };
+      })()`);
+            samples[kind] = sample;
+            await shot(`jl375-clima-${kind}`);
+            return sample;
+        };
 
-        await js(`(() => {
-      window.__jl315SoundCalls=[];
-      const audio=window.__audio, original=audio.play.bind(audio);
-      window.__jl315OriginalPlay=original;
-      audio.play=(cue, world)=>{ window.__jl315SoundCalls.push(cue.sound); return original(cue, world); };
-      __game.world.weather.force(${zoneId}, 'rain', 1);
-    })()`);
-        await sleep(1800);
-        const rain = await js(`(() => {
-      const s=__game.view.scene, p=s.particleSystems.find(x=>x.name==='rain'), a=__game.view.atmosphere;
-      const audio=window.__audio, ids=Object.keys(audio.data.sfx.sounds);
-      const relevant=id=>/(rain|weather|thunder)/i.test(id);
-      return {
-        kind:__game.world.weather.at(${zoneId}).kind,
-        intensity:__game.world.weather.at(${zoneId}).intensity,
-        particles:p ? { started:p.isStarted(), emitRate:p.emitRate, active:p.getActiveCount() } : null,
-        fog:a.weather.fog,
-        fogDensity:s.fogDensity,
-        soundIds:ids.filter(relevant),
-        soundCalls:window.__jl315SoundCalls.filter(relevant),
-        ambience:Object.keys(audio.data.ambience),
-      };
-    })()`);
-        check('JL-315: lluvia forzada a intensidad completa', rain.kind === 'rain' && rain.intensity === 1, JSON.stringify(rain));
-        check(
-            'JL-315: emisor de lluvia activo con partículas',
-            rain.particles?.started && rain.particles.emitRate > 0 && rain.particles.active > 0,
-            JSON.stringify(rain.particles),
-        );
-        check('JL-315: niebla de lluvia aplicada', rain.fog > 0 && rain.fogDensity > clear.fogDensity, JSON.stringify({ clear, rain }));
-        await shot('jl315-lluvia');
+        for (const kind of ['clear', 'sun', 'rain', 'snow']) await capture(kind);
+        const clear = samples.clear;
+        const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) < 0.000001;
+        for (const kind of kinds) {
+            const sample = samples[kind];
+            check(
+                `JL-375: ${kind} forzado a intensidad completa`,
+                sample.kind === kind && sample.rawKind === kind && sample.intensity === 1,
+                JSON.stringify({ kind: sample.kind, rawKind: sample.rawKind, intensity: sample.intensity }),
+            );
 
-        const stormAvailable = setup.kinds.includes('storm');
-        check('JL-315: existe un tipo de clima tormenta', stormAvailable, JSON.stringify(setup.kinds));
-        const weatherSoundAvailable = rain.soundIds.length > 0 && rain.soundCalls.length > 0;
-        check(
-            'JL-315: el clima reproduce un sonido propio',
-            weatherSoundAvailable,
-            JSON.stringify({ ids: rain.soundIds, reproducidos: rain.soundCalls, ambience: rain.ambience }),
-        );
+            const expectedEmitter = kind === 'rain' ? 'rain' : kind === 'snow' ? 'snow' : null;
+            const particlesMatch = ['rain', 'snow'].every((name) => {
+                const particle = sample.particles[name];
+                if (!particle) return false;
+                if (name !== expectedEmitter) return !particle.started && particle.emitRate === 0;
+                return particle.started && particle.emitRate === sample.visual.particles && particle.active > 0;
+            });
+            check(`JL-375: partículas de ${kind}`, particlesMatch, JSON.stringify(sample.particles));
+
+            const expectedWeatherFog = sample.visual.fog;
+            const expectedStateFog = Math.max(0, clear.lighting.fogDensity + expectedWeatherFog);
+            const expectedSceneFog =
+                Math.max(sample.lighting.fogDensity, sample.lighting.minFogDensity) *
+                Math.min(1, 20 / Math.max(1, sample.lighting.cameraDistance)) /
+                (1 + sample.lighting.altitude / 12);
+            const fogMatches =
+                close(sample.weather.fog, expectedWeatherFog) &&
+                close(sample.lighting.fogDensity, expectedStateFog) &&
+                close(sample.lighting.sceneFogDensity, expectedSceneFog);
+            check(
+                `JL-375: niebla de ${kind}`,
+                fogMatches,
+                JSON.stringify({ configured: expectedWeatherFog, weather: sample.weather.fog, lighting: sample.lighting }),
+            );
+
+            const expectedHaze = clear.lighting.haze.map((channel, i) => Math.min(1, channel * sample.visual.tint[i]));
+            const lightMatches =
+                close(sample.weather.dim, sample.visual.dim) &&
+                close(sample.lighting.sun, clear.lighting.sun * (1 - sample.visual.dim)) &&
+                close(sample.lighting.ambient, clear.lighting.ambient * (1 - sample.visual.dim * 0.5)) &&
+                sample.lighting.haze.every((channel, i) => close(channel, expectedHaze[i]));
+            check(
+                `JL-375: luz y tinte de ${kind}`,
+                lightMatches,
+                JSON.stringify({ configured: sample.visual, weather: sample.weather, lighting: sample.lighting, expectedHaze }),
+            );
+        }
 
         fs.writeFileSync(
-            path.join(OUT, 'jl315-clima.json'),
-            JSON.stringify({ fecha: new Date().toISOString(), zone: setup.zone, kinds: setup.kinds, clear, rain }, null, 2),
+            path.join(OUT, 'jl375-clima.json'),
+            JSON.stringify(
+                {
+                    fecha: new Date().toISOString(),
+                    zone: setup.zone,
+                    climate: setup.climate,
+                    timeOfDay: 0.5,
+                    kinds: setup.kinds,
+                    weatherSoundIds: setup.weatherSoundIds,
+                    snowWasForcedForRenderOnly: setup.climate !== 'cold',
+                    samples,
+                },
+                null,
+                2,
+            ),
         );
-        await js(`(() => {
-      __game.world.weather.force(${zoneId}, 'clear', 1);
-      if (window.__jl315OriginalPlay) __audio.play=window.__jl315OriginalPlay;
-      delete window.__jl315OriginalPlay;
-    })()`);
+        await js(`(() => { __game.world.weather.force(${zoneId}, 'clear', 1); __game.world.timeScale=1; })()`);
         await sleep(300);
 
         const errors = await js(`(window.__consola?.errores(20)||'')`);
-        check('JL-315: consola sin errores', !errors || errors.length < 3, errors.slice(0, 200));
+        check('JL-375: consola sin errores', !errors || errors.length < 3, errors.slice(0, 200));
     },
 
     /** JL-223: Opciones gráficas dentro de la barriada — calidad, estilo de pintura y distancia de vista. */

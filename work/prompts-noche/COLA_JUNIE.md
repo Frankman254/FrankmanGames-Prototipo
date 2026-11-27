@@ -1658,7 +1658,7 @@ Contexto del coordinador:
 
 ### E. Reintentos
 - [x] JL-374 Reintenta JL-64 (rework de los pisos a mano). Las pruebas de antorchas siguen mandando: si sigue bloqueada, `[!]` con la lista exacta de pruebas que caen y por qué. — commit «Rehacer pisos manuales de la cripta con antorchas» — 5 pisos rehechos; suites dirigidas de antorchas/regresión 26/26, sin fallos de antorchas; `npm test`: 431 archivos, 5.086 aprobadas; `npm run typecheck`, `npm run build` y `npm run docs:check` (217 rutas) limpios. Electron `utileriaCripta` 12/17: fallan exactamente Piso 1–5 `meshes dProp` (0/2, 0/2, 0/2, 0/2, 0/4) pese a los props declarados; consola limpia. Evidencia: `work/junie-jl374/electron/`.
-- [ ] JL-375 Reintenta JL-315 (`lluvia`) solo con los climas que existen (`clear`, `rain`, `sun`, `snow`): partículas, niebla y luz en cada uno. La tormenta y el sonido de clima pasan a pregunta al creador.
+- [x] JL-375 Reintenta JL-315 (`lluvia`) solo con los climas que existen (`clear`, `rain`, `sun`, `snow`): partículas, niebla y luz en cada uno. La tormenta y el sonido de clima pasan a pregunta al creador. — commit «JL-375: verificar los cuatro tiempos existentes» — Electron `lluvia` 19/19, consola limpia; lluvia 1.800/s (1.260 partículas), nieve 900/s (976); niebla y luz/tinte verificados en los cuatro. Capturas revisadas y JSON en `work/junie-jl375/electron/`; `npm test` 431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` (217 rutas) limpios.
 - [ ] JL-376 Reintenta JL-300 sin borrar nada: lista los 64 audios sin referencia, con su línea de `PROCEDENCIA.md`, en `work/junie-jl376/AUDIOS_SIN_USO.md`. La decisión es del creador.
 
 ### F. Cierre de la tanda
