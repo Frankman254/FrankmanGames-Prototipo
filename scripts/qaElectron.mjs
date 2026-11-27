@@ -5667,6 +5667,114 @@ const scenarios = {
         await shot('armas-centinela');
     },
 
+    /** JL-404: captura cada arma, escudo, tocado y capa con malla propia en equipo.glb. */
+    async jl404EquipoPropio() {
+        await newGame('QA Equipo Propio', { classId: 'mangrove_hunter' });
+        await resize(1920, 1080);
+        await sleep(2500);
+
+        const catalog = JSON.parse(fs.readFileSync('data/rpg/items.json', 'utf8')).items;
+        const glb = fs.readFileSync('assets/models/equipo.glb');
+        const jsonLength = glb.readUInt32LE(12);
+        const model = JSON.parse(glb.toString('utf8', 20, 20 + jsonLength));
+        const nodes = new Map((model.nodes ?? []).map((node) => [node.name, node]));
+        const slots = [
+            { slot: 'weapon', label: 'arma', view: 'front' },
+            { slot: 'offhand', label: 'escudo', view: 'front' },
+            { slot: 'head', label: 'tocado', view: 'front' },
+            { slot: 'back', label: 'capa', view: 'back' },
+        ];
+        const allItems = slots.flatMap(({ slot, label, view }) =>
+            Object.entries(catalog)
+                .filter(([, def]) => def.slot === slot)
+                .flatMap(([id, def]) => {
+                    const node = nodes.get(`obj_${id}`);
+                    const mesh = node?.mesh === undefined ? null : model.meshes?.[node.mesh];
+                    if (!mesh?.primitives?.some((primitive) => primitive.attributes?.POSITION !== undefined))
+                        return [];
+                    return [{ id, def, slot, label, view, mesh: node.mesh }];
+                }),
+        );
+        const items =
+            process.env.QA_JL404_MUESTRA === '1'
+                ? slots.map(({ slot }) => allItems.find((item) => item.slot === slot)).filter(Boolean)
+                : allItems;
+        const level = Math.max(1, ...items.map(({ def }) => def.level ?? 1));
+        await js(`(()=>{const c=${W}.character;c.level=${level};c.spellbook.level=${level};})()`);
+        const totals = Object.fromEntries(
+            slots.map(({ slot, label }) => [label, items.filter((item) => item.slot === slot).length]),
+        );
+        console.log('     JL-404: modelos con malla propia', JSON.stringify(totals));
+        await js(`(()=>{
+            const w=${W},v=__game.view,p=w.player,i=w.grid.nearestWalkable({x:127,y:130});
+            if(i<0)throw new Error('No hay claro caminable para la captura');
+            const a=w.grid.center(i);
+            p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.facing=0;p.alive=true;
+            v.player.reset();v.player.visualYaw=0;v.player.model.root.rotation.y=0;
+            v.rig.mode='manual';v.rig.yawDeg=180;v.rig.pitchDeg=10;v.rig.distance=4.5;v.rig.jumpTo(4.5);
+        })()`);
+        await sleep(500);
+
+        const captures = [];
+        const overlay = await js(`(()=>{let e=document.getElementById('jl404-item-label');if(!e){e=document.createElement('div');e.id='jl404-item-label';Object.assign(e.style,{position:'fixed',top:'12px',left:'12px',zIndex:'2147483647',background:'rgba(0,0,0,.82)',color:'#fff',padding:'8px 12px',font:'bold 18px sans-serif',borderRadius:'4px',pointerEvents:'none'});document.body.append(e);}return true;})()`);
+        check('JL-404: etiqueta de captura instalada', overlay === true, String(overlay));
+
+        for (const [index, item] of items.entries()) {
+            const title = `${item.label} · ${item.def.name ?? item.id} · ${item.id}`;
+            try {
+                const equipped = await js(`(()=>{
+                    const c=${W}.character,s=${S},id=${JSON.stringify(item.id)},slot=${JSON.stringify(item.slot)};
+                    for(const clear of ['weapon','offhand','head','back']){
+                        const old=c.equipment.get(clear);if(!old)continue;
+                        const result=s.unequip(clear);if(!result.ok)throw new Error('No se pudo retirar '+clear);
+                        const returned=c.inventory.slots.find(x=>x?.uid===old.uid);
+                        if(returned)c.inventory.remove(returned.uid,returned.quantity);
+                    }
+                    if(c.give(id)!==0)throw new Error('No se pudo añadir '+id);
+                    const inst=c.inventory.slots.find(x=>x?.itemId===id);
+                    if(!inst)throw new Error('No aparece en mochila '+id);
+                    const result=s.equip(inst.uid,slot);if(!result.ok)throw new Error(result.reason||'No se pudo equipar '+id);
+                    const current=c.equipment.get(slot);
+                    if(current?.itemId!==id)throw new Error('Ranura '+slot+' no conserva '+id);
+                    return {slot:current.slot??slot,itemId:current.itemId};
+                })()`);
+                if (equipped.itemId !== item.id) throw new Error(`Equipo inesperado: ${JSON.stringify(equipped)}`);
+
+                await js(`(()=>{const r=__game.view.rig;r.yawDeg=${item.view === 'front' ? 180 : 0};r.pitchDeg=10;r.distance=4.5;r.jumpTo(4.5);const e=document.getElementById('jl404-item-label');e.textContent=${JSON.stringify(`${index + 1}/${items.length} · ${title}`)};})()`);
+                const meshExpression = `__game.view.player.model.meshes.some(m=>m.name.includes(${JSON.stringify(`obj_${item.id}`)})&&m.isEnabled()&&m.getTotalVertices()>0)`;
+                await until(meshExpression, 12000, `malla equipada ${item.id}`);
+                await sleep(220);
+                const renderedMeshes = await js(
+                    `__game.view.player.model.meshes.filter(m=>m.name.includes(${JSON.stringify(`obj_${item.id}`)})&&m.isEnabled()&&m.getTotalVertices()>0).map(m=>m.name)`,
+                );
+                const filename = `${item.slot}-${item.id}.jpg`;
+                await shot(filename.slice(0, -4));
+                captures.push({
+                    slot: item.slot,
+                    category: item.label,
+                    id: item.id,
+                    name: item.def.name,
+                    kind: item.def.kind,
+                    mesh: item.mesh,
+                    renderedMeshes,
+                    file: filename,
+                });
+            } catch (error) {
+                captures.push({ slot: item.slot, category: item.label, id: item.id, name: item.def.name, kind: item.def.kind, mesh: item.mesh, error: String(error?.message ?? error) });
+            }
+        }
+
+        fs.writeFileSync(
+            path.join(OUT, 'jl404-capturas.json'),
+            JSON.stringify({ playerClass: 'mangrove_hunter', window: '1920x1080', totals, captures }, null, 2),
+        );
+        for (const { slot, label } of slots) {
+            const group = captures.filter((capture) => capture.slot === slot);
+            const passed = group.filter((capture) => capture.file && capture.renderedMeshes?.length).length;
+            check(`JL-404: ${label} con modelo propio capturado`, group.length > 0 && passed === group.length, `${passed}/${group.length}`);
+        }
+    },
+
     async montado() {
         // F21: jinete sentado y quieto sobre la arpía (sin animación de andar), montura con sus colores.
         await newGame('QA Montado');
@@ -15308,6 +15416,8 @@ scenarios.medidorDano.timeout = 90;
 scenarios.clipsHeroes.timeout = 600;
 // JL-403: seis modelos × dos estados × tres ángulos.
 scenarios.jl403Heroes.timeout = 550;
+// JL-404: 394 modelos de equipo propio, uno por captura.
+scenarios.jl404EquipoPropio.timeout = 550;
 // JL-323: seis modelos × dos marchas, muestreadas durante tres ciclos.
 scenarios.jl323Zancada.timeout = 600;
 // JL-324: seis modelos × cuatro transiciones grabadas desde Electron.

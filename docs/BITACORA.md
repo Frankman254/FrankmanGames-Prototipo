@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-404: capturar equipo con modelo propio (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario `jl404EquipoPropio`, que equipa y captura una a una las armas, los escudos, los tocados y las capas con geometría propia en `assets/models/equipo.glb`. Las tomas usan un claro caminable; no elaboré la lista de ranuras sin modelo reservada a MOD-09.
+
+**Validación:** Electron 6/6, consola limpia; 394 capturas revisadas: 129 armas, 19 escudos, 152 tocados y 94 capas. `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `node --check scripts/qaElectron.mjs` limpios. `npm run docs:check` limpio.
+
+**Evidencia:** `work/junie-jl404/electron/jl404-capturas.json`, `work/junie-jl404/electron/resultado.json`, los JPG individuales y las láminas `work/junie-jl404/electron/contacto-armas.jpg`, `work/junie-jl404/electron/contacto-escudos.jpg`, `work/junie-jl404/electron/contacto-tocados.jpg` y `work/junie-jl404/electron/contacto-capas.jpg`.
+
+---
+
 ## 2026-11-27 — JL-403: capturar seis héroes de pie y corriendo (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
