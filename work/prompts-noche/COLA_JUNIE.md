@@ -1724,7 +1724,7 @@ Contexto del coordinador:
 - [x] JL-404 Electron: captura puesta de cada arma, escudo, tocado y capa con modelo propio. La tabla de las ranuras que se ven sin modelo es para MOD-09. — commit «JL-404: capturar equipo con modelo propio» — Electron 6/6, 394 capturas revisadas (129 armas, 19 escudos, 152 tocados y 94 capas), consola limpia; evidencia en `work/junie-jl404/electron/`.
 
 ### D. Interfaz y textos
-- [ ] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla.
+- [x] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla. — commit «JL-405: auditar la cobertura de textos de interfaz» — detector `node scripts/i18nUi.mjs`: 0; pruebas i18n 12/12; suite 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl405/RESULTADO.md`, `CANDIDATOS_SIN_EN_UI.json`.
 - [ ] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista.
 - [ ] JL-407 Accesibilidad: todas las acciones de la barra y de los menús principales se pueden hacer con teclado. Lista lo que solo va con ratón.
 - [ ] JL-408 Electron: tooltip de un objeto de set con piezas puestas y sin ellas. El contador de piezas cuadra con lo equipado (el creador vio posiciones rotas en el set de la Diablica).

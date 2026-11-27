@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-405: auditar la cobertura de textos de interfaz (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia local en `work/junie-jl405/`.
+
+**Qué se hizo:** `node scripts/i18nUi.mjs` encontró cero faltantes dentro de su alcance. La prueba JL-98 sí detecta los resultados de ese detector, pero este excluye `src/ui/editor/`, `src/ui/dev/` y `src/ui/menus/fake/`, y comprueba la unión de las tres tablas inglesas, no la pertenencia específica a `en.ui.json`. La extracción literal ampliada generó 706 candidatos sin clave directa en `en.ui.json` (439 con clave en otra tabla y 267 sin clave inglesa); contiene falsos positivos de código y no se considera un inventario validado de textos visibles. Propuse una prueba estricta basada en salidas de texto, sin aplicar umbrales ni excepciones; no modifiqué locales ni pruebas.
+
+**Validación:** Verificación final `npm test`: 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `npm run docs:check` limpios. Pruebas dirigidas JL-98 y `tests/ui/i18n.test.ts`: 12/12; `node scripts/i18nUi.mjs`: 0 textos sin inglés. No aplica Electron: auditoría estática.
+
+**Evidencia:** `work/junie-jl405/RESULTADO.md` y `work/junie-jl405/CANDIDATOS_SIN_EN_UI.json` (inventario heurístico; no versionados).
+
+---
+
 ## 2026-11-27 — JL-404: capturar equipo con modelo propio (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
