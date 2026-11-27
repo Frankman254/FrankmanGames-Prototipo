@@ -10873,9 +10873,19 @@ const scenarios = {
             const glbOk = await js(`fetch('/assets/models/utileria_cripta.glb').then(r=>r.ok).catch(()=>false)`);
             record(`Piso ${floor + 1}: utileria_cripta.glb accesible`, glbOk, String(glbOk));
 
-            /* Verificar que no hay meshes dProp- (hallazgo: floor.props vacío). */
+            /* Esperar al GLB asíncrono y verificar que se dibuja toda la utilería declarada. */
+            const declaredProps = await js(`__game.crypt.floorData?.props?.length ?? 0`);
+            await until(
+                `__game.view.scene.transformNodes.filter(n=>n.name.startsWith('dProp-')).length >= ${declaredProps}`,
+                10000,
+                `utilería del piso ${floor + 1}`,
+            ).catch(() => {});
             const dPropCount = await js(`__game.view.scene.transformNodes.filter(n=>n.name.startsWith('dProp-')).length`);
-            record(`Piso ${floor + 1}: meshes dProp`, dPropCount > 0, `dProp: ${dPropCount} (hallazgo: floor.props vacío en generateHandFloor)`);
+            record(
+                `Piso ${floor + 1}: meshes dProp`,
+                declaredProps > 0 && dPropCount === declaredProps,
+                `dProp: ${dPropCount}/${declaredProps}`,
+            );
 
             /* Captura del piso. */
             await shot(`jl143-piso-${floor + 1}-${id}`);

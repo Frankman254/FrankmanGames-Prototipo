@@ -1657,7 +1657,7 @@ Contexto del coordinador:
 - [x] JL-373 Lista de los textos del juego que todavía dicen «hilo de retorno», «Ovillo» o «posima/poción de regreso», para que el creador decida si el guía cambia algún nombre. Solo lista. — commit «JL-373: listar los textos de retorno de la cripta» — `work/junie-jl373/RESULTADO.md`; `npm test` 5.084 aprobadas (1 omitida, 1 todo), `npm run typecheck` limpio y `npm run docs:check` (215 rutas).
 
 ### E. Reintentos
-- [ ] JL-374 Reintenta JL-64 (rework de los pisos a mano). Las pruebas de antorchas siguen mandando: si sigue bloqueada, `[!]` con la lista exacta de pruebas que caen y por qué.
+- [x] JL-374 Reintenta JL-64 (rework de los pisos a mano). Las pruebas de antorchas siguen mandando: si sigue bloqueada, `[!]` con la lista exacta de pruebas que caen y por qué. — commit «Rehacer pisos manuales de la cripta con antorchas» — 5 pisos rehechos; suites dirigidas de antorchas/regresión 26/26, sin fallos de antorchas; `npm test`: 431 archivos, 5.086 aprobadas; `npm run typecheck`, `npm run build` y `npm run docs:check` (217 rutas) limpios. Electron `utileriaCripta` 12/17: fallan exactamente Piso 1–5 `meshes dProp` (0/2, 0/2, 0/2, 0/2, 0/4) pese a los props declarados; consola limpia. Evidencia: `work/junie-jl374/electron/`.
 - [ ] JL-375 Reintenta JL-315 (`lluvia`) solo con los climas que existen (`clear`, `rain`, `sun`, `snow`): partículas, niebla y luz en cada uno. La tormenta y el sonido de clima pasan a pregunta al creador.
 - [ ] JL-376 Reintenta JL-300 sin borrar nada: lista los 64 audios sin referencia, con su línea de `PROCEDENCIA.md`, en `work/junie-jl376/AUDIOS_SIN_USO.md`. La decisión es del creador.
 

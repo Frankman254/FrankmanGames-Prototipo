@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-374: rehacer los pisos manuales de la cripta (Junie)
+
+**Archivos:** `data/dungeons/cripta-tulivieja.json`, `tests/jl374_handFloorRework.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Se rehicieron los cinco contornos manuales, con antorchas declaradas y orientadas a suelo transitable; se recolocaron 12 piezas existentes. JL-64 deja de estar bloqueada: ninguna prueba de antorchas cae. El escenario Electron ahora espera la carga del GLB y compara los props declarados con los nodos `dProp-`.
+
+**Validación:** `tests/jl374_handFloorRework.test.ts`: 2/2; las cinco suites dirigidas (antorchas y regresión) pasaron 26/26; `npm test`: 431 archivos, 5.086 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` (tres proyectos), `npm run build`, `npm run docs:check` (217 rutas) y `node --check scripts/qaElectron.mjs` limpios. Electron `utileriaCripta`: 12/17; siguen fallando solo las cinco comprobaciones `meshes dProp` (0/2, 0/2, 0/2, 0/2 y 0/4), aunque cada piso declara props y el GLB es accesible; sin errores de consola. No se amplió JL-374 para corregir ese fallo de render separado.
+
+**Evidencia:** `work/junie-jl374/electron/resultado.json` y capturas revisadas `jl143-piso-1-atrio.jpg`, `jl143-piso-2-galeria.jpg`, `jl143-piso-3-camara.jpg`, `jl143-piso-4-patio.jpg` y `jl143-piso-5-santuario.jpg`.
+
+---
+
 ## 2026-11-27 — JL-373: listar los textos de retorno de la cripta (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
