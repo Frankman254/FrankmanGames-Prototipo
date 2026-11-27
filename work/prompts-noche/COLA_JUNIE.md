@@ -1642,7 +1642,7 @@ Contexto del coordinador:
 - [x] JL-364 Modo edición: `World.applyRpgContent()` llama a `placeNpcs()`, que vacía `this.npcs`. Dentro de la cripta, recargar `npcs.json` borra a Chalo y Nina. — commit «JL-364: conservar PNJ interiores al recargar contenido RPG» — `tests/jl364_interiorNpcHotApply.test.ts` 1/1; Electron `criptaRecargaPnj` 6/6, consola limpia; capturas revisadas en `work/junie-jl364/electron/`.
   - Prueba que lo demuestre.
   - Arreglo pequeño: conservar los PNJ de interior.
-- [ ] JL-365 Prueba: la acción `leaveDungeon` en un PNJ que no es de la cripta es válida para el lector. Decide si debe serlo. Si no, valida en `content.ts` que solo la lleven PNJ con `crypt: true`, con su prueba y su mensaje de error.
+- [x] JL-365 Prueba: la acción `leaveDungeon` en un PNJ que no es de la cripta es válida para el lector. Decide si debe serlo. Si no, valida en `content.ts` que solo la lleven PNJ con `crypt: true`, con su prueba y su mensaje de error. — commit «JL-365: validar regreso de cripta solo en PNJ de cripta» — `tests/rpg/content.test.ts` 1/1; suite 5.076 aprobadas; typecheck y `docs:check` limpios; evidencia en `work/junie-jl365/RESULTADO.md`.
 - [ ] JL-366 Prueba: `waterDistance` y `waterCircles` con un estanque sin lóbulos dan lo mismo que antes, para los estanques del mundo abierto (`meadow_pond`, `poza_iguanera`): orilla, `spotAt` y las aproximaciones de pesca.
 - [ ] JL-367 Prueba: los lóbulos de los 100 pisos quedan dentro de su sala (ningún círculo se sale del rectángulo de la sala menos 1 baldosa).
 - [ ] JL-368 Prueba: los PNJ de la cripta no salen en el compendio ni en la lista de mercaderes del mapa del mundo abierto. Si salen, lista dónde y en qué forma: es pregunta al creador, no la arregles.

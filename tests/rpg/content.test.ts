@@ -114,6 +114,21 @@ describe('contenido RPG', () => {
         );
     });
 
+    it('JL-365: sólo permite leaveDungeon en PNJ de la cripta', () => {
+        const c = content();
+        const guideAction = c.npcs.crypt_guide?.dialogue.nodes.hello?.options[0]?.actions[0];
+        expect(c.npcs.crypt_guide?.crypt).toBe(true);
+        expect(guideAction).toEqual({ type: 'leaveDungeon' });
+
+        const raw = clone(rpgRawFiles()) as Record<string, any>;
+        raw['npcs'].npcs.fisher.dialogue.nodes.hello.options[0].actions = [{ type: 'leaveDungeon' }];
+
+        expect(() => parseRpgContent(raw as never, archetypes())).toThrow(
+            '[data/rpg/npcs.json] npcs.fisher.dialogue.nodes.hello.options[0].actions[0].type: ' +
+                'leaveDungeon sólo se permite en PNJ con crypt: true',
+        );
+    });
+
     it('rechaza números y valores fuera de rango', () => {
         const raw = clone(rpgRawFiles()) as Record<string, any>;
         raw['items'].items.fang.maxStack = 0;

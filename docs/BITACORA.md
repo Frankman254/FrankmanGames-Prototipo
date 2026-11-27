@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-365: validar regreso de cripta solo en PNJ de cripta (Junie)
+
+**Archivos:** `src/rpg/content.ts`, `tests/rpg/content.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** `parseNpc()` ahora exige `crypt: true` para cada acción `leaveDungeon`, incluida la marca heredada desde `merchants.json`; el error señala `dialogue.nodes.<nodo>.options[n].actions[n].type` y explica que solo se permite en PNJ de cripta. Nina conserva su acción válida. La prueba de regresión reproduce que Marina era aceptada antes del cambio y ahora comprueba el rechazo y su mensaje literal; no cambia el diálogo productivo.
+
+**Validación:** Antes del arreglo, `npx vitest run tests/rpg/content.test.ts -t "JL-365"` falló porque el lector no lanzaba error. Después: prueba dirigida 1/1; `npm test`: 426 archivos, 5.076 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; `npm run docs:check` limpio. No aplica Electron: es validación de datos no visible.
+
+**Evidencia:** `work/junie-jl365/RESULTADO.md`.
+
+---
+
 ## 2026-11-26 — JL-364: conservar PNJ interiores al recargar contenido RPG (Junie)
 
 **Archivos:** `src/sim/world.ts`, `tests/jl364_interiorNpcHotApply.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

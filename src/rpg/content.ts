@@ -1309,11 +1309,27 @@ function parseDialogue(r: Reader, raw: unknown): DialogueDef {
 
 function parseNpc(merchants: Record<string, MerchantDef>) {
     return (id: string, o: Obj, r: Reader): NpcDef => {
-        const dialogue = parseDialogue(r.child('dialogue'), o['dialogue']);
+        const dialogueReader = r.child('dialogue');
+        const dialogue = parseDialogue(dialogueReader, o['dialogue']);
+        const checkLeaveDungeon = (crypt: boolean): void => {
+            if (crypt) return;
+            for (const [nodeId, node] of Object.entries(dialogue.nodes))
+                node.options.forEach((option, optionIndex) =>
+                    option.actions.forEach((action, actionIndex) => {
+                        if (action.type === 'leaveDungeon')
+                            dialogueReader
+                                .child(`nodes.${nodeId}`)
+                                .child(`options[${optionIndex}]`)
+                                .child(`actions[${actionIndex}]`)
+                                .fail('type', 'leaveDungeon sólo se permite en PNJ con crypt: true');
+                    }),
+                );
+        };
         if (o['merchant'] === true) {
             // Mercader con diálogo: nombre, sitio y aspecto salen de merchants.json.
             const m = merchants[id];
             if (!m) r.fail('merchant', `no hay mercader "${id}" en merchants.json`);
+            checkLeaveDungeon(m.crypt === true);
             return {
                 id,
                 name: m.name,
@@ -1326,6 +1342,8 @@ function parseNpc(merchants: Record<string, MerchantDef>) {
             };
         }
         const model = o['model'] === undefined ? undefined : r.str(o, 'model');
+        const crypt = flag(r, o, 'crypt');
+        checkLeaveDungeon(crypt);
         return {
             id,
             name: r.str(o, 'name'),
@@ -1335,7 +1353,7 @@ function parseNpc(merchants: Record<string, MerchantDef>) {
             model,
             merchantId: null,
             dialogue,
-            ...(flag(r, o, 'crypt') ? { crypt: true } : {}),
+            ...(crypt ? { crypt: true } : {}),
         };
     };
 }
