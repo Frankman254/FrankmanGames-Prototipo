@@ -1,14 +1,17 @@
 // GRP-01: coste de simular compañeros. Mismo combate (semillas fijas) con 1, 2 y 4 participantes;
 // mide el tick (media y máximo), búsquedas de camino, actores y sucesos, y las métricas de cada uno.
-// Uso: npm run lab:grupo   (escribe work/claude-grp/grp01/rendimiento.json)
+// Uso: npm run lab:grupo -- [--mismo-nivel] [--out <ruta>]
+// Sin --out escribe work/claude-grp/grp01/rendimiento.json.
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { loadGameData } from '../../src/data';
 import { World } from '../../src/sim/world';
 import { makeGroupLab, type MemberSpec } from './grupo';
+import { rosterForMode } from './grupoRunConfig';
 
 const base = loadGameData();
-const ROSTER: MemberSpec[] = [
+const BASE_ROSTER: MemberSpec[] = [
     { classId: 'ember_vanguard', level: 10 },
     { classId: 'storm_weaver', level: 10 },
     { classId: 'mangrove_hunter', level: 10 },
@@ -18,6 +21,12 @@ const ENEMIES = [
     { archetype: 'melee', count: 4 },
     { archetype: 'ranged', count: 2 },
 ];
+const args = process.argv.slice(2);
+const sameLevel = args.includes('--mismo-nivel');
+const ROSTER = rosterForMode(BASE_ROSTER, ENEMIES, base, sameLevel);
+const outputOption = args.indexOf('--out');
+const outputPath = outputOption < 0 ? 'work/claude-grp/grp01/rendimiento.json' : args[outputOption + 1];
+if (!outputPath || outputPath.startsWith('--')) throw new Error('--out requiere una ruta');
 const SEEDS = [1, 2, 3, 4, 5];
 const MAX_TICKS = 60 * 120;
 
@@ -108,6 +117,10 @@ const summary = (['campo', 'zona'] as const).flatMap((zone) =>
         };
     }),
 );
+console.log(
+    `Modo de nivel: ${sameLevel ? 'mismo nivel (máximo base enemigo)' : 'predeterminado'}; ` +
+        `niveles de jugadores: ${[...new Set(ROSTER.map((member) => member.level))].join(', ')}`,
+);
 for (const s of summary) {
     const one = summary.find((x) => x.zone === s.zone && x.players === 1)!;
     console.log(
@@ -123,8 +136,18 @@ for (const m of four.metrics)
         `  #${m.id}: daño ${m.damageDealt}, recibido ${m.damageTaken}, curación ${m.healing}, ` +
             `activo ${m.activeSeconds.toFixed(1)} s, bajas ${m.kills}, muertes ${m.deaths}, parte ${(m.participation * 100).toFixed(1)} %`,
     );
-mkdirSync('work/claude-grp/grp01', { recursive: true });
+mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(
-    'work/claude-grp/grp01/rendimiento.json',
-    JSON.stringify({ roster: ROSTER, enemies: ENEMIES, summary, rows }, null, 2),
+    outputPath,
+    JSON.stringify(
+        {
+            playerLevelMode: sameLevel ? 'mismo-nivel' : 'predeterminado',
+            roster: ROSTER,
+            enemies: ENEMIES,
+            summary,
+            rows,
+        },
+        null,
+        2,
+    ),
 );

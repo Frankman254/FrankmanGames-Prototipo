@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-387: comparar grupoRun a nivel base (Junie)
+
+**Archivos:** `scripts/balance/grupoRun.ts`, `scripts/balance/grupoRunConfig.ts`, `tests/balance/grupoRun.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí `--mismo-nivel` a `grupoRun.ts`; asigna a todos los jugadores el mayor nivel base de los enemigos configurados (nivel 2 para melee 1 y ranged 2). Sin la opción se conserva el roster original de nivel 10. `--out` permite guardar cada modo aparte sin sobrescribir el informe existente. No cambié `data/` ni el balance productivo.
+
+**Validación:** Prueba dirigida: 3/3. `npm test`: 433 archivos, 5.096 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; `npm run docs:check` limpio (218 rutas). Las dos baterías completas tienen 30 corridas por modo; ambos modos ganaron 30/30. No aplica Electron: es una herramienta de medición sin cambio visual.
+
+**Evidencia:** `work/junie-jl387/COMPARACION.md`, `predeterminado.json` y `mismo-nivel.json`.
+
+---
+
 ## 2026-11-27 — JL-386: ampliar la batería fiel a grupos (Junie)
 
 **Archivos:** `scripts/balance/fiel.ts`, `scripts/balance/metrics.ts`, `tests/balance/fiel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
