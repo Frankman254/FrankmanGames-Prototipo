@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-412: comprobar tiendas con stock por franja (Junie)
+
+**Archivos:** `tests/jl412_merchantStockByBand.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl412/RESULTADO.md`.
+
+**Qué se hizo:** Añadí una prueba por franja de `data/zones.json`: en cada techo de nivel revisa todo el stock de las tiendas productivas y exige que cada una tenga un artículo con `item.level` menor o igual. Las 18 zonas con franja (14 techos distintos) y las tiendas `smith`, `apothecary` y `crypt_peddler` pasan; no hay tiendas vacías. Se excluye `dev_buhonero` porque es `devOnly`. No cambié datos ni comportamiento del juego.
+
+**Validación:** `tests/jl412_merchantStockByBand.test.ts`: 19/19; `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y Prettier específico limpios. No aplica Electron: auditoría de datos sin cambio visual.
+
+**Evidencia:** `work/junie-jl412/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-411: listar alcances de hechizos a distancia (Junie)
 
 **Archivos:** `tests/jl411_distanceSpellRange.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl411/RESULTADO.md`.

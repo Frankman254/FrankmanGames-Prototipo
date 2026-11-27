@@ -601,6 +601,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-411 | Junie | Hecho (commit «JL-411: listar alcances de hechizos a distancia») | `tests/jl411_distanceSpellRange.test.ts`: 1/1; de 14 arquetipos del rol a distancia, lista cinco hechizos con alcance menor que el básico: cuatro de `trapper` y uno de `espejo_cascabelero`. No se modificaron datos ni cifras. `npm test`: 439 archivos, 5.115 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier específico limpios. Evidencia: `work/junie-jl411/RESULTADO.md`. No aplica Electron: sin cambio visual. |
 
+## Cierre de JL-412 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-412 | Junie | Hecho (commit «JL-412: comprobar tiendas con stock por franja») | `tests/jl412_merchantStockByBand.test.ts`: 19/19; las 18 zonas con franja de `data/zones.json` revisan las tres tiendas productivas y no encuentran tiendas vacías (14 techos distintos). `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier específico limpios. Inventario detallado: `work/junie-jl412/RESULTADO.md`. No aplica Electron: comprobación de datos sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
