@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-389: comprobar el efecto de armor en enemigos (Junie)
+
+**Archivos:** `tests/zones.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí una prueba que carga `data/zones.json`, cambia `flatPerLevel.armor` de 0,15 a 100,15, vuelve a parsear las zonas y crea el mismo enemigo `melee` de nivel 10 en `World`. El parser elimina `armor` antes de `levelStatBlock`; la definición del enemigo, sus estadísticas, vida y recompensas permanecen idénticas. Anoté al creador si prefiere quitar la clave heredada o decidir que tenga efecto. No cambié `src/`, `data/` ni reglas de combate.
+
+**Validación:** `npx vitest run tests/zones.test.ts`: 17/17; `npm test`: 434 archivos, 5.098 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. No aplica Electron: es una prueba de simulación, sin cambio visual.
+
+**Evidencia:** `work/junie-jl389/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-387: comparar grupoRun a nivel base (Junie)
 
 **Archivos:** `scripts/balance/grupoRun.ts`, `scripts/balance/grupoRunConfig.ts`, `tests/balance/grupoRun.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

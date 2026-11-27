@@ -4,6 +4,10 @@ Actualizado: 2026-11-27. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Pregunta pendiente (JL-389)
+
+- `data/zones.json` declara `scaling.flatPerLevel.armor: 0.15`, pero `parseZones()` acepta y descarta esa clave. La prueba compara el enemigo de nivel 10 con `armor` 0,15 y 100,15: sus estadísticas no cambian. ¿Quitamos la clave heredada o quieres que tenga efecto en los enemigos? No se modificó el juego ni se decidió una regla de armadura. Evidencia: `tests/zones.test.ts` y `work/junie-jl389/RESULTADO.md`.
+
 ## Respuestas del 2026-11-24
 
 | ID | Palabras del creador | Lo que entendí | Tarea |

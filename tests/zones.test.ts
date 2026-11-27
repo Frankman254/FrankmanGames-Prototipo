@@ -156,6 +156,35 @@ describe('zonas: escalado por nivel', () => {
         expect(xp).toEqual({ type: 'xp', amount: rewardXp(scaled, 1, 10, data.rpg.progression.rewardProximity) });
     });
 
+    it('flatPerLevel.armor no cambia las estadísticas de un enemigo escalado', () => {
+        const enemyAtArmor = (armor: number) => {
+            const game = loadGameData();
+            const zonesRaw = raw();
+            zonesRaw.scaling.flatPerLevel['armor'] = armor;
+            game.zones = parseZones(zonesRaw, game.enemies.archetypes);
+            const world = new World(game, { encounter: false });
+            const enemy = world.spawnEnemy('melee', { x: 70, y: 70 }, 10);
+            const actor = world.enemyActor(enemy);
+            return {
+                flatPerLevel: game.zones.scaling.flatPerLevel,
+                definition: enemy.def,
+                stats: actor.stats.lines(),
+                health: actor.health,
+                xp: actor.xp,
+                goldScale: actor.goldScale,
+                extraLootRolls: actor.extraLootRolls,
+            };
+        };
+
+        const currentArmor = raw().scaling.flatPerLevel['armor']!;
+        const current = enemyAtArmor(currentArmor);
+        const muchMoreArmor = enemyAtArmor(currentArmor + 100);
+
+        expect(currentArmor).toBe(0.15);
+        expect(current.flatPerLevel).not.toHaveProperty('armor');
+        expect(muchMoreArmor).toEqual(current);
+    });
+
     it('el esbirro conserva la diferencia de nivel con su invocador', () => {
         const w = arena();
         const sh = w.spawnEnemy('summoner', { x: 16, y: 30 }, 13);
