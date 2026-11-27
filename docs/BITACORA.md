@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-398: verificar doble lanzamiento de hechizos libres (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl398/electron/`.
+
+**Qué se hizo:** Añadí el escenario Electron `hechizosLibres`. Con la Tejedora se lanzan `frost_nova` (normal) y `storm_focus` (libre de GCD) mediante pulsaciones `Q`/`W`; el escenario registra los eventos al insertarse en la cola y vuelve a observarla tras cada drenado de `World.drainEvents()`. Comprueba el GCD activo, que la barra no pinta su barrido sobre el hueco libre antes del segundo lanzamiento y que después muestra el enfriamiento personal de `storm_focus`. No cambia reglas, datos ni código productivo.
+
+**Validación:** Electron 7/7, dos eventos `cast` en orden separados por 43,7 ms, sin bloqueos ni errores de consola; `node --check scripts/qaElectron.mjs`; `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` (218 rutas) limpios.
+
+**Evidencia:** `work/junie-jl398/electron/resultado.json`, `jl398-observacion.json`, `jl398-antes-de-lanzar.jpg` y `jl398-dos-lanzamientos.jpg` (revisadas).
+
+---
+
 ## 2026-11-27 — JL-397: medir doble lanzamiento del bot (Junie)
 
 **Archivos:** `tests/balance/bot.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl397/`.

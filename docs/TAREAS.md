@@ -515,6 +515,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|---|
 | JL-397 | Junie | Hecho (commit «JL-397: medir doble lanzamiento del bot») | Prueba de caracterización `tests/balance/bot.test.ts` (8/8): con `spark` y `storm_focus` listos el bot solo lanza `storm_focus`. En 180 pares fieles hubo 52 acciones complementarias; delta medio variante−bot de −0,89 daño PJ, con 8 pares positivos (+65 total, máximo +19) y sin cambios de victorias. Sin modificación productiva. | `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Evidencia: `work/junie-jl397/MEDICION.md` y `runs.json`. |
 
+## Cierre de JL-398 (2026-11-27)
+
+| ID | Agente | Estado | Qué se hizo | Validación y evidencia |
+|---|---|---|---|---|
+| JL-398 | Junie | Hecho (commit «JL-398: verificar doble lanzamiento de hechizos libres») | Escenario Electron `hechizosLibres`: la Tejedora lanza `frost_nova` y `storm_focus` con pulsaciones `Q` y `W`. Ambos eventos `cast` se emiten en 43,7 ms; con el GCD activo, el hueco libre no muestra barrido antes de su propio lanzamiento. No cambia reglas, datos ni código productivo. | Electron 7/7, consola limpia; `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` (218 rutas) limpios. Evidencia: `work/junie-jl398/electron/resultado.json`, `jl398-observacion.json`, `jl398-antes-de-lanzar.jpg` y `jl398-dos-lanzamientos.jpg`. |
+
 ## Bloqueadas
 
 - JL-391 (2026-11-27): bloqueada porque la única autorización en lote para Junie del tablero cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe una medición ampliada, no una autorización para cambiar `auditBuilds.ts`. No se modificaron código ni pruebas.

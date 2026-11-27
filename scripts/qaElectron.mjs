@@ -11558,6 +11558,145 @@ const scenarios = {
         await resize(1280, 800);
     },
 
+    /** JL-398: dos pulsaciones seguidas de la Tejedora; el GCD del normal no debe barrer el libre. */
+    async hechizosLibres() {
+        await newGame('QA Hechizos Libres', { classId: 'storm_weaver' });
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la Tejedora');
+
+        await js(`(() => {
+            const c=${S}.character;
+            c.gainXp(5000000);
+            for (const id of ['frost_nova','storm_focus']) if (c.spellbook.rank(id)===0) c.spellbook.learn(id);
+            c.spellbook.hotbar.fill(null);
+            c.spellbook.hotbar[0]='frost_nova';
+            c.spellbook.hotbar[1]='storm_focus';
+            c.resource=c.maxResource;
+            ${W}.player.cooldowns={};
+            ${W}.player.gcd=0;
+            ${W}.player.gcdTotal=0;
+        })()`);
+        await sleep(400);
+
+        const setup = await js(`(() => ({
+            classId:${S}.character.classDef.id,
+            spells:${S}.character.spellbook.hotbar.slice(0,2),
+            ranks:['frost_nova','storm_focus'].map(id=>${S}.character.spellbook.rank(id)),
+        }))()`);
+        check(
+            'hechizosLibres: Tejedora y hechizos preparados',
+            setup.classId === 'storm_weaver' && setup.spells.join(',') === 'frost_nova,storm_focus' && setup.ranks.every((rank) => rank > 0),
+            JSON.stringify(setup),
+        );
+
+        const firstSlot = await js(`(() => {
+            const el=document.querySelectorAll('.hud-slot-rows .hot-slot')[0];
+            if(!el) return null;
+            const r=el.getBoundingClientRect();
+            return {x:r.x+r.width/2,y:r.y+r.height/2};
+        })()`);
+        if (!firstSlot) throw new Error('No está visible el primer hueco de la barra');
+        await mouse(firstSlot.x, firstSlot.y, { button: 'right' });
+        await until(`!!document.querySelector('.hot-slot-cast-mode-menu [data-mode="press"]')`, 5000, 'modo de pulsación del hueco normal');
+        await click('.hot-slot-cast-mode-menu [data-mode="press"]');
+
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl398';
+        fs.mkdirSync(outDir, { recursive: true });
+        await shot('jl398-antes-de-lanzar');
+
+        const observerInstalled = await js(`(() => {
+            const world=${W};
+            const observer={events:[],queue:null};
+            const patchQueue=()=>{
+                if(observer.queue===world.events) return;
+                observer.queue=world.events;
+                const push=observer.queue.push;
+                observer.queue.push=function(...events){
+                    for(const event of events) if(event.type==='cast'||event.type==='castBlocked')
+                        observer.events.push({type:event.type,ability:event.ability,reason:event.reason??null,at:performance.now()});
+                    return push.apply(this,events);
+                };
+            };
+            patchQueue();
+            const drain=world.drainEvents.bind(world);
+            world.drainEvents=function(){const events=drain();patchQueue();return events;};
+            window.__jl398=observer;
+            return true;
+        })()`);
+        if (!observerInstalled) throw new Error('No se pudo instalar el observador de eventos cast');
+
+        const tapHotbar = async (code) => {
+            const keyName = code.slice(3).toLowerCase();
+            const base = { code, key: keyName, windowsVirtualKeyCode: keyName.toUpperCase().charCodeAt(0) };
+            await cdp('Input.dispatchKeyEvent', { ...base, type: 'rawKeyDown' });
+            await cdp('Input.dispatchKeyEvent', { ...base, type: 'keyUp' });
+        };
+        const hudState = `(() => {
+            const world=${W}, dom=[...document.querySelectorAll('.hud-slot-rows .hot-slot')].slice(0,2);
+            return {
+                events:window.__jl398.events,
+                gcd:world.player.gcd,
+                gcdTotal:world.player.gcdTotal,
+                freeCooldown:world.spell('storm_focus').cooldown,
+                states:world.hotbarState().slice(0,2),
+                dom:dom.map(slot=>({sweep:slot.querySelector('.sweep')?.style.background??null,time:slot.querySelector('.time')?.textContent??null})),
+            };
+        })()`;
+
+        await tapHotbar('KeyQ');
+        const afterNormal = await js(`new Promise(resolve=>requestAnimationFrame(()=>resolve(${hudState})))`);
+        const normalCasts = afterNormal.events.filter((event) => event.type === 'cast' && event.ability === 'frost_nova');
+        const freeBefore = afterNormal.states[1];
+        const freeDomBefore = afterNormal.dom[1];
+        const freeClearDuringGcd =
+            afterNormal.gcd > 0 &&
+            freeBefore?.spellId === 'storm_focus' &&
+            freeBefore.cooldownRemaining === 0 &&
+            freeDomBefore?.sweep === '' &&
+            freeDomBefore?.time === '';
+        check(
+            'hechizosLibres: el GCD del normal no pinta barrido sobre el libre',
+            normalCasts.length === 1 && freeClearDuringGcd,
+            JSON.stringify({ normalCasts, gcd: afterNormal.gcd, free: freeBefore, dom: freeDomBefore }),
+        );
+
+        await tapHotbar('KeyW');
+        const afterBoth = await js(`new Promise(resolve=>requestAnimationFrame(()=>resolve(${hudState})))`);
+        const casts = afterBoth.events.filter((event) => event.type === 'cast' && ['frost_nova','storm_focus'].includes(event.ability));
+        const blocked = afterBoth.events.filter((event) => event.type === 'castBlocked' && ['frost_nova','storm_focus'].includes(event.ability));
+        const elapsedMs = casts.length === 2 ? casts[1].at - casts[0].at : null;
+        check(
+            'hechizosLibres: dos eventos cast en orden y sin bloqueos',
+            casts.length === 2 && casts[0].ability === 'frost_nova' && casts[1].ability === 'storm_focus' && blocked.length === 0,
+            JSON.stringify({ casts, blocked }),
+        );
+        check(
+            'hechizosLibres: ambos cast en menos de 100 ms',
+            elapsedMs !== null && elapsedMs >= 0 && elapsedMs < 100,
+            elapsedMs === null ? 'faltan eventos cast' : `${elapsedMs.toFixed(2)} ms`,
+        );
+        const freeAfter = afterBoth.states[1];
+        check(
+            'hechizosLibres: el libre conserva su enfriamiento propio con el GCD activo',
+            afterBoth.gcd > 0 &&
+                freeAfter?.spellId === 'storm_focus' &&
+                Math.abs(freeAfter.cooldownTotal - afterBoth.freeCooldown) < 1e-6 &&
+                freeAfter.cooldownRemaining > afterBoth.gcd &&
+                !!afterBoth.dom[1]?.sweep,
+            JSON.stringify({ gcd: afterBoth.gcd, freeCooldown: afterBoth.freeCooldown, free: freeAfter, dom: afterBoth.dom[1] }),
+        );
+        await shot('jl398-dos-lanzamientos');
+        fs.writeFileSync(
+            path.join(outDir, 'jl398-observacion.json'),
+            JSON.stringify({ classId: setup.classId, spells: setup.spells, afterNormal, afterBoth, elapsedMs }, null, 2),
+        );
+        check(
+            'hechizosLibres: sin errores nuevos de consola',
+            consoleErrors.length === 0,
+            consoleErrors.slice(0, 5).join(' | ') || '0',
+        );
+    },
+
     /** JL-178: captura de cada emote y cada hechizo de las 3 clases, para comparar antes y después de OMP-PJ-02.
      * Lanza cada Emote_* y cada hechizo, captura el fotograma central. Evidencia en work/junie-jl178/ANTES/. */
     async jl178_emotes() {
