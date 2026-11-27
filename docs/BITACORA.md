@@ -1,3 +1,13 @@
+## 2026-11-27 — JL-392: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No ejecuté la batería fiel ni generé `work/junie-jl392/COMPARADA.md`: la fila `BAL-P0-FIEL` no autoriza JL-384…JL-423 y el tablero solo autoriza en lote JL-354…JL-383. Marqué JL-392 bloqueada; como JL-391 quedó bloqueada justo antes por la misma causa, detuve la cola y anoté una sola solicitud de autorización en `docs/ACCIONES_CREADOR.md`. No se tocaron código, pruebas ni cifras.
+
+**Validación:** `npx tsc --noEmit` limpio; `npx vitest run`: 434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check`: 218 rutas, todas existen. No aplica Electron: no hubo cambio visual.
+
+---
+
 ## 2026-11-27 — JL-391: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

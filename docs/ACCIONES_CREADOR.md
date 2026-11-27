@@ -4,6 +4,10 @@ Actualizado: 2026-11-27. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Autorización pendiente (JL-391 y JL-392)
+
+En `docs/TAREAS.md`, la única autorización en lote para Junie cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe la batería ampliada, pero no autoriza la ejecución de sus tareas. JL-391 y JL-392 quedan bloqueadas por el mismo motivo y se detiene la cola. ¿Autorizas la tanda JL-384…JL-423 en `TAREAS.md`?
+
 ## Pregunta pendiente (JL-390)
 
 `data/rpg/spoils.json` marca `minXpShare: 0.25` como `PROPUESTA`. `distribute()` aplica ese mínimo individualmente: con un monstruo que aporta 100 XP y cinco jugadores con el mismo aporte (20 de daño y 10 s cada uno), cada uno tiene `share` 0,20 y recibe 25 XP. La suma del grupo queda en 125 XP:
