@@ -1,3 +1,20 @@
+## 2026-11-26 — MOD-09: equipo.glb cubre todos los equipables visibles; AUD-SFX-02 propuesto (Claude)
+
+**Archivos:** `assets/models/equipo.glb`, `scripts/blender/equipo.py`, `scripts/blender/validar_equipo.py`, `PROCEDENCIA.md`, `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- **MOD-09.** Se regeneró `equipo.glb` con `equipo.py`, `equipo_espeja.py` y `equipo_diablica.py`. Pasa de 89 a 394 mallas `obj_<itemId>` más 8 grupos por hueso de la Espeja, y ningún nodo anterior se pierde. Las capas sin diseño propio toman la tela del tema del objeto.
+- **Validador.** `validar_equipo.py` ahora entiende los grupos por hueso: el GLB anterior no pasaba el validador, y el nuevo sí. `data/art/ajusteEquipo.json` se dejó tal cual, con el ajuste de POL-08.
+- **AUD-SFX-02.** Propuesta de 15 SFX sintetizados desde cero: viaje por elemento, cripta y aves. Están catalogados en `work/musica-generada/` y no se integran hasta que el creador elija.
+
+**Límite:** es cobertura, no diseño. Muchas piezas repiten la silueta de su tipo, y la mayoría de tocados salen como sombrero de palma. Faltan las capturas puestas en Electron. El GLB pasa de 3,0 a 6,4 MB.
+
+**Validación:** `npm test` (430 archivos, 5.083 aprobadas), `npm run typecheck`, `npx vite build` y `checkPublishable` limpios.
+
+**Evidencia:** `work/claude-mod09/` (láminas `lamina_weapon.png`, `lamina_head.png`, `lamina_back.png`, logs, GLB anterior) y `work/claude-aud-sfx-02/` (`FICHA.md`, `salida/lamina.mp3`).
+
+---
+
 ## 2026-11-26 — BAL-P0-FIEL: batería de combate fiel y cola de Junie con reserva (Claude)
 
 **Archivos:** `scripts/balance/fiel.ts`, `scripts/balance/fielRun.ts`, `package.json` (`balance:fiel`), `scripts/balance/gear.ts`, cabeceras de `balM3.ts`, `auditCombat.ts` y `auditBuilds.ts`, `tests/balance/spendPoints.test.ts`, `scripts/mac/junie_continuo.sh`, `docs/TAREAS.md`, `docs/ARQUITECTURA.md`.

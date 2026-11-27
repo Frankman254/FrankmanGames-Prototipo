@@ -17,9 +17,18 @@ expected = {
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=os.path.join(ROOT, 'assets', 'models', 'equipo.glb'))
-objects = {obj.name: obj for obj in bpy.context.scene.objects if obj.type == 'MESH'}
-actual = set(objects)
-missing, extra = sorted(expected - actual), sorted(actual - expected)
+objects = {obj.name: obj for obj in bpy.context.scene.objects if obj.type == 'MESH' and obj.name in expected}
+# EQ-10: el ajuar de La Espeja es un nodo vacío `obj_<id>` con mallas hijas por hueso
+# (`obj_<id>@<hueso>`, `obj_<id>_malla`); cuenta como presente y sus hijas no sobran.
+groups = {
+    obj.name
+    for obj in bpy.context.scene.objects
+    if obj.type == 'EMPTY' and obj.name.removeprefix('obj_') in items and any(c.type == 'MESH' for c in obj.children_recursive)
+}
+grouped = {c.name for g in groups for c in bpy.data.objects[g].children_recursive}
+actual = set(objects) | (groups & expected)
+loose = {obj.name for obj in bpy.context.scene.objects if obj.type == 'MESH' and obj.name not in expected and obj.name not in grouped}
+missing, extra = sorted(expected - actual), sorted(loose)
 assert not missing, f'nodos ausentes: {missing}'
 assert not extra, f'nodos sobrantes: {extra}'
 
@@ -40,4 +49,4 @@ for name, obj in objects.items():
     elif item.get('slot') == 'back':
         assert hi[2] < 0.15 and lo[2] > -1.20, f'{name}: fuera del anclaje de capa {lo}..{hi}'
 
-print(f'equipo.glb válido: {len(objects)} nodos, IDs exactos, origen común y escala real')
+print(f'equipo.glb válido: {len(objects)} nodos y {len(groups)} grupos por hueso, IDs exactos, origen común y escala real')

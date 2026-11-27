@@ -530,7 +530,8 @@ def cape(builder, item_id):
     if item_id == 'palm_cape':
         palm_cape(builder)
         return
-    material = {'straw_cape': PALM, 'baru_cloud_cape': FROST, 'darien_cape': LEAF}[item_id]
+    # Capas sin diseño propio: la tela sale del tema del objeto (MOD-09, 2026-11-26).
+    material = {'straw_cape': PALM, 'baru_cloud_cape': FROST, 'darien_cape': LEAF}.get(item_id) or theme(item_id, ITEMS[item_id])[0]
     top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.38, 0.15, -0.78), (0, 0.18, -0.92), (-0.38, 0.15, -0.78)]
     back = [(x, y + 0.035, z) for x, y, z in top]
     builder.poly(top, back, material)
