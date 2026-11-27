@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-367: comprobar que los lóbulos caben en la sala (Junie)
+
+**Archivos:** `tests/jl367_lobesWithinRoom.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí una prueba pura que genera los 100 pisos y, para cada estanque con lóbulos, localiza la sala que contiene su centro y verifica que tanto el círculo principal como todos sus lóbulos quedan dentro del rectángulo de la sala retraído una baldosa por lado. La geometría actual cumple; no se modificó código productivo.
+
+**Validación:** Prueba dirigida: 1/1; `npm test`: 428 archivos, 5.079 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en tres proyectos; Prettier y `npm run docs:check` limpios. No aplica Electron: es una prueba geométrica pura y no cambia presentación.
+
+**Evidencia:** `work/junie-jl367/RESULTADO.md`.
+
+---
+
 ## 2026-11-26 — JL-366: compatibilidad de estanques circulares (Junie)
 
 **Archivos:** `tests/jl366_roundPonds.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
