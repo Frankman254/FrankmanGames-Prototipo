@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-411: listar alcances de hechizos a distancia (Junie)
+
+**Archivos:** `tests/jl411_distanceSpellRange.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl411/RESULTADO.md`.
+
+**Qué se hizo:** La prueba recorre los 72 enemigos RPG y los 14 arquetipos cuyo rol raíz `_rol` indica «A distancia» o hereda de él. Encuentra cinco hechizos con alcance inferior al ataque básico: cuatro de `trapper` y `Rebote de cascabel` de `espejo_cascabelero`. Se listan las diferencias en el informe; no se cambiaron datos ni cifras.
+
+**Validación:** `tests/jl411_distanceSpellRange.test.ts`: 1/1; `npm test`: 439 archivos, 5.115 pruebas aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier específico limpios. No aplica Electron: auditoría de datos sin cambio visual.
+
+**Evidencia:** `work/junie-jl411/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-410: comprobar que hechizos libres no canalizan (Junie)
 
 **Archivos:** `tests/hechizosLibres.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl410/RESULTADO.md`.

@@ -1732,7 +1732,7 @@ Contexto del coordinador:
 ### E. Datos (solo validar)
 - [x] JL-409 Prueba: cada `item.level` de los objetos de botín cae dentro de ±5 del nivel base del enemigo que lo suelta. Lista las excepciones; no las cambies. — commit «JL-409: probar niveles de objetos de botín» — `tests/jl409_lootItemLevels.test.ts` 1/1; 471 excepciones enumeradas en `work/junie-jl409/RESULTADO.md`.
 - [x] JL-410 Prueba: cada hechizo con `offGlobalCooldown` tiene `castTime` 0 y no es de canalización. Ya hay una parte en `hechizosLibres.test.ts`; amplía a la canalización si existe el campo. — commit «JL-410: comprobar que hechizos libres no canalizan» — `tests/hechizosLibres.test.ts` 7/7; suite 438 archivos, 5.114 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier limpios. Evidencia: `work/junie-jl410/RESULTADO.md`.
-- [ ] JL-411 Prueba: ningún enemigo de `data/rpg/enemies.json` tiene un hechizo con alcance menor que su ataque básico y papel `distancia`. Solo listar.
+- [x] JL-411 Prueba: ningún enemigo de `data/rpg/enemies.json` tiene un hechizo con alcance menor que su ataque básico y papel `distancia`. Solo listar. — commit «JL-411: listar alcances de hechizos a distancia» — test dirigido 1/1; suite 439 archivos, 5.115 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y Prettier limpios. Cinco pares hallados en `work/junie-jl411/RESULTADO.md`; sin cambios en datos.
 - [ ] JL-412 Prueba: todas las tiendas venden algo que un personaje de su franja puede usar (nivel ≤ techo de la franja). Lista las tiendas vacías para la franja.
 
 ### F. Reintentos y cierre

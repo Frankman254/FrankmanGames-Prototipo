@@ -595,6 +595,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-410 | Junie | Hecho (commit «JL-410: comprobar que hechizos libres no canalizan») | `tests/hechizosLibres.test.ts`: 7/7; para cada hechizo `offGlobalCooldown`, exige `castTime` cero y rechaza cualquier propiedad activa con nombre de canalización. `SpellDef` y los datos no tienen actualmente ese campo. `npm test`: 438 archivos, 5.114 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (220 rutas) y Prettier específico limpios. Evidencia: `work/junie-jl410/RESULTADO.md`. No aplica Electron: sin cambio visual. |
 
+## Cierre de JL-411 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-411 | Junie | Hecho (commit «JL-411: listar alcances de hechizos a distancia») | `tests/jl411_distanceSpellRange.test.ts`: 1/1; de 14 arquetipos del rol a distancia, lista cinco hechizos con alcance menor que el básico: cuatro de `trapper` y uno de `espejo_cascabelero`. No se modificaron datos ni cifras. `npm test`: 439 archivos, 5.115 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier específico limpios. Evidencia: `work/junie-jl411/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
