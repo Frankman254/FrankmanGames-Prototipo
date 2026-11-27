@@ -1,3 +1,13 @@
+## 2026-11-27 — JL-391: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** No modifiqué `scripts/balance/auditBuilds.ts` ni añadí pruebas. El tablero solo autoriza en lote JL-354…JL-383; la tanda JL-384…JL-423 no figura autorizada, y `BAL-P0-FIEL` documenta una medición ampliada sin autorizar esos cambios. Dejé JL-391 bloqueada hasta que conste la autorización en `docs/TAREAS.md`.
+
+**Validación:** `npm run docs:check` pasó (218 rutas); `npm run typecheck` y `npm test` pasaron (434 archivos; 5.099 aprobadas, 1 omitida y 1 `todo`). La línea base `npx tsc --noEmit` también terminó limpia. No aplica Electron: no hubo cambio visual ni de código.
+
+---
+
 ## 2026-11-27 — JL-390: comprobar exceso de XP mínima en grupos (Junie)
 
 **Archivos:** `tests/rpg/energySpoils.test.ts`, `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

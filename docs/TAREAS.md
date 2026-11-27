@@ -493,6 +493,7 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 
 ## Bloqueadas
 
+- JL-391 (2026-11-27): bloqueada porque la única autorización en lote para Junie del tablero cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe una medición ampliada, no una autorización para cambiar `auditBuilds.ts`. No se modificaron código ni pruebas.
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
 - D-44, solo si hay choques reales entre agentes.
 - JL-300: bloqueada; 64 archivos en `assets/audio/` no tienen referencia de ejecución (63 WAV y `cripta_descenso.ogg`). Varias mezclas/stems son fuentes registradas en `PROCEDENCIA.md`; hace falta decisión del creador para conservarlas o retirarlas. Evidencia: `work/junie-jl300/INFORME.md` y el inventario con las líneas de procedencia en `work/junie-jl376/AUDIOS_SIN_USO.md`; la decisión sigue pendiente.
