@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-414: verificar consola limpia en escenarios nuevos (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia Electron en `work/junie-jl414/`.
+
+**Qué se hizo:** Verifiqué los resultados de `hechizosLibres`, `jl399FichaHechizoLibre`, `jl403Heroes`, `jl404EquipoPropio`, `jl406TextosResponsive`, `jl407AccesibilidadTeclado` y `jl408TooltipConjunto`: 102/102 comprobaciones aprobadas y cero errores de consola en los siete JSON. Revisé una captura representativa de cada escenario; el manifiesto registra 36 capturas de héroes y el de equipo 394, con los archivos presentes. No cambié código, pruebas, datos ni comportamiento del juego.
+
+**Validación:** `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios; `npm run docs:check`: 220 rutas, todas existen.
+
+**Evidencia:** Los siete `resultado.json`, `work/junie-jl414/jl403Heroes/capturas.json`, `work/junie-jl414/jl404EquipoPropio/jl404-capturas.json` y capturas revisadas en los directorios de cada escenario.
+
+---
+
 ## 2026-11-27 — JL-413: verificar bloqueos de la tanda (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl413/RESULTADO.md`.

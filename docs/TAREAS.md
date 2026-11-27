@@ -613,6 +613,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-413 | Junie | Hecho (commit «JL-413: verificar bloqueos de la tanda») | Auditoría de las casillas JL-368…JL-412 en la cola: cero tareas marcadas `[!]`, así que no había reintentos elegibles. No se modificaron código, pruebas ni tareas previas. `npx tsc --noEmit` limpio; `npx vitest run`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`. Informe en `work/junie-jl413/RESULTADO.md`. No aplica Electron: sin cambio visual. |
 
+## Cierre de JL-414 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-414 | Junie | Hecho (commit «JL-414: verificar consola limpia en escenarios nuevos») | Verificados los escenarios Electron `hechizosLibres`, `jl399FichaHechizoLibre`, `jl403Heroes`, `jl404EquipoPropio`, `jl406TextosResponsive`, `jl407AccesibilidadTeclado` y `jl408TooltipConjunto`: 102/102 comprobaciones y `consoleErrors: []` en los siete resultados. Revisé capturas representativas; los manifiestos incluyen 36 imágenes de héroes y 394 de equipo. `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios. `npm run docs:check`: 220 rutas, todas existen. Evidencia en `work/junie-jl414/`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
