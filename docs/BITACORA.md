@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-366: compatibilidad de estanques circulares (Junie)
+
+**Archivos:** `tests/jl366_roundPonds.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí una prueba con los datos reales de `meadow_pond` y `poza_iguanera`, que no tienen lóbulos. Para ambos confirma un círculo en `waterCircles`, la fórmula histórica de `waterDistance` en interior/orilla/exterior, la selección por `spotAt` y que `FishingManager` conserva los 72 puntos de aproximación en el mismo orden que antes de los lóbulos. No cambia código productivo.
+
+**Validación:** `npx vitest run tests/jl366_roundPonds.test.ts`: 2/2; `npm test`: 427 archivos, 5.078 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y Prettier limpios. No aplica Electron: la prueba cubre lógica pura y no cambia presentación.
+
+**Evidencia:** `tests/jl366_roundPonds.test.ts`.
+
+---
+
 ## 2026-11-26 — JL-365: validar regreso de cripta solo en PNJ de cripta (Junie)
 
 **Archivos:** `src/rpg/content.ts`, `tests/rpg/content.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
