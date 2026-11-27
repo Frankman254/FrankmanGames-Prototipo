@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-402: comprobar las pistas propias de los pueblos (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia de Electron en `work/junie-jl402/electron/`.
+
+**Qué se hizo:** Comprobé en el mezclador de Electron las cinco canciones propias: Chitrí (`chitri.ogg`), Muelle de Iguanera (`iguanera_muelle.ogg`), Pedasol (`pedasol.ogg`), Punta Venada (`punta_venada.ogg`) y Cambutal (`cambutal.ogg`). En los cinco casos coinciden la zona, `activeTrack`, la fuente activa y la URL real solicitada; el búfer está cargado, en bucle y con ganancia >0,99. No hay pueblos con pista repetida ni con su pista propia ausente; Villa Raspadura conserva el tema común `fiesta_en_el_atrio.ogg`.
+
+**Validación:** Electron manual: 5/5 pueblos, consola de depuración limpia; escenario `musicaContextos`: 18/18, cero errores de consola. `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; `npm run docs:check`: 218 rutas, todas existen.
+
+**Evidencia:** `work/junie-jl402/electron/RESULTADO.md`, `resultado.json` y cinco capturas de pueblo revisadas; `jl200-musicaContextos.jpg` y `resultado.json` del escenario general.
+
+---
+
 ## 2026-11-27 — JL-401: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
