@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-395: medir las pruebas más lentas de Vitest (Junie)
+
+**Archivos:** `work/junie-jl395/LENTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Medí y ordené las diez pruebas individuales más lentas de la suite. La más lenta tarda 18.181 ms (`tests/pagedMemory.test.ts`); propuse reducir búsquedas geográficas repetidas al generar páginas, conservando el mismo recorrido y aserciones, sin aplicar cambios de código ni de prueba.
+
+**Validación:** `npx vitest run --reporter=verbose`: 434 archivos aprobados, 1 omitido; 5.099 pruebas aprobadas, 1 `todo`; duración total 68,58 s. `npm test`: mismos resultados en 68,72 s; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios. No aplica Electron: no hay cambio visual.
+
+**Evidencia:** `work/junie-jl395/LENTAS.md`; salida completa en `work/junie-jl395/vitest.log`.
+
+---
+
 ## 2026-11-27 — JL-394: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

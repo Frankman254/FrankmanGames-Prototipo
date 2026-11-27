@@ -497,6 +497,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-393 | J | Hecho (commit «JL-393: listar extremos de la batería fiel») | Lista de las 10 filas `preparado` que cumplen cero victorias o TTK mediano <3 s. DPS mediano calculado por corrida desde el daño registrado del PJ y su mascota; no se cambiaron cifras ni datos. | Batería de origen: 2.880 corridas en `work/claude-bal-fiel/FIEL/runs.json`; lista y cálculos en `work/junie-jl393/EXTREMOS.md`. `npx tsc --noEmit`, `npx vitest run` y `npm run docs:check` limpios. No aplica Electron: solo lista, sin cambio visual. |
 
+## Cierre de JL-395 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-395 | J | Hecho (commit «JL-395: medir las diez pruebas más lentas de Vitest») | Lista las 10 pruebas individuales más lentas medidas con `npx vitest run --reporter=verbose`; propone optimizar el muestreo de páginas sin cambiar el recorrido ni sus aserciones, sin aplicar cambios. | `work/junie-jl395/LENTAS.md`; `npx vitest run --reporter=verbose`: 434 archivos aprobados, 1 omitido; 5.099 pruebas aprobadas, 1 `todo`, 68,58 s. `npm test`: mismos resultados, 68,72 s; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios. No aplica Electron: solo medición y documentación. |
+
 ## Bloqueadas
 
 - JL-391 (2026-11-27): bloqueada porque la única autorización en lote para Junie del tablero cubre JL-354…JL-383. La tanda JL-384…JL-423 no consta autorizada; `BAL-P0-FIEL` describe una medición ampliada, no una autorización para cambiar `auditBuilds.ts`. No se modificaron código ni pruebas.

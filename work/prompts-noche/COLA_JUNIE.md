@@ -1710,7 +1710,7 @@ Contexto del coordinador:
 - [!] JL-394 `npm run typecheck` pasa salvo `balM3.ts` (conocido). Comprueba si `fiel.ts`, `fielRun.ts` y `gear.ts` están limpios; arregla los tipos de esos tres si no. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada, y `BAL-P0-FIEL` no autoriza esta tarea.
 
 ### B. Pruebas y robustez
-- [ ] JL-395 Las 10 pruebas más lentas de la suite (`npx vitest run --reporter=verbose`, con su tiempo) en `work/junie-jl395/LENTAS.md`. Propón cómo acelerar la más lenta sin cambiar lo que prueba; no lo apliques.
+- [x] JL-395 Las 10 pruebas más lentas de la suite (`npx vitest run --reporter=verbose`, con su tiempo) en `work/junie-jl395/LENTAS.md`. Propón cómo acelerar la más lenta sin cambiar lo que prueba; no lo apliques. — commit «JL-395: medir las diez pruebas más lentas de Vitest» — `work/junie-jl395/LENTAS.md`; Vitest 434 archivos aprobados, 1 omitido; 5.099 pruebas aprobadas, 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios.
 - [ ] JL-396 Prueba: guardar y cargar con un hechizo libre de GCD en la barra (`offGlobalCooldown`, `tests/hechizosLibres.test.ts`) conserva la barra y el enfriamiento propio.
 - [ ] JL-397 Prueba: el bot de `scripts/balance/bot.ts` lanza un hechizo libre en el mismo tick que uno normal cuando los dos están listos. Si no lo hace, mide en `work/junie-jl397/` cuánto daño pierde en `fiel.ts` con `melee` y `alpha_wolf`. Solo medir.
 - [ ] JL-398 Escenario Electron `hechizosLibres`: con la Tejedora, un hechizo normal y uno libre con dos pulsaciones seguidas. Los dos eventos `cast` salen en menos de 100 ms y la barra no pinta el barrido del GCD sobre el libre. Capturas en `work/junie-jl398/`.
