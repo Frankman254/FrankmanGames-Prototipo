@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-385: añadir perfil razonable a fiel.ts (Junie)
+
+**Archivos:** `scripts/balance/fiel.ts`, `tests/balance/fiel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí `razonable`, que gasta los puntos de nivel y equipa objetos equipables de nivel ≤ personaje con fuente de botín en la zona (solo enemigos de nivel igual o menor) o en existencias de tiendas ordinarias; se excluyen vendedores `devOnly` y de cripta. El informe enumera los arquetipos/tablas por franja y las tiendas `apothecary`/`smith`. Añadí prueba para excluir objetos sin fuente. No cambié cifras productivas.
+
+**Validación:** Prueba dirigida: 3/3. Batería completa: 432 filas, 4.320 corridas (1.440 por perfil), cero métricas no finitas; `razonable` obtuvo 1.293 victorias, 141 derrotas y 6 límites agotados. `npm test`: 432 suites, 5.090 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio.
+
+**Evidencia:** `work/junie-jl385/FIEL.md` y `work/junie-jl385/runs.json`.
+
+---
+
 ## 2026-11-27 — JL-384: añadir prueba de humo para fiel.ts (Junie)
 
 **Archivos:** `tests/balance/fiel.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

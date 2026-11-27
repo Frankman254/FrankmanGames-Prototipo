@@ -10,12 +10,16 @@
 //
 // Perfiles del personaje:
 // - `sin_puntos`: el nivel y los hechizos de clase, sin gastar puntos ni equipo. Solo diagnóstico.
-// - `preparado`: puntos gastados (`spendPoints`) y lo mejor de CADA objeto de nivel ≤ N, sin mirar
-//   si se puede conseguir. Es un techo, no el equipo «razonable»: ese perfil falta (ver TAREAS).
+// - `preparado`: puntos gastados y lo mejor de CADA objeto de nivel ≤ N, sin mirar si se puede
+//   conseguir. Es un techo, no el equipo «razonable».
+// - `razonable`: puntos gastados y equipo de nivel ≤ N con fuente en el botín de la franja o en una
+//   tienda normal del pueblo; no incluye los vendedores de pruebas ni de la cripta.
 //
 //   npm run balance:fiel -- [--seeds 10] [--skill medio] [--limit 120] [--out work/balance/FIEL]
 import { mkdirSync, writeFileSync } from 'node:fs';
 import type { GameData } from '../../src/data';
+import type { ItemDef } from '../../src/rpg/contracts';
+import { slotsFor } from '../../src/rpg/items';
 import { xpToNext } from '../../src/rpg/progression';
 import { GameSession } from '../../src/rpg/session';
 import { Character } from '../../src/rpg/character';
@@ -23,7 +27,7 @@ import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
 import { PlayerBot } from './bot';
 import { buildData, FIELD_CENTER, openField, rawData } from './data';
-import { summonPet } from './gear';
+import { equipUpgrades, spendPoints, summonPet } from './gear';
 import { Recorder } from './metrics';
 import { DT, makeSessionAt, placeGroup, SKILLS, type SkillId } from './scenarios';
 
@@ -34,19 +38,59 @@ interface Foe {
 }
 /** Un arquetipo por papel en cada franja; el jugador va siempre al nivel base del enemigo. */
 export const BANDS: Foe[][] = [
-    [{ id: 'melee', role: 'normal' }, { id: 'ranged', role: 'distancia' }, { id: 'alpha_wolf', role: 'bruto' }],
-    [{ id: 'chame_crab', role: 'normal' }, { id: 'chame_heron', role: 'distancia' }, { id: 'chame_grandcrab', role: 'bruto' }],
-    [{ id: 'boquete_quetzal', role: 'distancia' }, { id: 'boquete_picker', role: 'bruto' }, { id: 'boquete_foreman', role: 'bruto' }],
-    [{ id: 'cerropunta_peccary', role: 'normal' }, { id: 'cerropunta_farmer', role: 'distancia' }, { id: 'cerropunta_boar', role: 'bruto' }],
-    [{ id: 'baru_jaguar', role: 'normal' }, { id: 'baru_lookout', role: 'distancia' }, { id: 'baru_elder', role: 'bruto' }],
-    [{ id: 'darien_neque', role: 'normal' }, { id: 'darien_blowgun', role: 'distancia' }, { id: 'darien_harpy', role: 'bruto' }],
-    [{ id: 'bocas_frog', role: 'normal' }, { id: 'bocas_pirate', role: 'distancia' }, { id: 'bocas_captain', role: 'bruto' }],
-    [{ id: 'perlas_oyster', role: 'normal' }, { id: 'perlas_fisher', role: 'distancia' }, { id: 'perlas_shark', role: 'bruto' }],
-    [{ id: 'fortuna_archer', role: 'distancia' }, { id: 'fortuna_gale', role: 'bruto' }, { id: 'fortuna_coyote', role: 'bruto' }],
-    [{ id: 'ancon_titi', role: 'normal' }, { id: 'ancon_pavo', role: 'distancia' }, { id: 'ancon_bus', role: 'bruto' }],
+    [
+        { id: 'melee', role: 'normal' },
+        { id: 'ranged', role: 'distancia' },
+        { id: 'alpha_wolf', role: 'bruto' },
+    ],
+    [
+        { id: 'chame_crab', role: 'normal' },
+        { id: 'chame_heron', role: 'distancia' },
+        { id: 'chame_grandcrab', role: 'bruto' },
+    ],
+    [
+        { id: 'boquete_quetzal', role: 'distancia' },
+        { id: 'boquete_picker', role: 'bruto' },
+        { id: 'boquete_foreman', role: 'bruto' },
+    ],
+    [
+        { id: 'cerropunta_peccary', role: 'normal' },
+        { id: 'cerropunta_farmer', role: 'distancia' },
+        { id: 'cerropunta_boar', role: 'bruto' },
+    ],
+    [
+        { id: 'baru_jaguar', role: 'normal' },
+        { id: 'baru_lookout', role: 'distancia' },
+        { id: 'baru_elder', role: 'bruto' },
+    ],
+    [
+        { id: 'darien_neque', role: 'normal' },
+        { id: 'darien_blowgun', role: 'distancia' },
+        { id: 'darien_harpy', role: 'bruto' },
+    ],
+    [
+        { id: 'bocas_frog', role: 'normal' },
+        { id: 'bocas_pirate', role: 'distancia' },
+        { id: 'bocas_captain', role: 'bruto' },
+    ],
+    [
+        { id: 'perlas_oyster', role: 'normal' },
+        { id: 'perlas_fisher', role: 'distancia' },
+        { id: 'perlas_shark', role: 'bruto' },
+    ],
+    [
+        { id: 'fortuna_archer', role: 'distancia' },
+        { id: 'fortuna_gale', role: 'bruto' },
+        { id: 'fortuna_coyote', role: 'bruto' },
+    ],
+    [
+        { id: 'ancon_titi', role: 'normal' },
+        { id: 'ancon_pavo', role: 'distancia' },
+        { id: 'ancon_bus', role: 'bruto' },
+    ],
 ];
 
-export type Profile = 'sin_puntos' | 'preparado';
+export type Profile = 'sin_puntos' | 'preparado' | 'razonable';
 
 export interface FielSpec {
     classId: string;
@@ -92,6 +136,72 @@ function bareSession(data: GameData, classId: string, level: number, seed: numbe
     return s;
 }
 
+function zoneForEnemy(data: GameData, foeId: string) {
+    const zone = data.zones.zones.find((candidate) => candidate.spawns.some((spawn) => spawn.archetype === foeId));
+    if (!zone) throw new Error(`No hay una franja de zona para ${foeId}`);
+    return zone;
+}
+
+/** Fuentes reales para los objetos de equipo que puede alcanzar un personaje de ese nivel. */
+export function equipmentSources(data: GameData, foeId: string, level: number): Map<string, string[]> {
+    const zone = zoneForEnemy(data, foeId);
+    const sources = new Map<string, Set<string>>();
+    const add = (itemId: string, source: string) => {
+        if (!data.rpg.items[itemId]) return;
+        const found = sources.get(itemId) ?? new Set<string>();
+        found.add(source);
+        sources.set(itemId, found);
+    };
+
+    for (const spawn of zone.spawns) {
+        const enemy = data.rpg.enemies[spawn.archetype];
+        if (!enemy || enemy.level > level || !enemy.lootTable) continue;
+        const table = data.rpg.lootTables[enemy.lootTable];
+        if (!table || table.chance <= 0 || table.rolls <= 0) continue;
+        for (const entry of table.entries) {
+            if (entry.weight > 0 && (data.rpg.items[entry.itemId]?.dropWeight ?? 0) > 0)
+                add(entry.itemId, `botín:${spawn.archetype}/${table.id}`);
+        }
+    }
+
+    for (const merchant of Object.values(data.rpg.merchants)) {
+        if (merchant.devOnly || merchant.crypt) continue;
+        for (const offer of merchant.stock) {
+            if (offer.quantity !== 0) add(offer.itemId, `tienda:${merchant.id}`);
+        }
+    }
+
+    return new Map([...sources].map(([itemId, found]) => [itemId, [...found].sort()]));
+}
+
+/** Equipo con nivel requerido cumplido y al menos una fuente de botín o tienda. */
+export function obtainableEquipment(data: GameData, foeId: string, level: number): ItemDef[] {
+    const sources = equipmentSources(data, foeId, level);
+    return Object.values(data.rpg.items).filter(
+        (item) => slotsFor(item).length > 0 && item.level <= level && sources.has(item.id),
+    );
+}
+
+function reasonableSession(data: GameData, classId: string, foeId: string, level: number, seed: number): GameSession {
+    const s = bareSession(data, classId, level, seed);
+    const ch = s.character;
+    spendPoints(s);
+    const before = new Set(ch.inventory.slots.filter((item) => item).map((item) => item!.uid));
+    const maxWeight = ch.inventory.maxWeight;
+    ch.inventory.setMaxWeight(Number.POSITIVE_INFINITY);
+    for (const item of obtainableEquipment(data, foeId, level)) {
+        for (let copy = 0; copy < (item.slot === 'ring' ? 2 : 1); copy++) ch.give(item.id, 1);
+    }
+    equipUpgrades(s);
+    for (const item of [...ch.inventory.slots]) {
+        if (item && !before.has(item.uid) && data.rpg.items[item.itemId]!.slot)
+            ch.inventory.remove(item.uid, item.quantity);
+    }
+    ch.inventory.setMaxWeight(maxWeight);
+    ch.restore();
+    return s;
+}
+
 export function enemyLevel(data: GameData, id: string): number {
     return data.rpg.enemies[id]?.level ?? 1;
 }
@@ -102,7 +212,9 @@ export function runFiel(field: GameData, spec: FielSpec): FielRun {
     const s =
         spec.profile === 'preparado'
             ? makeSessionAt(field, spec.classId, level, seed, true)
-            : bareSession(field, spec.classId, level, seed);
+            : spec.profile === 'razonable'
+              ? reasonableSession(field, spec.classId, spec.foe.id, level, seed)
+              : bareSession(field, spec.classId, level, seed);
     const w = new World(field, { encounter: false, character: s.character, seed: spec.seed });
     s.attach(w);
     w.player.pos = { ...FIELD_CENTER };
@@ -166,9 +278,43 @@ function summarize(rows: Row[], limit: number): string {
         const t = wins.map((q) => q.seconds);
         lines.push(
             `| ${x.classId} | ${x.profile} | ${x.level} | ${x.enemy} (${x.role}) | ${x.count} | ${x.playerMaxHealth} | ${x.enemyMaxHealth} | ${wins.length}/${r.runs.length} | ${r.runs.filter((q) => q.died).length} | ${
-                t.length ? `${f(quantile(t, 0.1), 1)} / ${f(quantile(t, 0.5), 1)} / ${f(quantile(t, 0.9), 1)}` : `— (límite ${limit} s)`
-            } | ${f(quantile(r.runs.map((q) => q.healthLeft * 100), 0.5))} % | ${f(quantile(r.runs.map((q) => q.potions), 0.5))} |`,
+                t.length
+                    ? `${f(quantile(t, 0.1), 1)} / ${f(quantile(t, 0.5), 1)} / ${f(quantile(t, 0.9), 1)}`
+                    : `— (límite ${limit} s)`
+            } | ${f(
+                quantile(
+                    r.runs.map((q) => q.healthLeft * 100),
+                    0.5,
+                ),
+            )} % | ${f(
+                quantile(
+                    r.runs.map((q) => q.potions),
+                    0.5,
+                ),
+            )} |`,
         );
+    }
+    return lines.join('\n');
+}
+
+function sourceReport(data: GameData, bands: Foe[][]): string {
+    const lines = [
+        '## Fuentes del perfil `razonable`',
+        '',
+        'Se admiten objetos equipables (`data/rpg/items.json`) de nivel ≤ personaje si aparecen en botín con probabilidad positiva (`data/zones.json` → apariciones, `data/rpg/enemies.json` → tabla, `data/rpg/loot.json` → entradas) o en existencias de una tienda ordinaria (`data/rpg/merchants.json`). Para el botín, el enemigo de origen no puede superar el nivel del personaje. Se excluyen mercaderes `devOnly` y de cripta.',
+        '',
+    ];
+    const stores = Object.values(data.rpg.merchants)
+        .filter((merchant) => !merchant.devOnly && !merchant.crypt)
+        .map((merchant) => merchant.id)
+        .sort();
+    for (const band of bands) {
+        const zone = zoneForEnemy(data, band[0]!.id);
+        const enemies = zone.spawns.map((spawn) => {
+            const table = data.rpg.enemies[spawn.archetype]?.lootTable;
+            return table ? `${spawn.archetype} (${table})` : `${spawn.archetype} (sin tabla)`;
+        });
+        lines.push(`- **${zone.name}** (\`${zone.id}\`): ${enemies.join(', ')}; tiendas: ${stores.join(', ')}.`);
     }
     return lines.join('\n');
 }
@@ -195,7 +341,7 @@ export function main(): void {
         for (const foe of band)
             for (const count of foe.role === 'bruto' ? [1] : [1, 3])
                 for (const classId of classes)
-                    for (const profile of ['sin_puntos', 'preparado'] as Profile[]) {
+                    for (const profile of ['sin_puntos', 'preparado', 'razonable'] as Profile[]) {
                         const runs: FielRun[] = [];
                         for (let seed = 1; seed <= seeds; seed++)
                             runs.push(runFiel(field, { classId, foe, count, profile, skill, seed, limit }));
@@ -205,7 +351,14 @@ export function main(): void {
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
     mkdirSync(out.replace(/\/[^/]*$/, '') || '.', { recursive: true });
     mkdirSync(out, { recursive: true });
-    writeFileSync(`${out}/runs.json`, JSON.stringify(rows.flatMap((r) => r.runs), null, 1));
+    writeFileSync(
+        `${out}/runs.json`,
+        JSON.stringify(
+            rows.flatMap((r) => r.runs),
+            null,
+            1,
+        ),
+    );
     writeFileSync(
         `${out}/FIEL.md`,
         [
@@ -213,7 +366,10 @@ export function main(): void {
             '',
             `${seeds} semillas por fila, bot «${skill}», límite ${limit} s, campo abierto, mascota invocada. Generado en ${secs} s con \`npm run balance:fiel\`.`,
             '`preparado` = puntos gastados + lo mejor de cada objeto de nivel ≤ N sin mirar si se consigue (techo). `sin_puntos` = diagnóstico.',
+            '`razonable` = puntos gastados + equipo equipable de nivel ≤ N con fuente en la franja o en una tienda ordinaria.',
             'TTK solo de las victorias. Las cifras de `data/` siguen siendo PROPUESTA: esto no las cambia.',
+            '',
+            sourceReport(field, bands),
             '',
             summarize(rows, limit),
             '',
@@ -221,4 +377,3 @@ export function main(): void {
     );
     console.log(`\n${rows.length} filas en ${secs} s → ${out}/FIEL.md`);
 }
-
