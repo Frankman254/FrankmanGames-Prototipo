@@ -1725,7 +1725,7 @@ Contexto del coordinador:
 
 ### D. Interfaz y textos
 - [x] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla. — commit «JL-405: auditar la cobertura de textos de interfaz» — detector `node scripts/i18nUi.mjs`: 0; pruebas i18n 12/12; suite 435 archivos, 5.102 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl405/RESULTADO.md`, `CANDIDATOS_SIN_EN_UI.json`.
-- [ ] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista.
+- [x] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista. — commit «JL-406: evitar etiquetas cortadas en el mapa» — `work/junie-jl406/RESULTADO.md`, ocho capturas revisadas, Electron 10/10.
 - [ ] JL-407 Accesibilidad: todas las acciones de la barra y de los menús principales se pueden hacer con teclado. Lista lo que solo va con ratón.
 - [ ] JL-408 Electron: tooltip de un objeto de set con piezas puestas y sin ellas. El contador de piezas cuadra con lo equipado (el creador vio posiciones rotas en el set de la Diablica).
 

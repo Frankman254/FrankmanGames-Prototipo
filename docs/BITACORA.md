@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-406: revisar textos de ventanas a dos resoluciones (Junie)
+
+**Archivos:** `src/ui/map/mapDraw.ts`, `src/ui/map/worldMap.ts`, `tests/ui/mapLabelBounds.test.ts`, `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia local en `work/junie-jl406/`.
+
+**Qué se hizo:** Añadí `labelsFullyInsideViewport` para no dibujar etiquetas del mapa grande que quedarían recortadas en el canvas y una prueba de alineación/límites. El escenario Electron revisa inventario, libro de hechizos, mapa y tienda a 1280×720 y 1920×1080; generé y revisé las ocho capturas. En el mapa a 1280×720 algunas etiquetas centrales se acercan o se superponen, pero no salen del canvas.
+
+**Validación:** La prueba dirigida falla con la función ausente (2/2) y pasa aplicada (2/2); `npm test`: 436 archivos, 5.104 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, Prettier y `node --check scripts/qaElectron.mjs` limpios. `npm run build` correcto (aviso de Vite por bundles >500 kB); `npm run docs:check`: 221 rutas, todas existen. Electron `jl406TextosResponsive`: 10/10, ocho paneles dentro, cero candidatos DOM recortados y consola limpia.
+
+**Evidencia:** `work/junie-jl406/RESULTADO.md`, `work/junie-jl406/electron/jl406-mediciones.json` y ocho capturas `jl406-{inventario,hechizos,mapa,tienda}-{1280x720,1920x1080}.jpg` revisadas.
+
+---
+
 ## 2026-11-27 — JL-405: auditar la cobertura de textos de interfaz (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia local en `work/junie-jl405/`.

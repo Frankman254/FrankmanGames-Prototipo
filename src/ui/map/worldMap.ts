@@ -16,6 +16,7 @@ import {
     drawQuestArea,
     drawQuestMark,
     imageCanvas,
+    labelsFullyInsideViewport,
     measureLabel,
 } from './mapDraw';
 import {
@@ -573,7 +574,7 @@ export class WorldMap extends Panel {
 
         // Evitar solapamientos y dibujar todas las etiquetas.
         avoidLabelCollisions(labels);
-        for (const lb of labels) {
+        for (const lb of labelsFullyInsideViewport(labels, cw, ch)) {
             drawLabel(ctx, lb.text, lb.x, lb.y, lb.px, lb.color, lb.align);
         }
 

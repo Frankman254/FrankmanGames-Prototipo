@@ -319,6 +319,18 @@ export function measureLabel(ctx: CanvasRenderingContext2D, text: string, px: nu
     return m.width;
 }
 
+/** Omite etiquetas cuyo texto, con su alineación, quedaría cortado por el canvas. */
+export function labelsFullyInsideViewport<
+    T extends { x: number; y: number; w: number; h: number; align?: CanvasTextAlign },
+>(labels: T[], width: number, height: number, margin = 2): T[] {
+    return labels.filter((label) => {
+        const left =
+            label.align === 'left' ? label.x : label.align === 'right' ? label.x - label.w : label.x - label.w / 2;
+        const top = label.y - label.h / 2;
+        return left >= margin && top >= margin && left + label.w <= width - margin && top + label.h <= height - margin;
+    });
+}
+
 /** Desplaza las etiquetas para que no se solapen (margen mínimo `gap`). */
 export function avoidLabelCollisions(labels: { x: number; y: number; w: number; h: number }[], gap = 2): void {
     for (let i = 0; i < labels.length; i++) {

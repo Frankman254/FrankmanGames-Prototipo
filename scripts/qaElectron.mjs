@@ -1559,6 +1559,79 @@ const scenarios = {
         await key('KeyB', 'b');
     },
 
+    /** JL-406: revisar texto de cuatro pantallas a 720p y 1080p. */
+    async jl406TextosResponsive() {
+        await newGame('QA JL406');
+        const sizes = [
+            [1280, 720],
+            [1920, 1080],
+        ];
+        const screens = [
+            { name: 'inventario', selector: '.panel-inventory', open: () => key('KeyB', 'b') },
+            { name: 'hechizos', selector: '.panel-spellbook', open: () => key('KeyV', 'v') },
+            { name: 'mapa', selector: '.panel-worldmap', open: () => key('KeyM', 'm') },
+            {
+                name: 'tienda',
+                selector: '.panel-shop',
+                open: async () => {
+                    await js(
+                        `(() => { const s=${S}, w=${W}, n=w.npcs.find(x=>x.merchantId); if(!n) throw new Error('No hay mercader'); const p=w.player.pos; p.x=n.pos.x+1; p.y=n.pos.y; w.player.path=[]; s.character.emit({type:'openMerchant',merchantId:n.merchantId}); })()`,
+                    );
+                },
+            },
+        ];
+        const observations = [];
+        for (const [width, height] of sizes) {
+            await resize(width, height);
+            for (const screen of screens) {
+                await screen.open();
+                await until(
+                    `!!document.querySelector(${JSON.stringify(screen.selector)})?.offsetParent`,
+                    10000,
+                    screen.name,
+                );
+                await sleep(500);
+                const audit = await js(`(() => {
+                    const panel = document.querySelector(${JSON.stringify(screen.selector)});
+                    const r = panel.getBoundingClientRect();
+                    const clipped = [...panel.querySelectorAll('*')].filter(e => {
+                        if (e.children.length || !e.textContent.trim()) return false;
+                        const b = e.getBoundingClientRect(), s = getComputedStyle(e);
+                        if (b.width < 1 || b.height < 1 || s.display === 'none' || s.visibility === 'hidden') return false;
+                        const x = e.scrollWidth > e.clientWidth + 2 && /hidden|clip/.test(s.overflowX + s.overflow);
+                        const y = e.scrollHeight > e.clientHeight + 2 && /hidden|clip/.test(s.overflowY + s.overflow);
+                        return x || y;
+                    }).map(e => ({text:e.textContent.trim().replace(/\\s+/g,' ').slice(0,100), x:e.scrollWidth>e.clientWidth+2, y:e.scrollHeight>e.clientHeight+2}));
+                    return {
+                        viewport: {width:innerWidth,height:innerHeight},
+                        panel: {x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height),right:Math.round(r.right),bottom:Math.round(r.bottom)},
+                        outside: r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1,
+                        clippedTextCandidates: clipped,
+                    };
+                })()`);
+                observations.push({ screen: screen.name, ...audit });
+                check(
+                    `JL-406 ${screen.name} ${width}×${height}: ventana dentro`,
+                    !audit.outside,
+                    JSON.stringify(audit.panel),
+                );
+                console.log(
+                    `     JL-406 detalle ${screen.name} ${width}×${height}: ${JSON.stringify(audit.clippedTextCandidates)}`,
+                );
+                await shot(`jl406-${screen.name}-${width}x${height}`);
+                for (let attempt = 0; attempt < 4; attempt++) {
+                    const anyOpen = await js(
+                        `[...document.querySelectorAll('.panel-inventory,.panel-inventory-trade,.panel-spellbook,.panel-worldmap,.panel-shop')].some(p=>p.offsetParent!==null)`,
+                    );
+                    if (!anyOpen) break;
+                    await key('Escape', 'Escape');
+                }
+            }
+        }
+        fs.writeFileSync(path.join(OUT, 'jl406-mediciones.json'), JSON.stringify(observations, null, 2));
+        check('JL-406: ocho capturas y mediciones registradas', observations.length === 8);
+    },
+
     async banco() {
         await newGame('QA Banco');
         await js(`(() => { const p=${W}.player; p.pos.x=116; p.pos.y=126; p.path=[]; })()`);
