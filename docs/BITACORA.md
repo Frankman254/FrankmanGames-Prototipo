@@ -1,3 +1,15 @@
+## 2026-11-26 — JL-363: verificar orillas caminables de estanques con lóbulos (Junie)
+
+**Archivos:** `tests/jl363_lobedPonds.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí una prueba que construye la rejilla efectiva de `World` para los 100 pisos, incluyendo el bloqueo de los círculos principales y lóbulos con el margen de navegación. Con `floodDistances`, comprueba que la llegada es caminable, que cada estanque con lóbulos tiene orilla seca alcanzable desde ella y que el agua no interrumpe la ruta a la escalera de bajada en los pisos que la tienen. La geometría generada ya cumple, por lo que no se modificó código productivo.
+
+**Validación:** `npx vitest run tests/jl363_lobedPonds.test.ts`: 1/1; `npm test`: 425 archivos, 5.074 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en tres proyectos; Prettier limpio. La comprobación no cambia presentación y no requiere escenario Electron.
+
+**Evidencia:** `work/junie-jl363/RESULTADO.md`.
+
+---
+
 ## 2026-11-26 — Windows tras bajar los cambios del Mac: limpieza y errores (Claude)
 
 **Archivos:** `src/render/disposeWhenSettled.ts` (nuevo), `src/render/characterPreview.ts`, `src/ui/menus/compendiumPreview.ts`, `scripts/qaElectron.mjs`, `tests/jl102_resetConfirm.test.ts`, `tests/jl29_keyboardFocus.test.ts`, `tests/ui/modalP12.test.ts`.

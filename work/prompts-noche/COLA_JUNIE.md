@@ -1638,7 +1638,7 @@ Contexto del coordinador:
   - quedan a ≥ 1 m de la escalera, del poste del hilo de retorno, de los cofres, las jarras y las puertas;
   - no tapan el paso de la llegada a la escalera de bajada.
   - Si algún piso falla, arreglo pequeño en `cryptStaffSpots` con la prueba.
-- [ ] JL-363 En los 100 pisos, cada estanque con lóbulos tiene orilla caminable conectada con la llegada y no corta el camino de la llegada a la escalera de bajada (`floodDistances`).
+- [x] JL-363 En los 100 pisos, cada estanque con lóbulos tiene orilla caminable conectada con la llegada y no corta el camino de la llegada a la escalera de bajada (`floodDistances`). — commit «JL-363: verificar orillas caminables de estanques con lóbulos» — `tests/jl363_lobedPonds.test.ts` 1/1; suite 5.074 aprobadas, typecheck limpio; evidencia en `work/junie-jl363/RESULTADO.md`.
 - [ ] JL-364 Modo edición: `World.applyRpgContent()` llama a `placeNpcs()`, que vacía `this.npcs`. Dentro de la cripta, recargar `npcs.json` borra a Chalo y Nina.
   - Prueba que lo demuestre.
   - Arreglo pequeño: conservar los PNJ de interior.
