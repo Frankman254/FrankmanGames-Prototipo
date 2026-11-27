@@ -6766,6 +6766,178 @@ const scenarios = {
         );
     },
 
+    /** JL-371: aísla el coste de los discos del estanque lobulado del piso 6. */
+    async jl371RendimientoEstanque() {
+        await newGame('QA Estanque');
+        await fullscreen();
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(5,'above')`);
+        await until(`__game.crypt.floor===5`, 15000, 'piso 6');
+        await until('!document.querySelector(".carga:not([hidden])")', 20000, 'piso 6 listo');
+        await sleep(7000);
+        await js(`(() => {
+            const world = ${W};
+            world.timeScale = 0;
+            for (const enemy of world.enemies.list) {
+                enemy.frozen = true;
+                enemy.state = 'idle';
+                enemy.stateTime = 0;
+            }
+        })()`);
+
+        const pond = await js(`(() => {
+            const crypt = __game.crypt;
+            const scene = __game.view.scene;
+            const floor = crypt.floorData;
+            const pool = floor?.pools.find((item) => (item.lobes?.length ?? 0) >= 2);
+            if (!pool) return null;
+            const tileSize = floor.tileSize;
+            const room = floor.rooms.find((item) =>
+                pool.x > item.x0 * tileSize && pool.x < (item.x0 + item.w) * tileSize &&
+                pool.y > item.y0 * tileSize && pool.y < (item.y0 + item.h) * tileSize,
+            );
+            if (!room) return null;
+            const circles = [{ x: pool.x, y: pool.y, radius: pool.radius }, ...pool.lobes];
+            const starts = [];
+            for (let x = room.x0 + 1; x < room.x0 + room.w - 1; x++) {
+                for (let y = room.y0 + 1; y < room.y0 + room.h - 1; y++) {
+                    const cell = ${W}.grid.nearestWalkable({ x: (x + 0.5) * tileSize, y: (y + 0.5) * tileSize });
+                    if (cell < 0) continue;
+                    const position = ${W}.grid.center(cell);
+                    if (!${W}.grid.walkable(position) || starts.some((start) => Math.hypot(start.x - position.x, start.y - position.y) < 0.1)) continue;
+                    const shore = Math.min(...circles.map((circle) => Math.hypot(position.x - circle.x, position.y - circle.y) - circle.radius));
+                    if (shore >= 3 && shore <= 8) starts.push({ x: position.x, y: position.y, shore });
+                }
+            }
+            starts.sort((a, b) => Math.abs(a.shore - 4) - Math.abs(b.shore - 4));
+            const start = starts[0];
+            if (!start) return null;
+            const prefix = 'dPool-' + pool.id + '-';
+            const discs = scene.meshes.filter((mesh) => mesh.name.startsWith(prefix) && mesh.metadata?.dungeonPool);
+            return {
+                id: pool.id,
+                x: pool.x,
+                y: pool.y,
+                lobes: pool.lobes.length,
+                discs: discs.length,
+                otherDiscs: scene.meshes.filter((mesh) => /^dPool-/.test(mesh.name) && mesh.metadata?.dungeonPool).length,
+                start,
+                resolution: scene.getEngine().getRenderWidth() + 'x' + scene.getEngine().getRenderHeight(),
+                gpu: scene.getEngine().getGlInfo().renderer,
+            };
+        })()`);
+        if (!pond) throw new Error('El piso 6 no tiene un estanque lobulado con una posición seca cercana');
+        check(
+            'JL-371: estanque lobulado del piso 6 cargado',
+            pond.lobes > 0 && pond.discs === pond.lobes + 1,
+            JSON.stringify(pond),
+        );
+
+        const cameraYaw = (Math.atan2(pond.x - pond.start.x, pond.y - pond.start.y) * 180) / Math.PI;
+        await js(`(() => {
+            const world = ${W};
+            const player = world.player;
+            player.pos.x = player.prevPos.x = ${pond.start.x};
+            player.pos.y = player.prevPos.y = ${pond.start.y};
+            player.path = [];
+            player.moveTarget = null;
+            player.attackTarget = null;
+            player.pickupTarget = null;
+            player.health = player.maxHealth;
+            player.invulnerable = 1000;
+            const rig = __game.view.rig;
+            rig.yawDeg = ${cameraYaw};
+            rig.pitchDeg = 45;
+            rig.distance = 11;
+        })()`);
+        await sleep(2200);
+
+        const visibility = (visible) =>
+            js(`(() => {
+            const prefix = 'dPool-' + ${JSON.stringify(pond.id)} + '-';
+            const discs = __game.view.scene.meshes.filter((mesh) => mesh.name.startsWith(prefix) && mesh.metadata?.dungeonPool);
+            for (const mesh of discs) mesh.isVisible = ${visible};
+            return discs.length;
+        })()`);
+        await shot('jl371-piso-6-estanque-con-agua');
+        await visibility(false);
+        await sleep(800);
+        await shot('jl371-piso-6-estanque-sin-agua');
+        await visibility(true);
+
+        const measure = async (state) => {
+            await visibility(state === 'con estanque');
+            await sleep(1000);
+            return js(`(async () => {
+                const frames = [];
+                let last = performance.now();
+                const end = last + 5000;
+                await new Promise((resolve) => {
+                    const tick = () => {
+                        const now = performance.now();
+                        frames.push(now - last);
+                        last = now;
+                        if (now < end) requestAnimationFrame(tick);
+                        else resolve();
+                    };
+                    requestAnimationFrame(tick);
+                });
+                const sorted = [...frames].sort((a, b) => a - b);
+                const mean = frames.reduce((sum, frame) => sum + frame, 0) / frames.length;
+                return {
+                    fps: +(1000 / mean).toFixed(2),
+                    p95: +sorted[Math.floor(sorted.length * 0.95)].toFixed(2),
+                    frames: frames.length,
+                };
+            })()`);
+        };
+        const samples = [];
+        for (const state of ['con estanque', 'sin estanque', 'sin estanque', 'con estanque']) {
+            samples.push({ estado: state, ...(await measure(state)) });
+        }
+        await visibility(true);
+
+        const meanFps = (state) => {
+            const values = samples.filter((sample) => sample.estado === state).map((sample) => sample.fps);
+            return +(values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2);
+        };
+        const conEstanque = meanFps('con estanque');
+        const sinEstanque = meanFps('sin estanque');
+        const perdida = +(sinEstanque - conEstanque).toFixed(2);
+        const out = {
+            piso: 6,
+            estanque: pond,
+            muestras: samples,
+            fpsMedioConEstanque: conEstanque,
+            fpsMedioSinEstanque: sinEstanque,
+            perdidaFps: perdida,
+            superaUmbralDeDosFps: perdida > 2,
+            propuesta:
+                perdida > 2
+                    ? 'Evaluar una malla única que una los discos del estanque, conservando el contorno lobulado; no se implementó en esta tarea.'
+                    : null,
+        };
+        fs.writeFileSync(path.join(OUT, 'jl371-fps.json'), JSON.stringify(out, null, 2));
+        fs.writeFileSync(
+            path.join(OUT, 'FPS.md'),
+            `# JL-371 — FPS del estanque lobulado, piso 6\n\n` +
+                `- Resolución: ${pond.resolution}; GPU: ${pond.gpu}.\n` +
+                `- Estanque \`${pond.id}\`: ${pond.lobes} lóbulos y ${pond.discs} discos (uno por círculo).\n` +
+                `- Muestras de 5 s, en orden con/sin/sin/con, en la misma sesión: ${samples.map((sample) => `${sample.estado} ${sample.fps} FPS (p95 ${sample.p95} ms)`).join('; ')}.\n` +
+                `- Media con estanque: ${conEstanque} FPS; sin estanque: ${sinEstanque} FPS; pérdida atribuible a sus discos: ${perdida} FPS.\n` +
+                (perdida > 2
+                    ? `- PROPUESTA (no aplicada): evaluar una malla única que una los discos, conservando el contorno lobulado.\n`
+                    : `- La pérdida no supera 2 FPS; no se propone fusionar los discos.\n`) +
+                `- Capturas: \`jl371-piso-6-estanque-con-agua.jpg\` y \`jl371-piso-6-estanque-sin-agua.jpg\`.\n`,
+        );
+        console.log('     JL-371 FPS', JSON.stringify(out));
+        check(
+            'JL-371: tomó cuatro muestras con y sin estanque',
+            samples.length === 4 && samples.every((sample) => sample.fps > 0),
+            JSON.stringify(samples),
+        );
+    },
+
     async mapaDentro() {
         // F26: dentro de la cripta y del banco el minimapa pinta lo ya pisado.
         const floorPixels = `(() => { const c=document.querySelector('.minimap canvas'); const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; let n=0; for (let i=0;i<d.length;i+=4) if (Math.abs(d[i]-150)<6 && Math.abs(d[i+1]-128)<6 && Math.abs(d[i+2]-92)<6) n++; return n; })()`;

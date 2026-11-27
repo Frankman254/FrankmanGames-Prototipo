@@ -1,3 +1,17 @@
+## 2026-11-27 — JL-371: medir FPS del estanque lobulado (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `jl371RendimientoEstanque`, que mide en el piso 6 con los cuatro discos del estanque visibles y ocultos en orden con/sin/sin/con, en la misma sesión y desde la misma posición. Congela la simulación de QA, captura ambos estados y no cambia el juego ni los datos productivos.
+
+**Resultado:** Estanque `pool:5:6`, 3 lóbulos y 4 discos, a 3600×2160 en Apple M5. Media: 119,01 FPS con el agua y 119,68 sin ella; pérdida de 0,67 FPS. No supera 2 FPS, así que no propongo fusionar discos.
+
+**Validación:** Electron 3/3, consola limpia; `npm test`: 430 archivos, 5.083 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check`, `node --check scripts/qaElectron.mjs` y `git diff --check` limpios. Prettier falla también sobre `HEAD:scripts/qaElectron.mjs`; el rango nuevo no presenta diferencias de formato.
+
+**Evidencia:** `work/junie-jl371/FPS.md`, `work/junie-jl371/resultado.json` y capturas `jl371-piso-6-estanque-con-agua.jpg` / `jl371-piso-6-estanque-sin-agua.jpg`.
+
+---
+
 ## 2026-11-27 — JL-370: capturar estanques con lóbulos en la cripta (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
