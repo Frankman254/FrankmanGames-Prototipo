@@ -54,8 +54,75 @@ CORAL = pint('equipo_coral', 'tela_coral')
 MOLA = pint('equipo_mola', 'mola_coral_zigzag')
 FEATHER = pint('equipo_pluma', 'plumas_guacamaya')
 
+# MOD-09b (2026-11-27): metales y piedras de los prefijos de items.json, propios del proyecto.
+COPPER = fg.material('equipo_cobre', (0.70, 0.33, 0.16), metallic=0.55, rough=0.38)
+TIN = fg.material('equipo_estano', (0.68, 0.70, 0.72), metallic=0.5, rough=0.42)
+SILVER = fg.material('equipo_plata', (0.82, 0.84, 0.88), metallic=0.7, rough=0.26)
+CHROME = fg.material('equipo_cromo', (0.88, 0.90, 0.94), metallic=0.9, rough=0.14)
+RHENIUM = fg.material('equipo_renio', (0.52, 0.55, 0.64), metallic=0.75, rough=0.3)
+GRANITE = fg.material('equipo_granito', (0.43, 0.41, 0.39), rough=0.9)
+VERDIGRIS = fg.material('equipo_verdin', (0.18, 0.52, 0.40), metallic=0.35, rough=0.5)
+OBSIDIAN = fg.material('equipo_obsidiana', (0.05, 0.03, 0.08), metallic=0.2, rough=0.12)
+DUSK = fg.material('equipo_crepusculo', (0.40, 0.14, 0.46), rough=0.3, emit=(0.18, 0.04, 0.22), strength=0.5)
+RUBY = fg.material('equipo_corindon', (0.62, 0.04, 0.10), metallic=0.1, rough=0.2)
+ABYSS = fg.material('equipo_abismo', (0.03, 0.08, 0.22), rough=0.3, emit=(0.01, 0.06, 0.2), strength=0.4)
+COBALT = fg.material('equipo_cobalto', (0.08, 0.22, 0.68), metallic=0.45, rough=0.32)
+BONE = fg.material('equipo_hueso', (0.84, 0.79, 0.64), rough=0.7)
+
+PREFIX_THEME = {
+    'cobre': ('COPPER', 'LEATHER'), 'laton': ('GOLD', 'DARK_WOOD'), 'oroviejo': ('GOLD', 'BLACK'),
+    'granito': ('GRANITE', 'IRON'), 'estano': ('TIN', 'BRONZE'), 'acero': ('STEEL', 'BLACK'),
+    'titan': ('IRON', 'GOLD'), 'relampago': ('STORM', 'GOLD'), 'bronce': ('BRONZE', 'LEATHER'),
+    'verdin': ('VERDIGRIS', 'BRONZE'), 'obsidiana': ('OBSIDIAN', 'VIOLET'), 'crepusculo': ('DUSK', 'GOLD'),
+    'totuma': ('LIGHT_WOOD', 'EARTH'), 'forja': ('IRON', 'FIRE'), 'nacar2': ('NACRE', 'GOLD'),
+    'corindon': ('RUBY', 'GOLD'), 'eclipse': ('BLACK', 'GOLD'), 'plata': ('SILVER', 'STEEL'),
+    'abismo': ('ABYSS', 'FROST'), 'cobalto': ('COBALT', 'STEEL'), 'marea': ('TURQUOISE', 'NACRE'),
+    'ambar': ('AMBER', 'DARK_WOOD'), 'carbon': ('BLACK', 'FIRE'), 'niquel': ('SILVER', 'BRONZE'),
+    'renio': ('RHENIUM', 'VIOLET'), 'bone': ('BONE', 'DARK_LEATHER'), 'perlanegra': ('BLACK', 'NACRE'),
+    'istmo': ('TURQUOISE', 'GOLD'), 'cromo': ('CHROME', 'BLACK'), 'learning': ('LEATHER', 'BRONZE'),
+}
+ELEMENT_THEME = {
+    'earth': ('EARTH', 'BRONZE'), 'tierra': ('EARTH', 'BRONZE'), 'fire': ('FIRE', 'BLACK'), 'fuego': ('FIRE', 'BLACK'),
+    'air': ('WHITE', 'GOLD'), 'aire': ('WHITE', 'GOLD'), 'water': ('TURQUOISE', 'NACRE'), 'agua': ('TURQUOISE', 'NACRE'),
+    'frost': ('FROST', 'NACRE'), 'hielo': ('FROST', 'NACRE'), 'lightning': ('STORM', 'GOLD'), 'rayo': ('STORM', 'GOLD'),
+    'endurance': ('IRON', 'LEATHER'), 'spirit': ('VIOLET', 'GOLD'), 'precision': ('LEAF', 'BRONZE'), 'support': ('WHITE', 'GOLD'),
+    'diablico': ('FIRE', 'BLACK'), 'mangle': ('LEAF', 'CORAL'), 'bocas': ('STORM', 'BRONZE'), 'nube': ('FROST', 'WHITE'),
+    'tulivieja': ('VIOLET', 'FROST'), 'mareas': ('TURQUOISE', 'WHITE'), 'campanas': ('BRONZE', 'GOLD'),
+    'cruces': ('EARTH', 'IRON'), 'perla': ('NACRE', 'GOLD'), 'corrientes': ('TURQUOISE', 'STORM'),
+    'tambor': ('LEATHER', 'CORAL'), 'dos': ('TURQUOISE', 'GOLD'),
+}
+
+
+def token_theme(item_id):
+    """Tema por el prefijo de material o el elemento del ID; None si el ID no los trae."""
+    if item_id in ('titan_maul', 'tulivieja_staff'):  # diseño anterior a MOD-09b: se conserva
+        return None
+    parts = item_id.split('_')
+    if parts[0] == 'learning' and parts[1].isdigit():  # una tela por tomo del aprendiz
+        cycle = (('LEATHER', 'BRONZE'), ('COBALT', 'GOLD'), ('RUBY', 'GOLD'), ('LEAF', 'BRONZE'), ('VIOLET', 'SILVER'),
+                 ('FIRE', 'BLACK'), ('EARTH', 'GOLD'), ('TURQUOISE', 'NACRE'), ('DUSK', 'GOLD'), ('BLACK', 'GOLD'))
+        pair = cycle[(int(parts[1]) - 1) % len(cycle)]
+        return (globals()[pair[0]], globals()[pair[1]])
+    pair = PREFIX_THEME.get(parts[0])
+    if pair is None:
+        pair = next((ELEMENT_THEME[p] for p in parts if p in ELEMENT_THEME), None)
+    return (globals()[pair[0]], globals()[pair[1]]) if pair else None
+
+
+def tier(item):
+    """0…4 según el nivel del objeto: cuánto adorno lleva."""
+    return max(0, min(4, int(item.get('level', 1)) // 40))
+
+
+def pick(item_id, n):
+    """Elección estable por ID (no depende del hash aleatorio de Python)."""
+    return sum((i + 1) * ord(c) for i, c in enumerate(item_id)) % n
+
 
 def theme(item_id, item):
+    pair = token_theme(item_id)
+    if pair:
+        return pair
     text = f"{item_id} {item.get('name', '')} {item.get('description', '')}".lower()
     if any(word in text for word in ('torment', 'rayo', 'vendaval', 'ancón', 'ancon', 'bus')):
         return STORM, GOLD
@@ -401,7 +468,7 @@ def hood(builder, item_id):
         'darien_hood': LEAF,
         'fortuna_hood': VIOLET,
         'tulivieja_veil': FROST,
-    }.get(item_id, LEATHER)
+    }.get(item_id) or theme(item_id, ITEMS[item_id])[0]
     builder.blob((0, 0.075, 0.035), (0.215, 0.135, 0.235), cloth, subdiv=2)
     builder.tube((-0.17, -0.035, -0.08), (-0.13, -0.085, 0.14), 0.026, 0.024, BRONZE, sides=6)
     builder.tube((0.17, -0.035, -0.08), (0.13, -0.085, 0.14), 0.026, 0.024, BRONZE, sides=6)
@@ -421,8 +488,8 @@ def hood(builder, item_id):
 
 
 def helmet(builder, item_id):
-    shell = {'iron_helm': IRON, 'basalt_helm': BLACK, 'locks_helm': LEAF}.get(item_id, IRON)
-    trim = BRONZE if item_id != 'basalt_helm' else FIRE
+    shell = {'iron_helm': IRON, 'basalt_helm': BLACK, 'locks_helm': LEAF}.get(item_id) or theme(item_id, ITEMS[item_id])[0]
+    trim = {'iron_helm': BRONZE, 'basalt_helm': FIRE, 'locks_helm': BRONZE}.get(item_id) or theme(item_id, ITEMS[item_id])[1]
     builder.blob((0, 0.035, 0.055), (0.205, 0.17, 0.20), shell, subdiv=2)
     builder.tube((-0.22, 0, -0.03), (0.22, 0, -0.03), 0.025, 0.025, trim, sides=6)
     builder.box((0, -0.165, 0.025), (0.045, 0.035, 0.22), trim)
@@ -455,6 +522,9 @@ def hat(builder, item_id):
         return
     if item_id == 'leather_cap':
         leather_cap(builder)
+        return
+    if item_id not in ('reed_hat', 'machetero_hat'):
+        hat_generic(builder, item_id, ITEMS[item_id])
         return
     crown = WHITE if item_id == 'machetero_hat' else PALM
     builder.tube((0, 0, -0.035), (0, 0, 0.01), 0.34, 0.34, crown, sides=18)
@@ -530,8 +600,14 @@ def cape(builder, item_id):
     if item_id == 'palm_cape':
         palm_cape(builder)
         return
-    # Capas sin diseño propio: la tela sale del tema del objeto (MOD-09, 2026-11-26).
-    material = {'straw_cape': PALM, 'baru_cloud_cape': FROST, 'darien_cape': LEAF}.get(item_id) or theme(item_id, ITEMS[item_id])[0]
+    if item_id not in ('straw_cape', 'baru_cloud_cape', 'darien_cape'):
+        item = ITEMS[item_id]
+        if 'mochila' in item.get('name', '').lower() or item_id.startswith('learning_'):
+            backpack(builder, item_id, item)
+        else:
+            cape_generic(builder, item_id, item)
+        return
+    material = {'straw_cape': PALM, 'baru_cloud_cape': FROST, 'darien_cape': LEAF}[item_id]
     top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.38, 0.15, -0.78), (0, 0.18, -0.92), (-0.38, 0.15, -0.78)]
     back = [(x, y + 0.035, z) for x, y, z in top]
     builder.poly(top, back, material)
@@ -545,6 +621,177 @@ def cape(builder, item_id):
     elif item_id == 'darien_cape':
         for x, z in ((-0.22, -0.25), (0.18, -0.32), (-0.08, -0.58), (0.24, -0.68)):
             builder.poly([(x, 0.10, z + 0.10), (x + 0.09, 0.10, z), (x, 0.10, z - 0.10), (x - 0.09, 0.10, z)], [(px, 0.135, pz) for px, _, pz in [(x, 0, z + 0.10), (x + 0.09, 0, z), (x, 0, z - 0.10), (x - 0.09, 0, z)]], EARTH)
+
+
+# ---------------------------------------------------------------------------
+# MOD-09b (2026-11-27): tocados, capas y mochilas con silueta propia por familia.
+# Cabeza: centro del cráneo en el origen, +Z arriba, frente hacia -Y. Espalda: barra de
+# hombros en el origen, la prenda cuelga hacia -Z por +Y.
+
+HAT_SHAPES = ('ala_ancha', 'copa_alta', 'pluma', 'concha', 'gorro_piel', 'tricornio', 'morrion', 'diadema', 'visera', 'birrete')
+SHAPE_BY_TOKEN = {
+    'earth': 'ala_ancha', 'fire': 'copa_alta', 'air': 'pluma', 'water': 'concha', 'frost': 'gorro_piel',
+    'lightning': 'tricornio', 'endurance': 'morrion', 'spirit': 'diadema', 'precision': 'visera',
+    'support': 'concha', 'learning': 'birrete',
+}
+
+
+def hat_shape(item_id):
+    for part in item_id.split('_'):
+        if part in SHAPE_BY_TOKEN:
+            return SHAPE_BY_TOKEN[part]
+    return HAT_SHAPES[pick(item_id, 9)]
+
+
+def gems(builder, n, radius, z, mat, size=0.026, front_only=False):
+    """Piedras repartidas por la cinta; con `front_only`, en abanico al frente (-Y)."""
+    for k in range(n):
+        a = math.radians(-90 + (k - (n - 1) / 2) * 28) if front_only else math.radians(-90 + 360 * k / n)
+        builder.blob((radius * math.cos(a), radius * math.sin(a), z), (size, size * 0.7, size), mat, subdiv=1)
+
+
+def brim(builder, mat, r, z, thick=0.03, sides=12):
+    builder.tube((0, 0, z - thick), (0, 0, z), r, r, mat, sides=sides)
+
+
+def hat_generic(builder, item_id, item):
+    main, accent = theme(item_id, item)
+    t = tier(item)
+    shape = hat_shape(item_id)
+    band = accent if t >= 1 else LEATHER
+    if shape == 'ala_ancha':
+        brim(builder, main, 0.38, -0.01, sides=12)
+        builder.tube((0, 0, -0.01), (0, 0, 0.13), 0.18, 0.16, main, sides=12)
+        builder.tube((0, 0, 0.13), (0, 0, 0.15), 0.16, 0.12, main, sides=12)
+        builder.tube((0, 0, 0.02), (0, 0, 0.06), 0.185, 0.18, band, sides=12)
+        gems(builder, t, 0.19, 0.04, accent, front_only=True)
+    elif shape == 'copa_alta':
+        brim(builder, main, 0.30, 0.0, sides=14)
+        builder.tube((0, 0, 0.0), (0, 0, 0.30), 0.165, 0.13, main, sides=14)
+        builder.tube((0, 0, 0.03), (0, 0, 0.08), 0.17, 0.165, band, sides=14)
+        for k in range(1 + t // 2 + 1):
+            x = (k - (t // 2 + 1) / 2) * 0.06
+            builder.tube((x, -0.13, 0.10), (x * 1.3, -0.15, 0.24 + 0.05 * (k % 2)), 0.032, 0.004, accent, sides=6)
+    elif shape == 'pluma':
+        brim(builder, main, 0.32, 0.0, sides=12)
+        builder.blob((0, 0, 0.09), (0.17, 0.17, 0.13), main, subdiv=2)
+        builder.tube((0, 0, 0.0), (0, 0, 0.05), 0.178, 0.175, band, sides=12)
+        for k in range(2 + t // 2):
+            dx = 0.03 * k
+            quill = [(0.15 + dx, 0.05, 0.04), (0.17 + dx, 0.07, 0.04), (0.24 + dx, 0.24, 0.40 - 0.05 * k), (0.21 + dx, 0.22, 0.42 - 0.05 * k)]
+            builder.poly(quill, [(x, y + 0.012, z) for x, y, z in quill], FEATHER if k % 2 == 0 else accent)
+    elif shape == 'concha':
+        builder.blob((0, 0, 0.05), (0.205, 0.205, 0.17), main, subdiv=2)
+        builder.tube((0, 0, -0.04), (0, 0, 0.01), 0.27, 0.25, accent, sides=12)
+        builder.blob((0, -0.20, 0.07), (0.07, 0.025, 0.06), NACRE, subdiv=1)
+        for k in range(5):
+            a = math.radians(-90 + (k - 2) * 12)
+            builder.tube((0.02 * math.cos(a), -0.19, 0.03), (0.08 * math.cos(a) * (k - 2), -0.215, 0.12), 0.006, 0.006, GOLD if t >= 2 else NACRE, sides=4)
+        gems(builder, t, 0.26, -0.015, NACRE)
+    elif shape == 'gorro_piel':
+        builder.blob((0, 0.01, 0.05), (0.21, 0.205, 0.19), main, subdiv=2)
+        builder.tube((0, 0.01, -0.05), (0, 0.01, 0.03), 0.245, 0.235, WHITE, sides=14)
+        builder.blob((0, 0.02, 0.25), (0.06, 0.06, 0.06), WHITE, subdiv=1)
+        for side in (-1, 1):
+            builder.blob((side * 0.20, 0.0, -0.10), (0.05, 0.08, 0.10), WHITE, subdiv=1)
+        gems(builder, min(t, 3), 0.245, -0.01, accent, front_only=True)
+    elif shape == 'tricornio':
+        builder.tube((0, 0, 0.0), (0, 0, 0.16), 0.175, 0.15, main, sides=14)
+        for k in range(3):
+            a = math.radians(-90 + 120 * k)
+            c, d = math.cos(a), math.sin(a)
+            wing = [(0.13 * c - 0.16 * d, 0.13 * d + 0.16 * c, 0.0), (0.13 * c + 0.16 * d, 0.13 * d - 0.16 * c, 0.0),
+                    (0.31 * c + 0.08 * d, 0.31 * d - 0.08 * c, 0.12), (0.31 * c - 0.08 * d, 0.31 * d + 0.08 * c, 0.12)]
+            builder.poly(wing, [(x, y, z + 0.025) for x, y, z in wing], main)
+        bolt = [(-0.02, -0.17, 0.15), (0.03, -0.17, 0.09), (0.0, -0.17, 0.085), (0.03, -0.17, 0.02), (-0.03, -0.17, 0.09), (0.0, -0.17, 0.095)]
+        builder.poly(bolt, [(x, y - 0.015, z) for x, y, z in bolt], accent)
+    elif shape == 'morrion':
+        builder.blob((0, 0.01, 0.06), (0.21, 0.19, 0.20), main, subdiv=2)
+        brim(builder, accent, 0.27, -0.02, thick=0.025, sides=14)
+        builder.poly([(0, -0.12, 0.20), (0, 0.16, 0.19), (0, 0.14, 0.30), (0, -0.08, 0.32)],
+                     [(0.02, -0.12, 0.20), (0.02, 0.16, 0.19), (0.02, 0.14, 0.30), (0.02, -0.08, 0.32)], accent)
+        gems(builder, t, 0.215, 0.0, accent, size=0.02)
+    elif shape == 'diadema':
+        builder.tube((0, 0.01, 0.0), (0, 0.01, 0.045), 0.215, 0.212, accent, sides=12)
+        builder.blob((0, -0.21, 0.04), (0.04, 0.02, 0.055), main, subdiv=1)
+        for k in range(2 + t):
+            a = math.radians(-90 + (k - (1 + t) / 2) * 22)
+            builder.tube((0.212 * math.cos(a), 0.212 * math.sin(a), 0.04), (0.215 * math.cos(a), 0.215 * math.sin(a), 0.10 + 0.03 * (k % 2)), 0.012, 0.003, accent, sides=4)
+        builder.poly([(-0.16, 0.13, 0.03), (0.16, 0.13, 0.03), (0.22, 0.20, -0.40), (-0.22, 0.20, -0.40)],
+                     [(-0.16, 0.15, 0.03), (0.16, 0.15, 0.03), (0.22, 0.22, -0.40), (-0.22, 0.22, -0.40)], main)
+    elif shape == 'visera':
+        builder.blob((0, 0.015, 0.01), (0.216, 0.21, 0.165), main, subdiv=2)
+        builder.tube((0, 0.015, -0.03), (0, 0.015, 0.012), 0.224, 0.222, accent, sides=12)
+        builder.blob((0, 0.015, 0.18), (0.03, 0.03, 0.018), accent, subdiv=1)
+        visor(builder, main, 0.19, 0.33, -0.02, front=-1, span=140, droop=0.04)
+        gems(builder, min(t, 2), 0.225, 0.0, accent, size=0.018, front_only=True)
+    else:  # birrete
+        builder.tube((0, 0, -0.03), (0, 0, 0.12), 0.20, 0.19, main, sides=12)
+        builder.box((0, 0, 0.135), (0.46, 0.46, 0.03), DARK_LEATHER, rot=(math.radians(45), 'Z'))
+        builder.blob((0, 0, 0.155), (0.03, 0.03, 0.015), accent, subdiv=1)
+        builder.tube((0, 0, 0.155), (0.21, -0.05, 0.14), 0.006, 0.006, accent, sides=4)
+        builder.tube((0.21, -0.05, 0.14), (0.22, -0.06, 0.0), 0.010, 0.022, accent, sides=6)
+
+
+def cape_generic(builder, item_id, item):
+    main, accent = theme(item_id, item)
+    t = tier(item)
+    style = pick(item_id, 4)
+    length = 0.78 + 0.04 * t
+    if style == 0:  # punta
+        top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.38, 0.15, -length), (0, 0.18, -length - 0.14), (-0.38, 0.15, -length)]
+    elif style == 1:  # recta con bajo ancho
+        top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.40, 0.16, -length), (-0.40, 0.16, -length)]
+    elif style == 2:  # jirones
+        top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.38, 0.15, -length)]
+        for k in range(1, 6):
+            x = 0.38 - 0.76 * k / 6
+            top.append((x + 0.063, 0.16, -length + (0.16 if k % 2 else 0.0)))
+            top.append((x, 0.16, -length - 0.10 + 0.05 * (k % 2)))
+        top.append((-0.38, 0.15, -length))
+    else:  # dos colas
+        top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.38, 0.15, -length), (0.06, 0.17, -length + 0.22),
+               (0.0, 0.17, -length + 0.30), (-0.06, 0.17, -length + 0.22), (-0.38, 0.15, -length)]
+    builder.poly(top, [(x, y + 0.035, z) for x, y, z in top], main)
+    builder.tube((-0.22, 0.06, 0.04), (0.22, 0.06, 0.04), 0.025, 0.025, accent, sides=7)
+    # Ribete del bajo y broche
+    builder.tube((-0.36, 0.20, -length + 0.06), (0.36, 0.20, -length + 0.06), 0.012, 0.012, accent, sides=5)
+    for side in (-1, 1):
+        builder.blob((side * 0.21, 0.04, 0.04), (0.04, 0.025, 0.04), accent, subdiv=1)
+    if t >= 2:  # esclavina sobre los hombros
+        builder.blob((0, 0.11, -0.02), (0.30, 0.09, 0.13), accent if t >= 3 else main, subdiv=2)
+    if t >= 1:
+        builder.blob((0, 0.20, -0.30), (0.08, 0.02, 0.08), accent, subdiv=1)
+    if t >= 4:
+        for x in (-0.2, 0.2):
+            builder.tube((x, 0.20, -0.25), (x * 1.2, 0.21, -length + 0.1), 0.008, 0.008, GOLD, sides=4)
+
+
+def backpack(builder, item_id, item):
+    """Mochila de viaje: cuerpo, solapa, correas, petate arriba y bolsillos; adornos por nivel."""
+    main, accent = theme(item_id, item)
+    cloth = main if main not in (STEEL, IRON, SILVER, CHROME, TIN, RHENIUM, GOLD) else LEATHER
+    t = tier(item)
+    builder.tube((-0.20, 0.06, 0.04), (0.20, 0.06, 0.04), 0.02, 0.02, DARK_LEATHER, sides=6)
+    for side in (-1, 1):
+        builder.tube((side * 0.12, 0.06, 0.04), (side * 0.13, 0.11, -0.08), 0.022, 0.022, DARK_LEATHER, sides=5)
+    builder.box((0, 0.20, -0.25), (0.36, 0.17, 0.42), cloth)
+    builder.box((0, 0.20, -0.09), (0.37, 0.18, 0.10), DARK_LEATHER)
+    builder.box((0, 0.29, -0.14), (0.30, 0.02, 0.18), DARK_LEATHER, rot=(math.radians(-6), 'X'))
+    builder.blob((0, 0.305, -0.21), (0.035, 0.012, 0.025), accent, subdiv=1)
+    for side in (-1, 1):
+        builder.box((side * 0.20, 0.20, -0.30), (0.05, 0.12, 0.16), DARK_LEATHER)
+    roll = WHITE if pick(item_id, 2) else EARTH
+    builder.tube((-0.21, 0.18, 0.03), (0.21, 0.18, 0.03), 0.065, 0.065, roll, sides=8)
+    for x in (-0.12, 0.12):
+        builder.tube((x, 0.18, -0.04), (x, 0.18, 0.10), 0.068, 0.068, DARK_LEATHER, sides=8)
+    if item_id.startswith('learning_'):
+        builder.box((0.08, 0.255, 0.06), (0.10, 0.035, 0.12), RUBY if pick(item_id, 2) else COBALT)
+        builder.tube((-0.10, 0.27, -0.02), (-0.13, 0.28, 0.12), 0.022, 0.022, WHITE, sides=6)
+    for k in range(t):
+        builder.blob((-0.12 + 0.08 * k, 0.29, -0.40), (0.022, 0.01, 0.022), accent, subdiv=1)
+    if t >= 3:
+        builder.tube((0.22, 0.24, -0.05), (0.24, 0.26, -0.40), 0.03, 0.03, accent, sides=6)
 
 
 def make_item(item_id, item):

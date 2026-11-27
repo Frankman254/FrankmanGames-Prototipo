@@ -1,3 +1,24 @@
+## 2026-11-27 — MOD-09b: tocados, mochilas, capas y armas con identidad propia (Claude)
+
+**Archivos:** `assets/models/equipo.glb`, `scripts/blender/equipo.py`, `PROCEDENCIA.md`, `docs/TAREAS.md`.
+
+**Qué se hizo:**
+- **Colores.** El tema de cada objeto sale del prefijo de material del ID (cobre, latón, plata, obsidiana, corindón, cobalto…) o de su elemento y familia (tierra, fuego, aire, agua, escarcha, rayo, resistencia, espíritu…). Las armas dejan de ser todas acero gris.
+- **Tocados.** Diez siluetas por familia: ala ancha, copa alta con cresta, pluma, concha, gorro de piel, tricornio, morrión, diadema con velo, visera y birrete con borla. Los objetos de nivel alto llevan más piedras y adornos.
+- **Mochilas.** Los 26 objetos «Mochila» ya son mochilas, con cuerpo, solapa, petate y bolsillos, y no capas.
+- **Capas.** Cuatro cortes (punta, recta, jirones y dos colas), con ribete, broches y esclavina según el nivel.
+- **Sin cambios** en los diseños anteriores, los IDs, los anclajes ni `ajusteEquipo.json`.
+
+**Validación:**
+- `validar_equipo.py`: 394 nodos y 8 grupos.
+- `tests/jl259_glbValidator.test.ts`: el GLB se quedó primero en 106.793 triángulos, por encima del tope de 100.000. Se rebajó la geometría hasta 98.245, sin tocar la prueba.
+- `npm test`, `npm run typecheck`, `npx vite build` y `checkPublishable` limpios.
+- No se miró en Electron: las capturas puestas son JL-404 y JL-434…436 de Junie.
+
+**Evidencia:** `work/claude-mod09b/lamina_head.png`, `lamina_back.png`, `lamina_weapon.png` y los logs de Blender.
+
+---
+
 ## 2026-11-27 — Cola de Junie desbloqueada y tanda JL-424…JL-453 (Claude)
 
 **Archivos:** `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`, `work/prompts-noche/COLA_JUNIE.md`, `scripts/mac/junie_continuo.sh`.
