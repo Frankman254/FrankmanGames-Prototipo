@@ -8,6 +8,16 @@
 
 **Evidencia:** `work/qa/` (capturas y resultados de esos escenarios).
 
+## 2026-11-26 — JL-361: verificar Estrella de vendaval con clic real (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Añadí el escenario Electron `estrellaCursor`: crea al Cazador del Manglar en nivel suficiente, coloca dos enemigos quietos con el centro a 7 m y otro a 2 m en un brazo, apunta el hechizo con `Q` y lo confirma con un clic real en el lienzo. El escenario mide el punto recibido, el daño de ambos enemigos y la consola; no cambia lógica productiva ni cifras.
+
+**Validación:** Electron `estrellaCursor`: 6/6 comprobaciones, consola limpia; clic confirmado a 7,0368 m del jugador y a 0,0368 m del centro, con 60 de daño a cada enemigo (el segundo a 2,0003 m del centro). `npm test`: 423 archivos, 5.072 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `node --check scripts/qaElectron.mjs` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl361/electron/resultado.json` y capturas revisadas `jl361-apuntado-a-7m.jpg`, `jl361-impacto-estrella.jpg` y `jl361-enemigos-danados.jpg`.
+
 ---
 
 ## 2026-11-26 — JL-360: verificar el mapa grande de la cripta (Junie)

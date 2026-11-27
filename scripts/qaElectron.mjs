@@ -7606,6 +7606,140 @@ const scenarios = {
         check('JL-359: consola sin errores nuevos',consoleErrors.length===0,consoleErrors.slice(0,5).join(' | ')||'0');
     },
 
+    /** JL-361: clic real de Estrella de vendaval a 7 m y daño en el centro y un brazo. */
+    async estrellaCursor() {
+        await newGame('QA Estrella', { classId: 'mangrove_hunter' });
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+        await js('__game.castInput.setMode("pressClick")');
+
+        const setup = await js(`(() => {
+            const w=${W}, c=w.character;
+            c.gainXp(5000000);
+            c.resource=c.maxResource;
+            if (c.spellbook.rank('gale_star')===0) c.spellbook.learn('gale_star');
+            c.spellbook.hotbar[0]='gale_star';
+            w.player.cooldowns={};w.player.gcd=0;w.player.invulnerable=1000;
+            w.player.attackTarget=null;
+
+            const origin={x:w.player.pos.x,y:w.player.pos.y};
+            let placement=null;
+            for(let i=0;i<72;i++) {
+                const angle=i*Math.PI/36;
+                const direction={x:Math.cos(angle),y:Math.sin(angle)};
+                const center={x:origin.x+direction.x*7,y:origin.y+direction.y*7};
+                const arm={x:center.x-direction.y*2,y:center.y+direction.x*2};
+                if(!w.grid.walkable(center)||!w.grid.walkable(arm)||!w.grid.lineOfSight(origin,center)) continue;
+                placement={angle,center,arm};
+                break;
+            }
+            if(!placement) throw new Error('No hay un punto caminable y con línea de visión a 7 m para Estrella de vendaval');
+
+            const centerEnemy=w.spawnEnemy('melee',placement.center);
+            const armEnemy=w.spawnEnemy('melee',placement.arm);
+            for(const enemy of [centerEnemy,armEnemy]) {
+                enemy.state='stagger';enemy.stateTime=-1e9;enemy.frozen=true;
+                enemy.health=1000000;enemy.maxHealth=1000000;
+            }
+            const original=w.commandCastSlot.bind(w);
+            globalThis.__jl361={centerId:centerEnemy.id,armId:armEnemy.id,centerHealth:centerEnemy.health,armHealth:armEnemy.health,cast:null};
+            w.commandCastSlot=(slot,aim)=>{
+                const result=original(slot,aim);
+                globalThis.__jl361.cast={slot,aim:{point:{x:aim.point.x,y:aim.point.y},targetId:aim.targetId},result};
+                return result;
+            };
+            const rig=__game.view.rig;
+            rig.yawDeg=Math.atan2(placement.center.x-origin.x,placement.center.y-origin.y)*180/Math.PI;
+            rig.pitchDeg=40;rig.distance=12;
+            return {
+                classId:c.classDef.id,level:c.level,spellRank:c.spellbook.rank('gale_star'),slot:c.spellbook.hotbar[0],
+                centerId:centerEnemy.id,armId:armEnemy.id,
+                origin,center:placement.center,arm:placement.arm,angle:placement.angle,
+                centerDistance:Math.hypot(centerEnemy.pos.x-origin.x,centerEnemy.pos.y-origin.y),
+                armDistance:Math.hypot(armEnemy.pos.x-placement.center.x,armEnemy.pos.y-placement.center.y),
+                lineOfSight:w.grid.lineOfSight(origin,placement.center),
+                range:w.content.spells.gale_star.range,
+            };
+        })()`);
+        check(
+            'JL-361: Cazador del Manglar prepara Estrella de vendaval con enemigos a 7 m y 2 m del centro',
+            setup.classId==='mangrove_hunter'&&setup.level>=4&&setup.spellRank>0&&setup.slot==='gale_star'&&
+                Math.abs(setup.centerDistance-7)<0.05&&Math.abs(setup.armDistance-2)<0.05&&setup.lineOfSight&&setup.centerDistance<=setup.range,
+            JSON.stringify(setup),
+        );
+        await sleep(900);
+
+        const screen = await js(`(() => {
+            const scene=__game.view.scene,cam=__game.view.rig.camera,engine=scene.getEngine();
+            const canvas=engine.getRenderingCanvas(),rect=canvas.getBoundingClientRect();
+            const V=cam.position.constructor,M=cam.getViewMatrix().constructor;
+            const viewport=cam.viewport.toGlobal(engine.getRenderWidth(),engine.getRenderHeight());
+            const target=window.__jl361.centerId===null?null:${W}.enemies.get(window.__jl361.centerId)?.pos;
+            if(!target) return null;
+            const groundY=__game.view.heights.sample(target.x,target.y);
+            const point=V.Project(new V(target.x,groundY+0.02,target.y),M.Identity(),scene.getTransformMatrix(),viewport);
+            const localX=point.x*canvas.clientWidth/engine.getRenderWidth();
+            const localY=point.y*canvas.clientHeight/engine.getRenderHeight();
+            const picked=__game.view.pickGround(localX,localY);
+            return {
+                x:rect.x+localX,y:rect.y+localY,localX,localY,
+                within:localX>=0&&localY>=0&&localX<rect.width&&localY<rect.height,
+                ground:picked,
+                groundDistance:picked?Math.hypot(picked.x-target.x,picked.y-target.y):null,
+                pickedEnemy:__game.view.pickEnemy(localX,localY),
+                centerId:window.__jl361.centerId,
+            };
+        })()`);
+        if(!screen) throw new Error('No se pudo proyectar al enemigo del centro de la estrella');
+        check(
+            'JL-361: el punto real del cursor cae sobre el enemigo del centro a 7 m',
+            screen.within&&screen.pickedEnemy===screen.centerId&&screen.groundDistance!==null&&screen.groundDistance<0.75,
+            JSON.stringify(screen),
+        );
+        if(!(screen.within&&screen.pickedEnemy===screen.centerId&&screen.groundDistance!==null&&screen.groundDistance<0.75))
+            throw new Error(`El cursor proyectado no cae sobre el enemigo central: ${JSON.stringify(screen)}`);
+
+        const errorsBefore=consoleErrors.length;
+        await key('KeyQ','q');
+        await until('__game.castInput.aiming===0',5000,'apuntar Estrella de vendaval con Q');
+        await cdp('Input.dispatchMouseEvent',{type:'mouseMoved',x:screen.x,y:screen.y});
+        await sleep(300);
+        await shot('jl361-apuntado-a-7m');
+        await mouse(screen.x,screen.y);
+        await until('window.__jl361.cast!==null',5000,'confirmar el clic real de Estrella de vendaval');
+        await shot('jl361-impacto-estrella');
+
+        const cast=await js('window.__jl361.cast');
+        const aimDistance=cast?Math.hypot(cast.aim.point.x-setup.origin.x,cast.aim.point.y-setup.origin.y):null;
+        const centerAimDistance=cast?Math.hypot(cast.aim.point.x-setup.center.x,cast.aim.point.y-setup.center.y):null;
+        check(
+            'JL-361: el clic real confirma el slot del hechizo sobre el punto de 7 m',
+            cast?.slot===0&&cast.result===null&&cast.aim.targetId===setup.centerId&&aimDistance!==null&&Math.abs(aimDistance-7)<0.75&&centerAimDistance!==null&&centerAimDistance<0.75,
+            JSON.stringify({cast,aimDistance,centerAimDistance}),
+        );
+
+        await until(
+            `${W}.enemies.get(${setup.centerId})?.health<window.__jl361.centerHealth&&${W}.enemies.get(${setup.armId})?.health<window.__jl361.armHealth`,
+            10000,
+            'daño al enemigo central y al enemigo situado en el brazo de la estrella',
+        );
+        const damage=await js(`(() => {
+            const center=${W}.enemies.get(${setup.centerId}),arm=${W}.enemies.get(${setup.armId}),cast=window.__jl361.cast;
+            return {
+                center:{before:window.__jl361.centerHealth,after:center?.health??null,damage:center?window.__jl361.centerHealth-center.health:0,distance:Math.hypot(center.pos.x-cast.aim.point.x,center.pos.y-cast.aim.point.y)},
+                arm:{before:window.__jl361.armHealth,after:arm?.health??null,damage:arm?window.__jl361.armHealth-arm.health:0,distance:Math.hypot(arm.pos.x-cast.aim.point.x,arm.pos.y-cast.aim.point.y)},
+            };
+        })()`);
+        check(
+            'JL-361: reciben daño el enemigo del centro y el situado a 2 m en un brazo',
+            damage.center.damage>0&&damage.center.distance<0.75&&damage.arm.damage>0&&Math.abs(damage.arm.distance-2)<0.05,
+            JSON.stringify(damage),
+        );
+        await sleep(250);
+        await shot('jl361-enemigos-danados');
+        check('JL-361: consola sin errores nuevos',consoleErrors.length===errorsBefore,consoleErrors.slice(errorsBefore).join(' | ')||'0');
+    },
+
     async criptaAccesos() {
         // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
         await newGame('QA Accesos');

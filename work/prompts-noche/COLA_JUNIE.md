@@ -1631,7 +1631,7 @@ Contexto del coordinador:
 - [x] JL-360 Escenario `criptaMapaGrande`: en el piso 10, M abre el mapa del piso con la rejilla. — commit «JL-360: verificar el mapa grande de la cripta» — Electron 6/6, consola limpia; escalera ausente al llegar, visible en ambos mapas a 3,5 m y flecha del minimapa desde 96,81 m. Evidencia: `work/junie-jl360/electron/resultado.json` y las tres capturas revisadas en `work/junie-jl360/electron/`.
   - Al llegar, la escalera de bajada no está en el minimapa ni en el mapa.
   - Tras descubrirla, sale en los dos, y con flecha en el borde del minimapa cuando queda fuera.
-- [ ] JL-361 Escenario `estrellaCursor`: con el Cazador del Manglar, Estrella de vendaval con clic real a 7 m sobre un enemigo. El enemigo recibe daño, y otro a 2 m del centro también (brazo de la estrella).
+- [x] JL-361 Escenario `estrellaCursor`: con el Cazador del Manglar, Estrella de vendaval con clic real a 7 m sobre un enemigo. El enemigo recibe daño, y otro a 2 m del centro también (brazo de la estrella). — commit «JL-361: verificar Estrella de vendaval con clic real» — Electron 6/6, consola limpia; punto de clic a 7,0368 m, 60 de daño al enemigo central y al del brazo a 2,0003 m; evidencia en `work/junie-jl361/electron/resultado.json` y capturas revisadas.
 
 ### B. Pruebas puras de lo nuevo (Vitest)
 - [ ] JL-362 En los 100 pisos, los sitios de Chalo y Nina (`cryptStaffSpots` y `World.placeInteriorNpc`) cumplen dos cosas:
