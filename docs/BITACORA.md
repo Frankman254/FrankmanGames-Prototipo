@@ -1,3 +1,31 @@
+## 2026-11-27 — Cola de Junie desbloqueada y tanda JL-424…JL-453 (Claude)
+
+**Archivos:** `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`, `work/prompts-noche/COLA_JUNIE.md`, `scripts/mac/junie_continuo.sh`.
+
+**Qué se hizo:**
+- **Bloqueos falsos.** Junie bloqueó JL-391, 392, 394, 401 y 403…408 diciendo que la tanda JL-384…JL-423 no estaba autorizada, aunque la fila de lote existía. El creador confirma ambas tandas el 2026-11-27 («Sí, autorizo ambas»), y esas diez tareas se reabren.
+- **TAREAS.** Nueva sección «Lotes autorizados para Junie (vigentes)» al principio, para que la autorización no se pierda entre filas largas.
+- **Prompt del bucle.** Ahora remite a esa sección.
+- **Tanda nueva JL-424…JL-453.** Termina lo parcial: HZ-04b, HZ-03, D-07, filas Parcial viejas, pruebas y capturas de MOD-09, datos e interfaz.
+
+**Validación:** `bash -n scripts/mac/junie_continuo.sh` y `npm run docs:check` limpios. La cola queda con 55 `- [ ]` y la reserva con 40.
+
+**Evidencia:** `work/prompts-noche/COLA_JUNIE.md` (sección «Tanda del 2026-11-27»).
+
+---
+
+## 2026-11-27 — JL-408: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** JL-408 quedó bloqueada porque `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383 y JL-384…JL-423 no consta autorizada. No inspeccioné el tooltip ni el contador de piezas, no modifiqué código o pruebas y no abrí Electron; amplié a JL-408 la solicitud de autorización conjunta ya existente. No toqué otras casillas ni los cambios ajenos presentes en `work/junie-jl-99/`.
+
+**Validación:** Línea base previa: `npx tsc --noEmit` limpio; `npx vitest run`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: la tarea quedó bloqueada antes de revisar la interfaz.
+
+**Evidencia:** Bloqueo registrado en `docs/TAREAS.md` y `work/prompts-noche/COLA_JUNIE.md`; no se generaron capturas ni archivos en `work/junie-jl408/`.
+
+---
+
 ## 2026-11-27 — JL-407: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

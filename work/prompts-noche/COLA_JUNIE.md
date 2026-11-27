@@ -1677,7 +1677,7 @@ Contexto del coordinador:
 - [x] JL-383 `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces. — commit «JL-383: proponer la siguiente bolsa de pruebas» — evidencia: `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` (20 propuestas); `npx tsc --noEmit`, `npx vitest run`, `npm run typecheck` y `npm run docs:check` limpios.
 
 
-## Tanda del 2026-11-26, segunda parte (el creador: «arreglar la cola de junie para que no se quede sin tareas» y la auditoría externa de balance). JL-384…JL-423, en este orden, después de JL-383.
+## Tanda del 2026-11-26, segunda parte (el creador: «arreglar la cola de junie para que no se quede sin tareas» y la auditoría externa de balance). JL-384…JL-423, en este orden, después de JL-383. **AUTORIZADA** por el creador (2026-11-26; respuesta del 2026-11-27: «Sí, autorizo ambas»). No se bloquea por falta de autorización.
 
 Contexto del coordinador:
 - La auditoría externa del 2026-11-26 (BAL-P0-FIEL) mostró que `balM3.ts`, `auditCombat.ts` y `auditBuilds.ts` no reproducen el juego. Ahora llevan la cabecera «EXPLORATORIO, NO FIEL».
@@ -1702,12 +1702,12 @@ Contexto del coordinador:
 - [x] JL-389 Prueba que demuestre si `flatPerLevel.armor` de `data/zones.json` cambia algo en el enemigo (`src/sim/zones.ts:65`, `src/data/zonesSchema.ts:131`). — commit «JL-389: demostrar que armor no escala al enemigo» — `tests/zones.test.ts` 1/1: el enemigo `melee` de nivel 10 queda idéntico con `armor` 0,15 y 100,15; `npm test`: 434 archivos, 5.098 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. Pregunta al creador en `docs/ACCIONES_CREADOR.md`; evidencia `work/junie-jl389/RESULTADO.md`.
   - Si no tiene efecto, escribe la pregunta al creador en `ACCIONES_CREADOR.md`: quitar la clave o hacer que cuente. No lo arregles.
 - [x] JL-390 Prueba de `src/rpg/spoils.ts`: con varios jugadores, ¿puede la suma de los `minXpShare` pasar de la XP total del monstruo? Si pasa, haz una tabla con un caso concreto y pregunta al creador en `ACCIONES_CREADOR.md`. No lo arregles. — commit «JL-390: comprobar exceso de XP mínima en grupos» — `tests/rpg/energySpoils.test.ts` (51/51); `npm test` 434 archivos, 5.099 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios; pregunta en `docs/ACCIONES_CREADOR.md`; evidencia `work/junie-jl390/RESULTADO.md`.
-- [!] JL-391 `scripts/balance/auditBuilds.ts` aplica la resistencia del propio atacante a su daño. — BLOQUEADA: `docs/TAREAS.md` autoriza en lote JL-354…JL-383, pero no JL-384…JL-423; `BAL-P0-FIEL` no autoriza el cambio.
+- [ ] JL-391 `scripts/balance/auditBuilds.ts` aplica la resistencia del propio atacante a su daño.
   - Prueba que lo demuestre y arreglo en el script (es exploratorio; no toca `src/` ni `data/`).
   - Deja la cabecera «EXPLORATORIO, NO FIEL».
-- [!] JL-392 Batería fiel con `--skill malo` y `--skill bueno`; la de `medio` es la del coordinador. Tabla comparada por franja en `work/junie-jl392/COMPARADA.md`: victorias, TTK mediano y vida restante. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada.
+- [ ] JL-392 Batería fiel con `--skill malo` y `--skill bueno`; la de `medio` es la del coordinador. Tabla comparada por franja en `work/junie-jl392/COMPARADA.md`: victorias, TTK mediano y vida restante.
 - [x] JL-393 De la batería fiel, lista las filas `preparado` con 0 victorias y las que terminan en menos de 3 s. Por cada una, el nivel, la vida y el daño por segundo medidos. Solo lista, en `work/junie-jl393/EXTREMOS.md`. — commit «JL-393: listar extremos de la batería fiel» — 10 filas validadas a partir de 2.880 corridas; `npx tsc --noEmit`, `npx vitest run` y `npm run docs:check` limpios; evidencia en `work/junie-jl393/EXTREMOS.md`.
-- [!] JL-394 `npm run typecheck` pasa salvo `balM3.ts` (conocido). Comprueba si `fiel.ts`, `fielRun.ts` y `gear.ts` están limpios; arregla los tipos de esos tres si no. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada, y `BAL-P0-FIEL` no autoriza esta tarea.
+- [ ] JL-394 `npm run typecheck` pasa salvo `balM3.ts` (conocido). Comprueba si `fiel.ts`, `fielRun.ts` y `gear.ts` están limpios; arregla los tipos de esos tres si no.
 
 ### B. Pruebas y robustez
 - [x] JL-395 Las 10 pruebas más lentas de la suite (`npx vitest run --reporter=verbose`, con su tiempo) en `work/junie-jl395/LENTAS.md`. Propón cómo acelerar la más lenta sin cambiar lo que prueba; no lo apliques. — commit «JL-395: medir las diez pruebas más lentas de Vitest» — `work/junie-jl395/LENTAS.md`; Vitest 434 archivos aprobados, 1 omitido; 5.099 pruebas aprobadas, 1 `todo`; `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios.
@@ -1718,15 +1718,15 @@ Contexto del coordinador:
 - [x] JL-400 Prueba de `junie_continuo.sh`, sin lanzar Junie: con una cola sin `- [ ]` y una reserva con 12, el relleno pasa 10 y marca `[>]`; la segunda vez pasa 2; la tercera para. Hazla con archivos en `work/junie-jl400/` y la función `rellenar` copiada; no modifiques el script. — commit «JL-400: probar el relleno de la cola de Junie» — `work/junie-jl400/RESULTADO.md`, arnés y fixtures; 10 + 2 + parada, sin lanzar Junie.
 
 ### C. Audio y modelos (solo medir y capturar; el código y los assets son del coordinador o de OMP)
-- [!] JL-401 Lista de los sonidos que el juego pide y no existen (claves de `data/` o de `src/audio/` sin archivo en `assets/`), en `work/junie-jl401/FALTAN.md`. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionó el audio ni se creó el inventario.
+- [ ] JL-401 Lista de los sonidos que el juego pide y no existen (claves de `data/` o de `src/audio/` sin archivo en `assets/`), en `work/junie-jl401/FALTAN.md`.
 - [x] JL-402 Electron: en cada pueblo con música propia, comprueba que suena la pista de ese pueblo (nombre del archivo en la consola de depuración o en el estado del mezclador). Lista los pueblos con pista repetida o sin pista. — commit «JL-402: comprobar las pistas propias de los pueblos» — `work/junie-jl402/electron/RESULTADO.md` y cinco capturas revisadas
-- [!] JL-403 Electron: capturas de frente, perfil y espalda de las tres clases, en hombre y en mujer, de pie y en carrera. Lista dónde atraviesa la ropa o el pelo. Evidencia en `work/junie-jl403/`. — BLOQUEADA: la única autorización en lote para Junie en `docs/TAREAS.md` cubre JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionaron modelos ni se ejecutó Electron.
-- [!] JL-404 Electron: captura puesta de cada arma, escudo, tocado y capa con modelo propio. La tabla de las ranuras que se ven sin modelo es para MOD-09. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionaron modelos ni se abrió Electron; la solicitud de autorización de la tanda ya figura en `docs/ACCIONES_CREADOR.md`.
+- [ ] JL-403 Electron: capturas de frente, perfil y espalda de las tres clases, en hombre y en mujer, de pie y en carrera. Lista dónde atraviesa la ropa o el pelo. Evidencia en `work/junie-jl403/`.
+- [ ] JL-404 Electron: captura puesta de cada arma, escudo, tocado y capa con modelo propio. La tabla de las ranuras que se ven sin modelo es para MOD-09.
 
 ### D. Interfaz y textos
-- [!] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionó `src/ui/` ni se ejecutó la prueba de i18n.
-- [!] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista. — BLOQUEADA: `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionaron las pantallas ni se abrió Electron; la solicitud de autorización de la tanda ya figura en `docs/ACCIONES_CREADOR.md`.
-- [!] JL-407 Accesibilidad: todas las acciones de la barra y de los menús principales se pueden hacer con teclado. Lista lo que solo va con ratón. — BLOQUEADA: la única autorización en lote para Junie en `docs/TAREAS.md` cubre JL-354…JL-383; JL-384…JL-423 no consta autorizada. No se inspeccionó ni modificó la interfaz, ni se abrió Electron. Solicitud de autorización en `docs/ACCIONES_CREADOR.md`.
+- [ ] JL-405 Lista los textos de `src/ui/` sin clave en `data/i18n/en.ui.json`; la prueba de i18n debería cogerlos. Si la prueba no los coge, propón el cambio en la prueba sin relajarla.
+- [ ] JL-406 Electron a 1280×720 y 1920×1080: inventario, libro de hechizos, mapa y tienda sin texto cortado. Capturas y lista.
+- [ ] JL-407 Accesibilidad: todas las acciones de la barra y de los menús principales se pueden hacer con teclado. Lista lo que solo va con ratón.
 - [ ] JL-408 Electron: tooltip de un objeto de set con piezas puestas y sin ellas. El contador de piezas cuadra con lo equipado (el creador vio posiciones rotas en el set de la Diablica).
 
 ### E. Datos (solo validar)
@@ -1747,3 +1747,51 @@ Contexto del coordinador:
 - [ ] JL-421 Rendimiento: FPS medio en el mundo abierto (Chame), en la cripta piso 1 y en el piso 50, en `work/junie-jl421/FPS.md`. Compáralo con la última medida que haya en `work/`.
 - [ ] JL-422 Mide el tamaño del paquete de `npm run build` por carpeta de `assets/`; lista las 10 más pesadas.
 - [ ] JL-423 `work/junie-propuestas/BOLSA_SIGUIENTE_7.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces. La cola sigue con la reserva.
+
+## Tanda del 2026-11-27 (creador: «prepara las tareas de junie, sugiere tareas a terminar»; «Sí, autorizo ambas»). JL-424…JL-453, en este orden, después de JL-423. **AUTORIZADA**: ver «Lotes autorizados para Junie (vigentes)» en `docs/TAREAS.md`.
+
+Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir frentes nuevos. Las reglas son las de `JUNIE.md`:
+- sin cambiar cifras de `data/`;
+- un commit por tarea;
+- la evidencia va en `work/junie-jl<n>/`;
+- una pregunta para el creador se anota en `ACCIONES_CREADOR.md` y la cola sigue.
+
+### A. Terminar lo parcial
+- [ ] JL-424 HZ-04b: lista lo que falta de la fila de `docs/TAREAS.md` frente al código actual (`grep` en `src/rpg/` y `src/sim/`). Haz la primera pieza que no dependa del creador, con su prueba.
+- [ ] JL-425 HZ-04b: segunda pieza pendiente, con su prueba.
+- [ ] JL-426 HZ-03: de los 18 hechizos que esperan primitivas, lista los que ya se pueden hacer con las primitivas que existen hoy. Solo la lista, con su motivo.
+- [ ] JL-427 D-07: lista los hechizos de la línea nueva sin icono propio en `work/junie-jl427/`. No crees iconos.
+- [ ] JL-428 Revisa las filas «Parcial» de `docs/TAREAS.md` (JL-41…47, JL-59…64, JL-73…108, JL-166…180, JL-254…353). En `work/junie-jl428/PENDIENTES.md`, indica qué subtarea sigue abierta y si es tuya, de OMP o del creador. No ejecutes nada.
+- [ ] JL-429 De `PENDIENTES.md` (JL-428), haz la primera subtarea tuya que no dependa del creador.
+- [ ] JL-430 Ídem, la segunda.
+- [ ] JL-431 Ídem, la tercera.
+
+### B. Modelos y equipo (solo medir y capturar; los modelos son del coordinador)
+- [ ] JL-432 Prueba en `tests/`: cada objeto de `items.json` con ranura weapon, offhand, head o back tiene nodo `obj_<id>` en `assets/models/equipo.glb`. Lee el JSON del GLB, sin Babylon. Si falta alguno, la prueba falla: no la relajes.
+- [ ] JL-433 Prueba: ningún nodo `obj_*` de `equipo.glb` apunta a un objeto que no existe en `items.json`.
+- [ ] JL-434 Electron: el héroe de cada clase con la Diablica Espeja completa. Capturas de frente, de perfil y de espalda. Lista las piezas que atraviesan el cuerpo o flotan.
+- [ ] JL-435 Electron: captura puesta de 10 tocados y 10 capas al azar con semilla fija. Lista los que flotan, se hunden o salen girados.
+- [ ] JL-436 Electron: captura con 10 armas a dos manos y 10 a una mano en la mano del héroe. Lista las de agarre o giro raro.
+- [ ] JL-437 Mide el tiempo de carga de `equipo.glb` en Electron (6,4 MB) antes y después del primer equipo puesto. Informe.
+
+### C. Datos y robustez
+- [ ] JL-438 Prueba: cada hechizo de cada clase tiene nombre y descripción en español y en inglés.
+- [ ] JL-439 Prueba: cada enemigo de `enemies.json` con zona aparece en algún punto de aparición de esa zona.
+- [ ] JL-440 Prueba: cada receta de oficio produce un objeto que existe, y sus ingredientes existen.
+- [ ] JL-441 Prueba: guardar y cargar conserva el equipo puesto, la mascota, la montura y la barra.
+- [ ] JL-442 Electron: el jugador entra y sale de la cripta tres veces y la música vuelve a la de la zona. Consola limpia.
+- [ ] JL-443 Prueba: los sets de equipo no comparten pieza entre dos sets.
+
+### D. Interfaz
+- [ ] JL-444 Electron: el libro de hechizos con 30 o más hechizos aprendidos permite desplazarse y no corta texto.
+- [ ] JL-445 Electron: la tienda con el inventario lleno muestra el aviso y no vende.
+- [ ] JL-446 Electron: el tooltip de un arma muestra el mismo daño que usa el combate. Compara con `src/rpg/` y anota la cuenta.
+
+### E. Reintentos y cierre
+- [ ] JL-447 Reintento de lo que esté `[!]` en JL-384…JL-446 que no dependa del creador.
+- [ ] JL-448 Consola limpia en los escenarios Electron nuevos de esta tanda.
+- [ ] JL-449 Suite completa, `npm run typecheck`, `npm run build` y QA por tandas, sin regresiones.
+- [ ] JL-450 `docs:check` limpio y `docs/TAREAS.md` sin filas de JL-384…449 en estado ambiguo.
+- [ ] JL-451 `work/junie-jl451/PREGUNTAS.md` con las preguntas de las tandas JL-384…450. Cada una con su opción recomendada.
+- [ ] JL-452 Revisa `RESERVA_JUNIE.md`: marca `[x]` lo que ya esté hecho por otra tarea, con la referencia.
+- [ ] JL-453 `work/junie-propuestas/BOLSA_SIGUIENTE_8.md` con 20 tareas comprobadas con `grep`. Son propuestas: no se ejecutan.
