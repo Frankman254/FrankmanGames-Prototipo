@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-407: bloqueo por falta de autorización en TAREAS (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** JL-407 quedó bloqueada porque `docs/TAREAS.md` solo autoriza en lote JL-354…JL-383 y JL-384…JL-423 no consta autorizada. No inspeccioné ni modifiqué la interfaz ni abrí Electron; amplié a JL-407 la solicitud conjunta de autorización ya existente. No toqué otras casillas ni los cambios ajenos presentes en `work/junie-jl-99/`.
+
+**Validación:** `npm test`: 434 archivos, 5.101 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` limpio en los tres proyectos; `npm run docs:check`: 218 rutas citadas, todas existen. La línea base `npx tsc --noEmit` también quedó limpia. No aplica Electron: la tarea quedó bloqueada antes de revisar la interfaz.
+
+**Evidencia:** Bloqueo registrado en `docs/TAREAS.md` y `work/prompts-noche/COLA_JUNIE.md`; no se generaron capturas ni archivos en `work/junie-jl407/`.
+
+---
+
 ## 2026-11-27 — JL-406: bloqueo por falta de autorización en TAREAS (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
