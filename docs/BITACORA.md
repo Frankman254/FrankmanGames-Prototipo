@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-383: proponer la siguiente bolsa de pruebas (Junie)
+
+**Archivos:** `work/junie-propuestas/BOLSA_SIGUIENTE_6.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reuní 20 propuestas de integración y robustez para una tanda futura, contrastadas con `grep` contra el código y los escenarios Electron existentes. Las propuestas quedan sin autorizar y no se iniciaron; no cambié código, pruebas, balance, reglas, nombres ni assets. No hay cambio visual, así que no aplica captura Electron.
+
+**Validación:** Línea base `npx tsc --noEmit` limpia; `npx vitest run`: 431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`. Verificación final: `npm test` con el mismo resultado, `npm run typecheck` limpio en los tres proyectos y `npm run docs:check` limpio (218 rutas citadas, todas existen).
+
+**Evidencia:** `work/junie-propuestas/BOLSA_SIGUIENTE_6.md`.
+
+---
+
 ## 2026-11-27 — JL-382: reunir preguntas de la cripta y la tanda (Junie)
 
 **Archivos:** `work/junie-jl382/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

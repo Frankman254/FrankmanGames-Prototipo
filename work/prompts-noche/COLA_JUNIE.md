@@ -1674,7 +1674,7 @@ Contexto del coordinador:
   - la escalera en el mapa.
   - Añade las preguntas abiertas: en qué pisos van los PNJ, qué vende Chalo, sus nombres, y si «el pueblo» es la Piedra de casa o la última Piedra elegida.
 - [x] JL-382 Lista en `work/junie-jl382/PREGUNTAS.md` las preguntas al creador de esta tanda, cada una con su opción recomendada. — commit «JL-382: reunir preguntas de la cripta y la tanda» — evidencia: `work/junie-jl382/PREGUNTAS.md`; Vitest (431 archivos, 5.087 aprobadas, 1 omitida y 1 `todo`), `npx tsc --noEmit`, `npm run typecheck` y `npm run docs:check` limpios.
-- [ ] JL-383 `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces.
+- [x] JL-383 `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces. — commit «JL-383: proponer la siguiente bolsa de pruebas» — evidencia: `work/junie-propuestas/BOLSA_SIGUIENTE_6.md` (20 propuestas); `npx tsc --noEmit`, `npx vitest run`, `npm run typecheck` y `npm run docs:check` limpios.
 
 
 ## Tanda del 2026-11-26, segunda parte (el creador: «arreglar la cola de junie para que no se quede sin tareas» y la auditoría externa de balance). JL-384…JL-423, en este orden, después de JL-383.
