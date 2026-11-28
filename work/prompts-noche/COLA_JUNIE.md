@@ -1745,7 +1745,7 @@ Contexto del coordinador:
 - [x] JL-419 Revisa `work/prompts-noche/RESERVA_JUNIE.md`: marca `[x]` lo que ya esté hecho por otra tarea (con la prueba de `grep`), sin borrar líneas. — commit «JL-419: auditar tareas ya cubiertas en reserva» — cinco coincidencias verificadas con referencias `grep` en RJ-07, RJ-15, RJ-18, RJ-23 y RJ-38; las demás casillas y líneas quedaron intactas.
 - [x] JL-420 `docs:check` limpio y `docs/TAREAS.md` sin filas de JL-354…419 en estado ambiguo. — commit «JL-420: aclarar estados de la tanda en TAREAS» — `docs:check` (223 rutas); `npx tsc --noEmit`, `npm run typecheck` y `npx vitest run` limpios; resúmenes JL-354…383 y JL-384…JL-423 distinguen lo cerrado de lo pendiente.
 - [!] JL-421 Rendimiento: FPS medio en el mundo abierto (Chame), en la cripta piso 1 y en el piso 50, en `work/junie-jl421/FPS.md`. Compáralo con la última medida que haya en `work/`. — BLOQUEADA: Chame no tiene zona jugable (`data/zones.json`, `areas: []`); mediciones parciales de cripta, comparación y capturas en `work/junie-jl421/`.
-- [ ] JL-422 Mide el tamaño del paquete de `npm run build` por carpeta de `assets/`; lista las 10 más pesadas.
+- [x] JL-422 Mide el tamaño del paquete de `npm run build` por carpeta de `assets/`; lista las 10 más pesadas. — commit «JL-422: medir tamaño del build por carpeta de assets» — `work/junie-jl422/RESULTADO.md`
 - [ ] JL-423 `work/junie-propuestas/BOLSA_SIGUIENTE_7.md` con 20 tareas comprobadas con `grep`. Son propuestas: no las empieces. La cola sigue con la reserva.
 
 ## Tanda del 2026-11-27 (creador: «prepara las tareas de junie, sugiere tareas a terminar»; «Sí, autorizo ambas»). JL-424…JL-453, en este orden, después de JL-423. **AUTORIZADA**: ver «Lotes autorizados para Junie (vigentes)» en `docs/TAREAS.md`.

@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-422: medir tamaño del build por carpeta de assets (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; informe de medición en `work/junie-jl422/RESULTADO.md`.
+
+**Qué se hizo:** Ejecuté `npm run build` y asocié por SHA-256 los outputs de `dist/assets/` con sus fuentes. El build produjo 1.811 archivos en `dist/assets/` (291,27 MiB); 1.797 outputs coincidieron con fuentes de `assets/` (280,77 MiB). La tabla lista los diez directorios fuente directos con mayor contenido emitido, sin sumar descendientes más de una vez. Anoté aparte los 14 chunks JS/CSS y que el contenido inlineado no se atribuye a un directorio. No cambié código, pruebas, datos ni assets.
+
+**Validación:** `npm run build` correcto, con typecheck de los tres proyectos y `checkPublishable` limpios; `npx tsc --noEmit` limpio; `npx vitest run`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check` y `git diff --check` limpios. No aplica Electron: medición sin cambio visual.
+
+**Evidencia:** `work/junie-jl422/RESULTADO.md`.
+
+---
+
 ## 2026-11-27 — JL-421: medir FPS de cripta y documentar bloqueo de Chame (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia de medición en `work/junie-jl421/`.
