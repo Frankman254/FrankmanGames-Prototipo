@@ -98,9 +98,9 @@ Lo pidió el creador el 2026-11-27: «me gustaria armar un mapa estilo navidad»
 - **Tono.** Una Navidad del istmo: faroles de papel, colores de pollera en las guirnaldas, casitas de quincha con tejas y luces cálidas. Nada de marcas, personajes ni canciones de otros.
 - **Lo decide el creador:** el nombre definitivo; si hay nieve (de momento, ligera); si abre todo el año o solo en diciembre (de momento, siempre); y si habrá misiones, PNJ u objetos de evento (de momento, ninguno y sin cifras nuevas).
 
-## Planificación urbana (VIA-01, PROPUESTA)
+## Planificación urbana (VIA-01, plano aprobado el 2026-11-28)
 
-Lo pidió el creador el 2026-11-27: «hay que armar la primera ciudad correctamente para replicar el sistema de planificacion y modelado de ciudades las demas provincias». Villa Raspadura es la plantilla. Sus datos están en `data/urbanismo/villa_raspadura.json`, y el plano y los choques con lo que hay hoy, en `work/claude-via01/` (`plano.py`, `plano.png`, `CHOQUES.md`). Todas las medidas son PROPUESTA.
+Lo pidió el creador el 2026-11-27: «hay que armar la primera ciudad correctamente para replicar el sistema de planificacion y modelado de ciudades las demas provincias». Villa Raspadura es la plantilla. Sus datos están en `data/urbanismo/villa_raspadura.json`, y el plano y los choques con lo que hay hoy, en `work/claude-via01/` (`plano.py`, `plano.png`, `CHOQUES.md`). El creador aprobó el plano el 2026-11-28 («Apruebo el plano», [00_DECISIONES](00_DECISIONES.md)).
 
 Método, en este orden, para cada ciudad:
 

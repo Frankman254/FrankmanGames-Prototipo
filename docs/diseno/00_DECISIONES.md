@@ -90,6 +90,9 @@ Actualización del creador (2026-11-25, cripta; respuestas en el chat con el coo
 - **Escalera de bajada en el mapa.** Se marca «solo tras descubrirla», en el minimapa y en el mapa del piso. Si queda fuera del minimapa, una flecha en el borde apunta hacia ella.
 - **Dentro de la cripta.** Sus palabras: «dentro de la mazmorra deberia haber un Npc para poder comerciar, y otro npc para poder volver al pueblo sin usar posimas, y deberian haber zonas de agua (no nesesariamente circulares para poder pescar)». Lo implementado en CLA-CRIPTA2 es provisional: en qué pisos aparecen los dos PNJ, sus nombres, el surtido y el destino («la Piedra de casa») son elección del coordinador y esperan revisión.
 
+Actualización del creador (2026-11-28, plano de Villa Raspadura; en el chat con el coordinador):
+- **Plano urbano aprobado.** Sus palabras: «Apruebo el plano». Queda aprobado el trazado de VIA-01 en `data/urbanismo/villa_raspadura.json` (dibujo en `work/claude-via01/plano.png`): plaza mayor peatonal con calle en anillo, avenidas de entrada este y oeste, calles norte y sur, cuatro puertas, ocho manzanas, arboledas en las esquinas, callejón de borde y la lista `reubicar` (nada se borra). Es la plantilla para las ciudades de las demás provincias. VIA-04 puede construirlo en cuanto estén VIA-02 y VIA-03.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**

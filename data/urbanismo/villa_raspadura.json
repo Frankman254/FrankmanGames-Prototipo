@@ -1,6 +1,6 @@
 {
-  "_estado": "PROPUESTA",
-  "_nota": "VIA-01 (creador, 2026-11-27: «hay que armar la primera ciudad correctamente para replicar el sistema de planificacion y modelado de ciudades las demas provincias»). Plantilla del plano de Villa Raspadura: medidas PROPUESTA, metros del mundo (x al este, y al sur). La lee src/world/planUrbano.ts (VIA-02) y la construye VIA-04 cuando el creador apruebe el plano. Método en docs/diseno/01_MUNDO_E_HISTORIA.md, «Planificación urbana».",
+  "_estado": "APROBADO (creador, 2026-11-28: «Apruebo el plano»)",
+  "_nota": "VIA-01 (creador, 2026-11-27: «hay que armar la primera ciudad correctamente para replicar el sistema de planificacion y modelado de ciudades las demas provincias»). Plantilla del plano de Villa Raspadura: medidas PROPUESTA, metros del mundo (x al este, y al sur). La lee src/world/planUrbano.ts (VIA-02) y la construye VIA-04 (plano aprobado por el creador el 2026-11-28). Método en docs/diseno/01_MUNDO_E_HISTORIA.md, «Planificación urbana».",
   "nombre": "Villa Raspadura",
   "limite": { "x0": 89, "y0": 89, "x1": 167, "y1": 167 },
   "perfiles": {
