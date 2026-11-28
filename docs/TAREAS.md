@@ -643,6 +643,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-418 | Junie | Hecho (commit «JL-418: recopilar preguntas pendientes de balance fiel») | `work/junie-jl418/PREGUNTAS.md` resume las tres preguntas de balance de JL-389, JL-390 y JL-417, cada una con recomendación provisional y evidencia. No se cambiaron reglas ni cifras productivas. Verificación: `npm test`, `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` y `git diff --check` limpios. No aplica Electron: entregable documental sin cambio visual. |
 
+## Cierre de JL-419 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-419 | Junie | Hecho (commit «JL-419: auditar tareas ya cubiertas en reserva») | Revisé las 40 reservas y marqué solo RJ-07, RJ-15, RJ-18, RJ-23 y RJ-38, ya cubiertas por MUN-01, JL-47, pruebas de progresión, JL-14/JL-304 y JL-246. Cada línea conserva su texto y cita la evidencia de `grep`; las demás casillas permanecen intactas. `npm test`, `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` y `git diff --check` limpios. No aplica Electron: auditoría documental, sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

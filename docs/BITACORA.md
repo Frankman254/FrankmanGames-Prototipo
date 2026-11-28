@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-419: auditar tareas ya cubiertas en reserva (Junie)
+
+**Archivos:** `work/prompts-noche/RESERVA_JUNIE.md`, `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`.
+
+**Qué se hizo:** Revisé las 40 tareas de reserva y marqué RJ-07, RJ-15, RJ-18, RJ-23 y RJ-38 como cubiertas por verificaciones existentes. Cada casilla marcada incluye referencias comprobables con `grep`; no borré líneas ni alteré las otras 35 casillas.
+
+**Validación:** `npm test`, `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` y `git diff --check` limpios. No aplica Electron: cambio documental sin elemento visual.
+
+**Evidencia:** Referencias `grep` en `work/prompts-noche/RESERVA_JUNIE.md`; pruebas previas en `tests/mun01_npcDialogueI18n.test.ts`, `tests/rpg/compendium.test.ts`, `tests/rpg/progression.test.ts`, `tests/jl14_spellIcons.test.ts`, `tests/jl304_spellCatalog.test.ts` y `tests/jl168_procedencia.test.ts`.
+
+---
+
 ## 2026-11-27 — JL-418: recopilar preguntas pendientes de balance fiel (Junie)
 
 **Archivos:** `work/junie-jl418/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
