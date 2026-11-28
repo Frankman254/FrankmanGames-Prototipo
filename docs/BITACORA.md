@@ -24,6 +24,8 @@
 - Junie: `dialogue.ts`, `loadingScreen.ts` y la portada.
 - Claude: `scripts/blender/` y el audio.
 
+**Mapa de Navidad** (pedido después en la misma sesión): NAV-01…03 para Claude (ficha, modelos y texturas, implementación), NAV-04 para Junie (tres tareas simples tras NAV-03) y CDX-NAV-01 para Codex (iconos).
+
 **Evidencia:** las filas de `docs/TAREAS.md` y las dos colas.
 
 ---
