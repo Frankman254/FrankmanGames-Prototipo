@@ -1,3 +1,26 @@
+## 2026-11-28 — COMO_CREAR, mapa de Navidad, plano de Villa Raspadura y propuestas de audio (Claude)
+
+**Qué se hizo:**
+- `docs/COMO_CREAR.md`, el recetario de creación por tipo (`a73e91ca`).
+- Mapa de Navidad: plano, datos y modelos (NAV-01 y NAV-02, `a73e91ca`) y mapa jugable con su Piedra Pintada de ida y de vuelta (NAV-03, `9915dbda`).
+- Plano urbano de Villa Raspadura como plantilla PROPUESTA para las demás ciudades (VIA-01, `54800c90`). El método está en [01_MUNDO_E_HISTORIA](diseno/01_MUNDO_E_HISTORIA.md), «Planificación urbana».
+- Audio sin integrar, para escuchar:
+  - críticos épicos por arma, con A/B frente al actual (AUD-SFX-04);
+  - equipar y quitar por material (AUD-SFX-03);
+  - seis ambientes de 30 s en bucle (AUD-AMB-01);
+  - inventario de lo que suena viejo (AUD-REV-01).
+
+**Archivos:** los de esos tres commits, más esta entrada y sus filas en `TAREAS.md`. No entró ningún audio en `assets/` ni en `src/`, así que `PROCEDENCIA.md` no cambia por el audio.
+
+**Validación:** `npm test` (441 archivos de prueba en verde), `npm run typecheck` y `npm run docs:check`. NAV-03 se comprobó en Electron.
+
+**Evidencia:**
+- Navidad: `work/claude-nav01/`, `work/claude-nav03/`.
+- Plano: `work/claude-via01/plano.png` y `CHOQUES.md`, con lo que VIA-04 tiene que mover.
+- Audio: `work/claude-aud-sfx04/salida/lamina_ab.mp3`, `work/claude-aud-sfx03/salida/lamina.mp3`, `work/claude-aud-amb01/` y `work/claude-aud-rev01/INVENTARIO.md`.
+
+---
+
 ## 2026-11-28 — JL-424: implementar carga por hechizo HZ-04b (Junie)
 
 **Archivos:** `src/rpg/effects.ts`, `src/sim/world.ts`, `src/ui/menus/hud.ts`, `scripts/qaElectron.mjs`, pruebas HZ-04b y documentación. Evidencia local en `work/junie-jl424/`.
