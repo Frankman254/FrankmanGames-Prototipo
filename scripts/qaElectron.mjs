@@ -2578,9 +2578,13 @@ const scenarios = {
         await newGame('QA Audio Maz');
         await until(`window.__audio?.engine`, 10000, 'motor de audio');
         await until(`__audio.contextMusic?.active==='town'`, 15000, 'música de pueblo');
+        const startingMusic = await js(
+            `({context:__audio.contextMusic.active,track:__audio.contextMusic.activeTrack,zone:${W}.currentZone?.id??null})`,
+        );
         check(
-            'Audio pueblo: la partida empieza en un pueblo con su canción',
-            await js(`__audio.contextMusic.activeTrack==='town'`),
+            'JL-442: la partida empieza con la música de la zona',
+            startingMusic.context === 'town' && startingMusic.track === 'town',
+            JSON.stringify(startingMusic),
         );
         // Pelea: la misma ventana de tensión que dejan los enemigos en combate (threatHoldSeconds).
         await js(`__audio.threatHold=4`);
@@ -2588,22 +2592,51 @@ const scenarios = {
         check('Audio pueblo: una pelea cambia a su canción', true);
         await until(`__audio.contextMusic?.active==='town'`, 20000, 'vuelta a la música de pueblo');
         check('Audio pueblo: al acabar la pelea vuelve la del pueblo', true);
-        await js(`${S}.energy.value=100`);
-        await js(`__game.crypt.enter(0,'above')`);
-        await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
-        await until(`__audio.contextMusic?.active==='crypt'`, 15000, 'música de cripta');
-        const crypt = await js(
-            `({track:__audio.contextMusic.activeTrack,loop:__audio.contextMusic.current.source.loop,secs:__audio.contextMusic.current.source.buffer.duration})`,
-        );
-        const local = await js(
-            `({active:__audio.localMusic?.active??false,file:__audio.localMusic?.current?.file??null})`,
-        );
-        check(
-            'Audio mazmorra: suena la cripta propia en bucle (Ogg/Opus decodificado)',
-            crypt.track === 'crypt' && crypt.loop && crypt.secs > 280,
-            JSON.stringify(crypt),
-        );
-        check('Audio mazmorra: el MP3 local antiguo no tapa la cripta', !local.active, JSON.stringify(local));
+        for (let visit = 1; visit <= 3; visit++) {
+            await js(`${S}.energy.value=100`);
+            const entered = await js(`__game.crypt.enter(0,'above')`);
+            await until(`__game.crypt.floor===0`, 10000, `entrada ${visit}/3 a la cripta`);
+            await until(`__audio.contextMusic?.active==='crypt'`, 15000, `música de cripta, entrada ${visit}/3`);
+            const crypt = await js(
+                `({track:__audio.contextMusic.activeTrack,loop:__audio.contextMusic.current.source.loop,secs:__audio.contextMusic.current.source.buffer.duration})`,
+            );
+            check(
+                `JL-442: entrada ${visit}/3 activa la música de cripta`,
+                entered && crypt.track === 'crypt' && crypt.loop,
+                JSON.stringify(crypt),
+            );
+            if (visit === 1) {
+                check(
+                    'Audio mazmorra: la pista propia está decodificada y en bucle',
+                    crypt.secs > 280,
+                    JSON.stringify(crypt),
+                );
+                const local = await js(
+                    `({active:__audio.localMusic?.active??false,file:__audio.localMusic?.current?.file??null})`,
+                );
+                check('Audio mazmorra: el MP3 local antiguo no tapa la cripta', !local.active, JSON.stringify(local));
+                await shot('jl442-cripta-musica');
+            }
+
+            await js(`__game.crypt.leave()`);
+            await until(`__game.crypt.floor===null`, 10000, `salida ${visit}/3 de la cripta`);
+            await until(
+                `${W}.currentZone?.id==='azuero' && __audio.contextMusic?.active==='region:los_santos' && __audio.contextMusic.activeTrack==='region:los_santos'`,
+                20000,
+                `música de Azuero restaurada, salida ${visit}/3`,
+            );
+            const restored = await js(
+                `({context:__audio.contextMusic.active,track:__audio.contextMusic.activeTrack,zone:${W}.currentZone?.id??null})`,
+            );
+            check(
+                `JL-442: salida ${visit}/3 restaura la música de la zona`,
+                restored.zone === 'azuero' &&
+                    restored.context === 'region:los_santos' &&
+                    restored.track === 'region:los_santos',
+                JSON.stringify({ starting: startingMusic, after: restored }),
+            );
+            if (visit === 3) await shot('jl442-zona-musica-restaurada');
+        }
     },
 
     /** JL-22: música del guardián — entrar al piso con guardián y comprobar que el contexto cambia a 'guardian' en pelea. */

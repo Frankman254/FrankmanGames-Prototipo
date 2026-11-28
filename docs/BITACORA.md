@@ -121,6 +121,18 @@
 
 ---
 
+## 2026-11-28 — JL-442: verificar retorno de música tras salir de cripta (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; capturas en `work/junie-jl442/electron-final/`.
+
+**Qué se hizo:** El escenario `audioMazmorra` verifica la pista del pueblo inicial, tres entradas a la cripta y tres regresos a la música de la zona de salida, Azuero (`region:los_santos`). Conserva la comprobación de la pista propia en bucle; no cambia lógica ni datos productivos.
+
+**Validación:** Electron 12/12, tres ciclos completos y `consoleErrors: []`; `npm test`: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `node --check scripts/qaElectron.mjs`, `npm run docs:check` y `git diff --check` limpios.
+
+**Evidencia:** `work/junie-jl442/electron-final/resultado.json`, `jl442-cripta-musica.jpg` y `jl442-zona-musica-restaurada.jpg`.
+
+---
+
 ## 2026-11-28 — JL-438: comprobar traducciones de hechizos por clase (Junie)
 
 **Archivos:** `tests/jl438_spellTranslations.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`. Sin cambios en los datos productivos.

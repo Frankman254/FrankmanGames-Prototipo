@@ -750,6 +750,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-441 | Junie | Hecho (commit «JL-441: probar persistencia de equipo, mascota, montura y barra») | `tests/jl441_saveLoadState.test.ts` verifica una vuelta por `SaveStore` y `RpgSessionFactory.load`, incluidos los UID de las piezas y la barra completa. `npm test`: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `npm run docs:check` (227 rutas) limpios. Electron `hechizosClases`: 28/28, consola limpia; capturas de barra a nivel alto revisadas en `work/junie-jl441/electron/`. No se cambió lógica ni datos del juego. |
 
+## Cierre de JL-442 (2026-11-28)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-442 | Junie | Hecho (commit «JL-442: verificar retorno de música tras salir de cripta») | Electron `audioMazmorra`: 12/12 comprobaciones; tres entradas activan la música `crypt` y tres salidas restauran `region:los_santos` en Azuero, con consola limpia. `npm test`: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check`, `node --check scripts/qaElectron.mjs` y `git diff --check` limpios. Evidencia: `work/junie-jl442/electron-final/resultado.json`, `jl442-cripta-musica.jpg` y `jl442-zona-musica-restaurada.jpg`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
