@@ -4328,6 +4328,170 @@ const scenarios = {
         );
     },
 
+    /** JL-436: muestra reproducible de armas de una y dos manos equipadas en el Centinela. */
+    async jl436ArmasEnMano() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl436';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const seed = 4362026;
+        const sampleSize = 10;
+        const twoHandedKinds = new Set(['greatsword', 'hammer', 'spear', 'bow', 'crossbow', 'staff']);
+        const { items } = JSON.parse(fs.readFileSync(path.resolve('data/rpg/items.json'), 'utf8'));
+        const definitions = Object.entries(items)
+            .filter(([, item]) => item.slot === 'weapon' && item.weapon)
+            .map(([id, item]) => ({
+                id,
+                name: item.name ?? id,
+                kind: item.kind,
+                hands: item.hands ?? (twoHandedKinds.has(item.kind) ? 2 : 1),
+            }))
+            .sort((a, b) => a.id.localeCompare(b.id));
+        const groups = [
+            { id: 'dos_manos', hands: 2 },
+            { id: 'una_mano', hands: 1 },
+        ];
+        const select = (initialSeed) => {
+            let state = initialSeed >>> 0;
+            const random = () => {
+                state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+                return state / 0x100000000;
+            };
+            const shuffle = (list) => {
+                const shuffled = list.slice();
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            };
+            return Object.fromEntries(
+                groups.map(({ id, hands }) => {
+                    const candidates = definitions.filter((item) => item.hands === hands);
+                    const kinds = [...new Set(candidates.map((item) => item.kind))].sort();
+                    const representatives = kinds.map(
+                        (kind) => shuffle(candidates.filter((item) => item.kind === kind))[0],
+                    );
+                    if (representatives.length > sampleSize)
+                        throw new Error(`Más de ${sampleSize} tipos de arma de ${hands} mano(s)`);
+                    const representativeIds = new Set(representatives.map((item) => item.id));
+                    const remainder = shuffle(candidates.filter((item) => !representativeIds.has(item.id)));
+                    return [id, [...representatives, ...remainder].slice(0, sampleSize)];
+                }),
+            );
+        };
+        const selected = select(seed);
+        const repeated = select(seed);
+        const reproducible = JSON.stringify(selected) === JSON.stringify(repeated);
+        const complete = groups.every(({ id, hands }) => {
+            const sample = selected[id];
+            const kinds = new Set(definitions.filter((item) => item.hands === hands).map((item) => item.kind));
+            return (
+                sample.length === sampleSize &&
+                new Set(sample.map((item) => item.id)).size === sampleSize &&
+                [...kinds].every((kind) => sample.some((item) => item.kind === kind))
+            );
+        });
+        check('JL-436: la misma semilla produce la misma selección', reproducible, `semilla ${seed}`);
+        check(
+            'JL-436: diez armas distintas por grupo y todos sus tipos',
+            complete,
+            JSON.stringify(Object.fromEntries(groups.map(({ id }) => [id, selected[id].map((item) => item.id)]))),
+        );
+        if (!reproducible || !complete) throw new Error('La selección JL-436 no es completa o reproducible');
+
+        await newGame('QA Armas en Mano', { classId: 'ember_vanguard' });
+        await js(`(()=>{
+          const w=${W},s=${S},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130}));
+          s.character.sex='masculino';w.character.level=200;w.character.spellbook.level=200;
+          p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.facing=0;p.alive=true;
+          v.rig.mode='manual';v.player.reset();v.player.visualYaw=0;v.player.oneShot=null;v.player.model.root.rotation.y=0;
+          v.player.model.play('idle',{restart:true});v.rig.pitchDeg=14;v.rig.distance=5;v.rig.jumpTo(5);
+          v.scene.meshes.filter(m=>!m.name.startsWith('player:')).forEach(m=>m.isVisible=false);
+          const label=document.createElement('div');label.id='qa-jl436-label';
+          Object.assign(label.style,{position:'fixed',top:'12px',left:'12px',zIndex:'99999',padding:'8px 12px',borderRadius:'6px',color:'#fff',background:'rgba(0,0,0,.8)',font:'16px sans-serif',whiteSpace:'pre-line',pointerEvents:'none'});
+          document.body.append(label);
+        })()`);
+        await until(
+            `__game.view.player.model?.entry?.file==='assets/models/centinela_anime.glb' && __game.view.player.model.meshes.length>0`,
+            30000,
+            'modelo Centinela masculino',
+        );
+        await js('__game.view.player.model.ready?.then(()=>true)');
+
+        const captures = [];
+        const views = [
+            { id: 'frente', yaw: 270 },
+            { id: 'perfil', yaw: 180 },
+        ];
+        for (const group of groups) {
+            for (const item of selected[group.id]) {
+                const equipped = await js(`(()=>{
+                  const c=${W}.character,s=${S},id=${JSON.stringify(item.id)};
+                  for(const slot of ['weapon','offhand']){
+                    const old=c.equipment.get(slot);if(!old)continue;
+                    const result=s.unequip(slot);if(!result.ok)return {ok:false,reason:result.reason??'no se pudo retirar '+slot};
+                    const returned=c.inventory.slots.find(i=>i?.uid===old.uid);if(returned)c.inventory.remove(returned.uid,returned.quantity);
+                  }
+                  for(const entry of c.inventory.slots)if(entry)c.inventory.remove(entry.uid,entry.quantity);
+                  c.level=200;c.spellbook.level=200;
+                  const left=c.give(id),instance=c.inventory.slots.find(i=>i?.itemId===id);
+                  if(left||!instance)return {ok:false,reason:'no se pudo crear '+id,left};
+                  const result=s.equip(instance.uid,'weapon');
+                  return {ok:result.ok,reason:result.reason??null,weapon:c.equipment.get('weapon')?.itemId??null,offhand:c.equipment.get('offhand')?.itemId??null};
+                })()`);
+                const equippedCorrectly = equipped.ok && equipped.weapon === item.id && equipped.offhand === null;
+                check(`JL-436 ${item.id}: equipada en la mano principal`, equippedCorrectly, JSON.stringify(equipped));
+                if (!equippedCorrectly) throw new Error(`No se pudo equipar ${item.id}: ${JSON.stringify(equipped)}`);
+
+                const meshExpression = `__game.view.player.model.meshes.some(m=>m.name.includes(${JSON.stringify(`obj_${item.id}`)})&&m.isEnabled()&&m.isVisible&&m.getTotalVertices()>0)`;
+                await until(meshExpression, 20000, `malla visible en mano ${item.id}`);
+                const expectedHand = item.kind === 'bow' ? 'handL' : 'handR';
+                const observed = await js(`(()=>({
+                  state:__game.view.player.model.state,
+                  file:__game.view.player.model.entry.file,
+                  visible:__game.view.player.model.root.isEnabled(),
+                  meshes:__game.view.player.model.meshes.filter(m=>m.name.includes(${JSON.stringify(`obj_${item.id}`)})).map(m=>({name:m.name,enabled:m.isEnabled(),visible:m.isVisible,vertices:m.getTotalVertices()}))
+                }))()`);
+                const visibleMeshes = observed.meshes.filter((mesh) => mesh.enabled && mesh.visible && mesh.vertices > 0);
+                const valid = observed.state === 'idle' && observed.visible && visibleMeshes.length > 0;
+                check(`JL-436 ${item.id}: malla puesta visible (${expectedHand})`, valid, JSON.stringify(observed));
+                if (!valid) throw new Error(`No se ve ${item.id} en la mano: ${JSON.stringify(observed)}`);
+
+                for (const view of views) {
+                    await js(`(()=>{
+                      const r=__game.view.rig;r.yawDeg=${view.yaw};r.pitchDeg=14;r.distance=5;r.jumpTo(5);
+                      document.querySelector('#qa-jl436-label').textContent=${JSON.stringify(`${item.name} · ${item.id}\n${item.hands} mano(s) · ${item.kind} · ${expectedHand} · ${view.id}`)};
+                    })()`);
+                    await sleep(350);
+                    const file = `jl436-${group.id}-${item.id}-${view.id}`;
+                    await shot(file);
+                    captures.push({
+                        screenshot: `${file}.jpg`,
+                        id: item.id,
+                        name: item.name,
+                        kind: item.kind,
+                        hands: item.hands,
+                        expectedHand,
+                        group: group.id,
+                        seed,
+                        hero: 'ember_vanguard',
+                        sex: 'masculino',
+                        view: view.id,
+                        yaw: view.yaw,
+                        meshes: observed.meshes,
+                    });
+                }
+            }
+        }
+
+        check('JL-436: 20 armas capturadas de frente y perfil', captures.length === 40, `${captures.length}/40`);
+        fs.writeFileSync(
+            path.join(outDir, 'capturas.json'),
+            JSON.stringify({ seed, sampleSize, selected, captures }, null, 2),
+        );
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -16074,6 +16238,8 @@ scenarios.trajes.timeout = 600;
 scenarios.jl434DiablicaEspeja.timeout = 550;
 // JL-435: 20 piezas equipadas × dos ángulos, con la selección fijada por semilla.
 scenarios.jl435TocadosCapas.timeout = 550;
+// JL-436: 20 armas equipadas × dos ángulos, con todos los tipos representados.
+scenarios.jl436ArmasEnMano.timeout = 550;
 // JL-330: recorre los 72 arquetipos, carga sus modelos y muestrea hit/death.
 scenarios.jl330Enemigos.timeout = 600;
 scenarios.benchCrowd.timeout = 180;

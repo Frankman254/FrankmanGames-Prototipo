@@ -101,6 +101,20 @@
 
 ---
 
+## 2026-11-28 — JL-436: revisar armas en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl436/`.
+
+**Qué se hizo:** El escenario `jl436ArmasEnMano` selecciona 10 armas de cada categoría con semilla fija `4362026`, representa todos los tipos del catálogo, las equipa al Centinela masculino y captura frente/perfil. No modifica assets ni cifras.
+
+**Resultado visual:** En el reposo, las armas marcadas de dos manos se sostienen desde un único punto (`handR`, salvo los arcos en `handL`); la mano libre no acompaña el agarre. Revisar especialmente la Ballesta de carbón (`carbon_crossbow`), cuyas palas cruzan las piernas en frente; las montoneras de crepúsculo y níquel (`crepusculo_greatsword`, `niquel_greatsword`) y los mazos de níquel y nácar (`niquel_hammer`, `nacar2_hammer`), que caen casi hasta los pies; y las lanzas de renio y del Centinela (`renio_spear`, `sentinel_spear`), cuya punta queda hacia el suelo. Los arcos (`guayacan_bow`, `marea_bow`) quedan parcialmente ocultos por cuerpo/capa de frente, aunque se distinguen de perfil. Son observaciones de pose para revisar, no defectos confirmados; no se tocaron los modelos.
+
+**Validación:** Electron 44/44, 40 capturas y consola limpia; `npm test`: 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` (227 rutas) y `node --check scripts/qaElectron.mjs` limpios.
+
+**Evidencia:** `work/junie-jl436/capturas.json`, `work/junie-jl436/RESULTADO.md` y 40 imágenes `jl436-<grupo>-<id>-<vista>.jpg`.
+
+---
+
 ## 2026-11-28 — JL-435: revisar tocados y capas en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl435/`.
