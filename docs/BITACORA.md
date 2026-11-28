@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-448: comprobar consola limpia en Electron (Junie)
+
+**Qué se hizo:** Repetí los diez escenarios Electron nuevos o modificados durante JL-424…JL-446: `hechizosClases`, `guardadoBarriadaCasa`, `jl434DiablicaEspeja`, `jl435TocadosCapas`, `jl436ArmasEnMano`, `jl437TiempoCargaEquipo`, `audioMazmorra`, `jl444Spellbook`, `jl445TiendaInventarioLleno` y `jl446TooltipDanioArma`. No hubo cambios de código ni datos.
+
+**Validación:** Electron 220/220; los diez resultados registran cero fallos y `consoleErrors: []`. Se revisaron capturas representativas de `jl434DiablicaEspeja`, `jl444Spellbook` y `jl445TiendaInventarioLleno`.
+
+**Evidencia:** `work/junie-jl448/electron/` (diez `resultado.json` y 128 capturas).
+
+---
+
 ## 2026-11-28 — CDX-IMG-02: seis retratos de héroes (Codex)
 
 Se generaron seis retratos originales con ImageGen integrado, siguiendo la dirección A y los trajes de JL-403. PNG 512×512 con viñeta propia, registrados previamente en PROCEDENCIA. HUD y ficha seleccionan clase y sexo y conservan `adventurer_default` como respaldo. Se añadió `sex` opcional a `PlayerView` y se expone desde `GameSession.player()` para evitar serializar guardados al repintar. Pendientes de revisión artística del creador.
