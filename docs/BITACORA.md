@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-445: avisar y evitar ventas con mochila llena (Junie)
+
+**Qué se hizo:** Añadí el escenario `jl445TiendaInventarioLleno` a `scripts/qaElectron.mjs`. La compra se intenta con un clic real desde la tienda y una mochila por encima del límite; la pantalla muestra «Inventario lleno» y las comprobaciones comparan inventario, stock y monedas antes/después. El comportamiento de compra ya estaba implementado, por lo que no se cambió código productivo.
+
+**Validación:** Electron 4/4, incluida consola limpia; `npm test`: 448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` (228 rutas) y `node --check scripts/qaElectron.mjs` limpios.
+
+**Evidencia:** `work/junie-jl445/electron/resultado.json` y captura revisada `work/junie-jl445/electron/jl445-tienda-inventario-lleno-aviso.jpg`.
+
+---
+
 ## 2026-11-28 — JL-444: desplazar el libro y conservar nombres completos (Junie)
 
 **Qué se hizo:** El límite responsive del libro ya no se sobrescribe con el alto completo del viewport; el panel se acota y su cuerpo desplaza la lista. Los nombres de hechizos se envuelven a varias líneas en lugar de truncarse con puntos suspensivos.

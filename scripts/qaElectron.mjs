@@ -2332,6 +2332,52 @@ const scenarios = {
         await shot('c05-mascota-retirada');
     },
 
+    /** JL-445: la tienda avisa y no vende cuando la mochila está llena. */
+    async jl445TiendaInventarioLleno() {
+        await newGame('QA Tienda Llena');
+        await resize(1920, 1080);
+        await js(
+            `(() => { const c=${S}.character, i=c.inventory; while (i.bagWeight <= i.maxWeight) c.pickUp(c.items.create('short_sword'),true); c.addGold(100000); })()`,
+        );
+        const merchantId = await js(
+            `(() => { const s=${S}, p=${W}.player, n=${W}.npcs.find(x=>x.merchantId); if(!n) return null; p.pos.x=n.pos.x+1; p.pos.y=n.pos.y; p.path=[]; s.character.emit({type:'openMerchant',merchantId:n.merchantId}); return n.merchantId; })()`,
+        );
+        if (!merchantId) throw new Error('No hay mercader para abrir la tienda JL-445');
+        await until(`document.querySelector('.panel-shop')?.offsetParent`, 5000, 'tienda JL-445');
+        await sleep(300);
+
+        const before = await js(
+            `(() => { const s=${S}, c=s.character, m=s.merchant(${JSON.stringify(merchantId)}), offer=m?.stock[0], cell=document.querySelector('.panel-shop .shop-grid:not(.buyback) .shop-cell'); if(!offer||!cell) return null; const r=cell.getBoundingClientRect(); return {gold:c.gold,inventory:c.inventory.slots.map(i=>i?{uid:i.uid,itemId:i.itemId,quantity:i.quantity}:null),stock:m.stock.map(o=>({itemId:o.item.itemId,quantity:o.quantity})),point:{x:r.x+r.width/2,y:r.y+r.height/2},itemId:offer.item.itemId}; })()`,
+        );
+        if (!before) throw new Error('La tienda JL-445 no muestra una oferta comprable');
+        await js(`document.querySelectorAll('.toast').forEach((toast)=>toast.remove())`);
+        await mouse(before.point.x, before.point.y);
+        await sleep(250);
+        const confirmationVisible = await js(
+            `[...document.querySelectorAll('.modal button')].some((button)=>button.offsetParent!==null&&button.textContent.trim()==='Comprar')`,
+        );
+        if (confirmationVisible) await button('Comprar');
+        await until(
+            `[...document.querySelectorAll('.toast.warn')].some((toast)=>toast.textContent.trim()==='Inventario lleno')`,
+            5000,
+            'aviso de inventario lleno',
+        );
+        await shot('jl445-tienda-inventario-lleno-aviso');
+
+        const after = await js(
+            `(() => { const s=${S}, c=s.character, m=s.merchant(${JSON.stringify(merchantId)}); return {gold:c.gold,inventory:c.inventory.slots.map(i=>i?{uid:i.uid,itemId:i.itemId,quantity:i.quantity}:null),stock:m?.stock.map(o=>({itemId:o.item.itemId,quantity:o.quantity}))??[],warning:[...document.querySelectorAll('.toast.warn')].map((toast)=>toast.textContent.trim()).find((text)=>text==='Inventario lleno')??null}; })()`,
+        );
+        check('JL-445: la tienda muestra el aviso «Inventario lleno»', after.warning === 'Inventario lleno', JSON.stringify(after));
+        check(
+            'JL-445: no se vende ni se cobra con la mochila llena',
+            after.gold === before.gold &&
+                JSON.stringify(after.inventory) === JSON.stringify(before.inventory) &&
+                JSON.stringify(after.stock) === JSON.stringify(before.stock),
+            `${before.itemId}: ${before.gold} → ${after.gold} monedas`,
+        );
+        check('JL-445: consola sin errores nuevos', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | ') || '0');
+    },
+
     async sobrepeso() {
         await newGame('QA Peso');
         await sleep(300);
