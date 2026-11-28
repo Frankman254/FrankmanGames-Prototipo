@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-427: listar iconos ausentes de la línea de hechizos (Junie)
+
+**Qué se hizo:** Contrasté los 48 IDs de los catálogos iniciales de la línea nueva con `assets/icons/spells/<id>.png`: hay 34/48 archivos presentes y 14 faltantes. El documento de diseño indica que HZ-04d sustituyó esa lista; sus 21 IDs marcados nuevos sí tienen PNG (21/21). No creé ni modifiqué iconos, código o datos.
+
+**Validación:** `npx tsc --noEmit` y `npx vitest run` en verde: 441 archivos, 5.139 aprobadas, 1 omitida y 1 `todo`. `npm run docs:check` y `git diff --check` limpios. No aplica Electron: no se modificó la presentación ni ningún asset.
+
+**Evidencia:** `work/junie-jl427/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-426: listar hechizos compatibles con primitivas actuales (Junie)
 
 **Qué se hizo:** Contrasté los 18 hechizos del calendario histórico HZ-03 con los efectos actuales. Solo las versiones vigentes HZ-04d de `kiln_thread`, `kiln_burst` y `thunder_flock` se expresan con primitivas existentes (`damage`, `bonusVsStatus` y `chain`); sus mecánicas HZ-03 originales siguen pendientes. No se cambió código, datos ni pruebas.
