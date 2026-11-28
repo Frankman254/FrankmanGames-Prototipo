@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-418: recopilar preguntas pendientes de balance fiel (Junie)
+
+**Archivos:** `work/junie-jl418/PREGUNTAS.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reuní las tres preguntas abiertas de la tanda sobre objetivos de TTK, `flatPerLevel.armor` y `minXpShare`, con opciones recomendadas y evidencia. Las recomendaciones quedan como propuestas: no se decidieron reglas ni se cambiaron cifras productivas. Para el TTK, recomendé separar encuentros individuales y de grupo porque la tabla existente agrega clases, perfiles, enemigos y tamaños de encuentro.
+
+**Validación:** `npm test`, `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` y `git diff --check` limpios. No aplica Electron: cambio documental sin elemento visual.
+
+**Evidencia:** `work/junie-jl418/PREGUNTAS.md`, `work/junie-jl389/RESULTADO.md`, `work/junie-jl390/RESULTADO.md` y `work/junie-jl392/COMPARADA.md`.
+
+---
+
 ## 2026-11-27 — JL-417: reunir decisiones pendientes de balance fiel (Junie)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

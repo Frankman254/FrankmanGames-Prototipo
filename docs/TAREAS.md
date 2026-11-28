@@ -637,6 +637,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-417 | Junie | Hecho (commit «JL-417: reunir decisiones pendientes de balance fiel») | `ACCIONES_CREADOR.md` reúne la decisión de TTK objetivo por franja con la medición de `work/junie-jl392/COMPARADA.md`, y las preguntas de `flatPerLevel.armor` y `minXpShare` respaldadas por `tests/zones.test.ts`, `work/junie-jl389/RESULTADO.md`, `tests/rpg/energySpoils.test.ts` y `work/junie-jl390/RESULTADO.md`. `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (223 rutas) y `git diff --check` limpios. Sin cambios de reglas ni cifras productivas; no aplica Electron. |
 
+## Cierre de JL-418 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-418 | Junie | Hecho (commit «JL-418: recopilar preguntas pendientes de balance fiel») | `work/junie-jl418/PREGUNTAS.md` resume las tres preguntas de balance de JL-389, JL-390 y JL-417, cada una con recomendación provisional y evidencia. No se cambiaron reglas ni cifras productivas. Verificación: `npm test`, `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` y `git diff --check` limpios. No aplica Electron: entregable documental sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
