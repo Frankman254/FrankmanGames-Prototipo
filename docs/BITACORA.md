@@ -1,3 +1,33 @@
+## 2026-11-27 — Tandas nuevas para Junie, Claude y Codex (Claude)
+
+**Autorización:** el creador pidió una tanda nueva para Junie, otra de modelado y audio para Claude y otra de imágenes para Codex. Después autorizó todo («autorizo todo mi rey») y pidió además planificación vial y críticos más épicos. Sus palabras van citadas en cada fila.
+
+**Tandas:**
+- **Junie, JL-454…JL-492** (en `work/prompts-noche/COLA_JUNIE.md`):
+  - enganches con respaldo para retratos, cargas y portada;
+  - revisión en Electron del equipo de MOD-09b;
+  - informes de audio y rendimiento;
+  - pruebas de integridad de datos;
+  - VIA-02 y VIA-05.
+- **Claude:**
+  - MOD-09c: armas y escudos por familia;
+  - AUD-AMB-01: ambientes por región;
+  - AUD-SFX-03: equipar por material;
+  - AUD-SFX-04: crítico épico;
+  - AUD-REV-01: inventario de lo que suena viejo;
+  - VIA-01: plano de Villa Raspadura como plantilla;
+  - VIA-03: kit modular de calle.
+- **Codex, CDX-IMG-01…10:** retratos de héroes, PNJ y bestiario, pantallas de carga, portada, iconos al día, marco del mapa, números de crítico y vista cenital de la ciudad. Cola local en `work/prompts-noche/COLA_CODEX.md`, sin versionar: `work/` está ignorado y no se usa `git add -f`.
+
+**Reparto de archivos:** un solo escritor por archivo.
+- Codex: `hud.ts`, `character.ts`, `floatingText.ts` y los assets de imagen.
+- Junie: `dialogue.ts`, `loadingScreen.ts` y la portada.
+- Claude: `scripts/blender/` y el audio.
+
+**Evidencia:** las filas de `docs/TAREAS.md` y las dos colas.
+
+---
+
 ## 2026-11-27 — JL-423: proponer próxima bolsa de tareas (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; propuesta local en `work/junie-propuestas/BOLSA_SIGUIENTE_7.md`.

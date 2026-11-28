@@ -1795,3 +1795,66 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [ ] JL-451 `work/junie-jl451/PREGUNTAS.md` con las preguntas de las tandas JL-384…450. Cada una con su opción recomendada.
 - [ ] JL-452 Revisa `RESERVA_JUNIE.md`: marca `[x]` lo que ya esté hecho por otra tarea, con la referencia.
 - [ ] JL-453 `work/junie-propuestas/BOLSA_SIGUIENTE_8.md` con 20 tareas comprobadas con `grep`. Son propuestas: no se ejecutan.
+
+## Tanda JL-454…JL-492 — AUTORIZADA (creador, 2026-11-27: «prepara otra tanda de tareas para junie…», confirmado: «autorizo todo mi rey»)
+
+Contexto: Codex está haciendo las imágenes del juego (retratos, pantallas de carga y portada; filas CDX-IMG-* en `docs/TAREAS.md`). Claude hace los modelos y el audio (MOD-09c, AUD-AMB-01 y AUD-SFX-03). Tú preparas el código para que esas piezas entren solas y revisas lo que ya existe.
+
+Reglas de la tanda:
+- **No toques** `src/ui/menus/hud.ts`, `src/ui/menus/character.ts`, `assets/portraits/`, `assets/art/` ni `scripts/blender/equipo*.py`. Son de Codex y de Claude.
+- Todo enganche de imagen funciona **sin** el PNG: si no hay archivo, se ve lo de hoy. Una imagen que falta no bloquea nada.
+- No cambies cifras de `data/`. Un commit por tarea. La evidencia va en `work/junie-jl<n>/`.
+
+### A. Enganches para las imágenes de Codex (código con prueba y respaldo)
+- [ ] JL-454 Diálogo: si existe `assets/portraits/npc_<idPNJ>.png`, `src/ui/menus/dialogue.ts` lo muestra junto al nombre, con `portraitImg()` de `artIcons.ts`. Si no existe, el diálogo queda como hoy. La elección del id va en `dialogueLogic.ts`, con prueba.
+- [ ] JL-455 Pantalla de carga: fondo `assets/art/carga/<zona>.jpg` buscado con `import.meta.glob`, con la cripta como `cripta.jpg`. Si no existe, se usa el fondo CSS de hoy. La elección de zona → archivo es una función pura con prueba.
+- [ ] JL-456 Portada: si existe `assets/art/portada/portada.jpg`, va de fondo del menú principal bajo el título. Si no, la de hoy. Prueba de la elección y captura Electron sin el archivo.
+- [ ] JL-457 `scripts/art/coberturaImagenes.mjs`: lista por familia (héroes, PNJ, enemigos, carga, portada) qué imágenes esperadas faltan. Los ids salen de `data/`. Solo informa: nunca falla. Informe en `work/junie-jl457/`.
+- [ ] JL-458 Electron: diálogo, carga y portada **sin** ninguna imagen nueva. Capturas y consola limpia. Esto demuestra que el respaldo funciona.
+
+### B. Equipo nuevo (MOD-09b)
+- [ ] JL-459 Informe de triángulos de `equipo.glb` por ranura y los 30 nodos `obj_*` más pesados, en `work/junie-jl459/`. Claude lo usa para MOD-09c: el catálogo está en 98.245 de 100.000.
+- [ ] JL-460 Electron: 10 objetos «Mochila» puestos en héroe y heroína. Lista los que atraviesan el cuerpo o flotan, con captura. No edites `ajusteEquipo.json`: anota.
+- [ ] JL-461 Electron: un tocado de cada una de las 10 siluetas (ala ancha, copa alta, pluma, concha, gorro de piel, tricornio, morrión, diadema, visera y birrete) en los seis héroes. Lista los que atraviesan el pelo.
+
+### C. Audio
+- [ ] JL-462 Prueba: cada región de `data/zones.json` tiene un contexto de música cuya carpeta existe en `assets/audio/music/`.
+- [ ] JL-463 Informe: qué regiones usan solo el ambiente sintetizado de `data/audio/ambience.json`, y qué capas oye cada una. Va en `work/junie-jl463/` y sirve para AUD-AMB-01.
+- [ ] JL-464 Electron: el volumen de ambiente a 0 se guarda y sigue así tras reiniciar. Captura de opciones antes y después.
+
+### D. Datos: integridad (solo pruebas; si una falla, anota el dato, no lo cambies)
+- [ ] JL-465 Cada PNJ de `data/rpg/npcs.json` tiene nombre y saludo en español y en inglés.
+- [ ] JL-466 Cada enemigo de `data/rpg/enemies.json` tiene un modelo GLB que existe o un respaldo declarado.
+- [ ] JL-467 Cada tabla de `loot.json` y `spoils.json` apunta a objetos que existen.
+- [ ] JL-468 Cada misión de `quests.json` apunta a PNJ, objetos y enemigos que existen.
+- [ ] JL-469 Cada mercader de `merchants.json` vende objetos que existen y tienen precio mayor que 0.
+- [ ] JL-470 En `sets.json`, cada umbral de bonificación es menor o igual que el número de piezas del set.
+- [ ] JL-471 Cada mascota de `pets.json` tiene modelo e icono que existen.
+- [ ] JL-472 El nivel de cada receta de `professions.json` no supera el nivel máximo del oficio.
+
+### E. Interfaz en Electron
+- [ ] JL-473 Hablar con cada uno de los 11 PNJ: una captura por diálogo y consola limpia.
+- [ ] JL-474 Pantalla de carga entre pueblo y cripta, a 3440×1440 y a 1280×720: sin texto cortado.
+- [ ] JL-475 Inventario con muchos objetos: fps al desplazarse. Informe con la cifra; no optimices sin anotarlo.
+- [ ] JL-476 Mapa del mundo: los 10 iconos de `assets/icons/map/` se ven con los dos zooms.
+- [ ] JL-477 Juego en inglés: recorre los menús y lista los textos sin traducir. Corrige solo textos de interfaz. Los nombres del juego no se traducen sin el creador.
+- [ ] JL-478 `scripts/checkContraste.mjs` sobre las pantallas nuevas de esta tanda. Informe.
+
+### F. Rendimiento (medir; corregir solo lo seguro)
+- [ ] JL-479 `scripts/benchSim.ts` sobre HEAD: comparación con la última medición de `work/`. Informe.
+- [ ] JL-480 Electron: memoria tras 10 minutos quieto en el pueblo. Informe.
+- [ ] JL-481 `scripts/qa-cold-start.mjs`: arranque en frío. Informe.
+- [ ] JL-482 Corrige el primer hallazgo de JL-479…481 que no pida cambiar cifras ni decisión del creador. Prueba antes y después.
+
+### G. Cierre
+- [ ] JL-483 Reintento de lo que esté `[!]` en JL-454…482 y no dependa del creador.
+- [ ] JL-484 Consola limpia en los escenarios Electron nuevos de esta tanda.
+- [ ] JL-485 Suite completa, `npm run typecheck`, `npm run build` y QA por tandas, sin regresiones.
+- [ ] JL-486 `docs:check` limpio y ninguna fila de JL-454…485 en estado ambiguo en `docs/TAREAS.md`.
+- [ ] JL-487 `work/junie-jl487/PREGUNTAS.md` con las preguntas de esta tanda, cada una con su opción recomendada.
+- [ ] JL-488 Revisa `RESERVA_JUNIE.md` y marca `[x]` lo que ya esté hecho, con la referencia.
+- [ ] JL-489 `work/junie-propuestas/BOLSA_SIGUIENTE_9.md` con 20 tareas comprobadas con `grep`. Son propuestas: no se ejecutan.
+### H. Planificación vial de Villa Raspadura (VIA-02 y VIA-05 de `docs/TAREAS.md`)
+- [ ] JL-491 VIA-02: módulo puro `src/world/planUrbano.ts` que lee `data/urbanismo/villa_raspadura.json` (de Claude, VIA-01) y sus validadores con prueba. Reutiliza `urbanizacion.ts`, sin reescribirlo. Si el JSON aún no existe, márcala `[!]` y sigue.
+- [ ] JL-492 VIA-05: en `tests/`, la misma plantilla con otras medidas genera el plano de un segundo pueblo sin romper ningún validador. No cambia el juego.
+- [ ] JL-490 Si no queda nada abierto en esta cola, junta en un solo commit `docs: cierre de JL-454…JL-490` las casillas y filas pendientes.
