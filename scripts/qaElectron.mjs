@@ -14481,7 +14481,12 @@ const scenarios = {
         await js(`${W}.commandMove({x:5.0,y:9.0})`);
         await sleep(3000);
         const posBefore = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
-        record('A2: posición dentro de la casa', posBefore.x > 2 && posBefore.x < 8, JSON.stringify(posBefore));
+        const savedPlaceBefore = await js(`__game.place`);
+        record(
+            'A2: posición y marcador de casa antes de guardar',
+            posBefore.x > 2 && posBefore.x < 8 && savedPlaceBefore?.houseRoom === 'casa',
+            JSON.stringify({ pos: posBefore, place: savedPlaceBefore }),
+        );
         await shot('jl237-casa-antes-guardado');
 
         /* 4. Guardar y cargar desde dentro de la casa. */
@@ -14489,12 +14494,14 @@ const scenarios = {
         await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'carga tras guardado casa');
         await sleep(3000);
 
-        /* 5. Verificar que reaparecemos dentro de la casa.
-         * HALLAZGO: el personaje reaparece fuera de la casa (cerca de la puerta exterior).
-         * El guardado dentro de interiores no restaura la escena interior.
-         * Se registra como hallazgo; no se rompe el flujo. */
+        /* 5. Verificar que reaparecemos dentro de la casa. */
         const insideAfter = await js(`!!__game.houses.inside`);
-        record('A3: tras cargar, dentro de la casa', insideAfter, String(insideAfter));
+        const loadedPlace = await js(`__game.session.startPlace`);
+        record(
+            'A3: tras cargar, dentro de la casa',
+            insideAfter && loadedPlace?.houseRoom === 'casa',
+            JSON.stringify({ insideAfter, loadedPlace }),
+        );
         const posAfter = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
         // Si está fuera, la posición será cerca de la puerta exterior (~165,214).
         // Si está dentro, la posición será dentro del interior (0..10, 0..15).
@@ -14533,7 +14540,12 @@ const scenarios = {
         );
         await sleep(1000);
         const barriadaPosBefore = await js(`({x:Math.round(${W}.player.pos.x),y:Math.round(${W}.player.pos.y)})`);
-        record('B3: posición en calle 2', Math.hypot(barriadaPosBefore.x - 6235, barriadaPosBefore.y - 306.5) < 3, JSON.stringify(barriadaPosBefore));
+        const barriadaSavedPlaceBefore = await js(`__game.place`);
+        record(
+            'B3: posición y marcador de barriada antes de guardar',
+            Math.hypot(barriadaPosBefore.x - 6235, barriadaPosBefore.y - 306.5) < 3 && barriadaSavedPlaceBefore?.barriada === true,
+            JSON.stringify({ pos: barriadaPosBefore, place: barriadaSavedPlaceBefore }),
+        );
 
         /* 9. Guardar y cargar desde dentro de la barriada. */
         await saveAndLoad();
@@ -14542,7 +14554,12 @@ const scenarios = {
 
         /* 10. Verificar que reaparecemos dentro de la barriada. */
         const barriadaInsideAfter = await js(`!!__game.houses.inside`);
-        record('B4: tras cargar, dentro de la barriada', barriadaInsideAfter, String(barriadaInsideAfter));
+        const barriadaLoadedPlace = await js(`__game.session.startPlace`);
+        record(
+            'B4: tras cargar, dentro de la barriada',
+            barriadaInsideAfter && barriadaLoadedPlace?.barriada === true,
+            JSON.stringify({ barriadaInsideAfter, barriadaLoadedPlace }),
+        );
         const barriadaPlaceAfter = await js(`__game.houses.place?.name ?? 'null'`);
         record('B5: place tras cargar es Praderas del Norte', barriadaPlaceAfter === 'Praderas del Norte', barriadaPlaceAfter);
         const barriadaPosAfter = await js(`({x:Math.round(${W}.player.pos.x),y:Math.round(${W}.player.pos.y)})`);

@@ -70,7 +70,7 @@ import { CryptScene } from './scenes/cryptScene';
 import { BANK_LOCATION, BankScene } from './scenes/bankScene';
 import { HouseScene } from './scenes/houseScene';
 import { SwitchableHeightField } from './world/switchableGround';
-import { FALLBACK_TEXT, pointInZone, resolvePlace, type PlaceWorld } from './world/placement';
+import { FALLBACK_TEXT, pointInZone, resolveInteriorPlace, resolvePlace, type PlaceWorld } from './world/placement';
 import { floorTitle, useDungeonKey } from './world/dungeon';
 import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
@@ -1090,24 +1090,32 @@ function enterPlace(place: SavePlace | null, seed: number, dungeonState?: Dungeo
         newWorld(seed, arriveAt(stones.respawn));
         return;
     }
+    const interior = resolveInteriorPlace(place, placeWorld());
+    if (interior) {
+        const exterior = interior.exterior;
+        const at =
+            exterior.kind === 'overworld'
+                ? exterior.pos
+                : arriveAt(stones.get(exterior.stone) ?? stones.respawn);
+        newWorld(seed, at);
+        if (houses) {
+            switch (interior.interior.kind) {
+                case 'barriada':
+                    houses.enterBarriada(at);
+                    break;
+                case 'navidad':
+                    houses.enterNavidad(at);
+                    break;
+                case 'house':
+                    houses.enter({ door: at, outside: { ...at }, rotDeg: 0 }, interior.interior.room);
+                    break;
+            }
+        }
+        return;
+    }
     const r = resolvePlace(place, placeWorld());
     if (r.kind === 'overworld') {
         newWorld(seed, r.pos);
-        // CLA-BARR1: si el guardado era dentro de la barriada, entrar de nuevo.
-        if (place?.barriada) {
-            const stone = stones.get(BARRIADA_STONE);
-            if (stone) houses?.enterBarriada(arriveAt(stone));
-        }
-        // NAV-03: igual con el mapa de Navidad.
-        else if (place?.navidad) {
-            const stone = stones.get(NAVIDAD_STONE);
-            if (stone) houses?.enterNavidad(arriveAt(stone));
-        }
-        // JL-254: si el guardado era dentro de una casa, entrar de nuevo en la sala.
-        else if (place?.houseRoom && houses) {
-            const at = r.pos;
-            houses.enter({ door: at, outside: { ...at }, rotDeg: 0 }, place.houseRoom as 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo');
-        }
         return;
     }
     if (r.kind === 'dungeon') {

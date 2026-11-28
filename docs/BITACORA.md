@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-429: restaurar interiores al cargar guardados (Junie)
+
+**Qué se hizo:** `normalizePlace()` rearmaba `SavePlace` sin conservar `houseRoom`, `barriada` ni `navidad`; por eso la carga no sabía qué escena interior reconstruir. Ahora persiste los marcadores válidos del mundo abierto, y `enterPlace()` vuelve a entrar en la casa, la barriada o el mapa navideño, usando una ubicación exterior segura si la coordenada guardada quedó bloqueada o fuera del mundo. No se cambiaron cifras ni contenido.
+
+**Validación:** La prueba de normalización reprodujo la pérdida antes del arreglo; las pruebas dirigidas pasaron 37/37. `npm test`: 441 archivos, 5.142 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, `npm run docs:check` (227 rutas), `node --check scripts/qaElectron.mjs` y `git diff --check` pasaron. Electron `guardadoBarriadaCasa` pasó 14/14 con consola limpia.
+
+**Evidencia:** `tests/jl254_houseRoomSave.test.ts`, `work/junie-jl429/electron/resultado.json`, `work/junie-jl429/electron/jl237-casa-despues-carga.jpg` y `work/junie-jl429/electron/jl237-barriada-despues-carga.jpg`.
+
+---
+
 ## 2026-11-28 — JL-428: inventariar pendientes de filas parciales (Junie)
 
 **Qué se hizo:** Revisé las cinco filas parciales indicadas, separando las tareas ya cerradas por reintentos de los asuntos abiertos. No ejecuté ninguna subtarea de juego: JL-254 conserva un fallo integrado; JL-169/171/172/173/180 esperan OMP-PB-01; JL-327 espera al coordinador; y JL-300/310/315, junto con JL-256/258/261/326, requieren decisión o revisión del creador.

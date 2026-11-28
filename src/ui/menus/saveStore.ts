@@ -17,6 +17,7 @@ import {
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
 import { DAY_LENGTH_DEFAULT_MINUTES, normalizeDayLengthMinutes } from '../../world/dayNight';
+import { isSavedHouseRoom } from '../../world/placement';
 
 /** Lo mínimo de `Storage` que se usa. */
 export interface KeyValueStore {
@@ -180,6 +181,11 @@ export function normalizePlace(raw: unknown): SavePlace | null {
     if (finite(o['playSeconds']) && o['playSeconds'] > 0) place.playSeconds = o['playSeconds'];
     const name = strOrNull(o['name']);
     if (name) place.name = name.slice(0, 80);
+    if (scene === 'overworld') {
+        if (o['barriada'] === true) place.barriada = true;
+        if (o['navidad'] === true) place.navidad = true;
+        if (isSavedHouseRoom(o['houseRoom'])) place.houseRoom = o['houseRoom'];
+    }
     return place;
 }
 

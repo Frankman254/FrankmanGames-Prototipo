@@ -1,7 +1,8 @@
 // JL-254: guardar dentro de una casa y cargar restaura la escena interior.
 import { describe, it, expect } from 'vitest';
 import type { SavePlace } from '../src/rpg/contracts';
-import { resolvePlace, type PlaceWorld } from '../src/world/placement';
+import { resolveInteriorPlace, resolvePlace, type PlaceWorld } from '../src/world/placement';
+import { normalizePlace } from '../src/ui/menus/saveStore';
 import { Character } from '../src/rpg/character';
 import { RpgSessionFactory } from '../src/rpg/session';
 import { loadGameData } from '../src/data';
@@ -93,6 +94,22 @@ describe('JL-254: houseRoom en SavePlace', () => {
         }
     });
 
+    it('normalizePlace conserva los marcadores válidos de interiores y descarta IDs desconocidos', () => {
+        const base = {
+            scene: 'overworld',
+            dungeon: null,
+            floor: null,
+            x: 100,
+            y: 100,
+            stone: 'raspadura',
+            timeOfDay: 0.5,
+        };
+        expect(normalizePlace({ ...base, houseRoom: 'casa' })?.houseRoom).toBe('casa');
+        expect(normalizePlace({ ...base, barriada: true })?.barriada).toBe(true);
+        expect(normalizePlace({ ...base, navidad: true })?.navidad).toBe(true);
+        expect(normalizePlace({ ...base, houseRoom: 'sala_desconocida' })?.houseRoom).toBeUndefined();
+    });
+
     it('barriada=true sin houseRoom → no entra en sala al cargar', () => {
         // La barriada usa barriada=true, no houseRoom.
         const place: SavePlace = {
@@ -110,6 +127,53 @@ describe('JL-254: houseRoom en SavePlace', () => {
         // Fuera del mundo base (2000×2000); resolvePlace cae a fallback (piedra conocida).
         // Lo importante: houseRoom no está, así que enterPlace no entra en sala.
         expect(r.kind).not.toBe('overworld'); // posición fuera del mundo
+    });
+
+    it('mantiene el destino interior cuando el punto exterior requiere fallback', () => {
+        const mundoBloqueado: PlaceWorld = { ...mundoBase, walkable: () => false };
+        const casa: SavePlace = {
+            scene: 'overworld',
+            dungeon: null,
+            floor: null,
+            x: 100,
+            y: 100,
+            stone: 'raspadura',
+            timeOfDay: 0.5,
+            houseRoom: 'casa',
+        };
+        expect(resolveInteriorPlace(casa, mundoBloqueado)).toEqual({
+            interior: { kind: 'house', room: 'casa' },
+            exterior: { kind: 'stone', stone: 'raspadura', reason: 'bloqueado' },
+        });
+
+        const barriada: SavePlace = {
+            scene: 'overworld',
+            dungeon: null,
+            floor: null,
+            x: 6000,
+            y: 6000,
+            stone: 'praderas_norte',
+            timeOfDay: 0.5,
+            barriada: true,
+        };
+        expect(resolveInteriorPlace(barriada, mundoBase)).toEqual({
+            interior: { kind: 'barriada' },
+            exterior: { kind: 'stone', stone: 'praderas_norte', reason: 'fuera' },
+        });
+    });
+
+    it('no restaura salas con un ID no reconocido', () => {
+        const corrupto: SavePlace = {
+            scene: 'overworld',
+            dungeon: null,
+            floor: null,
+            x: 100,
+            y: 100,
+            stone: 'raspadura',
+            timeOfDay: 0.5,
+            houseRoom: 'sala_desconocida',
+        };
+        expect(resolveInteriorPlace(corrupto, mundoBase)).toBeNull();
     });
 
     it('houseRoom y barriada no coexisten en el mismo guardado', () => {

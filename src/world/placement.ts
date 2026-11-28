@@ -41,6 +41,21 @@ export type Placement =
     | { kind: 'dungeon'; dungeon: string; floor: number; pos: Vec2 | null }
     | { kind: 'stone'; stone: string; reason: FallbackReason };
 
+export type SavedHouseRoom = 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo';
+
+export type SavedInterior = { kind: 'house'; room: SavedHouseRoom } | { kind: 'barriada' } | { kind: 'navidad' };
+
+export interface InteriorPlacement {
+    interior: SavedInterior;
+    exterior: Exclude<Placement, { kind: 'dungeon' }>;
+}
+
+const HOUSE_ROOMS = new Set<SavedHouseRoom>(['hogar', 'taller', 'salon', 'casa', 'casaEspejo']);
+
+export function isSavedHouseRoom(room: unknown): room is SavedHouseRoom {
+    return typeof room === 'string' && HOUSE_ROOMS.has(room as SavedHouseRoom);
+}
+
 /** Texto del aviso al caer en una piedra por no existir el sitio (null si no hace falta avisar). */
 export const FALLBACK_TEXT: Record<FallbackReason, string | null> = {
     'sin-posicion': null,
@@ -87,6 +102,28 @@ export function resolvePlace(place: SavePlace | null | undefined, w: PlaceWorld)
         return { kind: 'stone', stone: nearestStone(w, pos), reason: 'fuera' };
     if (!w.walkable(pos)) return { kind: 'stone', stone: nearestStone(w, pos), reason: 'bloqueado' };
     return { kind: 'overworld', pos };
+}
+
+/** Escena especial guardada y punto exterior seguro desde el que reconstruirla. */
+export function resolveInteriorPlace(place: SavePlace | null | undefined, w: PlaceWorld): InteriorPlacement | null {
+    if (!place || place.scene !== 'overworld') return null;
+
+    const interior: SavedInterior | null = place.barriada
+        ? { kind: 'barriada' }
+        : place.navidad
+          ? { kind: 'navidad' }
+          : isSavedHouseRoom(place.houseRoom)
+            ? { kind: 'house', room: place.houseRoom as SavedHouseRoom }
+            : null;
+    if (!interior) return null;
+
+    const exteriorPlace = { ...place };
+    delete exteriorPlace.barriada;
+    delete exteriorPlace.navidad;
+    delete exteriorPlace.houseRoom;
+    const exterior = resolvePlace(exteriorPlace, w);
+    if (exterior.kind === 'dungeon') return null;
+    return { interior, exterior };
 }
 
 /**
