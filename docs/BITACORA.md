@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-440: validar referencias de recetas de oficio (Junie)
+
+**Qué se hizo:** Añadí `tests/jl440_professionRecipeRefs.test.ts`, que comprueba que el producto y cada ingrediente de todas las recetas de `data/rpg/professions.json` existen en `data/rpg/items.json`. Un control negativo verifica que también se detectan referencias inexistentes. El catálogo actual pasa sin faltantes; no se modificaron datos ni cifras.
+
+**Validación:** La prueba dirigida pasó 2/2; `npm test` pasó con 445 archivos, 5.149 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` y Prettier específico limpios. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `tests/jl440_professionRecipeRefs.test.ts` y `work/junie-jl440/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-439: cobertura de enemigos por zona (bloqueada)
 
 **Qué se hizo:** La inspección encontró que `data/rpg/enemies.json` y `data/enemies.json` no registran una zona por enemigo. `data/zones.json` define la asociación únicamente desde `zones[].spawns`: 52 de 72 fichas RPG aparecen allí y no hay información independiente que permita decidir si las otras 20 no tienen zona o si falta su aparición. Derivar la expectativa de esas mismas listas sería circular; no se inventó un mapa de zonas ni se añadió una prueba vacía. JL-439 queda bloqueada hasta contar con una fuente autorizada de asociaciones enemigo→zona.
