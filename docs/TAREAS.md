@@ -765,6 +765,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-443 | Junie | Hecho (commit «JL-443: comprobar que los sets no comparten piezas») | `tests/jl443_exclusiveEquipmentSets.test.ts` agrupa los objetos por `setId` y comprueba que ninguna pieza pertenezca a dos sets; el control negativo confirma que una pieza repetida entre sets se detecta. Prueba dirigida 2/2; `npm test`: 447 archivos, 5.152 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios. `npm run docs:check` (227 rutas) y `git diff --check` limpios. No aplica Electron: prueba de integridad sin cambio visual. Evidencia: `work/junie-jl443/RESULTADO.md`. |
 
+## Cierre de JL-447 (2026-11-28)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-447 | Junie | Hecha (commit «JL-447: revalidar bloqueos sin inventar datos») | Reintenté los tres `[!]` de JL-384…JL-446. JL-430 sigue pendiente de decisión del creador sobre 64 audios originales sin referencia; JL-431 sigue pendiente de definir las acciones contextuales y la entidad seleccionable del compañero; JL-439 no tiene fuente independiente para asignar enemigos a zonas. No se modificaron sus casillas, código, pruebas ni datos; derivar la asignación de los propios `spawns` sería circular. Evidencia y validaciones en `work/junie-jl447/RESULTADO.md`. No aplica Electron: sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

@@ -1788,7 +1788,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [x] JL-446 Electron: el tooltip de un arma muestra el mismo daño que usa el combate. Compara con `src/rpg/` y anota la cuenta. — commit «JL-446: verificar daño del arma entre tooltip y combate» — Electron 6/6, consola limpia; `npm test` (448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck`, `npm run docs:check` (228 rutas) y `node --check scripts/qaElectron.mjs`; cuenta y resultado en `docs/BITACORA.md` y `work/junie-jl446/electron/resultado.json`. La captura CDP no compone el tooltip aunque el DOM lo muestra visible.
 
 ### E. Reintentos y cierre
-- [ ] JL-447 Reintento de lo que esté `[!]` en JL-384…JL-446 que no dependa del creador.
+- [x] JL-447 Reintento de lo que esté `[!]` en JL-384…JL-446 que no dependa del creador. — commit «JL-447: revalidar bloqueos sin inventar datos» — evidencia: `work/junie-jl447/RESULTADO.md`; JL-430 y JL-431 siguen requiriendo decisiones del creador; JL-439 carece de una fuente independiente enemigo→zona.
 - [ ] JL-448 Consola limpia en los escenarios Electron nuevos de esta tanda.
 - [ ] JL-449 Suite completa, `npm run typecheck`, `npm run build` y QA por tandas, sin regresiones.
 - [ ] JL-450 `docs:check` limpio y `docs/TAREAS.md` sin filas de JL-384…449 en estado ambiguo.

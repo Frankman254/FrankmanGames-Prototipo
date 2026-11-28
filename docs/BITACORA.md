@@ -6,6 +6,16 @@ Validación: `npm test`: 448 archivos aprobados, uno omitido; 5.154 pruebas apro
 
 ---
 
+## 2026-11-28 — JL-447: reintentar bloqueos sin inventar datos (Junie)
+
+**Qué se hizo:** Revalidé las tres tareas `[!]` de JL-384…JL-446, sin tocar sus casillas. JL-430 sigue requiriendo decisión del creador sobre los 64 audios originales sin referencia (86 archivos versionados en total); JL-431 requiere que el creador defina las acciones contextuales y la entidad visible del compañero. Para JL-439 confirmé que los dos catálogos tienen 72 entradas sin campo de zona, mientras que las 24 zonas contienen 96 filas de spawn y solo 52 arquetipos distintos; no hay una asignación independiente para los otros 20 y deducirla de `spawns` sería circular. No cambié código, pruebas, datos ni assets y no abrí otra tarea.
+
+**Validación:** `npx tsc --noEmit`, `npm test` (448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck`, `npm run docs:check` (228 rutas) y `git diff --check` limpios. No aplica Electron ni captura: no hubo cambio visual.
+
+**Evidencia:** `work/junie-jl447/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-446: verificar el daño del tooltip de arma (Junie)
 
 **Qué se hizo:** Añadí `jl446TooltipDanioArma` a `scripts/qaElectron.mjs`: equipa una `short_sword` con tiradas deterministas mínimas, abre su tooltip en la mochila y compara rango visible, `ItemDef.weapon` y el `EffectDef` del ataque básico. También verifica la visibilidad y límites del tooltip, y observa un impacto real. No se modificaron lógica productiva, datos ni cifras.
