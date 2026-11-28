@@ -744,6 +744,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-437 | Junie | Hecho (commit «JL-437: medir carga de equipo.glb en Electron») | Electron `jl437TiempoCargaEquipo`: 4/4, consola limpia. Primer equipamiento hasta malla visible: 133,7 ms; transferencia única del GLB por CDP: 32,799 ms y 8.327.579 bytes. Cinco cambios posteriores: mediana 18,7 ms (rango 14,6–21,8), sin otra petición. El archivo fuente pesa 8.327.300 bytes (8,327 MB decimales / 7,942 MiB), no 6,4 MB. `npm test`: 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` (227 rutas), `git diff --check` y `node --check scripts/qaElectron.mjs` limpios. Informe y capturas revisadas en `work/junie-jl437/RESULTADO.md` y `work/junie-jl437/electron/`. |
 
+## Cierre de JL-441 (2026-11-28)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-441 | Junie | Hecho (commit «JL-441: probar persistencia de equipo, mascota, montura y barra») | `tests/jl441_saveLoadState.test.ts` verifica una vuelta por `SaveStore` y `RpgSessionFactory.load`, incluidos los UID de las piezas y la barra completa. `npm test`: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit` y `npm run docs:check` (227 rutas) limpios. Electron `hechizosClases`: 28/28, consola limpia; capturas de barra a nivel alto revisadas en `work/junie-jl441/electron/`. No se cambió lógica ni datos del juego. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

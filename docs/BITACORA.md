@@ -133,6 +133,18 @@
 
 ---
 
+## 2026-11-28 — JL-441: comprobar guardado y carga de equipo, mascota, montura y barra (Junie)
+
+**Archivos:** `tests/jl441_saveLoadState.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; capturas en `work/junie-jl441/electron/`. Sin cambios en lógica ni datos productivos.
+
+**Qué se hizo:** La prueba crea un personaje, equipa tres piezas y una montura, activa la mascota y asigna un hechizo; guarda en `SaveStore` y reconstruye la sesión desde el guardado. Comprueba los mismos objetos y UID en sus ranuras, la mascota activa y la barra exacta.
+
+**Validación:** `tests/jl441_saveLoadState.test.ts`: 1/1; `npm test`: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` (227 rutas) y `git diff --check` limpios. Electron `hechizosClases` a nivel alto: 28/28 comprobaciones, barra/HUD visibles y consola sin errores.
+
+**Evidencia:** `work/junie-jl441/electron/resultado.json`, `jl188-ember_vanguard-final.jpg` y `jl188-storm_weaver-final.jpg`.
+
+---
+
 ## 2026-11-28 — JL-436: revisar armas en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl436/`.
