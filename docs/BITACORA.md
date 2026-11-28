@@ -101,6 +101,18 @@
 
 ---
 
+## 2026-11-28 — JL-438: comprobar traducciones de hechizos por clase (Junie)
+
+**Archivos:** `tests/jl438_spellTranslations.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`. Sin cambios en los datos productivos.
+
+**Qué se hizo:** La prueba recorre los hechizos asociados a cada una de las tres clases y exige nombre y descripción en español, además de traducción directa al inglés. Quedaron cubiertos 97 hechizos (32 de Vanguardia, 32 de Tejedora y 33 de Cazador); no aplica captura de Electron porque no cambia la presentación.
+
+**Validación:** `tests/jl438_spellTranslations.test.ts`: 1/1; `npm test`: 444 archivos, 5.147 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (227 rutas) y `git diff --check` limpios.
+
+**Evidencia:** `work/junie-jl438/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-436: revisar armas en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl436/`.

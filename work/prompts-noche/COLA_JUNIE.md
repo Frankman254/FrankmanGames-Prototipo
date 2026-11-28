@@ -1775,7 +1775,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [x] JL-437 Mide el tiempo de carga de `equipo.glb` en Electron (6,4 MB) antes y después del primer equipo puesto. Informe. — commit «JL-437: medir carga de equipo.glb en Electron» — primera malla 133,7 ms; petición CDP 32,799 ms; cinco cambios posteriores mediana 18,7 ms sin nueva petición; informe y capturas en `work/junie-jl437/`.
 
 ### C. Datos y robustez
-- [ ] JL-438 Prueba: cada hechizo de cada clase tiene nombre y descripción en español y en inglés.
+- [x] JL-438 Prueba: cada hechizo de cada clase tiene nombre y descripción en español y en inglés. — commit «JL-438: comprobar traducciones de hechizos por clase» — `tests/jl438_spellTranslations.test.ts` (1/1); `npm test`: 444 archivos, 5.147 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios; evidencia `work/junie-jl438/RESULTADO.md`.
 - [ ] JL-439 Prueba: cada enemigo de `enemies.json` con zona aparece en algún punto de aparición de esa zona.
 - [ ] JL-440 Prueba: cada receta de oficio produce un objeto que existe, y sus ingredientes existen.
 - [ ] JL-441 Prueba: guardar y cargar conserva el equipo puesto, la mascota, la montura y la barra.
