@@ -6934,6 +6934,53 @@ const scenarios = {
         await shot('hzui01-libro-768p');
     },
 
+    /** JL-444: con 30+ hechizos aprendidos, el libro debe desplazarse y mostrar nombres completos. */
+    async jl444Spellbook() {
+        await newGame('QA JL444', { classId: 'ember_vanguard' });
+        await resize(1920, 1080);
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
+        const learned = await js(`(() => {
+            const c=${W}.character;
+            c.gainXp(50000000000);
+            for (const sp of Object.values(${S}.content.spells)) {
+                if (!sp.devOnly && c.spellbook.rank(sp.id) === 0 && (sp.unlockLevel ?? 1) <= c.level && (sp.classId === null || sp.classId === c.classId)) c.spellbook.learn(sp.id);
+            }
+            return { level: c.level, learned: c.spellbook.known.size };
+        })()`);
+        await key('KeyV', 'v');
+        await until(`!!document.querySelector('.panel-spellbook')`, 10000, 'libro de hechizos');
+        await sleep(500);
+
+        const inspect = () => js(`(() => {
+            const panel=document.querySelector('.panel-spellbook');
+            const body=panel.querySelector('.panel-body');
+            const cards=[...panel.querySelectorAll('.spell-card:not(.unknown)')];
+            const clipped=cards.map(c=>c.querySelector('.spell-name')).filter(n=>n && (n.scrollWidth>n.clientWidth+1 || n.scrollHeight>n.clientHeight+1)).map(n=>n.textContent);
+            const rect=panel.getBoundingClientRect();
+            return {known:cards.length, scrollTop:body.scrollTop, maxScroll:body.scrollHeight-body.clientHeight, clipped, x:rect.left+rect.width/2, y:rect.top+rect.height/2};
+        })()`);
+        const checkViewport = async (label) => {
+            await js(`document.querySelector('.panel-spellbook .panel-body').scrollTop=0`);
+            await sleep(200);
+            const top = await inspect();
+            check(`JL-444 ${label}: aparecen 30 o más hechizos aprendidos`, top.known >= 30 && learned.learned >= 30, JSON.stringify({ level: learned.level, learned: learned.learned, visible: top.known }));
+            check(`JL-444 ${label}: el libro tiene recorrido vertical`, top.maxScroll > 0, `${top.maxScroll}px`);
+            check(`JL-444 ${label}: no corta nombres de hechizos`, top.clipped.length === 0, top.clipped.join(', '));
+            await shot(`jl444-${label}-arriba`);
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseWheel', x: top.x, y: top.y, deltaX: 0, deltaY: 600 });
+            await sleep(300);
+            const bottom = await inspect();
+            check(`JL-444 ${label}: la rueda desplaza el libro`, bottom.scrollTop > top.scrollTop, `${top.scrollTop} → ${bottom.scrollTop}`);
+            check(`JL-444 ${label}: los nombres siguen completos al desplazarse`, bottom.clipped.length === 0, bottom.clipped.join(', '));
+            await shot(`jl444-${label}-desplazado`);
+        };
+
+        await checkViewport('1920x1080');
+        await resize(1366, 768);
+        await sleep(300);
+        await checkViewport('1366x768');
+    },
+
     async volar() {
         // F21: Tab despega; Espacio sube y W avanza; una tecla de hechizo no lanza nada en el aire.
         await newGame('QA Volar');

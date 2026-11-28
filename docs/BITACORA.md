@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-444: desplazar el libro y conservar nombres completos (Junie)
+
+**Qué se hizo:** El límite responsive del libro ya no se sobrescribe con el alto completo del viewport; el panel se acota y su cuerpo desplaza la lista. Los nombres de hechizos se envuelven a varias líneas en lugar de truncarse con puntos suspensivos.
+
+**Validación:** `tests/jl444_spellbookOverflow.test.ts` pasó 2/2; Electron `jl444Spellbook` pasó 11/11 con 42 hechizos aprendidos a 1920×1080 y 1366×768, sin nombres cortados ni errores de consola. `npm test`: 448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run build` (incluye `checkPublishable`) y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl444/electron/final/resultado.json` y capturas revisadas en `work/junie-jl444/electron/final/`.
+
+---
+
 ## 2026-11-28 — JL-443: comprobar que los sets no comparten piezas (Junie)
 
 **Qué se hizo:** Añadí `tests/jl443_exclusiveEquipmentSets.test.ts`, que agrupa las piezas de `data/rpg/items.json` por `setId` y comprueba que ninguna aparezca en dos sets. El control negativo verifica que una pieza duplicada entre dos sets se detecta. El catálogo no tiene piezas compartidas; no se modificaron datos ni cifras.

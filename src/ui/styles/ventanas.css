@@ -1093,9 +1093,8 @@ input[type='search'] {
 }
 .spell-name {
     font: 600 var(--fs-12)/1.2 var(--sans);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 .spell-meta {
     font-size: var(--fs-10);

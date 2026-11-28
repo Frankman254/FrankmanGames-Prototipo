@@ -1783,7 +1783,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [x] JL-443 Prueba: los sets de equipo no comparten pieza entre dos sets. — commit «JL-443: comprobar que los sets no comparten piezas» — `work/junie-jl443/RESULTADO.md`; prueba dirigida 2/2 y suite 447 archivos, 5.152 aprobadas.
 
 ### D. Interfaz
-- [ ] JL-444 Electron: el libro de hechizos con 30 o más hechizos aprendidos permite desplazarse y no corta texto.
+- [x] JL-444 Electron: el libro de hechizos con 30 o más hechizos aprendidos permite desplazarse y no corta texto. — commit «JL-444: desplazar el libro y conservar nombres completos» — Electron 11/11 con 42 hechizos a 1920×1080 y 1366×768; resultados y capturas en `work/junie-jl444/electron/final/`.
 - [ ] JL-445 Electron: la tienda con el inventario lleno muestra el aviso y no vende.
 - [ ] JL-446 Electron: el tooltip de un arma muestra el mismo daño que usa el combate. Compara con `src/rpg/` y anota la cuenta.
 

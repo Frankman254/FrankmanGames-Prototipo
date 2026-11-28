@@ -285,9 +285,11 @@
 /* Paneles que nacen a 8 px del borde superior: descuentan esa posición del
    alto disponible (misma especificidad que la regla general, y después). */
 .menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-character,
-.menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-spellbook,
 .menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-shop {
     max-height: max(180px, calc(var(--ui-max-height, 100vh) - 16px));
+}
+.menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-spellbook {
+    max-height: max(180px, min(620px, calc(var(--ui-max-height, 100vh) - 16px)));
 }
 .menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-character {
     overflow: hidden;
