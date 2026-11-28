@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-426: listar hechizos compatibles con primitivas actuales (Junie)
+
+**Qué se hizo:** Contrasté los 18 hechizos del calendario histórico HZ-03 con los efectos actuales. Solo las versiones vigentes HZ-04d de `kiln_thread`, `kiln_burst` y `thunder_flock` se expresan con primitivas existentes (`damage`, `bonusVsStatus` y `chain`); sus mecánicas HZ-03 originales siguen pendientes. No se cambió código, datos ni pruebas.
+
+**Validación:** Línea base `npx tsc --noEmit` y `npx vitest run` en verde: 441 archivos, 5.139 aprobadas, 1 omitida y 1 `todo`. `npm run docs:check` y `git diff --check` limpios. No aplica Electron: tarea de análisis documental sin cambio visual.
+
+**Evidencia:** `work/junie-jl426/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — COMO_CREAR, mapa de Navidad, plano de Villa Raspadura y propuestas de audio (Claude)
 
 **Qué se hizo:**
