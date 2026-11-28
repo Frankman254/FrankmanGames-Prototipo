@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-430: reintentar auditoría de audio (Junie)
+
+**Qué se hizo:** Revalidé la segunda subtarea identificada por JL-428, la auditoría JL-300. Las referencias de runtime están presentes, pero quedan 64 WAV/OGG originales sin referencia; su procedencia documenta fuentes conservadas y no existe decisión del creador para retirarlas o archivarlas. No cambié audios ni código; JL-430 queda bloqueada por esa decisión pendiente, no por falta de autorización.
+
+**Validación:** `git ls-files assets/audio` cuenta 86 archivos y no hay cambios de audio desde JL-350. `npx tsc --noEmit` pasó; `npx vitest run` pasó (441 archivos, 5.142 aprobadas, 1 omitida y 1 `todo`). No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `work/junie-jl300/INFORME.md` y `work/junie-jl350/REINTENTOS.md`.
+
+---
+
 ## 2026-11-28 — JL-429: restaurar interiores al cargar guardados (Junie)
 
 **Qué se hizo:** `normalizePlace()` rearmaba `SavePlace` sin conservar `houseRoom`, `barriada` ni `navidad`; por eso la carga no sabía qué escena interior reconstruir. Ahora persiste los marcadores válidos del mundo abierto, y `enterPlace()` vuelve a entrar en la casa, la barriada o el mapa navideño, usando una ubicación exterior segura si la coordenada guardada quedó bloqueada o fuera del mundo. No se cambiaron cifras ni contenido.
