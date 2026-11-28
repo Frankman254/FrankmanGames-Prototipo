@@ -718,6 +718,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-425 | Junie | Hecho (commit «JL-425: consumir una carga por estado en HZ-04b») | `bonusVsStatus.consume` ahora consume una sola acumulación: las restantes siguen activas y sus modificadores se recalculan; al llegar a la última, el estado se retira. La prueba de integración reproduce el consumo de una de tres cargas durante `warp_tide`, sin cambiar datos ni cifras. | `tests/hz04b_edges.test.ts`: 6/6; suites HZ-04b dirigidas: 33/33; `npm test`: 441 archivos, 5.139 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios; `npm run docs:check`: 226 rutas; `git diff --check` limpio. No aplica Electron: cambio de simulación sin alteración visual. Evidencia: `work/junie-jl425/RESULTADO.md`. |
 
+## Cierre de JL-432 (2026-11-28)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-432 | Junie | Hecho (commit «JL-432: verificar nodos de objetos equipables en equipo.glb») | `tests/jl432_equipmentModelCoverage.test.ts` lee el chunk JSON del GLB sin Babylon y exige `obj_<id>` para cada objeto en las ranuras `weapon`, `offhand`, `head` y `back`. `npm test`: 442 archivos, 5.143 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` (227 rutas), Prettier específico y `git diff --check` limpios. Evidencia: `work/junie-jl432/RESULTADO.md`. No aplica Electron: prueba de datos sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

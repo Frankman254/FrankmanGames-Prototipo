@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-432: verificar nodos de objetos equipables en equipo.glb (Junie)
+
+**Qué se hizo:** Añadí una prueba que lee el chunk JSON de `assets/models/equipo.glb` directamente, sin Babylon, y verifica que todos los objetos de `data/rpg/items.json` con ranura `weapon`, `offhand`, `head` o `back` tengan su nodo `obj_<id>`. No faltan nodos en el catálogo actual; no se modificaron el GLB ni los datos.
+
+**Validación:** La prueba JL-432 pasó 1/1; `npm test` pasó con 442 archivos, 5.143 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` (227 rutas), Prettier específico y `git diff --check` pasaron. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `tests/jl432_equipmentModelCoverage.test.ts` y `work/junie-jl432/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-431: reintentar menús contextuales (Junie)
 
 **Qué se hizo:** Revalidé la tercera subtarea inventariada por JL-428: JL-310. El clic derecho del lienzo sigue sin abrir menús para enemigos, PNJ o botín, y `addCompanion()` solo permite compañeros en el laboratorio; el render no representa compañeros. JL-431 queda bloqueada hasta que el creador defina las opciones y la entidad seleccionable, sin inventar interacciones ni cambiar controles.

@@ -1767,7 +1767,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [!] JL-431 Ídem, la tercera (JL-310). — BLOQUEADA: el creador debe definir las opciones de los menús contextuales para enemigos, PNJ y botín, y qué entidad visible representa al compañero; no se deben inventar interacciones. Evidencia: `work/junie-jl431/RESULTADO.md`.
 
 ### B. Modelos y equipo (solo medir y capturar; los modelos son del coordinador)
-- [ ] JL-432 Prueba en `tests/`: cada objeto de `items.json` con ranura weapon, offhand, head o back tiene nodo `obj_<id>` en `assets/models/equipo.glb`. Lee el JSON del GLB, sin Babylon. Si falta alguno, la prueba falla: no la relajes.
+- [x] JL-432 Prueba en `tests/`: cada objeto de `items.json` con ranura weapon, offhand, head o back tiene nodo `obj_<id>` en `assets/models/equipo.glb`. Lee el JSON del GLB, sin Babylon. Si falta alguno, la prueba falla: no la relajes. — commit «JL-432: verificar nodos de objetos equipables en equipo.glb» — `tests/jl432_equipmentModelCoverage.test.ts` (1/1); suite 442 archivos, 5.143 aprobadas; typecheck y `docs:check` limpios; evidencia `work/junie-jl432/RESULTADO.md`.
 - [ ] JL-433 Prueba: ningún nodo `obj_*` de `equipo.glb` apunta a un objeto que no existe en `items.json`.
 - [ ] JL-434 Electron: el héroe de cada clase con la Diablica Espeja completa. Capturas de frente, de perfil y de espalda. Lista las piezas que atraviesan el cuerpo o flotan.
 - [ ] JL-435 Electron: captura puesta de 10 tocados y 10 capas al azar con semilla fija. Lista los que flotan, se hunden o salen girados.
