@@ -1785,7 +1785,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 ### D. Interfaz
 - [x] JL-444 Electron: el libro de hechizos con 30 o más hechizos aprendidos permite desplazarse y no corta texto. — commit «JL-444: desplazar el libro y conservar nombres completos» — Electron 11/11 con 42 hechizos a 1920×1080 y 1366×768; resultados y capturas en `work/junie-jl444/electron/final/`.
 - [x] JL-445 Electron: la tienda con el inventario lleno muestra el aviso y no vende. — commit «JL-445: avisar y evitar ventas con mochila llena» — Electron `jl445TiendaInventarioLleno` 4/4; captura y resultado en `work/junie-jl445/electron/`.
-- [ ] JL-446 Electron: el tooltip de un arma muestra el mismo daño que usa el combate. Compara con `src/rpg/` y anota la cuenta.
+- [x] JL-446 Electron: el tooltip de un arma muestra el mismo daño que usa el combate. Compara con `src/rpg/` y anota la cuenta. — commit «JL-446: verificar daño del arma entre tooltip y combate» — Electron 6/6, consola limpia; `npm test` (448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck`, `npm run docs:check` (228 rutas) y `node --check scripts/qaElectron.mjs`; cuenta y resultado en `docs/BITACORA.md` y `work/junie-jl446/electron/resultado.json`. La captura CDP no compone el tooltip aunque el DOM lo muestra visible.
 
 ### E. Reintentos y cierre
 - [ ] JL-447 Reintento de lo que esté `[!]` en JL-384…JL-446 que no dependa del creador.

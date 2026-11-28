@@ -1,3 +1,15 @@
+## 2026-11-28 — JL-446: verificar el daño del tooltip de arma (Junie)
+
+**Qué se hizo:** Añadí `jl446TooltipDanioArma` a `scripts/qaElectron.mjs`: equipa una `short_sword` con tiradas deterministas mínimas, abre su tooltip en la mochila y compara rango visible, `ItemDef.weapon` y el `EffectDef` del ataque básico. También verifica la visibilidad y límites del tooltip, y observa un impacto real. No se modificaron lógica productiva, datos ni cifras.
+
+**Cuenta:** `format.ts` lee `weapon.min/max`; `Character.basicSwing()` selecciona esa misma arma y `World.basicAttack()` copia `min/max` y aplica `basicScaling = 0,3`. Para la base `1–2`, estadística elemental `2` y escalado `0,3`: `[⌊1 + 0,3×2⌋, ⌊2−ε + 0,3×2⌋] = [1,2]`; potencia `0` y afinidad `10 %` dan `×1,10` y el mismo `[1,2]`; daño plano de tierra `+1` deja `[2,3]`; resistencia enemiga `15 %` da `[⌊2×0,85⌋, ⌊3×0,85⌋] = [1,2]`. `spellPower = 1` (`weaponPower = 0`), crítico `0`, niveles iguales y clima `×1`; el golpe real fue `1`, dentro del preview `1–2`.
+
+**Validación:** Electron 6/6 y consola limpia; `npm test`: 448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` (228 rutas), `node --check scripts/qaElectron.mjs` y `git diff --check` limpios. La captura CDP no muestra el tooltip aunque el DOM lo informa visible y dentro del viewport, así que no se presenta como revisión visual.
+
+**Evidencia:** `work/junie-jl446/electron/resultado.json` y captura generada `work/junie-jl446/electron/jl446-tooltip-espada-corta.jpg` (limitación CDP indicada arriba).
+
+---
+
 ## 2026-11-28 — JL-445: avisar y evitar ventas con mochila llena (Junie)
 
 **Qué se hizo:** Añadí el escenario `jl445TiendaInventarioLleno` a `scripts/qaElectron.mjs`. La compra se intenta con un clic real desde la tienda y una mochila por encima del límite; la pantalla muestra «Inventario lleno» y las comprobaciones comparan inventario, stock y monedas antes/después. El comportamiento de compra ya estaba implementado, por lo que no se cambió código productivo.

@@ -2378,6 +2378,130 @@ const scenarios = {
         check('JL-445: consola sin errores nuevos', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | ') || '0');
     },
 
+    /** JL-446: la horquilla del tooltip coincide con la base del ataque y se registra un impacto real. */
+    async jl446TooltipDanioArma() {
+        await resize(1920, 1080);
+        await newGame('QA Espada');
+        const equipped = await js(`(() => {
+            const s=${S}, c=s.character;
+            c.give('short_sword');
+            const item=c.inventory.slots.filter(i=>i?.itemId==='short_sword').at(-1);
+            const rolls=c.content.items['short_sword'].rolls;
+            item?.rolled.forEach((roll,index)=>{ roll.value=rolls[index].min; });
+            const result=item ? s.equip(item.uid) : null;
+            c.give('short_sword');
+            const bagItem=c.inventory.slots.filter(i=>i?.itemId==='short_sword').at(-1);
+            bagItem?.rolled.forEach((roll,index)=>{ roll.value=rolls[index].min; });
+            return result;
+        })()`);
+        if (!equipped?.ok) throw new Error('No se pudo equipar la espada corta para JL-446');
+        await key('KeyB', 'b');
+        await until(`!!document.querySelector('.panel-inventory')?.offsetParent`, 5000, 'mochila JL-446');
+
+        const selector = '.panel-inventory .inv-grid .cell.filled[aria-label="Espada corta"]';
+        const point = await locate(selector);
+        if (!point) throw new Error(`No está visible: ${selector}`);
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 500 });
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y });
+        await until(
+            `!!document.querySelector('.tooltip') && !document.querySelector('.tooltip').hidden && [...document.querySelectorAll('.tooltip .tip-text')].some(line=>line.textContent.startsWith('Daño '))`,
+            3000,
+            'tooltip de la espada corta',
+        );
+        await sleep(500);
+
+        const weapon = await js(`(() => {
+            const w=${W}, c=w.character, swing=c.basicSwing(), basic=w.basicAttack();
+            const effect=basic.effects.find(e=>e.def?.type==='damage');
+            const tip=[...document.querySelectorAll('.tooltip .tip-text')].find(line=>line.textContent.startsWith('Daño '))?.textContent ?? null;
+            const match=tip?.match(/^Daño ([\\d.,]+)–([\\d.,]+)/);
+            const def=swing.def?.weapon;
+            return {
+                tooltip: tip,
+                displayedRange: match ? match.slice(1,3).map(v=>Number(v.replace(',', '.'))) : null,
+                weaponRange: def ? [def.min, def.max] : null,
+                swing: { hand: swing.hand, damage: swing.damage, speed: swing.speed },
+                combatBase: effect ? [effect.def.min, effect.def.max] : null,
+                combatScaling: effect?.def.scaling ?? null,
+                basicScaling: w.content.rules.basicScaling,
+                spellPower: basic.power,
+                tooltipRect: (() => {
+                    const tip=document.querySelector('.tooltip');
+                    const box=tip.getBoundingClientRect();
+                    const style=getComputedStyle(tip);
+                    return {
+                        x:Math.round(box.x),y:Math.round(box.y),width:Math.round(box.width),height:Math.round(box.height),
+                        visible:!tip.hidden && style.display!=='none' && style.visibility==='visible' && Number(style.opacity)>0,
+                    };
+                })(),
+                stats: def ? {
+                    element: def.element,
+                    elementStat: c.stats.get(w.content.rules.elementStat[def.element]),
+                    power: c.stats.get('power'),
+                    weaponPower: c.stats.get('weaponPower'),
+                    flatElementDamage: c.stats.get('damage.'+def.element),
+                    elementalDamage: c.stats.get('elementalDamage'),
+                    affinityBonus: c.affinity.includes(def.element) ? c.affinityBonus : 0,
+                } : null,
+            };
+        })()`);
+        const tooltipMatches = weapon.displayedRange?.[0] === weapon.weaponRange?.[0] &&
+            weapon.displayedRange?.[1] === weapon.weaponRange?.[1];
+        check('JL-446: tooltip y ItemDef muestran la misma horquilla', tooltipMatches, JSON.stringify(weapon));
+        const bounds = weapon.tooltipRect;
+        check(
+            'JL-446: tooltip visible y dentro del viewport',
+            bounds?.visible && bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= 1920 && bounds.y + bounds.height <= 1080,
+            JSON.stringify(bounds),
+        );
+        check(
+            'JL-446: el ataque básico usa esa base y su escalado',
+            weapon.swing?.hand === 'weapon' &&
+                weapon.swing.damage === 1 &&
+                weapon.combatBase?.[0] === weapon.weaponRange?.[0] &&
+                weapon.combatBase?.[1] === weapon.weaponRange?.[1] &&
+                weapon.combatScaling === weapon.basicScaling,
+            JSON.stringify(weapon),
+        );
+        await js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+        await sleep(500);
+        await shot('jl446-tooltip-espada-corta');
+
+        await key('KeyB', 'b');
+        const target = await js(`(() => {
+            const w=${W}, p=w.player.pos, e=w.spawnEnemy('melee', {x:p.x+1, y:p.y});
+            e.state='stagger'; e.stateTime=-1e9; e.health=100000;
+            w.player.basicCharges=w.data.player.basicAttack.charges;
+            w.player.basicRecharge=0;
+            return {id:e.id, health:e.health};
+        })()`);
+        const preview = await js(`${W}.previewDamage('basic', ${target.id})`);
+        await js(`${W}.commandAttack(${target.id})`);
+        await until(`${W}.enemyById(${target.id})?.health < ${target.health}`, 5000, 'impacto del ataque básico JL-446');
+        const impact = await js(`(() => {
+            const w=${W}, e=w.enemyById(${target.id}), before=${target.health};
+            const preview=${JSON.stringify(preview)};
+            const effect=w.basicAttack().effects.find(fx=>fx.def?.type==='damage');
+            const targetActor=w.enemyActor(e);
+            const ends=preview.critChance>0
+                ? [preview.min, preview.max, preview.critMin, preview.critMax]
+                : [preview.min, preview.max];
+            const weatherEnds=ends.map(amount=>w.weatherScaled(amount, effect.def.element));
+            return {
+                damage: before-e.health,
+                expected: [Math.min(...weatherEnds), Math.max(...weatherEnds)],
+                preview,
+                attackerLevel: w.character.level,
+                target: {level:e.level, resistance:targetActor.stats.get('resist.'+effect.def.element)},
+                weatherMultiplier: w.weather ? w.weather.damageMultiplier(w.weatherZone(), effect.def.element) : 1,
+            };
+        })()`);
+        const landedInRange = impact.damage > 0 && impact.damage >= impact.expected[0] && impact.damage <= impact.expected[1];
+        check('JL-446: el impacto real cae en el rango calculado por combate', landedInRange, JSON.stringify(impact));
+        console.log('     JL-446 cuenta', JSON.stringify({ weapon, impact }));
+        check('JL-446: consola sin errores nuevos', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | ') || '0');
+    },
+
     async sobrepeso() {
         await newGame('QA Peso');
         await sleep(300);
