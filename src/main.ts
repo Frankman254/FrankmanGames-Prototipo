@@ -20,6 +20,7 @@ import { ZoneBorderView } from './render/zoneBorderView';
 import { housePlacement, LandmarkView, naturePlacement } from './render/landmarkView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
+import { NAVIDAD, NAVIDAD_STONE } from './world/navidad';
 import { WEATHER_KINDS } from './data/zonesSchema';
 import { StoneBook, faceYawDeg, mapCoords, parseStones, prepareStoneArrival, type StoneDef } from './world/stones';
 import { boatAt, boatOpen, canBoard, parseBoats, type BoatDef } from './world/boats';
@@ -324,12 +325,14 @@ function openStones(): void {
                 saveStones();
             }
             // JL-216: si viajas desde la barriada, salir primero para restaurar terreno, vegetación y cámara.
-            if (houses?.inBarriada) houses.leave();
+            if (houses?.inBarriada || houses?.inNavidad) houses.leave();
             audio?.cue('stone_travel');
             veil({ kicker: tr('Viajando a'), title: z.name, sub: tr('Piedra Pintada') }, () => {
                 teleport(arriveAt(z));
                 // CLA-BARR1: la piedra de Praderas del Norte lleva a la barriada 1:1, que está aparte.
                 if (z.id === BARRIADA_STONE) houses?.enterBarriada(arriveAt(z));
+                // NAV-03: la Piedra Pintada de la Navidad lleva al mapa de Navidad, que está aparte.
+                if (z.id === NAVIDAD_STONE) houses?.enterNavidad(arriveAt(z));
             });
         },
         saveHome,
@@ -355,6 +358,11 @@ function syncWeather(): void {
     const s = w?.at(zone) ?? null;
     const kind = w && s ? w.kindAt(zone) : null;
     const focus = view.player.model.root.position;
+    // NAV-03: en el mapa de Navidad nieva siempre (sólo se ve: el mapa es interior para la simulación).
+    if (houses?.inNavidad && NAVIDAD.nieve.activa) {
+        weatherView?.update(focus, 'snow', NAVIDAD.nieve.densidad, view.atmosphere);
+        return;
+    }
     weatherView?.update(focus, world.interior ? null : kind, s?.intensity ?? 0, view.atmosphere);
     const key = kind && zone && !world.interior ? `${zone}:${kind}` : '';
     if (kind && key && key !== lastWeather && lastWeather !== '' && kind !== 'clear') {
@@ -1090,6 +1098,11 @@ function enterPlace(place: SavePlace | null, seed: number, dungeonState?: Dungeo
             const stone = stones.get(BARRIADA_STONE);
             if (stone) houses?.enterBarriada(arriveAt(stone));
         }
+        // NAV-03: igual con el mapa de Navidad.
+        else if (place?.navidad) {
+            const stone = stones.get(NAVIDAD_STONE);
+            if (stone) houses?.enterNavidad(arriveAt(stone));
+        }
         // JL-254: si el guardado era dentro de una casa, entrar de nuevo en la sala.
         else if (place?.houseRoom && houses) {
             const at = r.pos;
@@ -1120,9 +1133,18 @@ function currentPlace(): SavePlace {
     const p = bank?.inside ? BANK_LOCATION.returnPoint : houses?.inside ? houses.returnPoint! : world.player.pos;
     const inside = crypt?.inside ?? false;
     const inBarriada = houses?.inBarriada ?? false;
-    const zone = bank?.inside ? 'El Cruce' : inBarriada ? 'Praderas del Norte' : houses?.inside ? 'Villa Raspadura' : worldInfo().zone;
+    const inNavidad = houses?.inNavidad ?? false;
+    const zone = bank?.inside
+        ? 'El Cruce'
+        : inBarriada
+          ? 'Praderas del Norte'
+          : inNavidad
+            ? NAVIDAD.nombre
+            : houses?.inside
+              ? 'Villa Raspadura'
+              : worldInfo().zone;
     // JL-254: guardar la sala si el jugador está dentro de una casa (no la barriada).
-    const houseRoom = houses?.inside && !houses.inBarriada ? houses.currentRoom ?? null : null;
+    const houseRoom = houses?.inside && !houses.inBarriada && !houses.inNavidad ? houses.currentRoom ?? null : null;
     return {
         scene: inside ? 'dungeon' : 'overworld',
         dungeon: inside ? 'crypt' : null,
@@ -1135,6 +1157,7 @@ function currentPlace(): SavePlace {
         playSeconds: Math.round(playSeconds),
         ...(zone ? { name: zone } : {}),
         ...(inBarriada ? { barriada: true } : {}),
+        ...(inNavidad ? { navidad: true } : {}),
         ...(houseRoom ? { houseRoom } : {}),
     };
 }
@@ -1660,6 +1683,7 @@ if (import.meta.env.DEV) {
                 if (!z) return;
                 teleport(arriveAt(z));
                 if (z.id === BARRIADA_STONE) houses?.enterBarriada(arriveAt(z));
+                if (z.id === NAVIDAD_STONE) houses?.enterNavidad(arriveAt(z));
             },
             /** Pruebas: el modo edición y su aplicación en caliente, sin pasar por el POST de guardar. */
             editor,

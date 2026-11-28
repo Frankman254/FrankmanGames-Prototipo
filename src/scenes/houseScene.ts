@@ -8,6 +8,7 @@ import { modelFile } from '../render/modelFiles';
 import { OcclusionPlugin } from '../render/occlusion';
 import { staticMesh, staticTexture } from '../render/staticModels';
 import { BarriadaView } from '../render/barriadaView';
+import { NavidadView } from '../render/navidadView';
 import { NavGrid } from '../sim/navGrid';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
@@ -21,6 +22,7 @@ import {
     casaRoomStart,
 } from '../world/casaCreador';
 import { BARRIADA, barriadaInicio, barriadaPiedra, barriadaSolids } from '../world/barriada';
+import { NAVIDAD, navidadInicio, navidadPiedra, navidadSolids } from '../world/navidad';
 import { surfaceHeight, type Platform } from '../world/steps';
 import type { SwitchableHeightField } from '../world/switchableGround';
 import type { BankHost } from './bankScene';
@@ -72,7 +74,7 @@ export function castleGate(p: HouseProp): HouseDoor {
 
 const REACH = 1.6;
 
-type RoomId = 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo' | 'barriada';
+type RoomId = 'hogar' | 'taller' | 'salon' | 'casa' | 'casaEspejo' | 'barriada' | 'navidad';
 
 /** Casa del creador en el mapa (landmark `casa_creador` o `casa_creador_espejo`). */
 export interface CreatorHouseProp extends HouseProp {
@@ -167,6 +169,19 @@ export const ROOMS: Record<RoomId, Room> = {
         origin: { ...BARRIADA.origen },
         outdoor: true,
     },
+    // NAV-03: el mapa de Navidad (src/world/navidad.ts), al que se llega por la Piedra Pintada `navidad` de
+    // Villa Raspadura. La salida es la piedra del paseo.
+    navidad: {
+        name: NAVIDAD.nombre,
+        width: NAVIDAD.ancho,
+        depth: NAVIDAD.fondo,
+        zoom: 16,
+        solids: navidadSolids().map((o) => ({ x: o.x, z: o.y, w: o.w, d: o.d })),
+        start: navidadInicio(),
+        exit: { mesh: navidadPiedra(), pos: { x: navidadPiedra().x, y: navidadPiedra().y - 2.6 } },
+        origin: { ...NAVIDAD.origen },
+        outdoor: true,
+    },
 };
 
 type Target = { action: 'enter'; pos: Vec2; door: HouseDoor; room: RoomId } | { action: 'leave'; pos: Vec2 };
@@ -232,6 +247,7 @@ const ROOM_PIECES: Record<RoomId, ReadonlyArray<readonly [string, string]>> = {
     casa: [],
     casaEspejo: [],
     barriada: [],
+    navidad: [],
 };
 
 export class HouseScene {
@@ -245,6 +261,8 @@ export class HouseScene {
     private readonly materials = new Map<string, StandardMaterial>();
     /** CLA-BARR1: se construye la primera vez que se entra (cientos de casas y calles). */
     private barriada: BarriadaView | null = null;
+    /** NAV-03: se construye la primera vez que se entra. */
+    private navidad: NavidadView | null = null;
 
     constructor(
         private readonly host: HouseHost,
@@ -303,6 +321,11 @@ export class HouseScene {
         return this.room === 'barriada';
     }
 
+    /** NAV-03: true si el jugador está en el mapa de Navidad. */
+    get inNavidad(): boolean {
+        return this.room === 'navidad';
+    }
+
     /** JL-254: ID de la sala actual (para guardar/cargar). */
     get currentRoom(): RoomId | null {
         return this.room;
@@ -337,8 +360,10 @@ export class HouseScene {
         // CLA-BARR2: dentro de la barriada se encienden sus farolas, no las del mapa.
         const atmosphere = this.host.view.atmosphere;
         const inBarriada = this.room === 'barriada' && this.barriada !== null;
-        atmosphere.zoneLamps = inBarriada ? this.barriada!.lamps : null;
+        const inNavidad = this.room === 'navidad' && this.navidad !== null;
+        atmosphere.zoneLamps = inBarriada ? this.barriada!.lamps : inNavidad ? this.navidad!.lamps : null;
         if (inBarriada) this.barriada!.update(1 / 60, atmosphere.state.lampsOn);
+        if (inNavidad) this.navidad!.update(1 / 60, atmosphere.state.lampsOn);
         const target = this.pending;
         if (!target) return;
         const w = this.host.world();
@@ -362,6 +387,7 @@ export class HouseScene {
         const room = ROOMS[id];
         const d = this.host.data;
         if (id === 'barriada') this.buildBarriada();
+        if (id === 'navidad') this.buildNavidad();
         const ox = room.origin?.x ?? 0;
         const oy = room.origin?.y ?? 0;
         const data: GameData = {
@@ -397,6 +423,11 @@ export class HouseScene {
         return this.enter({ door: back, outside: { ...back }, rotDeg: 0 }, 'barriada');
     }
 
+    /** NAV-03: viaje de la Piedra Pintada `navidad`; al salir se vuelve a `back`. */
+    enterNavidad(back: Vec2): boolean {
+        return this.enter({ door: back, outside: { ...back }, rotDeg: 0 }, 'navidad');
+    }
+
     /**
      * Rejilla de una sala lejos del origen (la de `fromObstacles` empieza en 0, 0): densa, con el borde
      * cerrado. Las casas se estampan con la holgura de la zona al montar el mundo (`buildZoneGrid`).
@@ -427,6 +458,16 @@ export class HouseScene {
         this.barriada.setVisible(true);
         this.targets.set(this.barriada.stone, { action: 'leave', pos: { ...ROOMS.barriada.exit!.pos } });
         goldOutline(this.barriada.stone);
+    }
+
+    private buildNavidad(): void {
+        if (this.navidad) return;
+        const view = this.host.view;
+        this.navidad = new NavidadView(view.scene, view.atmosphere.shadows);
+        this.navidad.root.parent = this.rooms.get('navidad')!;
+        this.navidad.setVisible(true);
+        this.targets.set(this.navidad.stone, { action: 'leave', pos: { ...ROOMS.navidad.exit!.pos } });
+        goldOutline(this.navidad.stone);
     }
 
     leave(): void {
@@ -485,7 +526,7 @@ export class HouseScene {
         const room = ROOMS[id];
         if (room.model) this.loadRoomModel(root, room.model);
         const W = room.width;
-        // La barriada sale por su piedra (buildBarriada).
+        // La barriada y el mapa de Navidad salen por su piedra (buildBarriada, buildNavidad).
         if (room.outdoor) {
             root.setEnabled(false);
             return;

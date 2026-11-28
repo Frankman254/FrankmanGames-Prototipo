@@ -9,6 +9,7 @@
   "start": "iguanera",
   "stones": [
     { "id": "raspadura", "name": "Piedra Pintada de Villa Raspadura", "x": 131, "y": 118 },
+    { "id": "navidad", "name": "Piedra Pintada de la Navidad", "x": 128, "y": 130 },
     { "id": "garza", "name": "Piedra Pintada del Charco de la Garza", "x": 96, "y": 172 },
     { "id": "bajareque", "name": "Piedra Pintada de Guararé", "x": 182, "y": 56 },
     { "id": "iguanera", "name": "Piedra Pintada de Iguanera", "x": 628, "y": 244, "face": { "x": 618, "y": 232 } },

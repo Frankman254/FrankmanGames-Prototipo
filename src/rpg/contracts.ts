@@ -954,6 +954,8 @@ export interface SavePlace {
     name?: string;
     /** CLA-BARR1: true si el jugador estaba dentro de la barriada de Praderas del Norte. */
     barriada?: boolean;
+    /** NAV-03: true si el jugador estaba en el mapa de Navidad. */
+    navidad?: boolean;
     /** JL-254: ID de la sala interior (hogar, taller, salon, casa, casaEspejo) si el jugador estaba dentro de una casa. */
     houseRoom?: string;
 }
