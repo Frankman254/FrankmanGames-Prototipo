@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-449: validar suite completa y QA por tandas (Junie)
+
+**Qué se hizo:** Repetí los diez escenarios Electron de JL-424…JL-448 en seis tandas y verifiqué suite, typecheck y build. No cambié código, pruebas, datos ni assets.
+
+**Validación:** `npm test`: 448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build` (incluye `checkPublishable`), `npx tsc --noEmit` y `npm run docs:check` (228 rutas) limpios. Electron 216/216, cero fallos y cero errores de consola. Son 210 checks funcionales más seis comprobaciones globales de consola (una por tanda); JL-448 contó diez por ejecutar individualmente los mismos escenarios. La advertencia de Vite sobre bundles mayores a 500 kB persiste. Capturas revisadas; el tooltip se ve en la captura actual.
+
+**Evidencia:** `work/junie-jl449/RESULTADO.md`, seis `resultado.json` y capturas en `work/junie-jl449/electron/`.
+
+---
+
 ## 2026-11-28 — JL-448: comprobar consola limpia en Electron (Junie)
 
 **Qué se hizo:** Repetí los diez escenarios Electron nuevos o modificados durante JL-424…JL-446: `hechizosClases`, `guardadoBarriadaCasa`, `jl434DiablicaEspeja`, `jl435TocadosCapas`, `jl436ArmasEnMano`, `jl437TiempoCargaEquipo`, `audioMazmorra`, `jl444Spellbook`, `jl445TiendaInventarioLleno` y `jl446TooltipDanioArma`. No hubo cambios de código ni datos.

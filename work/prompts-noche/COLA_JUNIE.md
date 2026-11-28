@@ -1790,7 +1790,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 ### E. Reintentos y cierre
 - [x] JL-447 Reintento de lo que esté `[!]` en JL-384…JL-446 que no dependa del creador. — commit «JL-447: revalidar bloqueos sin inventar datos» — evidencia: `work/junie-jl447/RESULTADO.md`; JL-430 y JL-431 siguen requiriendo decisiones del creador; JL-439 carece de una fuente independiente enemigo→zona.
 - [x] JL-448 Consola limpia en los escenarios Electron nuevos de esta tanda. — commit «JL-448: comprobar consola limpia en Electron» — 10 escenarios, Electron 220/220, consola limpia; resultados y 128 capturas en `work/junie-jl448/electron/`.
-- [ ] JL-449 Suite completa, `npm run typecheck`, `npm run build` y QA por tandas, sin regresiones.
+- [x] JL-449 Suite completa, `npm run typecheck`, `npm run build` y QA por tandas, sin regresiones. — commit «JL-449: validar suite completa y QA por tandas» — `npm test`: 448 archivos, 5.154 aprobadas, 1 omitida y 1 `todo`; typecheck, build y `docs:check` (228 rutas) limpios; Electron 216/216 en seis tandas, cero errores de consola; evidencia en `work/junie-jl449/RESULTADO.md` y capturas.
 - [ ] JL-450 `docs:check` limpio y `docs/TAREAS.md` sin filas de JL-384…449 en estado ambiguo.
 - [ ] JL-451 `work/junie-jl451/PREGUNTAS.md` con las preguntas de las tandas JL-384…450. Cada una con su opción recomendada.
 - [ ] JL-452 Revisa `RESERVA_JUNIE.md`: marca `[x]` lo que ya esté hecho por otra tarea, con la referencia.
