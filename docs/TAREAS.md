@@ -736,6 +736,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-434 | Junie | Hecho (commit «JL-434: revisar el set Diablica Espeja en Electron») | El escenario `jl434DiablicaEspeja` equipa y renderiza las ocho ranuras de `diablica_espeja` en las tres clases y ambos sexos; captura frente, perfil y espalda (18 imágenes). Lista visual: aparente solapamiento de `diablica_espeja_chest` sobre el abdomen delantero de Cazador masculino y femenino; no observé piezas flotantes. No se modificaron assets ni cifras. | Electron 33/33, consola limpia; `capturas.json`, `resultado.json` y 18 imágenes revisados en `work/junie-jl434/`. `npm test`: 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios. |
 
+## Cierre de JL-437 (2026-11-28)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-437 | Junie | Hecho (commit «JL-437: medir carga de equipo.glb en Electron») | Electron `jl437TiempoCargaEquipo`: 4/4, consola limpia. Primer equipamiento hasta malla visible: 133,7 ms; transferencia única del GLB por CDP: 32,799 ms y 8.327.579 bytes. Cinco cambios posteriores: mediana 18,7 ms (rango 14,6–21,8), sin otra petición. El archivo fuente pesa 8.327.300 bytes (8,327 MB decimales / 7,942 MiB), no 6,4 MB. `npm test`: 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` (227 rutas), `git diff --check` y `node --check scripts/qaElectron.mjs` limpios. Informe y capturas revisadas en `work/junie-jl437/RESULTADO.md` y `work/junie-jl437/electron/`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

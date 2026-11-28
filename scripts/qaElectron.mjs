@@ -141,6 +141,8 @@ let nextId = 1;
 const waiting = new Map();
 const consoleErrors = [];
 const expectedConsoleErrors = [];
+const assetLoadEvents = [];
+const assetLoadsByRequest = new Map();
 let screencastFrames = null;
 
 /** JL-51: relanzar Electron y reconectar CDP (tras un timeout de escenario). */
@@ -187,6 +189,33 @@ ws.on('message', (raw) => {
         waiting.delete(m.id);
         if (m.error) fail(new Error(m.error.message));
         else ok(m.result);
+    } else if (
+        m.method === 'Network.requestWillBeSent' &&
+        !m.params.request.url.includes('?import') &&
+        /\/equipo(?:-[^/?#]+)?\.glb(?:[?#]|$)/i.test(m.params.request.url)
+    ) {
+        const load = {
+            requestId: m.params.requestId,
+            url: m.params.request.url,
+            startedAtSeconds: m.params.timestamp,
+            wallTime: m.params.wallTime,
+        };
+        assetLoadEvents.push(load);
+        assetLoadsByRequest.set(m.params.requestId, load);
+    } else if (m.method === 'Network.responseReceived' && assetLoadsByRequest.has(m.params.requestId)) {
+        const load = assetLoadsByRequest.get(m.params.requestId);
+        load.response = {
+            status: m.params.response.status,
+            mimeType: m.params.response.mimeType,
+            receivedAtSeconds: m.params.timestamp,
+        };
+    } else if (m.method === 'Network.loadingFinished' && assetLoadsByRequest.has(m.params.requestId)) {
+        const load = assetLoadsByRequest.get(m.params.requestId);
+        load.finishedAtSeconds = m.params.timestamp;
+        load.durationMs = +((m.params.timestamp - load.startedAtSeconds) * 1000).toFixed(3);
+        load.encodedDataLength = m.params.encodedDataLength;
+    } else if (m.method === 'Network.loadingFailed' && assetLoadsByRequest.has(m.params.requestId)) {
+        assetLoadsByRequest.get(m.params.requestId).error = m.params.errorText;
     } else if (m.method === 'Runtime.exceptionThrown') {
         consoleErrors.push(m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text);
     } else if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') {
@@ -224,6 +253,7 @@ const cdp = (method, params = {}) =>
     });
 await cdp('Runtime.enable');
 await cdp('Page.enable');
+await cdp('Network.enable');
 
 /** Evalúa en la página y devuelve el valor (JSON). */
 async function js(expr) {
@@ -4490,6 +4520,120 @@ const scenarios = {
             path.join(outDir, 'capturas.json'),
             JSON.stringify({ seed, sampleSize, selected, captures }, null, 2),
         );
+    },
+
+    /** JL-437: mide el primer equipamiento y los cambios posteriores con equipo.glb en caché. */
+    async jl437TiempoCargaEquipo() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl437';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+        await newGame('QA Equipo', { classId: 'ember_vanguard' });
+        await until(
+            `__game.view.player.model?.entry?.file && __game.view.player.model.meshes.length>0`,
+            30000,
+            'modelo del jugador',
+        );
+        await js('__game.view.player.model.ready?.then(()=>true)');
+        await js(`(()=>{
+          const w=${W},c=w.character,v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130}));
+          c.level=200;c.spellbook.level=200;p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.facing=0;
+          v.rig.mode='manual';v.player.reset();v.player.visualYaw=0;v.rig.pitchDeg=14;v.rig.distance=5;v.rig.jumpTo(5);
+          v.scene.meshes.filter(m=>!m.name.startsWith('player:')).forEach(m=>m.isVisible=false);
+        })()`);
+        await sleep(500);
+
+        const before = await js(`(()=>({weapon:${S}.equipment().weapon?.itemId??null,objectMeshes:__game.view.player.model.meshes.filter(m=>m.name.includes('obj_')).map(m=>m.name)}))()`);
+        const networkBefore = assetLoadEvents.length;
+        const initialEmpty = before.weapon === null && before.objectMeshes.length === 0;
+        check('JL-437: personaje sin equipo antes de la primera prueba', initialEmpty, JSON.stringify(before));
+        if (!initialEmpty) throw new Error(`El personaje ya tiene equipo: ${JSON.stringify(before)}`);
+        await shot('jl437-sin-equipo');
+
+        const measurements = [];
+        const equipAndMeasure = async (itemId, label) => {
+            const result = await js(`(()=>{
+              const c=${W}.character,s=${S},id=${JSON.stringify(itemId)};
+              let item=c.inventory.slots.find(i=>i?.itemId===id);
+              if(!item){const left=c.give(id);item=c.inventory.slots.find(i=>i?.itemId===id);if(left||!item)throw new Error('No se pudo crear '+id+': '+left);}
+              const startedAt=performance.now(),equipped=s.equip(item.uid,'weapon');
+              if(!equipped.ok)throw new Error('No se pudo equipar '+id+': '+JSON.stringify(equipped));
+              const measurement={itemId:id,startedAt,equipResult:equipped};
+              window.__jl437Measurements??={};window.__jl437Measurements[${JSON.stringify(label)}]=measurement;
+              const watch=()=>{const model=__game.view.player.model,mesh=model?.meshes?.find(m=>m.name.includes('obj_'+id)&&m.isEnabled()&&m.isVisible&&m.getTotalVertices()>0);if(mesh)measurement.visibleAt=performance.now();else requestAnimationFrame(watch);};
+              requestAnimationFrame(watch);
+              return {ok:equipped.ok,itemId:id};
+            })()`);
+            await until(
+                `Number.isFinite(window.__jl437Measurements?.[${JSON.stringify(label)}]?.visibleAt)`,
+                30000,
+                `${itemId}: modelo equipado visible`,
+            );
+            const timing = await js(`(()=>{const m=window.__jl437Measurements[${JSON.stringify(label)}];return {itemId:m.itemId,elapsedMs:+(m.visibleAt-m.startedAt).toFixed(3)};})()`);
+            measurements.push({ ...timing, label, equip: result });
+            await sleep(250);
+            return timing;
+        };
+
+        const first = await equipAndMeasure('woodcutter_axe', 'primerEquipo');
+        await sleep(250);
+        const loadsAfterFirst = assetLoadEvents.map((load) => ({ ...load, response: load.response ? { ...load.response } : undefined }));
+        await shot('jl437-primer-equipo');
+
+        const subsequent = [];
+        const laterItems = ['chonta_spike', 'smith_mace', 'carbon_orb', 'sentinel_spear', 'carbon_sword'];
+        for (const [index, itemId] of laterItems.entries()) {
+            subsequent.push(await equipAndMeasure(itemId, `equipoPosterior${index + 1}`));
+        }
+        const loadsAfterSubsequent = assetLoadEvents.map((load) => ({ ...load, response: load.response ? { ...load.response } : undefined }));
+        await shot('jl437-equipo-posterior');
+
+        const median = (values) => {
+            const sorted = values.slice().sort((a, b) => a - b);
+            return sorted[Math.floor(sorted.length / 2)];
+        };
+        const assetBytes = fs.statSync(path.resolve('assets/models/equipo.glb')).size;
+        const resourceCountStable = loadsAfterSubsequent.length === loadsAfterFirst.length;
+        const resourcePresent = loadsAfterFirst.length > 0;
+        check(
+            'JL-437: CDP registra la petición del GLB en Electron',
+            resourcePresent,
+            JSON.stringify({ before: networkBefore, afterFirst: loadsAfterFirst.length }),
+        );
+        check(
+            'JL-437: equipar después no vuelve a solicitar equipo.glb',
+            resourceCountStable,
+            `${loadsAfterFirst.length} → ${loadsAfterSubsequent.length} entradas de recurso`,
+        );
+
+        const report = {
+            asset: {
+                path: 'assets/models/equipo.glb',
+                bytes: assetBytes,
+                decimalMB: +(assetBytes / 1e6).toFixed(3),
+                binaryMiB: +(assetBytes / 1048576).toFixed(3),
+            },
+            environment: {
+                electronUserAgent: await js('navigator.userAgent'),
+                node: process.version,
+                viewport: '1920×1080',
+            },
+            beforeFirstEquipment: { ...before, resourceRequestsObserved: networkBefore },
+            firstEquipment: { ...first, resourceRequests: loadsAfterFirst },
+            subsequentEquipment: {
+                samples: subsequent,
+                medianMs: +median(subsequent.map((sample) => sample.elapsedMs)).toFixed(3),
+                minMs: +Math.min(...subsequent.map((sample) => sample.elapsedMs)).toFixed(3),
+                maxMs: +Math.max(...subsequent.map((sample) => sample.elapsedMs)).toFixed(3),
+                resourceRequests: loadsAfterSubsequent,
+            },
+            notes: [
+                'elapsedMs es el tiempo desde session.equip() hasta que la malla equipada está habilitada, visible y con vértices; incluye actualización del personaje y el primer render.',
+                'durationMs y encodedDataLength proceden de los eventos CDP de red; miden la petición y respuesta, no el parseo de Babylon.js.',
+                'La caché de equipo.glb es por escena; las cinco muestras posteriores se toman en la misma escena.',
+            ],
+        };
+        fs.writeFileSync(path.join(outDir, 'medicion.json'), JSON.stringify(report, null, 2));
+        console.log('     medición equipo.glb', JSON.stringify(report));
     },
 
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.

@@ -115,6 +115,18 @@
 
 ---
 
+## 2026-11-28 — JL-437: medir carga de `equipo.glb` en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl437/`.
+
+**Qué se hizo:** El escenario `jl437TiempoCargaEquipo` mide en Electron el tiempo desde equipar hasta que aparece una malla visible, observa la transferencia binaria con CDP y repite cinco cambios en la misma escena. El archivo fuente pesa 8.327.300 bytes (8,327 MB decimales / 7,942 MiB), no 6,4 MB. No se cambiaron assets, datos ni lógica del juego.
+
+**Validación:** Electron 4/4, consola limpia; primera malla visible en 133,7 ms, petición del GLB en 32,799 ms y cinco cambios posteriores con mediana 18,7 ms, sin repetir la petición. `npm test`: 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check` (227 rutas), `git diff --check` y `node --check scripts/qaElectron.mjs` limpios.
+
+**Evidencia:** `work/junie-jl437/RESULTADO.md`, `work/junie-jl437/electron/medicion.json`, `resultado.json` y capturas antes/después.
+
+---
+
 ## 2026-11-28 — JL-435: revisar tocados y capas en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl435/`.
