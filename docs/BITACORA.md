@@ -187,6 +187,18 @@
 
 ---
 
+## 2026-11-28 — CDX-IMG-01: guía visual de retratos e ilustraciones (Codex)
+
+**Qué se hizo:** Generé tres pruebas clean-room sobre la misma cazadora y comparé una dirección pintada, una gráfica y una atmosférica contra la lámina propia de iconos del 2026-11-22 y el atuendo capturado en Electron. Elegí la dirección pintada: contorno índigo, materiales táctiles, luz tropical cálida y recorte turquesa; conserva mejor el atuendo y la lectura pequeña. La guía fija paleta, luz, encuadre, trazo, fondos y una plantilla para las tareas siguientes. Sigue siendo `PROPUESTA` pendiente del creador.
+
+**Archivos:** Solo documentación versionada en `docs/TAREAS.md` y `docs/BITACORA.md`. Las tres pruebas de 1254×1254, los prompts exactos, la guía y la lámina A–B–C viven en `work/codex-img01/`; no se añadió nada a `assets/`, así que todavía no corresponde una fila nueva en `PROCEDENCIA.md`.
+
+**Validación:** Las imágenes se inspeccionaron a tamaño completo y juntas en la lámina de contacto. `npm run typecheck`, `npm run build`, `node scripts/checkPublishable.mjs`, `npm run docs:check` y `git diff --check` pasaron. `npm test`: 5.125 aprobadas, 1 `todo`, 1 omitida y 5 fallos ajenos a CDX-IMG-01: cuatro por `assets/models/navidad.glb`, añadido sin versionar por el escritor concurrente de NAV-02 mientras corría la suite, y uno porque el sandbox negó abrir `127.0.0.1` en la PoC local. No se relajó ni modificó ninguna prueba. No aplica Electron porque CDX-IMG-01 no cambia el juego.
+
+**Evidencia:** `work/codex-img01/GUIA.md`, `work/codex-img01/PROMPTS.md`, `work/codex-img01/lamina-contacto.png` y las tres pruebas PNG.
+
+---
+
 ## 2026-11-28 — JL-436: revisar armas en Electron (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl436/`.
