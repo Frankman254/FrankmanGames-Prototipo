@@ -619,6 +619,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-414 | Junie | Hecho (commit «JL-414: verificar consola limpia en escenarios nuevos») | Verificados los escenarios Electron `hechizosLibres`, `jl399FichaHechizoLibre`, `jl403Heroes`, `jl404EquipoPropio`, `jl406TextosResponsive`, `jl407AccesibilidadTeclado` y `jl408TooltipConjunto`: 102/102 comprobaciones y `consoleErrors: []` en los siete resultados. Revisé capturas representativas; los manifiestos incluyen 36 imágenes de héroes y 394 de equipo. `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios. `npm run docs:check`: 220 rutas, todas existen. Evidencia en `work/junie-jl414/`. |
 
+## Cierre de JL-415 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-415 | Junie | Hecho (commit «JL-415: validar suite completa y QA por tandas») | `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios; `npm run build` y `checkPublishable` correctos (aviso no bloqueante por chunks >500 kB). Los siete escenarios Electron se verificaron en cuatro lotes: 99/99 comprobaciones, cero fallos y cero errores de consola; muestras visuales revisadas y manifiesto de equipo con 394 capturas. Evidencia: `work/junie-jl415/RESULTADO.md` y `work/junie-jl415/electron/lote-01…lote-04/`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

@@ -1738,7 +1738,7 @@ Contexto del coordinador:
 ### F. Reintentos y cierre
 - [x] JL-413 Reintento de lo que esté `[!]` en JL-368…JL-412 que no dependa del creador. — commit «JL-413: verificar bloqueos de la tanda» — cero casillas `- [!]` en el rango; no había reintentos elegibles. Evidencia: `work/junie-jl413/RESULTADO.md`.
 - [x] JL-414 Consola limpia en los escenarios nuevos de esta tanda. — commit «JL-414: verificar consola limpia en escenarios nuevos» — siete escenarios Electron, 102/102 comprobaciones y cero errores de consola; capturas revisadas y manifiestos de héroes/equipo en `work/junie-jl414/`.
-- [ ] JL-415 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones.
+- [x] JL-415 Suite completa, `npm run typecheck` (salvo balM3), `npm run build` y QA por tandas, sin regresiones. — commit «JL-415: validar suite completa y QA por tandas» — `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; typecheck y build limpios; 99/99 comprobaciones Electron en 4 lotes, sin errores de consola; evidencia en `work/junie-jl415/RESULTADO.md`.
 - [ ] JL-416 Actualiza en `docs/ESTADO_ACTUAL.md` la parte de balance: la batería fiel y lo que mide; quita conclusiones de `balM3` si quedan.
 - [ ] JL-417 `ACCIONES_CREADOR.md`: entrada breve con lo que el creador debe decidir del balance, con números de la batería fiel: tiempo de muerte objetivo por franja, `flatPerLevel.armor`, `minXpShare`.
 - [ ] JL-418 `work/junie-jl418/PREGUNTAS.md` con las preguntas de esta tanda, cada una con su opción recomendada.

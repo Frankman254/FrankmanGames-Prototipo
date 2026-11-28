@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-415: suite completa y QA por tandas (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl415/`.
+
+**Qué se hizo:** Verifiqué la suite completa, los tres proyectos TypeScript y el build de producción. Revisé los resultados de siete escenarios Electron organizados en cuatro lotes: 99/99 comprobaciones agrupadas, sin fallos ni errores de consola; miré capturas representativas y el manifiesto con 394 capturas de equipo. No cambié código, pruebas, datos ni comportamiento del juego. El conteo agrupado evita tres comprobaciones de consola que sí se repiten al correr cada escenario por separado.
+
+**Validación:** `npm test`: 440 archivos, 5.134 pruebas aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit` y `npm run typecheck` limpios; `npm run build` y `checkPublishable` correctos, con el aviso no bloqueante de Vite por chunks mayores de 500 kB. `npm run docs:check` se ejecutó tras actualizar la documentación.
+
+**Evidencia:** `work/junie-jl415/RESULTADO.md` y los cuatro `resultado.json` en `work/junie-jl415/electron/lote-01/` a `lote-04/`.
+
+---
+
 ## 2026-11-27 — JL-414: verificar consola limpia en escenarios nuevos (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia Electron en `work/junie-jl414/`.
