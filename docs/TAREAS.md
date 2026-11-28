@@ -756,6 +756,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-442 | Junie | Hecho (commit «JL-442: verificar retorno de música tras salir de cripta») | Electron `audioMazmorra`: 12/12 comprobaciones; tres entradas activan la música `crypt` y tres salidas restauran `region:los_santos` en Azuero, con consola limpia. `npm test`: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npx tsc --noEmit`, `npm run docs:check`, `node --check scripts/qaElectron.mjs` y `git diff --check` limpios. Evidencia: `work/junie-jl442/electron-final/resultado.json`, `jl442-cripta-musica.jpg` y `jl442-zona-musica-restaurada.jpg`. |
 
+## Cierre de JL-443 (2026-11-28)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-443 | Junie | Hecho (commit «JL-443: comprobar que los sets no comparten piezas») | `tests/jl443_exclusiveEquipmentSets.test.ts` agrupa los objetos por `setId` y comprueba que ninguna pieza pertenezca a dos sets; el control negativo confirma que una pieza repetida entre sets se detecta. Prueba dirigida 2/2; `npm test`: 447 archivos, 5.152 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios. `npm run docs:check` (227 rutas) y `git diff --check` limpios. No aplica Electron: prueba de integridad sin cambio visual. Evidencia: `work/junie-jl443/RESULTADO.md`. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-443: comprobar que los sets no comparten piezas (Junie)
+
+**Qué se hizo:** Añadí `tests/jl443_exclusiveEquipmentSets.test.ts`, que agrupa las piezas de `data/rpg/items.json` por `setId` y comprueba que ninguna aparezca en dos sets. El control negativo verifica que una pieza duplicada entre dos sets se detecta. El catálogo no tiene piezas compartidas; no se modificaron datos ni cifras.
+
+**Validación:** Prueba dirigida 2/2; `npm test`: 447 archivos, 5.152 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios. `npm run docs:check` (227 rutas) y `git diff --check` limpios. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `tests/jl443_exclusiveEquipmentSets.test.ts` y `work/junie-jl443/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-440: validar referencias de recetas de oficio (Junie)
 
 **Qué se hizo:** Añadí `tests/jl440_professionRecipeRefs.test.ts`, que comprueba que el producto y cada ingrediente de todas las recetas de `data/rpg/professions.json` existen en `data/rpg/items.json`. Un control negativo verifica que también se detectan referencias inexistentes. El catálogo actual pasa sin faltantes; no se modificaron datos ni cifras.

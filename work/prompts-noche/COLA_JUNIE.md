@@ -1780,7 +1780,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [x] JL-440 Prueba: cada receta de oficio produce un objeto que existe, y sus ingredientes existen. — commit «JL-440: validar referencias de recetas de oficio» — `tests/jl440_professionRecipeRefs.test.ts` (2/2); suite completa: 445 archivos, 5.149 aprobadas, 1 omitida y 1 `todo`; typecheck y `docs:check` limpios; evidencia `work/junie-jl440/RESULTADO.md`.
 - [x] JL-441 Prueba: guardar y cargar conserva el equipo puesto, la mascota, la montura y la barra. — commit «JL-441: probar persistencia de equipo, mascota, montura y barra» — `tests/jl441_saveLoadState.test.ts` (1/1); suite completa: 446 archivos, 5.150 aprobadas, 1 omitida y 1 `todo`; Electron 28/28, consola limpia; evidencia `work/junie-jl441/electron/resultado.json` y capturas de la barra.
 - [x] JL-442 Electron: el jugador entra y sale de la cripta tres veces y la música vuelve a la de la zona. Consola limpia. — commit «JL-442: verificar retorno de música tras salir de cripta» — Electron `audioMazmorra` 12/12, consola limpia; `npm test` (446 archivos, 5.150 aprobadas, 1 omitida, 1 `todo`), `npm run typecheck`, `npx tsc --noEmit` y `npm run docs:check` limpios; evidencia `work/junie-jl442/electron-final/resultado.json` y capturas.
-- [ ] JL-443 Prueba: los sets de equipo no comparten pieza entre dos sets.
+- [x] JL-443 Prueba: los sets de equipo no comparten pieza entre dos sets. — commit «JL-443: comprobar que los sets no comparten piezas» — `work/junie-jl443/RESULTADO.md`; prueba dirigida 2/2 y suite 447 archivos, 5.152 aprobadas.
 
 ### D. Interfaz
 - [ ] JL-444 Electron: el libro de hechizos con 30 o más hechizos aprendidos permite desplazarse y no corta texto.
