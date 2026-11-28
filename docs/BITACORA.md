@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-433: verificar referencias de equipo.glb a items.json (Junie)
+
+**Qué se hizo:** Añadí `tests/jl433_equipmentModelReferences.test.ts`, que lee el chunk JSON de `assets/models/equipo.glb` sin Babylon y comprueba que cada nodo `obj_*` identifica un objeto de `data/rpg/items.json`. Resuelve las subpiezas propias del ajuar de la Espeja (`obj_<id>@<hueso>` y `obj_<id>_malla`) al ID padre, y un control negativo confirma que nodos con IDs inexistentes se detectan. Los 424 nodos del GLB tienen objeto asociado; no se modificaron el modelo ni los datos.
+
+**Validación:** Las pruebas dirigidas JL-433 y JL-432 pasaron 4/4; `npm test` pasó con 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check`, Prettier específico y `git diff --check` limpios. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `work/junie-jl433/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-432: verificar nodos de objetos equipables en equipo.glb (Junie)
 
 **Qué se hizo:** Añadí una prueba que lee el chunk JSON de `assets/models/equipo.glb` directamente, sin Babylon, y verifica que todos los objetos de `data/rpg/items.json` con ranura `weapon`, `offhand`, `head` o `back` tengan su nodo `obj_<id>`. No faltan nodos en el catálogo actual; no se modificaron el GLB ni los datos.
