@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-431: reintentar menús contextuales (Junie)
+
+**Qué se hizo:** Revalidé la tercera subtarea inventariada por JL-428: JL-310. El clic derecho del lienzo sigue sin abrir menús para enemigos, PNJ o botín, y `addCompanion()` solo permite compañeros en el laboratorio; el render no representa compañeros. JL-431 queda bloqueada hasta que el creador defina las opciones y la entidad seleccionable, sin inventar interacciones ni cambiar controles.
+
+**Validación:** `src/ui/input.ts:111` cancela el menú contextual nativo; `src/main.ts:842-923` despacha las interacciones actuales del mundo y no añade acciones contextuales; `src/sim/world.ts:554-560` restringe los compañeros al laboratorio. La línea base `npx tsc --noEmit` pasó y `npx vitest run` pasó (441 archivos, 5.142 aprobadas, 1 omitida y 1 `todo`). No aplica Electron ni captura: no se modificó la interfaz y la función bloqueada todavía no existe.
+
+**Evidencia:** `work/junie-jl431/RESULTADO.md`; decisión pendiente registrada en `work/junie-jl352/PREGUNTAS.md` y diagnóstico JL-310 en `work/junie-jl310/DIAGNOSTICO.md`.
+
+---
+
 ## 2026-11-28 — JL-430: reintentar auditoría de audio (Junie)
 
 **Qué se hizo:** Revalidé la segunda subtarea identificada por JL-428, la auditoría JL-300. Las referencias de runtime están presentes, pero quedan 64 WAV/OGG originales sin referencia; su procedencia documenta fuentes conservadas y no existe decisión del creador para retirarlas o archivarlas. No cambié audios ni código; JL-430 queda bloqueada por esa decisión pendiente, no por falta de autorización.

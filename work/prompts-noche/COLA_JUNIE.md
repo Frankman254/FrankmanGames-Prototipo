@@ -1764,7 +1764,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - [x] JL-428 Revisa las filas «Parcial» de `docs/TAREAS.md` (JL-41…47, JL-59…64, JL-73…108, JL-166…180, JL-254…353). En `work/junie-jl428/PENDIENTES.md`, indica qué subtarea sigue abierta y si es tuya, de OMP o del creador. No ejecutes nada. — commit «JL-428: inventariar pendientes de filas parciales» — evidencia: `work/junie-jl428/PENDIENTES.md`.
 - [x] JL-429 De `PENDIENTES.md` (JL-428), haz la primera subtarea tuya que no dependa del creador. — commit «JL-429: restaurar interiores al cargar guardados» — `tests/jl254_houseRoomSave.test.ts`; Electron `guardadoBarriadaCasa` 14/14 y consola limpia; evidencia visual y `resultado.json` en `work/junie-jl429/electron/`.
 - [!] JL-430 Ídem, la segunda. — BLOQUEADA: JL-300 confirma 64 archivos de audio originales sin referencia; retirarlos o archivarlos requiere decisión del creador. Reintento en `work/junie-jl350/REINTENTOS.md`; auditoría en `work/junie-jl300/INFORME.md`.
-- [ ] JL-431 Ídem, la tercera.
+- [!] JL-431 Ídem, la tercera (JL-310). — BLOQUEADA: el creador debe definir las opciones de los menús contextuales para enemigos, PNJ y botín, y qué entidad visible representa al compañero; no se deben inventar interacciones. Evidencia: `work/junie-jl431/RESULTADO.md`.
 
 ### B. Modelos y equipo (solo medir y capturar; los modelos son del coordinador)
 - [ ] JL-432 Prueba en `tests/`: cada objeto de `items.json` con ranura weapon, offhand, head o back tiene nodo `obj_<id>` en `assets/models/equipo.glb`. Lee el JSON del GLB, sin Babylon. Si falta alguno, la prueba falla: no la relajes.
