@@ -565,10 +565,11 @@ export class GameHud {
         const s = this.ctx.session();
         const p = s.player();
         const cls = s.content.classes[p.classId];
-        if (this.classKey !== p.classId && cls) {
-            this.classKey = p.classId;
+        const portraitKey = `${p.classId}_${p.sex === 'femenino' ? 'f' : 'm'}`;
+        if (this.classKey !== portraitKey && cls) {
+            this.classKey = portraitKey;
             // U02-INT: retrato PNG con respaldo al SVG de la clase.
-            const portrait = portraitImg('adventurer_default');
+            const portrait = portraitImg(portraitKey) ?? portraitImg('adventurer_default');
             this.portrait.innerHTML = portrait ?? artIcon('classes', cls.id) ?? namedIcon(cls.icon, cls.resource.color);
             this.el.style.setProperty('--res-color', cls.resource.color);
         }
@@ -654,7 +655,9 @@ export class GameHud {
             pot.root.setAttribute(
                 'aria-label',
                 trf('Poción rápida: {name}; tecla {key}', {
-                    name: id ? (s.content.items[id]?.name ?? id) : tr(pot.kind === 'health' ? 'Poción de vida' : 'Tónico de recurso'),
+                    name: id
+                        ? (s.content.items[id]?.name ?? id)
+                        : tr(pot.kind === 'health' ? 'Poción de vida' : 'Tónico de recurso'),
                     key: pot.key || tr('Sin tecla asignada'),
                 }),
             );

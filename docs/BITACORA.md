@@ -1,3 +1,11 @@
+## 2026-11-28 — CDX-IMG-02: seis retratos de héroes (Codex)
+
+Se generaron seis retratos originales con ImageGen integrado, siguiendo la dirección A y los trajes de JL-403. PNG 512×512 con viñeta propia, registrados previamente en PROCEDENCIA. HUD y ficha seleccionan clase y sexo y conservan `adventurer_default` como respaldo. Se añadió `sex` opcional a `PlayerView` y se expone desde `GameSession.player()` para evitar serializar guardados al repintar. Pendientes de revisión artística del creador.
+
+Validación: `npm test`: 448 archivos aprobados, uno omitido; 5.154 pruebas aprobadas y un `todo`. Build, typecheck y checkPublishable correctos. Electron comprueba seis combinaciones, ambas imágenes cargadas a 512 px, y cero excepciones. Capturas representativas revisadas; el QA cambia clase/sexo en memoria para probar exclusivamente presentación. Evidencia: `work/codex-img02/PROMPTS.md`, originales, `lamina-contacto.png`, `electron.json`, seis capturas y logs de build/suite.
+
+---
+
 ## 2026-11-28 — JL-446: verificar el daño del tooltip de arma (Junie)
 
 **Qué se hizo:** Añadí `jl446TooltipDanioArma` a `scripts/qaElectron.mjs`: equipa una `short_sword` con tiradas deterministas mínimas, abre su tooltip en la mochila y compara rango visible, `ItemDef.weapon` y el `EffectDef` del ataque básico. También verifica la visibilidad y límites del tooltip, y observa un impacto real. No se modificaron lógica productiva, datos ni cifras.

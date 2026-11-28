@@ -231,7 +231,12 @@ export class GameSession implements GameSessionApi {
     // ─── Vistas ──────────────────────────────────────────────────────────────
 
     player(): PlayerView {
-        return { ...this.character.view(), energy: this.energy.view(), spectral: this.character.spectral.toSave() };
+        return {
+            ...this.character.view(),
+            sex: this.character.sex,
+            energy: this.energy.view(),
+            spectral: this.character.spectral.toSave(),
+        };
     }
 
     inventory(): InventoryView {
@@ -344,7 +349,7 @@ export class GameSession implements GameSessionApi {
                 if (scrollCount < cost) {
                     const missing = cost - scrollCount;
                     return fail(
-                        `Necesitas ${cost} pergaminos para subir al rango ${targetRank} (te faltan ${missing})`
+                        `Necesitas ${cost} pergaminos para subir al rango ${targetRank} (te faltan ${missing})`,
                     );
                 }
                 const r = c.learnSpell(spellId);
@@ -548,8 +553,7 @@ export class GameSession implements GameSessionApi {
         if (step.openShop && conv.npc.merchantId !== null)
             this.character.emit({ type: 'openMerchant', merchantId: conv.npc.merchantId });
         if (step.clip) this.character.emit({ type: 'npcClip', npcId: conv.npc.id, clip: step.clip });
-        if (step.enterDungeon !== undefined)
-            this.character.emit({ type: 'enterDungeon', floor: step.enterDungeon });
+        if (step.enterDungeon !== undefined) this.character.emit({ type: 'enterDungeon', floor: step.enterDungeon });
         if (step.leaveDungeon) this.character.emit({ type: 'leaveDungeon' });
         this.character.emit({ type: 'changed' });
         return step.view;
@@ -808,8 +812,20 @@ class OfflineContext implements EffectContext {
     restoreResource(target: Actor, amount: number): void {
         if (target instanceof Character) target.resource = Math.min(target.maxResource, target.resource + amount);
     }
-    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void {
-        target.statuses.apply(def, { duration, source: this.caster, shield: shield ?? 0, shareTarget: opts?.shareTarget, sharePercent: opts?.sharePercent });
+    applyStatus(
+        target: Actor,
+        def: StatusDef,
+        duration: number,
+        shield?: number,
+        opts?: { shareTarget?: unknown; sharePercent?: number },
+    ): void {
+        target.statuses.apply(def, {
+            duration,
+            source: this.caster,
+            shield: shield ?? 0,
+            shareTarget: opts?.shareTarget,
+            sharePercent: opts?.sharePercent,
+        });
     }
     knockback(): void {}
     dash(): void {}

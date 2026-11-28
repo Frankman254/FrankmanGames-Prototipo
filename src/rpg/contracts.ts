@@ -616,6 +616,8 @@ export interface StatLine {
 }
 
 export interface PlayerView {
+    /** Sexo para seleccionar el retrato; guardados antiguos usan masculino. */
+    sex?: CharacterSex;
     spectral?: SpectralSaveData;
     name: string;
     classId: string;

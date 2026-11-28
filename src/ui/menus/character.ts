@@ -63,7 +63,8 @@ export class CharacterPanel extends Panel {
         clear(this.head);
         const face = h('div.char-face');
         // U02-INT: retrato PNG con respaldo al SVG de la clase.
-        const portrait = portraitImg('adventurer_default');
+        const portrait =
+            portraitImg(`${p.classId}_${p.sex === 'femenino' ? 'f' : 'm'}`) ?? portraitImg('adventurer_default');
         face.innerHTML =
             portrait ??
             artIcon('classes', cls?.id) ??

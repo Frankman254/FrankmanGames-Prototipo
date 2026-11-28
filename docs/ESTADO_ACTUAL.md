@@ -1,5 +1,7 @@
 # Estado actual
 
+Desde CDX-IMG-02 (2026-11-28), el HUD y la ficha muestran uno de seis retratos originales según clase y sexo; conservan `adventurer_default` como respaldo. Arte pendiente de revisión del creador. Evidencia: `work/codex-img02/`.
+
 Revisión: 2026-11-28, sobre HEAD. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
 
 «Existe en el código», «compila», «pasa los tests», «se vio en Electron» y «el creador lo aprobó» son evidencias distintas. Ninguna fila de este documento equivale a aprobación del creador.
