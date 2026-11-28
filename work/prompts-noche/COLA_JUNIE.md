@@ -1757,7 +1757,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 - una pregunta para el creador se anota en `ACCIONES_CREADOR.md` y la cola sigue.
 
 ### A. Terminar lo parcial
-- [ ] JL-424 HZ-04b: lista lo que falta de la fila de `docs/TAREAS.md` frente al código actual (`grep` en `src/rpg/` y `src/sim/`). Haz la primera pieza que no dependa del creador, con su prueba.
+- [x] JL-424 HZ-04b: lista lo que falta de la fila de `docs/TAREAS.md` frente al código actual (`grep` en `src/rpg/` y `src/sim/`). Haz la primera pieza que no dependa del creador, con su prueba. — commit «JL-424: implementar carga por hechizo HZ-04b» — evidencia: `tests/hz04b_edges.test.ts`, `tests/hz04b_selfStack.test.ts`, `work/junie-jl424/RESULTADO.md` y captura `work/junie-jl424/electron/jl188-ember_vanguard-fiery_slash.jpg`.
 - [ ] JL-425 HZ-04b: segunda pieza pendiente, con su prueba.
 - [ ] JL-426 HZ-03: de los 18 hechizos que esperan primitivas, lista los que ya se pueden hacer con las primitivas que existen hoy. Solo la lista, con su motivo.
 - [ ] JL-427 D-07: lista los hechizos de la línea nueva sin icono propio en `work/junie-jl427/`. No crees iconos.

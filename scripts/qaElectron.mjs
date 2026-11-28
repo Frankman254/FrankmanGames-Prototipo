@@ -12059,7 +12059,7 @@ const scenarios = {
                 const errorsAfter = await js(`window.__consola?.errores?.(20) || []`);
 
                 // Algunos hechizos son de apoyo (buff, desplazamiento): verificar también al jugador.
-                const playerStatusesAfter = await js(`Object.keys(${W}.player.statuses || {})`);
+                const playerStatusesAfter = await js(`${S}.player().statuses.map((status) => status.statusId)`);
 
                 const damage = hpBefore - hpAfter;
                 const hasDamage = damage > 0;
@@ -12072,6 +12072,20 @@ const scenarios = {
                 // iron_shout, hawk_eye (buffs) y lightning_step (blink) no dañan al enemigo.
                 const spellDef = JSON.parse(fs.readFileSync('data/rpg/spells.json', 'utf8')).spells[spellId];
                 const isUtility = spellDef && !spellDef.effects.some((e) => e.type === 'damage');
+
+                if (spell.effects.some((e) => e.type === 'selfStack')) {
+                    const chargeId = `selfStack_${spellId}`;
+                    const hasCharge = playerStatusesAfter.includes(chargeId);
+                    const hudStatuses = await js(`[...document.querySelectorAll('.hud-status')].map((e) => e.dataset.status)`);
+                    const visibleCharge = hudStatuses.includes(chargeId);
+                    totalChecks++;
+                    if (hasCharge && visibleCharge) passedChecks++;
+                    check(
+                        `hechizosClases: ${classLabel} — ${spellId} conserva y muestra su carga`,
+                        hasCharge && visibleCharge,
+                        `estado: ${hasCharge ? 'sí' : 'no'}, HUD: ${visibleCharge ? 'sí' : 'no'}`,
+                    );
+                }
 
                 totalChecks++;
                 if (hasEffect || isUtility) passedChecks++;

@@ -1,7 +1,6 @@
 // HZ-04b, casos límite pedidos por el creador (2026-11-18): rebote cuando el
 // primer blanco muere, varios blancos de un hechizo de línea con extra contra
-// empapados, rebote en cadena salto a salto, y la carga `selfStack`, que hoy
-// solo es un contrato (ningún hechizo la usa y no suma daño: ver TAREAS HZ-04b).
+// empapados, rebote en cadena salto a salto y carga real de `selfStack`.
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { Character } from '../src/rpg/character';
@@ -14,8 +13,9 @@ import { prepareSpells } from './levels';
 
 const DT = 1 / 60;
 
-function arena(classId: string): World {
+function arena(classId: string, configure?: (data: ReturnType<typeof loadGameData>) => void): World {
     const data = loadGameData();
+    configure?.(data);
     const rng = new Rng(1);
     const s = new GameSession(data.rpg, Character.create(data.rpg, classId, 'Prueba', rng), rng);
     const w = new World(data, { encounter: false, character: s.character, seed: 1 });
@@ -115,8 +115,40 @@ describe('HZ-04b: casos límite en combate', () => {
         const ctx = w.context(w.character, 'test', w.player.pos, 0);
         const me = w.character;
         for (let i = 0; i < 6; i++) eff.apply(ctx, me, 1);
-        const s = me.statuses.get('self_stack');
+        const s = me.statuses.get('selfStack_test');
         expect(s?.stacks).toBe(3); // respetado `max: 3`
         expect(s?.remaining).toBe(15); // duración del efecto
+    });
+
+    it('selfStack acumula por hechizo y potencia el siguiente impacto hasta el máximo', () => {
+        const w = arena('ember_vanguard', (data) => {
+            const spell = data.rpg.spells['fiery_slash']!;
+            const damage = spell.effects.find((effect) => effect.type === 'damage');
+            if (damage?.type !== 'damage') throw new Error('fiery_slash debe tener daño directo');
+            damage.min = 100;
+            damage.max = 100;
+            damage.scaling = 0;
+            spell.critChance = 0;
+            spell.critBonus = 0;
+        });
+        prepareSpells(w.character, 'fiery_slash');
+        const target = w.spawnEnemy('melee', { x: 11.5, y: 10 });
+        still(target);
+        target.health = 1e6;
+
+        const damage: number[] = [];
+        const stacks: number[] = [];
+        for (let cast = 0; cast < 3; cast++) {
+            w.player.cooldowns = {};
+            w.player.gcd = 0;
+            w.player.resource = w.player.maxResource;
+            expect(w.commandCast('fiery_slash', aim(11.5, 10, target.id))).toBeNull();
+            damage.push(damageOn(w.drainEvents(), target.id));
+            stacks.push(w.character.statuses.get('selfStack_fiery_slash')?.stacks ?? 0);
+        }
+
+        expect(damage[1]).toBeGreaterThan(damage[0]!);
+        expect(damage[2]).toBeGreaterThan(damage[1]!);
+        expect(stacks).toEqual([1, 2, 2]);
     });
 });

@@ -1,3 +1,17 @@
+## 2026-11-28 — JL-424: implementar carga por hechizo HZ-04b (Junie)
+
+**Archivos:** `src/rpg/effects.ts`, `src/sim/world.ts`, `src/ui/menus/hud.ts`, `scripts/qaElectron.mjs`, pruebas HZ-04b y documentación. Evidencia local en `work/junie-jl424/`.
+
+**Qué se hizo:** La auditoría de `src/rpg/` y `src/sim/` halló que `selfStack` no tenía identidad por hechizo y que el lanzamiento se potenciaba a sí mismo antes de consumir la carga. Ahora cada estado es `selfStack_<spellId>`: el lanzamiento usa las cargas anteriores para el daño, añade después una nueva hasta `max` y conserva la expiración; el HUD muestra el estado asociado al hechizo. Las pruebas ejercitan lanzamientos reales, daño creciente, tope e independencia entre hechizos. La comprobación Electron ahora lee los estados de `session.player()` y exige la presencia del nodo HUD.
+
+**Límite:** `data/rpg/spells.json` ya asigna `selfStack` a `fiery_slash`, `spark` y `hunter_arrow`, pese a que la fila HZ-04b dice que no se asigna a hechizos productivos. Se anotó la discrepancia en `docs/TAREAS.md`; JL-424 no cambió datos, cifras ni asignaciones.
+
+**Validación:** `npm test`: 441 archivos, 5.138 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run build`, `npm run docs:check` y `git diff --check` limpios. Electron `hechizosClases`: 28/28, consola limpia; tres hechizos verifican estado y HUD. `npx prettier --check` reportó diferencias en cinco archivos; no se aplicó formato completo que pudiera reescribir líneas ajenas a la tarea.
+
+**Evidencia:** `tests/hz04b_selfStack.test.ts`, `tests/hz04b_edges.test.ts`, captura `work/junie-jl424/electron/jl188-ember_vanguard-fiery_slash.jpg` y resultados en `work/junie-jl424/RESULTADO.md` y `work/junie-jl424/electron/`.
+
+---
+
 ## 2026-11-27 — Tandas nuevas para Junie, Claude y Codex (Claude)
 
 **Autorización:** el creador pidió una tanda nueva para Junie, otra de modelado y audio para Claude y otra de imágenes para Codex. Después autorizó todo («autorizo todo mi rey») y pidió además planificación vial y críticos más épicos. Sus palabras van citadas en cada fila.

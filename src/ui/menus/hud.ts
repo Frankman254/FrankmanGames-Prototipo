@@ -684,8 +684,11 @@ export class GameHud {
             this.statusKey = key;
             clear(this.statusRow);
             for (const st of list) {
-                const def = s.content.statuses[st.statusId];
+                const chargePrefix = 'selfStack_';
+                const spellId = st.statusId.startsWith(chargePrefix) ? st.statusId.slice(chargePrefix.length) : null;
+                const def = s.content.statuses[st.statusId] ?? (spellId ? s.content.statuses['self_stack'] : undefined);
                 if (!def) continue;
+                const name = spellId ? `${def.name}: ${s.content.spells[spellId]?.name ?? spellId}` : def.name;
                 const el = h(`div.hud-status.${def.kind}` as 'div', { 'data-status': st.statusId });
                 el.innerHTML = statusIcon(def);
                 el.append(h('div.t'));
@@ -696,7 +699,7 @@ export class GameHud {
                         .player()
                         .statuses.find((x) => x.statusId === st.statusId);
                     return [
-                        { kind: 'title', text: def.name, rarity: def.kind === 'buff' ? 'uncommon' : 'common' },
+                        { kind: 'title', text: name, rarity: def.kind === 'buff' ? 'uncommon' : 'common' },
                         { kind: 'sub', text: def.kind === 'buff' ? 'Beneficio' : 'Perjuicio' },
                         { kind: 'text', text: def.description },
                         {

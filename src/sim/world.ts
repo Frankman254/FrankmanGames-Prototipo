@@ -32,6 +32,7 @@ import {
     PushDamageEffect,
     RecoilEffect,
     SelfStackEffect,
+    selfStackStatusId,
     StatusEffect,
     SwapEffect,
     TeleportEffect,
@@ -1402,21 +1403,14 @@ export class World implements SessionWorld {
             };
         };
         const struck = new Set(targets.map((t) => t.id));
-        // HZ-04b: selfStack — primero se acumula (suma 1 stack), luego se consumen al golpear.
-        // Se aplica selfStack antes del consumo para que el primer lanzamiento acumule sin gastar.
+        // HZ-04b: usa las cargas anteriores del mismo hechizo; la carga de este lanzamiento
+        // queda disponible para el siguiente y caduca si no se vuelve a lanzar a tiempo.
         const selfStackEff = self.find((e): e is SelfStackEffect => e instanceof SelfStackEffect);
-        if (selfStackEff) {
-            selfStackEff.apply(ctx, ch, s.power);
-        }
-        // Leer las acumulaciones y multiplicar el power; cada una suma percent % y se consume.
         let effectivePower = s.power;
         if (selfStackEff) {
-            const stackStatus = ch.statuses.get('self_stack');
+            const stackStatus = ch.statuses.get(selfStackStatusId(s.id));
             if (stackStatus && stackStatus.stacks > 0) {
-                const consumed = stackStatus.stacks;
-                effectivePower = s.power * (1 + (selfStackEff.def.percent * consumed) / 100);
-                stackStatus.stacks = 0;
-                ch.statuses.remove('self_stack');
+                effectivePower = s.power * (1 + (selfStackEff.def.percent * stackStatus.stacks) / 100);
             }
         }
         const applyOne = (t: Actor, power: number, useCtx?: EffectContext): void => {
@@ -1462,7 +1456,10 @@ export class World implements SessionWorld {
         // HZ-04e: los buffs con área 'single' pueden caer en un aliado apuntado.
         const singleTarget = s.area.type === 'single' ? first : undefined;
         for (const e of self) {
-            if (e instanceof SelfStackEffect) continue; // ya aplicado arriba, antes del consumo.
+            if (e instanceof SelfStackEffect) {
+                e.apply(ctx, ch, s.power);
+                continue;
+            }
             // Si es un buff y el área es single, aplicar al objetivo (aliado o enemigo) en vez del lanzador.
             const target = (e instanceof PowerEffect || e instanceof CritChanceEffect ||
                 e instanceof CritDamageEffect || e instanceof FixedDamageEffect ||
@@ -2405,14 +2402,14 @@ export class World implements SessionWorld {
         const dmg = s.effects.filter((x): x is DamageEffect => x instanceof DamageEffect);
         if (dmg.length === 0) return null;
         // HZ-04b: incluir el bonus máximo de selfStack en la vista previa.
-        // min = sin stacks (primer lanzamiento), max = con stacks máximos consumidos.
+        // min = sin cargas previas, max = con el máximo de cargas del hechizo.
         const selfStackEff = s.effects.find((fx): fx is SelfStackEffect => fx instanceof SelfStackEffect);
         const maxPowerMultiplier = selfStackEff
             ? 1 + (selfStackEff.def.percent * selfStackEff.def.max) / 100
             : 1;
         const out = { min: 0, max: 0, critMin: 0, critMax: 0, critChance: 0, immune: this.isImmune(target) };
         for (const d of dmg) {
-            // Min: sin bonus de selfStack (primer lanzamiento, 0 stacks consumidos).
+            // Min: sin bonus de selfStack (primer lanzamiento, 0 cargas previas).
             const hitMin: HitSpec = {
                 min: d.def.min * s.power,
                 max: d.def.max * s.power,
