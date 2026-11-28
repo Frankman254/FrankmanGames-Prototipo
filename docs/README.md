@@ -21,6 +21,7 @@ Empieza aquí. Revisado el 2026-11-17.
 | Necesidad | Documento |
 |---|---|
 | Dónde vive cada responsabilidad del código y **dónde se añade cada tipo de contenido** | [Arquitectura](ARQUITECTURA.md) |
+| **Cómo se crea cada cosa** (mapa, ciudad, clase, hechizo, mecánica, objeto, monstruo, PNJ, misión, evento, modelo, icono, música…) y sus reglas | [Cómo crear](COMO_CREAR.md) |
 | Qué contenido se construye y por qué | [Dirección de diseño](diseno/README.md) |
 | Recorrido automático en Electron | [Prueba rápida](PRUEBAS_RAPIDAS.md) y [herramientas de QA](HERRAMIENTAS_QA.md) |
 | Mochila, comercio y banco | [Inventario y banco](INVENTARIO_BANCO.md) |

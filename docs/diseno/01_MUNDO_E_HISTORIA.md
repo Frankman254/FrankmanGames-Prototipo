@@ -89,6 +89,15 @@ Es el único acto que se construye ahora. Sus misiones están en [05 Versión es
 
 **Cierre del acto.** La danza se termina, Los Santicos se calma y el jugador se entera de que el Socio tiene tratos abiertos en todo el Istmo. Ña Chepa le da la máscara pequeña que abre la línea de misiones de los Diablicos.
 
+## Mapa de Navidad (NAV-01, PROPUESTA)
+
+Lo pidió el creador el 2026-11-27: «me gustaria armar un mapa estilo navidad»; «el mapa de navidad recuerda ponerle una piedra de teletransporte». Se arma como mapa aparte, igual que la barriada ([COMO_CREAR §3.2](../COMO_CREAR.md)). Los datos están en `data/navidad.json` y el plano en `work/claude-nav01/plano.png`.
+
+- **Entrada y salida.** Una Piedra Pintada de teletransporte en la plaza de Villa Raspadura lleva al mapa. Dentro, el mapa tiene **su propia Piedra Pintada**, al fondo del paseo de llegada: lleva de vuelta y abre la lista de viaje como cualquier otra.
+- **Trazado.** Plaza redonda de 18 m de radio con el árbol grande en el centro y regalos al pie. Tiene un anillo de 12 faroles con guirnaldas, cuatro bancas y un paseo de 24 m con faroles desde la piedra. Ocho casitas nevadas rodean la plaza mirando al árbol. Al norte está el nacimiento, frente al paseo, y hay dos muñecos de nieve en los claros del este y del oeste.
+- **Tono.** Una Navidad del istmo: faroles de papel, colores de pollera en las guirnaldas, casitas de quincha con tejas y luces cálidas. Nada de marcas, personajes ni canciones de otros.
+- **Lo decide el creador:** el nombre definitivo; si hay nieve (de momento, ligera); si abre todo el año o solo en diciembre (de momento, siempre); y si habrá misiones, PNJ u objetos de evento (de momento, ninguno y sin cifras nuevas).
+
 ## Reglas para quien escriba misiones
 
 1. Las misiones **de la historia principal** dicen quién debe qué a quién. Las demás no tienen por qué: pueden ser un secreto, una broma, un encargo de oficio, una pesca rara o una aventura suelta.

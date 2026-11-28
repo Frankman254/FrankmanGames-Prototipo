@@ -107,5 +107,5 @@ Cada encargo, en `TAREAS.md` o en la cola, dice:
 
 1. Las `DEC-*`: `docs/referencias/FRANKMANGAMES.md` (en Windows, `../FrankmanGames/04_VISION_Y_DECISIONES.md`).
 2. `docs/diseno/README.md` y `docs/diseno/00_DECISIONES.md`.
-3. `docs/ARQUITECTURA.md`.
+3. `docs/ARQUITECTURA.md` y, para crear cualquier cosa nueva, `docs/COMO_CREAR.md`.
 4. Solo si la tarea lo pide y la carpeta existe (en Mac no existe; ver `docs/referencias/`): `../FrankmanGames/07_PROPUESTA_PROTOTIPO_JUGABLE.md`, `../FrankmanGames/08_CONSOLIDADO_ANALISIS.md`, `../Dofus-ReverseEngineering/guia/GUIA_PROYECTO.md` y las fichas de `../FrankmanGames/fichas/FATE/` y `../Dofus-ReverseEngineering/fichas/`.

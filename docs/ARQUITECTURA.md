@@ -26,6 +26,8 @@ No se ha decidido extraer equipment/roll: el intento previo fue incompatible. An
 
 ## Dónde va cada cosa (2026-11-13)
 
+El paso a paso de cada tipo de contenido, con sus reglas y su reparto, está en [COMO_CREAR](COMO_CREAR.md).
+
 Regla general: **el contenido es dato, no código**. Si para añadir un monstruo o un hechizo hay que tocar `src/`, falta una pieza del sistema y eso se pide como tarea aparte.
 
 | Quiero añadir o cambiar… | Datos | Código que lo lee | Arte | Se comprueba con |

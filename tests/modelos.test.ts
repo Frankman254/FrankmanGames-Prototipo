@@ -46,6 +46,8 @@ describe('assets/models', () => {
             // CLA-CASA2: interiores caminables de la casa del creador (sala fija, sin clips).
             'casa_creador_interior.glb',
             'casa_creador_espejo_interior.glb',
+            // NAV-02: piezas fijas del mapa de Navidad; el parpadeo de luces lo hace el juego.
+            'navidad.glb',
         ];
         const missing = readdirSync(DIR).filter(
             (f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0,

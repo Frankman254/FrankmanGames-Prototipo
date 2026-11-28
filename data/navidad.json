@@ -1,0 +1,250 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "NAV-01 (creador, 2026-11-27: «me gustaria armar un mapa estilo navidad […]»; «el mapa de navidad recuerda ponerle una piedra de teletransporte»). Mapa aparte, como la barriada (docs/COMO_CREAR.md §3.2): se llega por la Piedra Pintada `navidad` de la plaza de Villa Raspadura y se vuelve o se viaja con la Piedra Pintada propia del mapa. Metros de la zona (se suma `origen`); rotDeg 0 = fachada a −y. Nombre, nieve y apertura (todo el año o solo en diciembre) los decide el creador: de momento nieve ligera, abierto siempre y sin misiones, objetos ni cifras nuevas. Modelos en assets/models/navidad.glb (NAV-02).",
+  "nombre": "Plaza de la Navidad (provisional)",
+  "origen": {
+    "x": 7000,
+    "y": 0
+  },
+  "ancho": 120,
+  "fondo": 100,
+  "nieve": {
+    "activa": true,
+    "densidad": 0.35
+  },
+  "plaza": {
+    "x": 60,
+    "y": 50,
+    "radio": 18
+  },
+  "arbol": {
+    "x": 60,
+    "y": 50,
+    "modelo": "arbol_navidad"
+  },
+  "regalos": [
+    {
+      "x": 62.6,
+      "y": 51.2,
+      "modelo": "regalo_a",
+      "rotDeg": 15
+    },
+    {
+      "x": 57.6,
+      "y": 51.6,
+      "modelo": "regalo_b",
+      "rotDeg": -20
+    },
+    {
+      "x": 60.8,
+      "y": 47.3,
+      "modelo": "regalo_c",
+      "rotDeg": 40
+    },
+    {
+      "x": 58.4,
+      "y": 47.8,
+      "modelo": "regalo_a",
+      "rotDeg": -55
+    },
+    {
+      "x": 62.2,
+      "y": 48.6,
+      "modelo": "regalo_b",
+      "rotDeg": 70
+    }
+  ],
+  "nacimiento": {
+    "x": 60,
+    "y": 22,
+    "rotDeg": 180,
+    "modelo": "nacimiento"
+  },
+  "paseo": {
+    "x": 60,
+    "y0": 68,
+    "y1": 92,
+    "ancho": 5
+  },
+  "piedra": {
+    "x": 60,
+    "y": 90
+  },
+  "inicio": {
+    "x": 60,
+    "y": 86
+  },
+  "casitas": [
+    {
+      "id": "casita_1",
+      "modelo": "casita_nevada_a",
+      "x": 68.2,
+      "y": 27.4,
+      "rotDeg": 200
+    },
+    {
+      "id": "casita_2",
+      "modelo": "casita_nevada_b",
+      "x": 79.7,
+      "y": 36.2,
+      "rotDeg": 235
+    },
+    {
+      "id": "casita_3",
+      "modelo": "casita_nevada_c",
+      "x": 79.7,
+      "y": 63.8,
+      "rotDeg": 305
+    },
+    {
+      "id": "casita_4",
+      "modelo": "casita_nevada_a",
+      "x": 68.2,
+      "y": 72.6,
+      "rotDeg": 340
+    },
+    {
+      "id": "casita_5",
+      "modelo": "casita_nevada_b",
+      "x": 51.8,
+      "y": 72.6,
+      "rotDeg": 20
+    },
+    {
+      "id": "casita_6",
+      "modelo": "casita_nevada_c",
+      "x": 40.3,
+      "y": 63.8,
+      "rotDeg": 55
+    },
+    {
+      "id": "casita_7",
+      "modelo": "casita_nevada_a",
+      "x": 40.3,
+      "y": 36.2,
+      "rotDeg": 125
+    },
+    {
+      "id": "casita_8",
+      "modelo": "casita_nevada_b",
+      "x": 51.8,
+      "y": 27.4,
+      "rotDeg": 160
+    }
+  ],
+  "faroles": [
+    {
+      "x": 63.9,
+      "y": 35.5
+    },
+    {
+      "x": 70.6,
+      "y": 39.4
+    },
+    {
+      "x": 74.5,
+      "y": 46.1
+    },
+    {
+      "x": 74.5,
+      "y": 53.9
+    },
+    {
+      "x": 70.6,
+      "y": 60.6
+    },
+    {
+      "x": 63.9,
+      "y": 64.5
+    },
+    {
+      "x": 56.1,
+      "y": 64.5
+    },
+    {
+      "x": 49.4,
+      "y": 60.6
+    },
+    {
+      "x": 45.5,
+      "y": 53.9
+    },
+    {
+      "x": 45.5,
+      "y": 46.1
+    },
+    {
+      "x": 49.4,
+      "y": 39.4
+    },
+    {
+      "x": 56.1,
+      "y": 35.5
+    },
+    {
+      "x": 56.5,
+      "y": 70
+    },
+    {
+      "x": 63.5,
+      "y": 70
+    },
+    {
+      "x": 56.5,
+      "y": 76
+    },
+    {
+      "x": 63.5,
+      "y": 76
+    },
+    {
+      "x": 56.5,
+      "y": 82
+    },
+    {
+      "x": 63.5,
+      "y": 82
+    }
+  ],
+  "guirnaldas": "entre faroles vecinos del anillo de la plaza",
+  "munecos": [
+    {
+      "x": 86,
+      "y": 50,
+      "rotDeg": 270,
+      "modelo": "muneco_nieve"
+    },
+    {
+      "x": 34,
+      "y": 50,
+      "rotDeg": 90,
+      "modelo": "muneco_nieve"
+    }
+  ],
+  "bancas": [
+    {
+      "x": 68.7,
+      "y": 45.0,
+      "rotDeg": 60,
+      "modelo": "banca_nevada"
+    },
+    {
+      "x": 68.7,
+      "y": 55.0,
+      "rotDeg": 120,
+      "modelo": "banca_nevada"
+    },
+    {
+      "x": 51.3,
+      "y": 55.0,
+      "rotDeg": 240,
+      "modelo": "banca_nevada"
+    },
+    {
+      "x": 51.3,
+      "y": 45.0,
+      "rotDeg": 300,
+      "modelo": "banca_nevada"
+    }
+  ]
+}
