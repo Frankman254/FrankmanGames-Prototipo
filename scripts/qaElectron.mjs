@@ -4076,6 +4076,128 @@ const scenarios = {
         check('JL-326: consola sin errores nuevos', consoleErrors.length === 0, `${consoleErrors.length} errores`);
     },
 
+    /** JL-434: revisa el ajuar completo de La Diablica Espeja en cada héroe y ángulo. */
+    async jl434DiablicaEspeja() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl434';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const classes = [
+            { id: 'ember_vanguard', label: 'Centinela', model: 'centinela' },
+            { id: 'storm_weaver', label: 'Oráculo', model: 'oraculo' },
+            { id: 'mangrove_hunter', label: 'Cazador', model: 'cazador' },
+        ];
+        const sexes = [
+            { id: 'masculino', suffix: '' },
+            { id: 'femenino', suffix: '_f' },
+        ];
+        const views = [
+            { id: 'frente', yaw: 270 },
+            { id: 'perfil', yaw: 180 },
+            { id: 'espalda', yaw: 90 },
+        ];
+        const requiredSlots = ['head', 'chest', 'amulet', 'waist', 'hands', 'feet', 'back', 'weapon'];
+        const { items } = JSON.parse(fs.readFileSync(path.resolve('data/rpg/items.json'), 'utf8'));
+        const outfitItems = Object.entries(items)
+            .filter(([, item]) => item.setId === 'diablica_espeja')
+            .map(([id, item]) => ({ id, name: item.name ?? id, slot: item.slot }))
+            .sort((a, b) => requiredSlots.indexOf(a.slot) - requiredSlots.indexOf(b.slot));
+        const complete =
+            outfitItems.length === requiredSlots.length &&
+            requiredSlots.every((slot) => outfitItems.some((item) => item.slot === slot));
+        check('JL-434: ajuar completo con ocho ranuras', complete, JSON.stringify(outfitItems));
+        if (!complete) throw new Error(`El ajuar diablica_espeja no cubre las ocho ranuras: ${JSON.stringify(outfitItems)}`);
+
+        const captures = [];
+        for (const hero of classes) {
+            for (const sex of sexes) {
+                const expectedFile = `assets/models/${hero.model}${sex.suffix}_anime.glb`;
+                await newGame(`QA Espeja ${hero.label}`, { classId: hero.id });
+                await js(`${S}.character.sex=${JSON.stringify(sex.id)}; ${W}.character.level=200`);
+                await until(
+                    `__game.view.player?.model?.entry?.file===${JSON.stringify(expectedFile)} && __game.view.player.model.meshes.length>0`,
+                    30000,
+                    `${hero.label} ${sex.id}`,
+                );
+                await js('__game.view.player.model.ready?.then(()=>true)');
+                const equipped = await js(`(()=>{
+                  const c=${W}.character,s=${S};
+                  for(const slot of Object.keys(c.equipment.slots)) if(c.equipment.get(slot)) s.unequip(slot);
+                  for(const item of c.inventory.slots) if(item) c.inventory.remove(item.uid,item.quantity);
+                  c.level=200;
+                  const failures=[];
+                  for(const def of ${JSON.stringify(outfitItems.map((item) => item.id))}){
+                    const left=c.give(def);
+                    const item=c.inventory.slots.find(i=>i?.itemId===def);
+                    if(left||!item){failures.push({itemId:def,reason:'no se pudo crear'});continue;}
+                    const result=s.equip(item.uid);
+                    if(!result.ok) failures.push({itemId:def,reason:result.reason??'no se pudo equipar'});
+                  }
+                  const slots=Object.fromEntries(Object.entries(c.equipment.slots).filter(([,item])=>item).map(([slot,item])=>[slot,item.itemId]));
+                  const missing=${JSON.stringify(outfitItems.map((item) => item.id))}.filter(id=>!Object.values(slots).includes(id));
+                  return {ok:failures.length===0&&missing.length===0,failures,missing,slots};
+                })()`);
+                check(`JL-434 ${hero.model} ${sex.id}: ocho piezas equipadas`, equipped.ok, JSON.stringify(equipped));
+                if (!equipped.ok)
+                    throw new Error(`No se pudo equipar el ajuar en ${hero.label} ${sex.id}: ${JSON.stringify(equipped)}`);
+
+                await sleep(250);
+                const gearMeshes = await js(
+                    `__game.view.player.model.meshes.map(m=>m.name).filter(n=>n.includes('obj_diablica_espeja_'))`,
+                );
+                const visiblePieces = outfitItems
+                    .filter((item) => gearMeshes.some((name) => name.includes(`obj_${item.id}`)))
+                    .map((item) => item.id);
+                check(
+                    `JL-434 ${hero.model} ${sex.id}: ocho piezas renderizadas`,
+                    visiblePieces.length === outfitItems.length,
+                    JSON.stringify({ visiblePieces, gearMeshes }),
+                );
+                if (visiblePieces.length !== outfitItems.length)
+                    throw new Error(`Faltan mallas del ajuar en ${hero.label} ${sex.id}: ${JSON.stringify({ visiblePieces, gearMeshes })}`);
+
+                await js(`(()=>{
+                  const w=${W},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130}));
+                  p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.facing=0;p.alive=true;
+                  v.rig.mode='manual';v.player.reset();v.player.visualYaw=0;v.player.oneShot=null;v.player.model.root.rotation.y=0;
+                  v.player.model.play('idle',{restart:true});v.rig.pitchDeg=14;v.rig.distance=5;v.rig.jumpTo(5);
+                  v.scene.meshes.filter(m=>!m.name.startsWith('player:')).forEach(m=>m.isVisible=false);
+                })()`);
+                await until(`__game.view.player.model.state==='idle'`, 8000, `${hero.label} ${sex.id} reposo`);
+
+                for (const view of views) {
+                    await js(`(()=>{const r=__game.view.rig;r.yawDeg=${view.yaw};r.pitchDeg=14;r.distance=5;r.jumpTo(5);})()`);
+                    await sleep(220);
+                    const observed = await js(
+                        `(()=>({state:__game.view.player.model.state,file:__game.view.player.model.entry.file,visible:__game.view.player.model.root.isEnabled()}))()`,
+                    );
+                    const ok = observed.state === 'idle' && observed.file === expectedFile && observed.visible;
+                    check(`JL-434 ${hero.model} ${sex.id} ${view.id}`, ok, JSON.stringify(observed));
+                    if (!ok) throw new Error(`Vista inválida para ${hero.label} ${sex.id} ${view.id}: ${JSON.stringify(observed)}`);
+                    const file = `jl434-${hero.model}-${sex.id}-${view.id}`;
+                    await shot(file);
+                    captures.push({
+                        screenshot: `${file}.jpg`,
+                        class: hero.label,
+                        model: hero.model,
+                        sex: sex.id,
+                        modelFile: expectedFile,
+                        setId: 'diablica_espeja',
+                        itemIds: outfitItems.map((item) => item.id),
+                        visiblePieces,
+                        gearMeshes,
+                        view: view.id,
+                        yaw: view.yaw,
+                        ...observed,
+                    });
+                }
+            }
+        }
+
+        check('JL-434: capturas de frente, perfil y espalda para seis modelos', captures.length === 18, `${captures.length}/18`);
+        fs.writeFileSync(path.join(outDir, 'capturas.json'), JSON.stringify(captures, null, 2));
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -15818,6 +15940,8 @@ scenarios.jinetes.timeout = 600;
 scenarios.jl328Reposo.timeout = 600;
 // JL-326: 137 conjuntos × seis modelos/sexos × dos poses.
 scenarios.trajes.timeout = 600;
+// JL-434: seis modelos × ajuar de ocho piezas × tres vistas.
+scenarios.jl434DiablicaEspeja.timeout = 550;
 // JL-330: recorre los 72 arquetipos, carga sus modelos y muestrea hit/death.
 scenarios.jl330Enemigos.timeout = 600;
 scenarios.benchCrowd.timeout = 180;

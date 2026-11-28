@@ -101,6 +101,18 @@
 
 ---
 
+## 2026-11-28 — JL-434: capturar el set de La Diablica Espeja (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl434/`.
+
+**Qué se hizo:** El escenario `jl434DiablicaEspeja` equipa las ocho piezas de `diablica_espeja` y captura frente, perfil y espalda de las tres clases en ambos sexos. Al revisar las 18 imágenes observé un aparente solapamiento de `diablica_espeja_chest` sobre el abdomen delantero del Cazador masculino y femenino; no vi piezas flotantes. No se alteraron modelos, datos ni cifras.
+
+**Validación:** Electron 33/33, 18 capturas y `consoleErrors: []`. `npm test`: 443 archivos, 5.146 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npm run docs:check` limpios.
+
+**Evidencia:** `work/junie-jl434/capturas.json`, `work/junie-jl434/resultado.json` y las 18 capturas `jl434-<clase>-<sexo>-<vista>.jpg`.
+
+---
+
 ## 2026-11-28 — JL-425: consumir una carga por estado en HZ-04b (Junie)
 
 **Archivos:** `src/rpg/effects.ts`, `src/rpg/status.ts`, `tests/hz04b_edges.test.ts` y documentación. Evidencia local en `work/junie-jl425/RESULTADO.md`.
