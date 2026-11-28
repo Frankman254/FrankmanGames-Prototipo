@@ -1,0 +1,71 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "VIA-01 (creador, 2026-11-27: «hay que armar la primera ciudad correctamente para replicar el sistema de planificacion y modelado de ciudades las demas provincias»). Plantilla del plano de Villa Raspadura: medidas PROPUESTA, metros del mundo (x al este, y al sur). La lee src/world/planUrbano.ts (VIA-02) y la construye VIA-04 cuando el creador apruebe el plano. Método en docs/diseno/01_MUNDO_E_HISTORIA.md, «Planificación urbana».",
+  "nombre": "Villa Raspadura",
+  "limite": { "x0": 89, "y0": 89, "x1": 167, "y1": 167 },
+  "perfiles": {
+    "avenida": { "calzada": 8, "cordon": 0.15, "grama": 1.2, "acera": 2, "_uso": "Entrada a la ciudad y eje de la plaza. Lleva farolas y árboles en la grama." },
+    "calle": { "calzada": 6, "cordon": 0.15, "grama": 0.6, "acera": 1.2, "_uso": "Mismas medidas que calle_casas de data/urbanizacion.json. Da frente a los lotes." },
+    "callejon": { "calzada": 3, "cordon": 0, "grama": 0, "acera": 0, "_uso": "Acceso trasero de los lotes, empedrado, sin acera." },
+    "sendero": { "calzada": 1.8, "cordon": 0, "grama": 0, "acera": 0, "_uso": "Tierra pisada por las arboledas de las esquinas; mismo ancho que las sendas de hoy." }
+  },
+  "plaza": {
+    "id": "plaza_mayor",
+    "x0": 116, "y0": 116, "x1": 140, "y1": 140,
+    "_uso": "Peatonal. Quedan dentro: las dos Piedras Pintadas, el alzador, el pozo, los estandartes y dos farolas. El yunque (134, 118) sale a un lote."
+  },
+  "vias": [
+    { "id": "anillo_plaza", "clase": "calle", "cerrada": true, "puntos": [[111, 111], [145, 111], [145, 145], [111, 145]] },
+    { "id": "avenida_oeste", "clase": "avenida", "puntos": [[89, 128], [106.05, 128]] },
+    { "id": "avenida_este", "clase": "avenida", "puntos": [[149.95, 128], [167, 128]] },
+    { "id": "calle_norte", "clase": "calle", "puntos": [[128, 89], [128, 111]] },
+    { "id": "calle_sur", "clase": "calle", "puntos": [[128, 145], [128, 167]] },
+    { "id": "callejon_borde", "clase": "callejon", "cerrada": true, "puntos": [[90.5, 90.5], [165.5, 90.5], [165.5, 165.5], [90.5, 165.5]] },
+    { "id": "sendero_no", "clase": "sendero", "puntos": [[90.5, 90.5], [106.05, 106.05]] },
+    { "id": "sendero_ne", "clase": "sendero", "puntos": [[165.5, 90.5], [149.95, 106.05]] },
+    { "id": "sendero_so", "clase": "sendero", "puntos": [[90.5, 165.5], [106.05, 149.95]] },
+    { "id": "sendero_se", "clase": "sendero", "puntos": [[165.5, 165.5], [149.95, 149.95]] }
+  ],
+  "puertas": [
+    { "id": "puerta_oeste", "x": 89, "y": 128, "via": "avenida_oeste", "camino": { "path": 1, "hacia": [78, 140] }, "_nota": "Camino de los Llanos (paths[1])." },
+    { "id": "puerta_este", "x": 167, "y": 128, "via": "avenida_este", "camino": { "path": 1, "hacia": [196, 132] }, "_nota": "El cruce de hoy en (160, 120) con paths[2] cae dentro de la manzana este_norte: VIA-04 lo pasa a esta puerta." },
+    { "id": "puerta_norte", "x": 128, "y": 89, "via": "calle_norte", "camino": { "path": 0, "hacia": [118, 84] }, "_nota": "Hacia el inicio del jugador (124, 104) — queda dentro del plano, en la calle norte." },
+    { "id": "puerta_sur", "x": 128, "y": 167, "via": "calle_sur", "camino": { "path": 0, "hacia": [146, 180] }, "_nota": "Hacia la urbanización de calle_casas (data/urbanizacion.json)." }
+  ],
+  "manzanas": [
+    { "id": "norte_oeste", "x0": 106.05, "y0": 92, "x1": 123.05, "y1": 106.05, "frente": "S", "lotes": 1, "retiro": 2, "uso": "iglesia", "_nota": "Manzana de la iglesia, con el atrio a la plaza." },
+    { "id": "norte_este", "x0": 132.95, "y0": 92, "x1": 149.95, "y1": 106.05, "frente": "S", "lotes": 2, "retiro": 3 },
+    { "id": "oeste_norte", "x0": 92, "y0": 106.05, "x1": 106.05, "y1": 120.65, "frente": "E", "lotes": 1, "retiro": 3 },
+    { "id": "oeste_sur", "x0": 92, "y0": 135.35, "x1": 106.05, "y1": 149.95, "frente": "E", "lotes": 1, "retiro": 3 },
+    { "id": "este_norte", "x0": 149.95, "y0": 106.05, "x1": 164, "y1": 120.65, "frente": "W", "lotes": 1, "retiro": 3, "uso": "taller", "_nota": "Herrería: el yunque y el herrero salen de la plaza a este lote." },
+    { "id": "este_sur", "x0": 149.95, "y0": 135.35, "x1": 164, "y1": 149.95, "frente": "W", "lotes": 1, "retiro": 3 },
+    { "id": "sur_oeste", "x0": 106.05, "y0": 149.95, "x1": 123.05, "y1": 164, "frente": "N", "lotes": 1, "retiro": 3, "uso": "casa_dorada" },
+    { "id": "sur_este", "x0": 132.95, "y0": 149.95, "x1": 149.95, "y1": 164, "frente": "N", "lotes": 1, "retiro": 2, "uso": "cripta", "_nota": "La entrada de la cripta (141, 156) y sus PNJ quedan en este lote." }
+  ],
+  "arboledas": [
+    { "id": "arboleda_no", "x0": 92, "y0": 92, "x1": 106.05, "y1": 106.05 },
+    { "id": "arboleda_ne", "x0": 149.95, "y0": 92, "x1": 164, "y1": 106.05 },
+    { "id": "arboleda_so", "x0": 92, "y0": 149.95, "x1": 106.05, "y1": 164 },
+    { "id": "arboleda_se", "x0": 149.95, "y0": 149.95, "x1": 164, "y1": 164 }
+  ],
+  "reubicar": {
+    "_nota": "Lo que hoy cae en el corredor de una vía (work/claude-via01/CHOQUES.md, generado por plano.py). VIA-04 lo mueve al destino; el destino es PROPUESTA.",
+    "iglesia": "norte_oeste",
+    "casa (108,116)": "oeste_norte",
+    "casa (142,112)": "norte_este",
+    "casa (144,142)": "este_sur",
+    "casa (110,146)": "oeste_sur",
+    "casa dorada": "sur_oeste",
+    "alambique": "plaza_mayor",
+    "yunque y herrero": "este_norte",
+    "inicio del jugador": "calle_norte, acera",
+    "pescador, anciano y buhonero": "plaza_mayor"
+  },
+  "reglas": {
+    "_nota": "Lo que comprueba planUrbano.ts (VIA-02) y lo que respeta VIA-04.",
+    "loteMinimo": { "ancho": 8, "fondo": 12 },
+    "arbolesSoloEn": ["arboledas", "grama de avenida"],
+    "nadaEnCalzada": true,
+    "terrenoLlano": "VIA-04 amplía flatAreas[0] de data/terrain.json para cubrir todo el límite"
+  }
+}

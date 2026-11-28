@@ -98,6 +98,35 @@ Lo pidió el creador el 2026-11-27: «me gustaria armar un mapa estilo navidad»
 - **Tono.** Una Navidad del istmo: faroles de papel, colores de pollera en las guirnaldas, casitas de quincha con tejas y luces cálidas. Nada de marcas, personajes ni canciones de otros.
 - **Lo decide el creador:** el nombre definitivo; si hay nieve (de momento, ligera); si abre todo el año o solo en diciembre (de momento, siempre); y si habrá misiones, PNJ u objetos de evento (de momento, ninguno y sin cifras nuevas).
 
+## Planificación urbana (VIA-01, PROPUESTA)
+
+Lo pidió el creador el 2026-11-27: «hay que armar la primera ciudad correctamente para replicar el sistema de planificacion y modelado de ciudades las demas provincias». Villa Raspadura es la plantilla. Sus datos están en `data/urbanismo/villa_raspadura.json`, y el plano y los choques con lo que hay hoy, en `work/claude-via01/` (`plano.py`, `plano.png`, `CHOQUES.md`). Todas las medidas son PROPUESTA.
+
+Método, en este orden, para cada ciudad:
+
+1. **Límite y llano.** Un cuadrado en metros del mundo. El terreno se aplana entero dentro de él (`flatAreas` de `data/terrain.json`).
+2. **Jerarquía de vías.** Cada clase tiene un perfil: calzada, cordón, grama y acera.
+   - **Avenida** (8 m de calzada): une las puertas con la plaza.
+   - **Calle** (6 m, las mismas medidas que `data/urbanizacion.json`): rodea la plaza y da frente a los lotes.
+   - **Callejón** (3 m): borde y accesos traseros, sin acera.
+   - **Sendero** (1,8 m): cruza las arboledas.
+3. **Plaza mayor** en el centro, peatonal. En ella van la Piedra Pintada, el alzador, el pozo y los estandartes.
+4. **Manzanas** entre los corredores de las vías.
+   - Cada manzana mira a una calle (`frente`) y se parte en lotes de al menos 8 × 12 m, con retiro.
+   - La iglesia ocupa la manzana que da a la plaza por el norte.
+   - Los talleres (yunque, telar…) van en lotes, no en la calle.
+5. **Puertas.** Una por cada camino que llega. Cada puerta dice qué camino de `data/paths.json` continúa; cuando exista la red de MAP-VIAL, dirá su nodo.
+6. **Verde.** Los árboles van solo en las arboledas de las esquinas y en la grama de las avenidas, nunca en una calzada ni en un lote.
+7. **Reubicar.** `plano.py` lista lo que hoy cae en el corredor de una vía. La plantilla dice a qué lote va cada cosa, y nada se borra.
+
+Lo comprueba `src/world/planUrbano.ts` (VIA-02):
+
+- que no haya solapes;
+- que cada lote dé a una calle;
+- que todo se alcance desde cada puerta.
+
+Lo construye VIA-04 con el kit de VIA-03, y solo cuando el creador apruebe el plano. Para otra provincia se copia el JSON y se cambian las medidas; VIA-05 prueba que el método se replica.
+
 ## Reglas para quien escriba misiones
 
 1. Las misiones **de la historia principal** dicen quién debe qué a quién. Las demás no tienen por qué: pueden ser un secreto, una broma, un encargo de oficio, una pesca rara o una aventura suelta.
