@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-439: cobertura de enemigos por zona (bloqueada)
+
+**Qué se hizo:** La inspección encontró que `data/rpg/enemies.json` y `data/enemies.json` no registran una zona por enemigo. `data/zones.json` define la asociación únicamente desde `zones[].spawns`: 52 de 72 fichas RPG aparecen allí y no hay información independiente que permita decidir si las otras 20 no tienen zona o si falta su aparición. Derivar la expectativa de esas mismas listas sería circular; no se inventó un mapa de zonas ni se añadió una prueba vacía. JL-439 queda bloqueada hasta contar con una fuente autorizada de asociaciones enemigo→zona.
+
+**Validación:** `npx tsc --noEmit`, `npm test` (444 archivos, 5.147 aprobadas, 1 omitida y 1 `todo`), `npm run typecheck`, `npm run docs:check` (227 rutas) y `git diff --check` pasaron. Esta verificación no sustituye la asignación faltante: no se añadió una prueba circular.
+
+**Evidencia:** `work/junie-jl439/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-433: verificar referencias de equipo.glb a items.json (Junie)
 
 **Qué se hizo:** Añadí `tests/jl433_equipmentModelReferences.test.ts`, que lee el chunk JSON de `assets/models/equipo.glb` sin Babylon y comprueba que cada nodo `obj_*` identifica un objeto de `data/rpg/items.json`. Resuelve las subpiezas propias del ajuar de la Espeja (`obj_<id>@<hueso>` y `obj_<id>_malla`) al ID padre, y un control negativo confirma que nodos con IDs inexistentes se detectan. Los 424 nodos del GLB tienen objeto asociado; no se modificaron el modelo ni los datos.
