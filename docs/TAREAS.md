@@ -625,6 +625,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-415 | Junie | Hecho (commit «JL-415: validar suite completa y QA por tandas») | `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run typecheck` y `npx tsc --noEmit` limpios; `npm run build` y `checkPublishable` correctos (aviso no bloqueante por chunks >500 kB). Los siete escenarios Electron se verificaron en cuatro lotes: 99/99 comprobaciones, cero fallos y cero errores de consola; muestras visuales revisadas y manifiesto de equipo con 394 capturas. Evidencia: `work/junie-jl415/RESULTADO.md` y `work/junie-jl415/electron/lote-01…lote-04/`. |
 
+## Cierre de JL-416 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-416 | Junie | Hecho (commit «JL-416: actualizar el estado de balance fiel») | `docs/ESTADO_ACTUAL.md` describe la batería BAL-P0-FIEL y limita sus resultados a mediciones, no aprobación; aclara que los análisis `balM3`, `auditCombat` y `auditBuilds` son exploratorios y no fieles. Evidencia de simulación: `work/junie-jl385/FIEL.md`, `work/junie-jl392/COMPARADA.md` y `work/junie-jl393/EXTREMOS.md`. `npm run docs:check` (223 rutas), `npx tsc --noEmit`, `npm run typecheck` y `npx vitest run` limpios. No aplica Electron: cambio documental sin elemento visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

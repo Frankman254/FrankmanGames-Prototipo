@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-416: actualizar el estado de balance fiel (Junie)
+
+**Archivos:** `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Actualicé el apartado de balance para explicar qué ejecuta y mide BAL-P0-FIEL, distinguir los tres perfiles y anotar sus límites: `preparado` es un techo de equipo, y ningún resultado supone aprobación. Las auditorías V2/V3 quedan descritas como exploratorias; las conclusiones de `balM3.ts`, `auditCombat.ts` y `auditBuilds.ts` no se usan como evidencia fiel. No cambié código, pruebas ni cifras de `data/`.
+
+**Validación:** `npm run docs:check`: 223 rutas, todas existen; `npx tsc --noEmit` y `npm run typecheck` limpios; `npx vitest run`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: cambio documental sin elemento visual.
+
+**Evidencia:** Método y resultados en `work/junie-jl385/FIEL.md` y `work/junie-jl385/runs.json`; comparación de habilidad en `work/junie-jl392/COMPARADA.md`; extremos en `work/junie-jl393/EXTREMOS.md`.
+
+---
+
 ## 2026-11-27 — JL-415: suite completa y QA por tandas (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia en `work/junie-jl415/`.
