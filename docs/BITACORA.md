@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-423: proponer próxima bolsa de tareas (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; propuesta local en `work/junie-propuestas/BOLSA_SIGUIENTE_7.md`.
+
+**Qué se hizo:** Preparé 20 ideas de pruebas con evidencia `grep` de la cobertura directa en `tests/`; donde ya existen pruebas de helpers, la propuesta delimita la clase/vista de integración pendiente. Se mantienen como propuestas sin autorización: no empecé ninguna, no toqué la reserva ni las otras casillas de la cola, y no cambié código, pruebas, cifras, nombres, datos o assets.
+
+**Validación:** Línea base `npx tsc --noEmit` limpia; `npx vitest run`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`. Tras actualizar la documentación, `npm run docs:check` y `git diff --check` limpios. No aplica Electron: no hubo cambio visual.
+
+**Evidencia:** `work/junie-propuestas/BOLSA_SIGUIENTE_7.md` y verificaciones `grep` detalladas en cada propuesta.
+
+---
+
 ## 2026-11-27 — JL-422: medir tamaño del build por carpeta de assets (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; informe de medición en `work/junie-jl422/RESULTADO.md`.

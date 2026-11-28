@@ -667,6 +667,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-422 | Junie | Hecho (commit «JL-422: medir tamaño del build por carpeta de assets») | `npm run build` generó `dist/assets/` con 1.811 archivos (305.413.731 bytes); 1.797 outputs coinciden por SHA-256 con fuentes de `assets/`. Top 10 de carpetas directas y límites de atribución inline en `work/junie-jl422/RESULTADO.md`. Suite: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; typecheck y `checkPublishable` limpios. No aplica Electron: medición sin cambio visual. |
 
+## Cierre de JL-423 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-423 | Junie | Hecho (commit «JL-423: proponer próxima bolsa de tareas») | `work/junie-propuestas/BOLSA_SIGUIENTE_7.md` contiene 20 propuestas de pruebas, cada una contrastada con `grep` contra `tests/`; las coincidencias existentes se limitan a helpers o lectura estática y se distinguen en la propuesta. No se inició ninguna propuesta ni se modificaron código, pruebas, cifras, nombres, datos o assets. `npx tsc --noEmit` y `npx vitest run` de línea base limpios: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`. No aplica Electron: entrega documental sin cambio visual. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.
