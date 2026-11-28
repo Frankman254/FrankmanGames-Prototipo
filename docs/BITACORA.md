@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-417: reunir decisiones pendientes de balance fiel (Junie)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Reuní en una entrada las decisiones pendientes sobre TTK objetivo por franja, `flatPerLevel.armor` y `minXpShare`. Incluí las medianas de TTK observadas para `malo`/`bueno` y los casos medidos de armadura ignorada y reparto de 125 XP de un pool de 100. No se decidió balance ni se cambiaron código, pruebas o cifras productivas.
+
+**Validación:** `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (223 rutas) y `git diff --check` limpios. No aplica Electron: cambio documental sin elemento visual.
+
+**Evidencia:** `work/junie-jl392/COMPARADA.md`, `work/junie-jl389/RESULTADO.md`, `work/junie-jl390/RESULTADO.md`, `tests/zones.test.ts` y `tests/rpg/energySpoils.test.ts`.
+
+---
+
 ## 2026-11-27 — JL-416: actualizar el estado de balance fiel (Junie)
 
 **Archivos:** `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

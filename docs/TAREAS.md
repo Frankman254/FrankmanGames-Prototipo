@@ -631,6 +631,12 @@ Listas para cuando el creador lo diga; el texto completo está en el histórico.
 |---|---|---|---|
 | JL-416 | Junie | Hecho (commit «JL-416: actualizar el estado de balance fiel») | `docs/ESTADO_ACTUAL.md` describe la batería BAL-P0-FIEL y limita sus resultados a mediciones, no aprobación; aclara que los análisis `balM3`, `auditCombat` y `auditBuilds` son exploratorios y no fieles. Evidencia de simulación: `work/junie-jl385/FIEL.md`, `work/junie-jl392/COMPARADA.md` y `work/junie-jl393/EXTREMOS.md`. `npm run docs:check` (223 rutas), `npx tsc --noEmit`, `npm run typecheck` y `npx vitest run` limpios. No aplica Electron: cambio documental sin elemento visual. |
 
+## Cierre de JL-417 (2026-11-27)
+
+| ID | Quién | Estado | Evidencia |
+|---|---|---|---|
+| JL-417 | Junie | Hecho (commit «JL-417: reunir decisiones pendientes de balance fiel») | `ACCIONES_CREADOR.md` reúne la decisión de TTK objetivo por franja con la medición de `work/junie-jl392/COMPARADA.md`, y las preguntas de `flatPerLevel.armor` y `minXpShare` respaldadas por `tests/zones.test.ts`, `work/junie-jl389/RESULTADO.md`, `tests/rpg/energySpoils.test.ts` y `work/junie-jl390/RESULTADO.md`. `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npx tsc --noEmit`, `npm run typecheck`, `npm run docs:check` (223 rutas) y `git diff --check` limpios. Sin cambios de reglas ni cifras productivas; no aplica Electron. |
+
 ## Bloqueadas
 
 - Hasta cerrar la rebanada: D-11, D-15, D-16, D-19, D-21, D-22, D-24, D-31 y D-32.

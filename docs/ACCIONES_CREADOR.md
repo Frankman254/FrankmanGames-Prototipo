@@ -8,6 +8,28 @@ Actualizado: 2026-11-27. Revisión completa: lo anterior está íntegro en [hist
 
 El creador autoriza la tanda JL-384…JL-423 y una nueva, JL-424…JL-453, con «Sí, autorizo ambas». Las tareas JL-391, 392, 394, 401 y 403…408 se reabren.
 
+## Pregunta pendiente (JL-417: balance fiel)
+
+La batería fiel compara el bot `malo` y `bueno` con 10 semillas; el TTK es la mediana de las victorias y agrupa clases, perfiles, enemigos y cantidades. ¿Qué tiempo objetivo para derrotar enemigos de nivel equivalente quieres en cada franja? ¿Debe definirse por enemigo individual y por grupo? Referencia medida (TTK mediano, `malo` / `bueno`, segundos):
+
+| Franja (nivel) | TTK mediano (`malo` / `bueno`, s) |
+|---|---:|
+| Llanos de Azuero (1–10) | 3,7 / 4,2 |
+| Manglares de Chame (10–20) | 10,0 / 22,1 |
+| Cerros de Boquete (20–30) | 14,5 / 24,1 |
+| Neblinas de Cerro Punta (30–40) | 10,8 / 15,2 |
+| Cumbre del Barú (40–50) | 13,0 / 18,0 |
+| Darién Profundo (50–60) | 11,4 / 19,7 |
+| Archipiélago de Bocas (60–70) | 11,1 / 18,7 |
+| Archipiélago de las Perlas (70–80) | 15,2 / 21,4 |
+| Páramo de Fortuna (80–90) | 14,0 / 24,3 |
+| Cerro Ancón Embrujado (90–100) | 15,7 / 23,4 |
+
+- `data/zones.json` declara `scaling.flatPerLevel.armor: 0.15`, pero `parseZones()` descarta la clave: el enemigo de nivel 10 no cambia al comparar `armor` 0,15 y 100,15. ¿Se quita la clave heredada o quieres definir que tenga efecto en los enemigos? Evidencia: `tests/zones.test.ts` y `work/junie-jl389/RESULTADO.md`.
+- `data/rpg/spoils.json` marca `minXpShare: 0.25` como `PROPUESTA`. Con un pool de 100 XP y cinco jugadores con aporte igual, se asignan 25 XP a cada uno (125 en total). ¿Es intencional que el mínimo supere el pool o debe limitarse la suma? Evidencia: `tests/rpg/energySpoils.test.ts` y `work/junie-jl390/RESULTADO.md`.
+
+Son preguntas, no decisiones: no se cambiaron reglas ni cifras productivas. Fuente del TTK: `work/junie-jl392/COMPARADA.md` (5.940 corridas por habilidad; detalle y método en el informe).
+
 ## Pregunta pendiente (JL-390)
 
 `data/rpg/spoils.json` marca `minXpShare: 0.25` como `PROPUESTA`. `distribute()` aplica ese mínimo individualmente: con un monstruo que aporta 100 XP y cinco jugadores con el mismo aporte (20 de daño y 10 s cada uno), cada uno tiene `share` 0,20 y recibe 25 XP. La suma del grupo queda en 125 XP:
