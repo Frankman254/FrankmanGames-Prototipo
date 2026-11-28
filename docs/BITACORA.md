@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-420: aclarar estados de la tanda en TAREAS (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:** Cerré el estado del lote JL-354…JL-383 con referencia a JL-383 y dejé explícito que JL-384…JL-420 está cerrado mientras JL-421…JL-423 sigue pendiente dentro del lote autorizado. Revisé las entradas individuales JL-354…JL-419 y mantuve sus resultados y evidencias; no cambié código, pruebas ni reglas del juego.
+
+**Validación:** `npm run docs:check`, `npx tsc --noEmit`, `npm run typecheck`, `npx vitest run` y `git diff --check` limpios. No aplica Electron: cambio documental sin elemento visual.
+
+**Evidencia:** Estados y autorizaciones en `docs/TAREAS.md`; verificación documental con `npm run docs:check`.
+
+---
+
 ## 2026-11-27 — JL-419: auditar tareas ya cubiertas en reserva (Junie)
 
 **Archivos:** `work/prompts-noche/RESERVA_JUNIE.md`, `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/BITACORA.md`.
