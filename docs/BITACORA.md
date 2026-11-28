@@ -1,3 +1,13 @@
+## 2026-11-28 — JL-428: inventariar pendientes de filas parciales (Junie)
+
+**Qué se hizo:** Revisé las cinco filas parciales indicadas, separando las tareas ya cerradas por reintentos de los asuntos abiertos. No ejecuté ninguna subtarea de juego: JL-254 conserva un fallo integrado; JL-169/171/172/173/180 esperan OMP-PB-01; JL-327 espera al coordinador; y JL-300/310/315, junto con JL-256/258/261/326, requieren decisión o revisión del creador.
+
+**Validación:** Contraste documental con `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md`, `docs/ACCIONES_CREADOR.md`, la cola de Junie y las evidencias JL-350/JL-352. `npm run docs:check` pasó (226 rutas). No se ejecutaron pruebas ni Electron, porque JL-428 prohíbe ejecutar las subtareas revisadas.
+
+**Evidencia:** `work/junie-jl428/PENDIENTES.md`.
+
+---
+
 ## 2026-11-28 — JL-427: listar iconos ausentes de la línea de hechizos (Junie)
 
 **Qué se hizo:** Contrasté los 48 IDs de los catálogos iniciales de la línea nueva con `assets/icons/spells/<id>.png`: hay 34/48 archivos presentes y 14 faltantes. El documento de diseño indica que HZ-04d sustituyó esa lista; sus 21 IDs marcados nuevos sí tienen PNG (21/21). No creé ni modifiqué iconos, código o datos.
