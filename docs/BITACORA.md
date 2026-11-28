@@ -101,6 +101,20 @@
 
 ---
 
+## 2026-11-28 — JL-435: revisar tocados y capas en Electron (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl435/`.
+
+**Qué se hizo:** El escenario `jl435TocadosCapas` selecciona 10 objetos distintos de `head` y 10 de `back` con semilla fija `4352026`, los equipa al Centinela masculino y captura frente/perfil o espalda/perfil. No modifica assets ni cifras.
+
+**Resultado visual:** No observé tocados o capas claramente hundidos ni girados. `learning_02_back` (Mochila de la Cartilla del Camino) y `bi_nube_baru_back` (Mochila de la Nube del Barú) parecen separados del torso en perfil; quedan como posibles flotaciones para revisar, no como defectos confirmados. El encuadre oculta las mallas del entorno, así que no evalúa altura respecto al suelo.
+
+**Validación:** Electron 64/64, 40 capturas y `consoleErrors` vacío. `npm test`: 443 archivos, 5.146 pruebas aprobadas, 1 omitida y 1 `todo`; `npm run typecheck`, `npm run docs:check` (227 rutas), `node --check scripts/qaElectron.mjs` y `git diff --check` limpios.
+
+**Evidencia:** `work/junie-jl435/resultado.json`, `capturas.json`, `RESULTADO.md` y `jl435-back-learning_02_back-perfil.jpg` / `jl435-back-bi_nube_baru_back-perfil.jpg`.
+
+---
+
 ## 2026-11-28 — JL-434: capturar el set de La Diablica Espeja (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `docs/TAREAS.md`, `docs/BITACORA.md` y `work/prompts-noche/COLA_JUNIE.md`; evidencia visual en `work/junie-jl434/`.

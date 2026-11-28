@@ -4198,6 +4198,136 @@ const scenarios = {
         fs.writeFileSync(path.join(outDir, 'capturas.json'), JSON.stringify(captures, null, 2));
     },
 
+    /** JL-435: muestra reproducible de tocados y capas equipados en el Centinela. */
+    async jl435TocadosCapas() {
+        const outDir = process.env.QA_EVIDENCE_DIR ?? 'work/junie-jl435';
+        fs.mkdirSync(outDir, { recursive: true });
+        await resize(1920, 1080);
+
+        const seed = 4352026;
+        const slots = ['head', 'back'];
+        const sampleSize = 10;
+        const { items } = JSON.parse(fs.readFileSync(path.resolve('data/rpg/items.json'), 'utf8'));
+        const definitions = Object.entries(items)
+            .map(([id, item]) => ({ id, name: item.name ?? id, slot: item.slot }))
+            .sort((a, b) => a.id.localeCompare(b.id));
+        const select = (initialSeed) => {
+            let state = initialSeed >>> 0;
+            const random = () => {
+                state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+                return state / 0x100000000;
+            };
+            return Object.fromEntries(
+                slots.map((slot) => {
+                    const candidates = definitions.filter((item) => item.slot === slot);
+                    for (let i = candidates.length - 1; i > 0; i--) {
+                        const j = Math.floor(random() * (i + 1));
+                        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+                    }
+                    return [slot, candidates.slice(0, sampleSize)];
+                }),
+            );
+        };
+        const selected = select(seed);
+        const repeated = select(seed);
+        const reproducible = JSON.stringify(selected) === JSON.stringify(repeated);
+        const complete = slots.every((slot) => selected[slot].length === sampleSize);
+        check('JL-435: la misma semilla produce la misma selección', reproducible, `semilla ${seed}`);
+        check(
+            'JL-435: diez tocados y diez capas distintos',
+            complete && slots.every((slot) => new Set(selected[slot].map((item) => item.id)).size === sampleSize),
+            JSON.stringify(Object.fromEntries(slots.map((slot) => [slot, selected[slot].map((item) => item.id)]))),
+        );
+        if (!reproducible || !complete) throw new Error('La selección JL-435 no es completa o reproducible');
+
+        await newGame('QA Tocados Capas', { classId: 'ember_vanguard' });
+        await js(`(()=>{
+          const w=${W},s=${S},v=__game.view,p=w.player,g=w.grid,a=g.center(g.nearestWalkable({x:127,y:130}));
+          s.character.sex='masculino';w.character.level=200;
+          p.pos.x=a.x;p.pos.y=a.y;p.prevPos.x=a.x;p.prevPos.y=a.y;p.path=[];p.speed=0;p.facing=0;p.alive=true;
+          v.rig.mode='manual';v.player.reset();v.player.visualYaw=0;v.player.oneShot=null;v.player.model.root.rotation.y=0;
+          v.player.model.play('idle',{restart:true});v.rig.pitchDeg=14;v.rig.distance=5;v.rig.jumpTo(5);
+          v.scene.meshes.filter(m=>!m.name.startsWith('player:')).forEach(m=>m.isVisible=false);
+          const label=document.createElement('div');label.id='qa-jl435-label';
+          Object.assign(label.style,{position:'fixed',top:'12px',left:'12px',zIndex:'99999',padding:'8px 12px',borderRadius:'6px',color:'#fff',background:'rgba(0,0,0,.8)',font:'16px sans-serif',whiteSpace:'pre-line',pointerEvents:'none'});
+          document.body.append(label);
+        })()`);
+        await until(
+            `__game.view.player.model?.entry?.file==='assets/models/centinela_anime.glb' && __game.view.player.model.meshes.length>0`,
+            30000,
+            'modelo Centinela masculino',
+        );
+        await js('__game.view.player.model.ready?.then(()=>true)');
+
+        const captures = [];
+        for (const slot of slots) {
+            const views =
+                slot === 'head'
+                    ? [
+                          { id: 'frente', yaw: 270 },
+                          { id: 'perfil', yaw: 180 },
+                      ]
+                    : [
+                          { id: 'espalda', yaw: 90 },
+                          { id: 'perfil', yaw: 180 },
+                      ];
+            for (const item of selected[slot]) {
+                const equipped = await js(`(()=>{
+                  const c=${W}.character,s=${S},slot=${JSON.stringify(slot)},id=${JSON.stringify(item.id)};
+                  for(const equipSlot of ['head','back']) if(c.equipment.get(equipSlot)) s.unequip(equipSlot);
+                  for(const entry of c.inventory.slots) if(entry) c.inventory.remove(entry.uid,entry.quantity);
+                  c.level=200;
+                  const left=c.give(id),inventoryItem=c.inventory.slots.find(i=>i?.itemId===id);
+                  if(left||!inventoryItem) return {ok:false,reason:'no se pudo crear',left};
+                  const result=s.equip(inventoryItem.uid);
+                  return {ok:result.ok,reason:result.reason??null,equipped:c.equipment.get(slot)?.itemId??null};
+                })()`);
+                const success = equipped.ok && equipped.equipped === item.id;
+                check(`JL-435 ${item.id}: equipado`, success, JSON.stringify(equipped));
+                if (!success) throw new Error(`No se pudo equipar ${item.id}: ${JSON.stringify(equipped)}`);
+
+                const meshExpression = `__game.view.player.model.meshes.some(m=>m.name.includes(${JSON.stringify(`obj_${item.id}`)})&&m.isEnabled()&&m.isVisible&&m.getTotalVertices()>0)`;
+                await until(meshExpression, 20000, `malla visible ${item.id}`);
+                const meshes = await js(`__game.view.player.model.meshes.filter(m=>m.name.includes(${JSON.stringify(`obj_${item.id}`)})).map(m=>({name:m.name,enabled:m.isEnabled(),visible:m.isVisible,vertices:m.getTotalVertices()}))`);
+
+                for (const view of views) {
+                    await js(`(()=>{
+                      const r=__game.view.rig;r.yawDeg=${view.yaw};r.pitchDeg=14;r.distance=5;r.jumpTo(5);
+                      document.querySelector('#qa-jl435-label').textContent=${JSON.stringify(`${item.name} · ${item.id}\nranura ${slot} · semilla ${seed} · ${view.id}`)};
+                    })()`);
+                    await sleep(350);
+                    const observed = await js(
+                        `(()=>({state:__game.view.player.model.state,file:__game.view.player.model.entry.file,visible:__game.view.player.model.root.isEnabled()}))()`,
+                    );
+                    const valid = observed.state === 'idle' && observed.visible;
+                    check(`JL-435 ${item.id} ${view.id}: modelo visible`, valid, JSON.stringify(observed));
+                    if (!valid) throw new Error(`Vista inválida para ${item.id} ${view.id}: ${JSON.stringify(observed)}`);
+                    const file = `jl435-${slot}-${item.id}-${view.id}`;
+                    await shot(file);
+                    captures.push({
+                        screenshot: `${file}.jpg`,
+                        id: item.id,
+                        name: item.name,
+                        slot,
+                        seed,
+                        hero: 'ember_vanguard',
+                        sex: 'masculino',
+                        view: view.id,
+                        yaw: view.yaw,
+                        meshes,
+                        ...observed,
+                    });
+                }
+            }
+        }
+
+        check('JL-435: 20 piezas capturadas en dos ángulos', captures.length === 40, `${captures.length}/40`);
+        fs.writeFileSync(
+            path.join(outDir, 'capturas.json'),
+            JSON.stringify({ seed, sampleSize, selected, captures }, null, 2),
+        );
+    },
+
     // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
     async espeja() {
         await newGame('QA Espeja');
@@ -15942,6 +16072,8 @@ scenarios.jl328Reposo.timeout = 600;
 scenarios.trajes.timeout = 600;
 // JL-434: seis modelos × ajuar de ocho piezas × tres vistas.
 scenarios.jl434DiablicaEspeja.timeout = 550;
+// JL-435: 20 piezas equipadas × dos ángulos, con la selección fijada por semilla.
+scenarios.jl435TocadosCapas.timeout = 550;
 // JL-330: recorre los 72 arquetipos, carga sus modelos y muestrea hit/death.
 scenarios.jl330Enemigos.timeout = 600;
 scenarios.benchCrowd.timeout = 180;
