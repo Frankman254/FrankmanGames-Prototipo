@@ -386,7 +386,7 @@ export class BonusVsStatusEffect extends Effect {
             critBonus: ctx.critBonus,
             ...(ctx.critRollFor ? { critRoll: ctx.critRollFor(target) } : {}),
         });
-        if (this.def.consume) target.statuses.remove(this.def.statusId);
+        if (this.def.consume) target.statuses.consumeStack(this.def.statusId);
     }
 }
 

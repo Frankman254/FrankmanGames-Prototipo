@@ -106,6 +106,30 @@ describe('HZ-04b: casos límite en combate', () => {
         expect(wetB).toBeGreaterThan(dryB);
     });
 
+    it('bonusVsStatus consume una acumulación y conserva las restantes', () => {
+        const w = arena('storm_weaver', (data) => {
+            data.rpg.statuses['soaked']!.maxStacks = 3;
+            const bonus = data.rpg.spells['warp_tide']!.effects.find((effect) => effect.type === 'bonusVsStatus');
+            if (bonus?.type !== 'bonusVsStatus') throw new Error('warp_tide debe tener bonusVsStatus');
+            bonus.consume = true;
+        });
+        prepareSpells(w.character, 'warp_tide');
+        const target = w.spawnEnemy('melee', { x: 12, y: 10 });
+        still(target);
+        target.health = 1e6;
+        const actor = w.enemyActor(target);
+        const ctx = w.context(w.character, 'test', target.pos, 0);
+        for (let i = 0; i < 3; i++) ctx.applyStatus(actor, w.content.statuses['soaked']!, 30);
+        expect(actor.statuses.get('soaked')?.stacks).toBe(3);
+
+        expect(w.commandCast('warp_tide', aim(16, 10))).toBeNull();
+        const ev = run(w, 1);
+
+        expect(damageOn(ev, target.id)).toBeGreaterThan(0);
+        expect(actor.statuses.get('soaked')?.stacks).toBe(2);
+        expect(actor.statuses.has('soaked')).toBe(true);
+    });
+
     it('selfStack: respeta el `max` del efecto y acumula stacks con duración', () => {
         // HZ-04b-carga: el efecto respeta `max` del efecto (no el del estado) y
         // cada lanzamiento suma 1 stack durante `duration` s.

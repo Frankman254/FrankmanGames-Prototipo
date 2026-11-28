@@ -1758,7 +1758,7 @@ Contexto del coordinador: esta tanda termina lo que quedó a medias, sin abrir f
 
 ### A. Terminar lo parcial
 - [x] JL-424 HZ-04b: lista lo que falta de la fila de `docs/TAREAS.md` frente al código actual (`grep` en `src/rpg/` y `src/sim/`). Haz la primera pieza que no dependa del creador, con su prueba. — commit «JL-424: implementar carga por hechizo HZ-04b» — evidencia: `tests/hz04b_edges.test.ts`, `tests/hz04b_selfStack.test.ts`, `work/junie-jl424/RESULTADO.md` y captura `work/junie-jl424/electron/jl188-ember_vanguard-fiery_slash.jpg`.
-- [ ] JL-425 HZ-04b: segunda pieza pendiente, con su prueba.
+- [x] JL-425 HZ-04b: segunda pieza pendiente, con su prueba. — commit «JL-425: consumir una carga por estado en HZ-04b» — reproducción roja confirmada; `tests/hz04b_edges.test.ts` 6/6, suites HZ-04b 33/33, `npm test` 441 archivos y 5.139 aprobadas; typecheck y `docs:check` limpios. Evidencia: `work/junie-jl425/RESULTADO.md`.
 - [ ] JL-426 HZ-03: de los 18 hechizos que esperan primitivas, lista los que ya se pueden hacer con las primitivas que existen hoy. Solo la lista, con su motivo.
 - [ ] JL-427 D-07: lista los hechizos de la línea nueva sin icono propio en `work/junie-jl427/`. No crees iconos.
 - [ ] JL-428 Revisa las filas «Parcial» de `docs/TAREAS.md` (JL-41…47, JL-59…64, JL-73…108, JL-166…180, JL-254…353). En `work/junie-jl428/PENDIENTES.md`, indica qué subtarea sigue abierta y si es tuya, de OMP o del creador. No ejecutes nada.

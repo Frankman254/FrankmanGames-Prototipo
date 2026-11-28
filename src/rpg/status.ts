@@ -84,6 +84,17 @@ export class StatusSet {
         this.sheet.remove(`status:${id}`);
     }
 
+    consumeStack(id: string): void {
+        const status = this.get(id);
+        if (!status) return;
+        if (status.stacks <= 1) {
+            this.remove(id);
+            return;
+        }
+        status.stacks -= 1;
+        this.syncMods(status);
+    }
+
     clear(): void {
         for (const s of [...this.list]) this.remove(s.def.id);
     }

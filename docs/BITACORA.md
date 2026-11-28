@@ -21,6 +21,18 @@
 
 ---
 
+## 2026-11-28 — JL-425: consumir una carga por estado en HZ-04b (Junie)
+
+**Archivos:** `src/rpg/effects.ts`, `src/rpg/status.ts`, `tests/hz04b_edges.test.ts` y documentación. Evidencia local en `work/junie-jl425/RESULTADO.md`.
+
+**Qué se hizo:** `bonusVsStatus.consume` decía gastar una acumulación, pero eliminaba el estado entero. `StatusSet.consumeStack()` ahora descuenta una sola carga, recalcula los modificadores si quedan cargas y elimina el estado solo al consumir la última. La prueba de integración aplica tres cargas de `soaked`, lanza `warp_tide` con `consume: true` y comprueba que quedan dos; no se cambiaron datos ni cifras.
+
+**Validación:** La reproducción falló antes del arreglo (`undefined` en vez de 2 cargas). Después, `tests/hz04b_edges.test.ts` pasó 6/6, las cuatro suites dirigidas pasaron 33/33, `npx tsc --noEmit` y `npm run typecheck` pasaron, y `npm test` pasó: 441 archivos, 5.139 aprobadas, 1 omitida y 1 `todo`. `npm run docs:check`: 226 rutas; `git diff --check` limpio. El chequeo Prettier de `src/rpg/effects.ts` también falla en `HEAD` previo; no se aplicó un reformateo global. No aplica Electron: no cambió la presentación.
+
+**Evidencia:** `work/junie-jl425/RESULTADO.md`.
+
+---
+
 ## 2026-11-28 — JL-424: implementar carga por hechizo HZ-04b (Junie)
 
 **Archivos:** `src/rpg/effects.ts`, `src/sim/world.ts`, `src/ui/menus/hud.ts`, `scripts/qaElectron.mjs`, pruebas HZ-04b y documentación. Evidencia local en `work/junie-jl424/`.
