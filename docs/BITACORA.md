@@ -1,3 +1,15 @@
+## 2026-11-27 — JL-421: medir FPS de cripta y documentar bloqueo de Chame (Junie)
+
+**Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`; evidencia de medición en `work/junie-jl421/`.
+
+**Qué se hizo:** En Electron a 3600×2160, medí en ventanas asentadas el piso 1 y el piso 50 de la cripta: ambos dieron 120 FPS (lectura redondeada); al entrar dieron 113 y 115 FPS. Revisé las dos capturas y comparé con JL-371 (piso 6: 119,01 FPS con estanque y 119,68 sin estanque), aclarando que son escenas y ventanas distintas. Chame no tiene área jugable (`data/zones.json`: `areas: []`); por eso no inventé una ubicación y marqué JL-421 bloqueada, sin tocar datos ni código.
+
+**Validación:** Escenario Electron `rendimientoHondo`: 2/2 comprobaciones, `consoleErrors: []`; evidencia y capturas revisadas. `npx tsc --noEmit` y `npm run typecheck` limpios; `npm test`: 440 archivos, 5.134 aprobadas, 1 omitida y 1 `todo`; `npm run docs:check`: 223 rutas; `git diff --check` limpio.
+
+**Evidencia:** `work/junie-jl421/FPS.md`, `work/junie-jl421/electron/rendimiento-hondo-jl421.json`, `work/junie-jl421/electron/resultado.json` y capturas de pisos 1 y 50; comparación previa `work/junie-jl371/FPS.md`.
+
+---
+
 ## 2026-11-27 — JL-420: aclarar estados de la tanda en TAREAS (Junie)
 
 **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
